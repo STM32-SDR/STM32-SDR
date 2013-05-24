@@ -139,14 +139,14 @@ int main(void)	{
 		if (Display_Flag ==1)
 			{
 			LCD_DrawFFT();
-			LCD_StringLine(0,130,&LCD_buffer[0]);
+			LCD_StringLine(0,130,(char*)&LCD_buffer[0]);
 
 
 			Check_BT_Flag ();
 			if (BT_Flag ==1)
 			{
 			LCD_StringLine(0,60,"BT  On");
-			LCD_StringLine(0,110,&received_string[0]);
+			LCD_StringLine(0,110, (char*)&received_string[0]);
 
 			//uart_putc( Start);
 			///for (j=0;j<128;j++) {

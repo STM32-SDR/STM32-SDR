@@ -47,9 +47,9 @@ void	Si570_StartUp ( void )		{
  
 void	Output_Frequency ( long Freq_Out )	{
 
-	int Disp4;
-	double Disp5;
-	int Disp6;
+	//int Disp4;
+	//double Disp5;
+	//int Disp6;
 
 
 		if ( Freq_Out < 0 ) Freq_Out	=	-Freq_Out;
@@ -59,9 +59,9 @@ void	Output_Frequency ( long Freq_Out )	{
 		RFREQ	=	( ( double ) Freq_Out ) * HS_DIV * N1 / FXTAL;
 
 	
-		Disp4 = (int)RFREQ;
-		Disp5 = RFREQ - (double)Disp4;
-		Disp6 = (int)(Disp5*10000.0);
+		//Disp4 = (int)RFREQ;
+		//Disp5 = RFREQ - (double)Disp4;
+		//Disp6 = (int)(Disp5*10000.0);
 		//Plot_Integer ( Disp4, 100, 40 );
 		//Plot_Integer ( Disp6, 100, 60 );
 	
@@ -77,10 +77,10 @@ void	Output_Frequency ( long Freq_Out )	{
 
 void	Compute_FXTAL ( void )	{
 
-	double Disp0;
-	int Disp1;
-	double Disp2;
-	int Disp3;
+	//double Disp0;
+	//int Disp1;
+	//double Disp2;
+	//int Disp3;
 
 		Recall_F0 ();
 
@@ -90,10 +90,10 @@ void	Compute_FXTAL ( void )	{
 
 		FXTAL	=	F0 * HS_DIV * N1 / RFREQ;
 	
-		Disp0 = FXTAL/1000000.0;
-		Disp1 = (int)Disp0;
-		Disp2 = Disp0 - (double)Disp1;
-		Disp3 = (int)(Disp2*10000.0);
+		//Disp0 = FXTAL/1000000.0;
+		//Disp1 = (int)Disp0;
+		//Disp2 = Disp0 - (double)Disp1;
+		//Disp3 = (int)(Disp2*10000.0);
 		//Plot_Integer ( Disp1, 100, 0 );
 		//Plot_Integer ( Disp3, 100, 20 );
 		}
@@ -122,7 +122,7 @@ void	Recall_F0 ( void )	{
 
 void	Set_HS_DIV_N1 ( long Freq_long )	{
 
-	long	N1_VALUE, MIN_N1, MAX_N1, FOSC, temp_N1, temp_HS_DIV, temp_FOSC = 0;
+	long	N1_VALUE, MIN_N1, MAX_N1, FOSC, temp_N1 = 0, temp_HS_DIV = 0, temp_FOSC = 0;
 	
 	unsigned char	i,j;
 

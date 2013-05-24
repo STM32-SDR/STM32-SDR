@@ -4821,7 +4821,12 @@ extern "C"
 	#else
 
     /* acc += A1 * x[n-1] + A2 * x[n-2]  */
+// Compiler directives to remove the following warning:
+// "warning: dereferencing type-punned pointer will break strict-aliasing rules [-Wstrict-aliasing]"
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstrict-aliasing"
     acc = __SMLALD(S->A1, (q31_t)__SIMD32(S->state), acc);
+#pragma GCC diagnostic pop
 
 	#endif
 
