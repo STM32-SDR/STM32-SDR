@@ -94,6 +94,9 @@ OPT = -Os
 # Folder for build intermediates:
 OBJDIR = obj
 
+# Required directories:
+DIRS = $(OBJDIR) $(OBJDIR)/src $(OBJDIR)/startup .dep
+
 #
 # End of user defines
 ##############################################################################################
@@ -135,13 +138,17 @@ CPFLAGS += -MD -MP -MF .dep/$(@F).d
 # makefile rules
 #
 
-all: $(OBJS) $(FULL_PRJ).elf  $(FULL_PRJ).hex $(FULL_PRJ).bin
+all: dirs $(OBJS) $(FULL_PRJ).elf  $(FULL_PRJ).hex $(FULL_PRJ).bin
 ifeq ($(RUN_FROM_FLASH), 0)
 	$(TRGT)size $(PROJECT)_ram.elf
 else
 	$(TRGT)size $(PROJECT)_rom.elf
 endif
  
+dirs: ${DIRS}
+${DIRS}:
+	mkdir ${DIRS}
+
 $(OBJDIR)/%.o: %.c
 	$(CC) -c $(CPFLAGS) -I . $(INCDIR) $< -o $@
 
