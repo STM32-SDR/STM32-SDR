@@ -16,8 +16,7 @@
 # Use at your own risk!!!!!
 #
 #	Modified by KB4FXC, 2012/08/23, to use static libraries rather
-#	than library object files. Also, MSWin-style back-slashes were changed to
-#	Unix-style slashes for all paths.
+#	than library object files. 
 #
 ##############################################################################################
 # Start of default section
@@ -66,24 +65,28 @@ UDEFS =
 UADEFS =
  
 # List C source files here
-
-LIBSDIR      = ./externals/SM32F4-Discovery
-CORELIBDIR   = $(LIBSDIR)/CMSIS-Includes
-DEVDIR       = $(LIBSDIR)/STM32F4xx-Includes
-STMSPDDIR    = $(LIBSDIR)/STM32F4xx-StdPeriph-Includes
-LINKER       = ./linker
+# Note: Use \ (or \\ if being processed by a tool) for paths because
+#       Linux tools handle either, but Windows tools (some) only handle \.
+LIBSDIR      = .\externals\SM32F4-Discovery
+CORELIBDIR   = $(LIBSDIR)\CMSIS-Includes
+DEVDIR       = $(LIBSDIR)\STM32F4xx-Includes
+STMSPDDIR    = $(LIBSDIR)\STM32F4xx-StdPeriph-Includes
+LINKER       = .\linker
 
 # Build all .c files in the src/ folder.
-SRC = $(wildcard ./src/*.c)
+# wildcard needs unix forward-slashes, but build tools need wisdows backslashes, 
+# so give wildcard what it likes, and then convert the results using subst function.
+SRC_TMP = $(wildcard ./src/*.c)
+SRC = $(subst /,\,$(SRC_TMP))
 
 # List ASM source files here
-ASRC = ./startup/startup_stm32f4xx.s
+ASRC = .\startup\startup_stm32f4xx.s
  
 # List all user directories here
-UINCDIR = $(DEVDIR) $(CORELIBDIR) $(STMSPDDIR)  ./inc     
+UINCDIR = $(DEVDIR) $(CORELIBDIR) $(STMSPDDIR)  .\inc     
      
 # List the user directory to look for the libraries here
-ULIBDIR = ./externals/libs
+ULIBDIR = .\externals\libs
  
 # List all user libraries here
 ULIBS = -lstm32f4xx_peripherals -lstm32f4xx_math -lm
@@ -95,7 +98,7 @@ OPT = -Os
 OBJDIR = obj
 
 # Required directories:
-DIRS = $(OBJDIR) $(OBJDIR)/src $(OBJDIR)/startup .dep
+DIRS = $(OBJDIR) $(OBJDIR)\src $(OBJDIR)\startup .dep
 
 #
 # End of user defines
@@ -121,8 +124,7 @@ DEFS    = $(DDEFS) $(UDEFS) -DRUN_FROM_FLASH=1
 endif
  
 ADEFS   = $(DADEFS) $(UADEFS)
-##OBJS    = $(ASRC:.s=.o) $(SRC:.c=.o)
-OBJS    = $(patsubst %,$(OBJDIR)/%,$(ASRC:.s=.o)) $(patsubst %,$(OBJDIR)/%,$(SRC:.c=.o))
+OBJS    = $(patsubst %,$(OBJDIR)\\%,$(ASRC:.s=.o)) $(patsubst %,$(OBJDIR)\\%,$(SRC:.c=.o))
 
 LIBS    = $(DLIBS) $(ULIBS)
 MCFLAGS = -mcpu=$(MCU) -mfpu=fpv4-sp-d16 -mfloat-abi=hard
@@ -145,14 +147,14 @@ else
 	$(TRGT)size $(PROJECT)_rom.elf
 endif
  
-dirs: ${DIRS}
-${DIRS}:
-	mkdir ${DIRS}
+dirs: $(DIRS)
+$(DIRS):
+	mkdir $@
 
-$(OBJDIR)/%.o: %.c
+$(OBJDIR)\\%.o: %.c
 	$(CC) -c $(CPFLAGS) -I . $(INCDIR) $< -o $@
 
-$(OBJDIR)/%.o: %.s
+$(OBJDIR)\\%.o: %.s
 	$(AS) -c $(ASFLAGS) $< -o $@
 
 %elf: $(OBJS)
