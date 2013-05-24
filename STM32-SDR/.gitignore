@@ -1,0 +1,7 @@
+/.dep
+/obj
+/STM32-SDR_rom.bin
+/STM32-SDR_rom.elf
+/STM32-SDR_rom.hex
+/STM32-SDR_rom.map
+
