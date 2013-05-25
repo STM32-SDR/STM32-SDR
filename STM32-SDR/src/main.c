@@ -195,7 +195,7 @@ void initializeHardware(void)
 
 void displaySplashScreen(void)
 {
-	LCD_StringLine(200, 100, "STM32 SDR V2.3");
+	LCD_StringLine(200, 100, "STM32 SDR V2.4");
 	LCD_StringLine(200, 80, __DATE__);
 	LCD_StringLine(200, 60, __TIME__);
 	main_delay(5000000);
