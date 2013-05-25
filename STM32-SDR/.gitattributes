@@ -2,3 +2,7 @@
 *.bin binary
 *.elf binary
 *.map binary
+
+# Always use CRLF line endings for .C and .H files.
+*.h text eol=crlf
+*.c text eol=crlf
