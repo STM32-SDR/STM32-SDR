@@ -199,6 +199,9 @@ dump:
 	@echo ASRC: $(ASRC)
 	@echo
 	@echo OBJS: $(OBJS)
+	@echo
+	@echo Your GCC version:
+	$(CC) --version
  
 
 
