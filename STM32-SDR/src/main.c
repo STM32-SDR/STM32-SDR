@@ -36,8 +36,16 @@ int16_t old_SS2_position;
 unsigned char Start = 241;
 unsigned char Stop = 242;
 
+/*
+ * PROTOTYPES
+ */
 void initializeHardware(void);
+void displaySplashScreen(void);
 
+
+/*
+ * FUNCTIONS
+ */
 int main(void)
 {
 
@@ -151,10 +159,7 @@ void initializeHardware(void)
 	uart_init();
 	main_delay(SETUP_DELAY);
 
-	LCD_StringLine(200, 100, "STM32 SDR V1.2");
-	LCD_StringLine(200, 80, __DATE__);
-	LCD_StringLine(200, 60, __TIME__);
-	main_delay(5000000);
+	displaySplashScreen();
 	LCD_Clear(0x0000);
 
 	main_delay(SETUP_DELAY);
@@ -186,6 +191,14 @@ void initializeHardware(void)
 
 	Init_CW_GPIO();
 	main_delay(SETUP_DELAY);
+}
+
+void displaySplashScreen(void)
+{
+	LCD_StringLine(200, 100, "STM32 SDR V1.2");
+	LCD_StringLine(200, 80, __DATE__);
+	LCD_StringLine(200, 60, __TIME__);
+	main_delay(5000000);
 }
 
 void main_delay(int a)

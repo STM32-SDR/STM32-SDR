@@ -202,6 +202,9 @@ dump:
 	@echo
 	@echo Your GCC version:
 	$(CC) --version
+	@echo
+	@echo Your make version:
+	make --version
  
 
 
