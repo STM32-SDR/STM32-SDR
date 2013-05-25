@@ -151,7 +151,7 @@ void initializeHardware(void)
 	uart_init();
 	main_delay(SETUP_DELAY);
 
-	LCD_StringLine(200, 100, "STM32 SDR V1.1");
+	LCD_StringLine(200, 100, "STM32 SDR V1.2");
 	LCD_StringLine(200, 80, __DATE__);
 	LCD_StringLine(200, 60, __TIME__);
 	main_delay(5000000);
