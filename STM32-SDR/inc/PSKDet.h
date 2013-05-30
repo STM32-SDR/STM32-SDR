@@ -17,8 +17,6 @@
 #ifndef PSKDET_H_
 #define PSKDET_H_
 
-
-
 #endif /* PSKDET_H_ */
 
 /* Modified by Milt Cram, W8NUE--June 2006  */
@@ -49,53 +47,53 @@
 
 #include	"arm_math.h"
 
-unsigned char	LCD_buffer [40];
+unsigned char LCD_buffer[40];
 
 //Stuff Imported From NUE_PSK_Header.h
-typedef struct 	{
-    unsigned F0_char		:1;
-    unsigned E0_char		:1;
-    unsigned Shift_key		:1;
-    unsigned Alt_key		:1;
-    unsigned Ctrl_key		:1;
-    unsigned Bailout		:1;
-    unsigned RXTune			:1;
-    unsigned DispFreq		:1;
-    unsigned E1_char		:1;
-    unsigned ProcFFT		:1;
-    unsigned TglRnT			:1;
-    unsigned ProcPSK		:1;
-	unsigned TglTune		:1;
-	unsigned DAV			:1;
-	unsigned Setup			:1;
-	unsigned MacRec			:1;
-	}
-	Flag_type;
+typedef struct
+{
+	unsigned F0_char :1;
+	unsigned E0_char :1;
+	unsigned Shift_key :1;
+	unsigned Alt_key :1;
+	unsigned Ctrl_key :1;
+	unsigned Bailout :1;
+	unsigned RXTune :1;
+	unsigned DispFreq :1;
+	unsigned E1_char :1;
+	unsigned ProcFFT :1;
+	unsigned TglRnT :1;
+	unsigned ProcPSK :1;
+	unsigned TglTune :1;
+	unsigned DAV :1;
+	unsigned Setup :1;
+	unsigned MacRec :1;
+} Flag_type;
 
-	typedef int             fractional;
+typedef int fractional;
 
-	typedef struct {
-			  fractional real;
-			  fractional imag;
-			} fractcomplex;
+typedef struct
+{
+	fractional real;
+	fractional imag;
+} fractcomplex;
 
-	const  int Sine_table [ 4096 ];
+const int Sine_table[4096];
 
-	float Sample_Frequency;
-	Flag_type Flag;
+float Sample_Frequency;
+Flag_type Flag;
 
-
-
-	double NCO_Frequency;
+double NCO_Frequency;
 
 #define PI2 6.2831853071795864765
 #define KCONV 10430.37835              // 		4096*16/PI2
 #define SYMBOL_RATE31 	31.25	/* 31.25 Symbols per Second */
 //barrier
 //Complex number   //
-struct Complex {
-	double	x;	// Real part
-	double	y;	// Imaginary part
+struct Complex
+{
+	double x;	// Real part
+	double y;	// Imaginary part
 };
 
 #define ADC_BUFFER_LENGTH 1024
@@ -103,91 +101,88 @@ struct Complex {
 #define TRUE 1
 #define FALSE 0
 
-
 #define SQMODEFAST 0
 #define SQMODESLOW 1
 
 /* methods */
 
-	struct Complex Samp;
-	struct Complex newsamp;
-	struct Complex sample;
-	struct Complex IQ;
-	void CalcAGC( struct Complex Samp );
-	void DecodeSymb( struct Complex newsamp );
-	void CalcQuality(double angle );
-	int SymbSync( struct Complex sample);
-	void CalcFreqError( struct Complex IQ );
-	void CalcFFreqError( struct Complex IQ );
+struct Complex Samp;
+struct Complex newsamp;
+struct Complex sample;
+struct Complex IQ;
+void CalcAGC(struct Complex Samp);
+void DecodeSymb(struct Complex newsamp);
+void CalcQuality(double angle);
+int SymbSync(struct Complex sample);
+void CalcFreqError(struct Complex IQ);
+void CalcFFreqError(struct Complex IQ);
 /* variables */
-	int m_FastAFCMode;
-	int m_AFCCaptureOn;
-	int m_IMDValid;
-	int m_SQOpen;
-	int m_LastBitZero;
+int m_FastAFCMode;
+int m_AFCCaptureOn;
+int m_IMDValid;
+int m_SQOpen;
+int m_LastBitZero;
 
-	unsigned char m_VaricodeDecTbl[2048];
-	int m_BitAcc;
-	long m_IQPhaseArray[20];
-	long m_SyncArray[20];
-	int m_AFCTimer;
-	int m_AFCmode;
-	int m_PSKmode;
-	int m_SampleClkAdj;
-	int m_IQPhzIndex;
-	int m_SquelchSpeed;
-	int m_SQLevel;
-	int m_SQThresh;
-	int m_ClkErrTimer;
-	int m_ClkErrCounter;
-	int m_ClkError;
-	int m_LastPkPos;
-	int m_OnCount;
-	int m_OffCount;
-	int m_SampCnt;
-	double m_FreqError;
-	double m_DevAve;
-	double m_I0;		/* 4 stage I/Q delay line variables */
-	double m_I1;
-	double m_Q0;
-	double m_Q1;
-	double m_BitPhaseInc;
-	double m_BitPhasePos;
-	double m_SyncAve[21];
-	double m_NCOphzinc;
-	double m_SampleFreq;
-	double m_AFClimit;
-	double m_AFCmax;
-	double m_AFCmin;
-	double m_NLPk;
+unsigned char m_VaricodeDecTbl[2048];
+int m_BitAcc;
+long m_IQPhaseArray[20];
+long m_SyncArray[20];
+int m_AFCTimer;
+int m_AFCmode;
+int m_PSKmode;
+int m_SampleClkAdj;
+int m_IQPhzIndex;
+int m_SquelchSpeed;
+int m_SQLevel;
+int m_SQThresh;
+int m_ClkErrTimer;
+int m_ClkErrCounter;
+int m_ClkError;
+int m_LastPkPos;
+int m_OnCount;
+int m_OffCount;
+int m_SampCnt;
+double m_FreqError;
+double m_DevAve;
+double m_I0; /* 4 stage I/Q delay line variables */
+double m_I1;
+double m_Q0;
+double m_Q1;
+double m_BitPhaseInc;
+double m_BitPhasePos;
+double m_SyncAve[21];
+double m_NCOphzinc;
+double m_SampleFreq;
+double m_AFClimit;
+double m_AFCmax;
+double m_AFCmin;
+double m_NLPk;
 
-	struct Complex m_FreqSignal;
-	struct Complex m_BitSignal;
+struct Complex m_FreqSignal;
+struct Complex m_BitSignal;
 
 /* Local variables for various functions that need to be saved between calls */
-	int	m_PkPos;
-	int	m_NewPkPos;
-	int m_BitPos;
-	int m_Pcnt;
-	int m_Ncnt;
-	double m_AGCave;
-	double m_FperrAve;
-	double m_FferrAve;
-	double m_QFreqError;
-	double m_VcoPhz;
-	struct Complex m_z1;
-	struct Complex m_z2;
+int m_PkPos;
+int m_NewPkPos;
+int m_BitPos;
+int m_Pcnt;
+int m_Ncnt;
+double m_AGCave;
+double m_FperrAve;
+double m_FferrAve;
+double m_QFreqError;
+double m_VcoPhz;
+struct Complex m_z1;
+struct Complex m_z2;
 
-	void InitPSK(int Fs );
-	void ProcPSKDet(void);
-	void ResetModem ( int mode );
-	void ResetDetector(void);
-	void CPSKInitDet( void );
-	void SetRXFrequency(double freq);
+void InitPSK(int Fs);
+void ProcPSKDet(void);
+void ResetModem(int mode);
+void ResetDetector(void);
+void CPSKInitDet(void);
+void SetRXFrequency(double freq);
 
-	void SetAFCLimit(int limit);
-	void SetSampleClkAdj(int ppm);
-
-
+void SetAFCLimit(int limit);
+void SetSampleClkAdj(int ppm);
 
 #endif /* PSK_DET_H_ */

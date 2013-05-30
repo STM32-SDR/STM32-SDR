@@ -11,6 +11,6 @@
 uint8_t BT_Flag;
 void User_Button_Config(void);
 void BT_Flag_Config(void);
-void Check_BT_Flag (void);
+void Check_BT_Flag(void);
 
 #endif /* USER_BUTTON_H_ */

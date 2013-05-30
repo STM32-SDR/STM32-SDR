@@ -8,8 +8,6 @@
 #ifndef PSKMOD_H_
 #define PSKMOD_H_
 
-
-
 #endif /* PSKMOD_H_ */
 /*==================================================================*/
 /* PSKMod.h: interface for the CPSKMod class.			    		*/
@@ -37,27 +35,27 @@
 /* http://www.gnu.org/copyleft/lesser.html			    			*/
 /*==================================================================*/
 
-	int m_Ramp;
-	int m_pTail;
-	int m_pHead;
-	char GetTxChar(void);
-	char XmitBuffer[26];
+int m_Ramp;
+int m_pTail;
+int m_pHead;
+char GetTxChar(void);
+char XmitBuffer[26];
 
 /* PSK31  generator variables */
-	int m_AddEndingZero;
-	uint16_t m_TxShiftReg;
-	double m_SymbolRate;
+int m_AddEndingZero;
+uint16_t m_TxShiftReg;
+double m_SymbolRate;
 
-	float  m_RMSConstant;
-	double m_2PI;
-	float S1, S2;
+float m_RMSConstant;
+double m_2PI;
+float S1, S2;
 
 /* PSK31 modulator private functions */
-	char GetChar(void );
-	char GetNextBPSKSymbol(void);
+char GetChar(void);
+char GetNextBPSKSymbol(void);
 
 /* PSK31 modulator */
 
-	void Update_PSK(void);
-	void InitPSKModulator(void);
+void Update_PSK(void);
+void InitPSKModulator(void);
 

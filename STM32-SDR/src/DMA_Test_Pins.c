@@ -11,16 +11,15 @@
 //This code initializes four outputs to enable testing of the DMA / DSP operation
 //These pins are:
 
-	//PD-12    Used for observing the DMA Interrupt
-	//PD-13   Used for observing the DMA I2S Input Stream Buffer Select
-	//PD-14   Used for observing the DMA I2S Output Stream Buffer Select
-	//PD-15    Used for observing the processing outside the Interrupt handler
+//PD-12    Used for observing the DMA Interrupt
+//PD-13   Used for observing the DMA I2S Input Stream Buffer Select
+//PD-14   Used for observing the DMA I2S Output Stream Buffer Select
+//PD-15    Used for observing the processing outside the Interrupt handler
 
-void TEST_GPIO_Init ( void  )	{
-
-
+void TEST_GPIO_Init(void)
+{
 	//Structure Assignment
-	GPIO_InitTypeDef        GPIO_InitStructure;
+	GPIO_InitTypeDef GPIO_InitStructure;
 
 	//Turn On GPIO Clock
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
@@ -35,5 +34,4 @@ void TEST_GPIO_Init ( void  )	{
 
 	//Init the GPIO Test Pins
 	GPIO_Init(GPIOD, &GPIO_InitStructure);
-
 }

@@ -8,8 +8,6 @@
 #ifndef CHANGEOVER_H_
 #define CHANGEOVER_H_
 
-
-
 #endif /* CHANGEOVER_H_ */
 
 void Receive_Sequence(void);

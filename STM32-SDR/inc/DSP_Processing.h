@@ -19,23 +19,23 @@ void Sideband_Demod(void);
 
 //q15_t FFT_Magnitude[BUFFERSIZE/8];  //1024 sampling
 
-q15_t FFT_Magnitude[BUFFERSIZE/4];  //512 sampling
+q15_t FFT_Magnitude[BUFFERSIZE / 4];  //512 sampling
 
-q15_t FIR_I_In[BUFFERSIZE/2];
+q15_t FIR_I_In[BUFFERSIZE / 2];
 
-q15_t FIR_Q_In[BUFFERSIZE/2];
+q15_t FIR_Q_In[BUFFERSIZE / 2];
 
-q15_t FIR_I_Out[BUFFERSIZE/2];
+q15_t FIR_I_Out[BUFFERSIZE / 2];
 
-q15_t FIR_Q_Out[BUFFERSIZE/2];
+q15_t FIR_Q_Out[BUFFERSIZE / 2];
 
-q15_t USB_Out[BUFFERSIZE/2];
+q15_t USB_Out[BUFFERSIZE / 2];
 
-q15_t LSB_Out[BUFFERSIZE/2];
+q15_t LSB_Out[BUFFERSIZE / 2];
 
 //q15_t   FFT_Input[BUFFERSIZE/4];  //1024 sampling
 
-q15_t   FFT_Input[BUFFERSIZE/2];  //512sampling
+q15_t FFT_Input[BUFFERSIZE / 2];  //512sampling
 
 //chh PSK Filters Arrays
 
@@ -55,9 +55,9 @@ arm_fir_instance_q15 Filter_Q3;
 
 arm_fir_instance_q15 Filter_Q4;
 
-q15_t Filter_delay_I1 [38];
+q15_t Filter_delay_I1[38];
 
-q15_t Filter_delay_I2 [38];
+q15_t Filter_delay_I2[38];
 
 q15_t Filter_delay_Q1[38];
 
@@ -71,8 +71,5 @@ q15_t Filter_delay_I4[65];
 
 q15_t Filter_delay_Q4[65];
 
-q15_t ADC_Buffer[BUFFERSIZE/2];
-
-
-
+q15_t ADC_Buffer[BUFFERSIZE / 2];
 

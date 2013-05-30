@@ -32,9 +32,7 @@
 #define CODEC_I2S_MCK_GPIO             GPIOC
 #define Audio_I2S_IRQHandler           SPI3_IRQHandler
 
+void I2S_GPIO_Init(void);
 
-  void I2S_GPIO_Init(void);
-
-  void Codec_AudioInterface_Init(uint32_t AudioFreq);
-
+void Codec_AudioInterface_Init(uint32_t AudioFreq);
 

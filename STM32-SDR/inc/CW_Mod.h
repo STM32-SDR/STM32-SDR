@@ -8,8 +8,6 @@
 #ifndef CW_MOD_H_
 #define CW_MOD_H_
 
-
-
 #endif /* CW_MOD_H_ */
 
-void Init_CW_GPIO (void);
+void Init_CW_GPIO(void);

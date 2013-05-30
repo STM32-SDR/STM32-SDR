@@ -11,7 +11,6 @@ void Xmit_SSB(void);
 void Xmit_CW(void);
 void Xmit_PSK(void);
 
-
 int16_t DSP_Flag;
 float rgain;
 float R_lgain;
@@ -24,4 +23,4 @@ float CW_Gain;
 int16_t Tx_Flag;
 
 double x_NCOphzinc;
-uint8_t  Key_Down;
+uint8_t Key_Down;

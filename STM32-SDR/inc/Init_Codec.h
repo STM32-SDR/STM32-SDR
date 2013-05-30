@@ -11,12 +11,7 @@
 #define Codec_Pause						1
 
 #define CODEC_RESET_DELAY               0x4FF //Delay for the Codec to be correctly reset
- void Codec_GPIO_Init(void);
- void Codec_Reset(void);
- void Codec_Init(void);
-
-
-
-
-
+void Codec_GPIO_Init(void);
+void Codec_Reset(void);
+void Codec_Init(void);
 

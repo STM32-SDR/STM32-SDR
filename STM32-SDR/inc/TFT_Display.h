@@ -15,16 +15,13 @@
  *      Author: CharleyK
  */
 
-
 #include "stm32f4xx.h"
 
 typedef struct
 {
-  int16_t X;
-  int16_t Y;
-} Point, * pPoint;
-
-
+	int16_t X;
+	int16_t Y;
+} Point, *pPoint;
 
 #define LCD_COLOR_WHITE          0xFFFF
 #define LCD_COLOR_BLACK          0x0000
@@ -80,7 +77,7 @@ void LCD_SetBackColor(__IO uint16_t Color);
 void LCD_Clear(uint16_t Color);
 void LCD_SetCursor(uint16_t Xpos, uint16_t Ypos);
 void LCD_CharSize(__IO uint16_t size);
-void Pixel(int16_t x, int16_t y,int16_t c);
+void Pixel(int16_t x, int16_t y, int16_t c);
 
 void LCD_DrawFFT(void);
 void LCD_PutChar(int16_t PosX, int16_t PosY, char c);
@@ -88,7 +85,8 @@ void LCD_StringLine(uint16_t PosX, uint16_t PosY, char *str);
 void LCD_DrawLine(uint16_t Xpos, uint16_t Ypos, uint16_t Length, uint8_t Direction);
 void LCD_DrawRect(uint16_t Xpos, uint16_t Ypos, uint8_t Height, uint16_t Width);
 void LCD_DrawSquare(uint16_t Xpos, uint16_t Ypos, uint16_t a);
-void LCD_DrawCircle(uint16_t Xpos, uint16_t Ypos, uint16_t Radius);;
+void LCD_DrawCircle(uint16_t Xpos, uint16_t Ypos, uint16_t Radius);
+;
 void LCD_DrawUniLine(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2);
 void LCD_DrawFullRect(uint16_t Xpos, uint16_t Ypos, uint16_t Width, uint16_t Height);
 void LCD_DrawFullCircle(uint16_t Xpos, uint16_t Ypos, uint16_t Radius);
@@ -100,7 +98,6 @@ void LCD_FillPolyLine(pPoint Points, uint16_t PointCount);
 void LCD_SetDisplayWindow(uint8_t Xpos, uint16_t Ypos, uint8_t Height, uint16_t Width);
 void LCD_DrawFullSquare(uint16_t Xpos, uint16_t Ypos, uint16_t a);
 
-
 void LCD_WriteRAM_Prepare(void);
 void LCD_WriteRAM(uint16_t RGB_Code);
 void LCD_WriteReg(uint8_t LCD_Reg, uint16_t LCD_RegValue);
@@ -108,11 +105,10 @@ void LCD_DisplayOn(void);
 void LCD_DisplayOff(void);
 void LCD_BackLight(int procentai);
 
-void Display_ULong ( uint16_t data, uint8_t XL, uint8_t YL);
+void Display_ULong(uint16_t data, uint8_t XL, uint8_t YL);
 
-void Plot_String (  uint8_t *string, uint8_t x, uint8_t y );
-void Plot_Integer ( int16_t number, uint8_t x, uint8_t y );
-void Plot_Freq ( uint32_t number, uint8_t x, uint8_t y );
-
+void Plot_String(uint8_t *string, uint8_t x, uint8_t y);
+void Plot_Integer(int16_t number, uint8_t x, uint8_t y);
+void Plot_Freq(uint32_t number, uint8_t x, uint8_t y);
 
 #endif /* TFT_DISPLAY_H_ */
