@@ -45,8 +45,51 @@ void displaySplashScreen(void);
 /*
  * FUNCTIONS
  */
+
+#if 0
+// Hacking in the USB stuff
+__ALIGN_BEGIN USB_OTG_CORE_HANDLE USB_OTG_Core_dev __ALIGN_END;
+
+__ALIGN_BEGIN USBH_HOST USB_Host __ALIGN_END;
+void hackUsbTogether(void)
+{
+	/* Init Host Library */
+	USBH_Init(
+			&USB_OTG_Core_dev, // Core handle
+#ifdef USE_USB_OTG_FS
+			USB_OTG_FS_CORE_ID,
+#else
+			USB_OTG_HS_CORE_ID, // core ID
+#endif
+			&USB_Host,         // In /main.c (above)
+			&HID_cb,           // In /drv/src/usbh_hid.core.c (class callback)
+			&USR_Callbacks     // In /usbh_usr.c (user callback)
+			);
+
+	STM_EVAL_LEDOff(LED_Blue); // added by "STM32"
+	STM_EVAL_LEDOff(LED_Red);  // added by "STM32"
+	STM_EVAL_LEDOff(LED_Green);  // added by "STM32"
+	STM_EVAL_LEDOff(LED_Orange);  // added by "STM32"
+
+	/* Initialize User Button */
+	STM_EVAL_PBInit(BUTTON_USER, BUTTON_MODE_GPIO);
+
+	while (1) {
+		/* Host Task handler */
+		USBH_Process(&USB_OTG_Core_dev, &USB_Host);
+	}
+
+}
+#else
+void hackUsbTogether(void)
+{
+}
+#endif
+
+
 int main(void)
 {
+	hackUsbTogether();
 
 	initializeHardware();
 

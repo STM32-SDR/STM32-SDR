@@ -59,7 +59,7 @@ PROJECT        = STM32-SDR
 RUN_FROM_FLASH = 1
  
 # List all user C define here, like -D_DEBUG=1
-UDEFS =
+UDEFS = 
  
 # Define ASM defines here
 UADEFS =
@@ -71,6 +71,7 @@ LIBSDIR      = .\externals\SM32F4-Discovery
 CORELIBDIR   = $(LIBSDIR)\CMSIS-Includes
 DEVDIR       = $(LIBSDIR)\STM32F4xx-Includes
 STMSPDDIR    = $(LIBSDIR)\STM32F4xx-StdPeriph-Includes
+USBINCDIR    = $(LIBSDIR)\USB\inc
 LINKER       = .\linker
 
 # Build all .c files in the src/ folder.
@@ -83,7 +84,7 @@ SRC = $(subst /,\,$(SRC_TMP))
 ASRC = .\startup\startup_stm32f4xx.s
  
 # List all user directories here
-UINCDIR = $(DEVDIR) $(CORELIBDIR) $(STMSPDDIR)  .\inc     
+UINCDIR = $(DEVDIR) $(CORELIBDIR) $(STMSPDDIR)  $(USBINCDIR) .\inc     
      
 # List the user directory to look for the libraries here
 ULIBDIR = .\externals\libs
