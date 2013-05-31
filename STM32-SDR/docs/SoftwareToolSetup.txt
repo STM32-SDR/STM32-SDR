@@ -1,0 +1,119 @@
+Software Tool setup for STW32-SDR (Software Defined HAM Radio)
+
+General source for tools install guide:
+	http://hertaville.com/2012/05/28/gcc-arm-toolchain-stm32f0discovery/
+
+GCC Compiler for ARM:
+---------------------
+	https://launchpad.net/gcc-arm-embedded/+download
+	File: gcc-arm-none-eabi-*_*-****q*-*********.exe
+		Use Version 4.6.2 (released 2012-10-31)
+		Version 4.7 does not work (FFT and PSK does not display....)
+
+	Install (IMPORTANT): 
+	********************
+		* Final screen, check:
+		  "Add path to environment variable" so complier can be executed by Make without any configuration.
+
+	Test:
+		* Open a command prompt
+		* Type: 
+			arm-none-eabi-gcc --version
+		  Should show long dump of configuration and build version.
+	
+GnuWin (for Make): 
+------------------
+	http://gnuwin32.sourceforge.net/packages/make.htm
+	- Select the "Setup program" link in the Download section (hard to see).
+
+	File: make-*.**.exe
+		Lastest should work.
+		Charley using 3.81
+
+	Install:
+		* Make need to uninstall conflicting MAKE program, if any.
+		* Add to the path:
+		  - Control panel --> System --> Advanced System Settings
+		  - Advanced tab --> Environment Variables
+		  - Edit the PATH variable under user (top section).
+		  - Append to end:
+			;C:\Program Files (x86)\GnuWin32\bin
+			** DO NOT LEAVE A SPACE BEFORE THE ';'! **
+
+ST-Link (Download to the STM32F4-Discovery board):
+--------------------------------------------------
+	http://www.st.com/web/catalog/tools/FM146/CL1984/SC720/SS1454/PF219866
+	Listed as: "STSW-LINK004 	STM32 ST-LINK utility"
+	File:      STM32 ST-LINK Utility_v2.5.0.exe
+	Windows 8: Disable authenticated driver install 
+		(temporary, requires reboot)
+
+
+Eclipse:
+	http://www.eclipse.org/downloads/
+	File: Eclipse IDE for C/C++ Developers
+
+	Extract the ZIP file anywhere you like.
+	- Create shortcut to desktop of the eclipse.exe file after extraction.
+
+
+GDB Debugging:
+	Directions: http://hertaville.com/2012/09/16/part-3-debugging-openocd-0-6-0/
+
+	Eclipse Update:
+		Install the "C/C++ GDB Hardware Debugging" package for Eclipse
+		(under Mobile and Device Development)
+
+	OpenOCD (http://openocd.sourceforge.net/)
+		Download Binaries: http://www.freddiechopin.info/en/download/category/4-openocd
+		- Currently using 0.7x
+		- Newer versions should work.
+
+		Requires STM Link to be installed for USB drivers
+
+	Installation:
+		- Extract the openocd-X.Y.Z folder anywhere.
+		- Add its bin/ to path: bin/ for 32bit machines; bin-x64 64-bit windows
+			Find 32 vs 64 by running: sysdm.cpl, general tab
+		- Test by opening a command prompt and...
+		  on a 64-bit Machine, enter:
+		      openocd-x64-0.7.0.exe --version 
+		  on a 32-bit Machine, enter:
+		      openocd-0.7.0.exe --version 
+
+	Use:
+		- Launch the GDB server:  (change exe name and path as apporpriate)
+			openocd-x64-0.7.0 -f C:\PathToYourStuff\openocd-0.7.0\scripts\board\stm32f4discovery.cfg
+			openocd-0.7.0 -f C:\PathToYourStuff\openocd-0.7.0\scripts\board\stm32f4discovery.cfg
+		  Ex:
+			openocd-x64-0.7.0 -f E:\Work\DFM\DaveHAMRadio\openocd-0.7.0\scripts\board\stm32f4discovery.cfg
+
+		Should see:
+			Open On-Chip Debugger 0.7.0 (2013-05-05-10:44)
+			Licensed under GNU GPL v2
+			For bug reports, read
+					http://openocd.sourceforge.net/doc/doxygen/bugs.html
+			srst_only separate srst_nogate srst_open_drain connect_deassert_srst
+			Info : This adapter doesn't support configurable speed
+			Info : STLINK v2 JTAG v16 API v2 SWIM v0 VID 0x0483 PID 0x3748
+			Info : Target voltage: 2.856743
+			Info : stm32f4x.cpu: hardware has 6 breakpoints, 4 watchpoints
+
+		Leave the command window open so GDB server executes while trying to debug.
+
+		- Via eclipse, configure the debug settings (as per directions above) and then just debug.
+
+Git Resources:
+----------------------
+My YouTube tutorials (see the Git section):
+http://www.cs.sfu.ca/CourseCentral/276/bfraser/videolist.html
+
+A free book (online) with great explanations of Git. It uses the command line (whereas I propose we use the Eclipse graphical tools), but it's explanations are quite clear. I especially recommend sections 3.1 through 3.5, and 5.1 and 5.2.
+http://git-scm.com/book/en/
+
+Tutorials (step-by-step exercises) for using Eclipse with Git.
+https://docs.google.com/folder/d/0B4F_gjXVrHZVRXkydE0xVFBRRkc1WUpEcXdwQ2I1dw/edit?pli=1&docId=0B4F_gjXVrHZVc015aTNiNmhScktlcDJJTGNZd1NlQQ
+
+Eclipse's plugin that gives us Git support (named EGit) has a pretty good manual:
+http://wiki.eclipse.org/EGit/User_Guide
+Google Docs - Items from this e-mail
