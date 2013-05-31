@@ -294,6 +294,7 @@ uint32_t I2C_WriteEEProm(uint16_t RegisterAddr, uint8_t RegisterValue)
 	uint32_t result = 0;
 
 	/*!< While the bus is busy */
+	Timeout = I2C_SHORT_TIMEOUT;
 	while (I2C_GetFlagStatus(I2C1, I2C_FLAG_BUSY )) {
 		if ((Timeout--) == 0)
 			return 1; //TIMEOUT_UserCallback();

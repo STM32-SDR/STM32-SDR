@@ -55,14 +55,12 @@ int main(void)
 		if (DSP_Flag == 1) {
 			for (j = 0; j < 128; j++) {
 				//Changed for getting right display with SR6.3
-				FFT_Output[j] = (uint8_t) (6
-						* log((float32_t) (FFT_Magnitude[j] + 1)));
+				FFT_Output[j] = (uint8_t) (6 * log((float32_t) (FFT_Magnitude[j] + 1)));
 
 				if (FFT_Output[j] > 64)
 					FFT_Output[j] = 64;
 				FFT_Display[2 * j] = FFT_Output[j];
-				FFT_Display[2 * j + 1] = (FFT_Output[j] + FFT_Output[j + 1])
-				        		/ 2;
+				FFT_Display[2 * j + 1] = (FFT_Output[j] + FFT_Output[j + 1]) / 2;
 			}
 
 			DSP_Flag = 0;

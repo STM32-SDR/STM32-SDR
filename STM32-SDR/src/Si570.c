@@ -94,8 +94,11 @@ void Recall_F0(void)
 	i = I2C_ReadSlave( SI570_Addr, 135);
 	I2C_WriteRegister( SI570_Addr, 135, i | 0x01);	//	Recall NVM Freq
 
-	while (I2C_ReadSlave( SI570_Addr, 135) & 0x01)
-		;
+	uint32_t timeout = 8;
+	while (I2C_ReadSlave( SI570_Addr, 135) & 0x01) {
+		if ((timeout--) == 0)
+			return;
+	}
 }
 
 //===================================================================
