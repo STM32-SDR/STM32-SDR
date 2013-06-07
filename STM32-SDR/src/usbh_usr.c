@@ -26,39 +26,39 @@
  */
 
 /* Includes ------------------------------------------------------------------*/
-//#include "lcd_log.h"
 #include "usbh_usr.h"
-#include "usbh_hid_mouse.h"
 #include "usbh_hid_keybd.h"
+#include "uart.h"
 
-//extern USB_OTG_CORE_HANDLE           USB_OTG_Core_dev;
-/*  Points to the DEVICE_PROP structure of current device */
-/*  The purpose of this register is to speed up the execution */
-
-USBH_Usr_cb_TypeDef USR_Callbacks =
-{
+USBH_Usr_cb_TypeDef USR_Callbacks = {
 		USBH_USR_Init,
 		USBH_USR_DeInit,
 		USBH_USR_DeviceAttached,
 		USBH_USR_ResetDevice,
-		USBH_USR_DeviceDisconnected,
-		USBH_USR_OverCurrentDetected,
-		USBH_USR_DeviceSpeedDetected,
-		USBH_USR_Device_DescAvailable,
-		USBH_USR_DeviceAddressAssigned,
-		USBH_USR_Configuration_DescAvailable,
-		USBH_USR_Manufacturer_String,
-		USBH_USR_Product_String,
-		USBH_USR_SerialNum_String,
-		USBH_USR_EnumerationDone,
-		USBH_USR_UserInput,
-		NULL,
-		USBH_USR_DeviceNotSupported,
-		USBH_USR_UnrecoveredError
+        USBH_USR_DeviceDisconnected,
+        USBH_USR_OverCurrentDetected,
+        USBH_USR_DeviceSpeedDetected,
+        USBH_USR_Device_DescAvailable,
+        USBH_USR_DeviceAddressAssigned,
+        USBH_USR_Configuration_DescAvailable,
+        USBH_USR_Manufacturer_String,
+        USBH_USR_Product_String,
+        USBH_USR_SerialNum_String,
+        USBH_USR_EnumerationDone,
+        USBH_USR_UserInput,
+        NULL,
+        USBH_USR_DeviceNotSupported,
+        USBH_USR_UnrecoveredError
 };
 
 
-
+// Called by other functions when interesting USB events happen.
+// Used for debugging; passed line number of calling method to help debug.
+void USB_debugEvent(int lineNumber)
+{
+	static int usbEventCounter = 0;
+	usbEventCounter++;
+}
 
 /**
  * @brief  USBH_USR_Init
@@ -68,24 +68,7 @@ USBH_Usr_cb_TypeDef USR_Callbacks =
  */
 void USBH_USR_Init(void)
 {
-	static uint8_t startup = 0;
-
-	if(startup == 0 )
-	{
-		startup = 1;
-		/* Configure the LEDs */
-		STM_EVAL_LEDInit(LED_Green);
-		STM_EVAL_LEDInit(LED_Orange);
-		STM_EVAL_LEDInit(LED_Red);
-		STM_EVAL_LEDInit(LED_Blue);
-
-		STM_EVAL_LEDOn(LED_Green);
-		STM_EVAL_LEDOn(LED_Orange);
-		STM_EVAL_LEDOn(LED_Red);
-		STM_EVAL_LEDOn(LED_Blue);
-
-		STM_EVAL_PBInit(BUTTON_USER, BUTTON_MODE_GPIO);
-	}
+	USB_debugEvent(__LINE__);
 }
 
 /**
@@ -95,7 +78,8 @@ void USBH_USR_Init(void)
  * @retval None
  */
 void USBH_USR_DeviceAttached(void)
-{  
+{
+	USB_debugEvent(__LINE__);
 }
 
 /**
@@ -103,8 +87,9 @@ void USBH_USR_DeviceAttached(void)
  * @param  None
  * @retval None
  */
-void USBH_USR_UnrecoveredError (void)
+void USBH_USR_UnrecoveredError(void)
 {
+	USB_debugEvent(__LINE__);
 }
 
 /**
@@ -113,8 +98,9 @@ void USBH_USR_UnrecoveredError (void)
  * @param  None
  * @retval None
  */
-void USBH_USR_DeviceDisconnected (void)
+void USBH_USR_DeviceDisconnected(void)
 {
+	USB_debugEvent(__LINE__);
 }
 
 /**
@@ -126,8 +112,8 @@ void USBH_USR_DeviceDisconnected (void)
 void USBH_USR_ResetDevice(void)
 {
 	/* Users can do their application actions here for the USB-Reset */
+	USB_debugEvent(__LINE__);
 }
-
 
 /**
  * @brief  USBH_USR_DeviceSpeedDetected
@@ -137,6 +123,7 @@ void USBH_USR_ResetDevice(void)
  */
 void USBH_USR_DeviceSpeedDetected(uint8_t DeviceSpeed)
 {
+	USB_debugEvent(__LINE__);
 	//  if(DeviceSpeed == HPRT0_PRTSPD_HIGH_SPEED)
 	//  {
 	////   LCD_UsrLog((void *)MSG_DEV_HIGHSPEED);
@@ -163,6 +150,7 @@ void USBH_USR_DeviceSpeedDetected(uint8_t DeviceSpeed)
  */
 void USBH_USR_Device_DescAvailable(void *DeviceDesc)
 {
+	USB_debugEvent(__LINE__);
 	//  uint8_t temp[50];
 	//  USBH_DevDesc_TypeDef *hs;
 	//  hs = DeviceDesc;
@@ -184,9 +172,8 @@ void USBH_USR_Device_DescAvailable(void *DeviceDesc)
  */
 void USBH_USR_DeviceAddressAssigned(void)
 {
-
+	USB_debugEvent(__LINE__);
 }
-
 
 /**
  * @brief  USBH_USR_Conf_Desc
@@ -194,10 +181,10 @@ void USBH_USR_DeviceAddressAssigned(void)
  * @param  ConfDesc : Configuration descriptor
  * @retval None
  */
-void USBH_USR_Configuration_DescAvailable(USBH_CfgDesc_TypeDef * cfgDesc,
-		USBH_InterfaceDesc_TypeDef *itfDesc,
-		USBH_EpDesc_TypeDef *epDesc)
+void USBH_USR_Configuration_DescAvailable(USBH_CfgDesc_TypeDef * cfgDesc, USBH_InterfaceDesc_TypeDef *itfDesc,
+        USBH_EpDesc_TypeDef *epDesc)
 {
+	USB_debugEvent(__LINE__);
 	//  USBH_InterfaceDesc_TypeDef *id;
 	//
 	//  id = itfDesc;
@@ -220,6 +207,7 @@ void USBH_USR_Configuration_DescAvailable(USBH_CfgDesc_TypeDef * cfgDesc,
  */
 void USBH_USR_Manufacturer_String(void *ManufacturerString)
 {
+	USB_debugEvent(__LINE__);
 }
 
 /**
@@ -230,6 +218,7 @@ void USBH_USR_Manufacturer_String(void *ManufacturerString)
  */
 void USBH_USR_Product_String(void *ProductString)
 {
+	USB_debugEvent(__LINE__);
 }
 
 /**
@@ -240,7 +229,8 @@ void USBH_USR_Product_String(void *ProductString)
  */
 void USBH_USR_SerialNum_String(void *SerialNumString)
 {
-} 
+	USB_debugEvent(__LINE__);
+}
 
 /**
  * @brief  EnumerationDone
@@ -251,7 +241,8 @@ void USBH_USR_SerialNum_String(void *SerialNumString)
  */
 void USBH_USR_EnumerationDone(void)
 {
-} 
+	USB_debugEvent(__LINE__);
+}
 
 /**
  * @brief  USBH_USR_DeviceNotSupported
@@ -261,8 +252,8 @@ void USBH_USR_EnumerationDone(void)
  */
 void USBH_USR_DeviceNotSupported(void)
 {
-}  
-
+	USB_debugEvent(__LINE__);
+}
 
 /**
  * @brief  USBH_USR_UserInput
@@ -272,12 +263,13 @@ void USBH_USR_DeviceNotSupported(void)
  */
 USBH_USR_Status USBH_USR_UserInput(void)
 {
+	USB_debugEvent(__LINE__);
 
 	USBH_USR_Status usbh_usr_status;
 
 	usbh_usr_status = USBH_USR_NO_RESP;
 
-	STM_EVAL_LEDOn(LED_Blue); // added by "STM32"
+	//STM_EVAL_LEDOn(LED_Blue); // added by "STM32"
 
 	// commented by "STM32"
 	//  /*Key B3 is in polling mode to detect user action */
@@ -288,10 +280,9 @@ USBH_USR_Status USBH_USR_UserInput(void)
 
 	//  }
 
-
 	return usbh_usr_status;
 
-} 
+}
 
 /**
  * @brief  USBH_USR_OverCurrentDetected
@@ -299,31 +290,11 @@ USBH_USR_Status USBH_USR_UserInput(void)
  * @param  None
  * @retval None
  */
-void USBH_USR_OverCurrentDetected (void)
+void USBH_USR_OverCurrentDetected(void)
 {
+	USB_debugEvent(__LINE__);
 	//   LCD_ErrLog ("Overcurrent detected.\n");
 
-}
-
-/**
- * @brief  USR_MOUSE_Init
- *         Init Mouse window
- * @param  None
- * @retval None
- */
-void USR_MOUSE_Init	(void)
-{
-
-}
-
-/**
- * @brief  USR_MOUSE_ProcessData
- *         Process Mouse data
- * @param  data : Mouse data to be displayed
- * @retval None
- */
-void USR_MOUSE_ProcessData(HID_MOUSE_Data_TypeDef *data)
-{
 }
 
 /**
@@ -332,10 +303,10 @@ void USR_MOUSE_ProcessData(HID_MOUSE_Data_TypeDef *data)
  * @param  None
  * @retval None
  */
-void  USR_KEYBRD_Init (void)
+void USR_KEYBRD_Init(void)
 {
+	USB_debugEvent(__LINE__);
 }
-
 
 /**
  * @brief  USR_KEYBRD_ProcessData
@@ -343,11 +314,14 @@ void  USR_KEYBRD_Init (void)
  * @param  data : Keyboard data to be displayed
  * @retval None
  */
-void  USR_KEYBRD_ProcessData (uint8_t data)
+void USR_KEYBRD_ProcessData(uint8_t data)
 {
-	// TODO: Handle the character.
-	STM_EVAL_LEDToggle(LED_Green);  // added by "STM32"
+	USB_debugEvent(__LINE__);
 
+	// Skip control characters like enter, bell, escape..
+	if (data >= ' ') {
+		uart_addRxCharacter(data);
+	}
 }
 
 /**
@@ -358,6 +332,7 @@ void  USR_KEYBRD_ProcessData (uint8_t data)
  */
 void USBH_USR_DeInit(void)
 {
+	USB_debugEvent(__LINE__);
 }
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

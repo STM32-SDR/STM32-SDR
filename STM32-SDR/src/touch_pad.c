@@ -19,7 +19,6 @@
 #include "Encoder_1.h"
 #include "Encoder_2.h"
 #include "eeprom.h"
-#include "main.h"
 #include "DMA_IRQ_Handler.h"
 #include "ChangeOver.h"
 #include "ModeSelect.h"

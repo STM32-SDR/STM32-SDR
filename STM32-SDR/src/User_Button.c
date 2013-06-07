@@ -80,7 +80,7 @@ void BT_Flag_Config(void)
 
 void Check_BT_Flag(void)
 {
-	BT_Flag = GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_10 );
+	BT_Flag = GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_10);
 }
 
 //===============================================================================

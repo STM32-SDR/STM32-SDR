@@ -77,7 +77,7 @@ LINKER       = .\linker
 # Build all .c files in the src/ folder.
 # wildcard needs unix forward-slashes, but build tools need wisdows backslashes, 
 # so give wildcard what it likes, and then convert the results using subst function.
-SRC_TMP = $(wildcard ./src/*.c)
+SRC_TMP = $(wildcard ./src/*.c) $(wildcard ./externals/SM32F4-Discovery/USB/src/*.c)
 SRC = $(subst /,\,$(SRC_TMP))
 
 # List ASM source files here
@@ -99,7 +99,7 @@ OPT = -Os
 OBJDIR = obj
 
 # Required directories:
-DIRS = $(OBJDIR) $(OBJDIR)\src $(OBJDIR)\startup .dep
+DIRS = $(OBJDIR) $(OBJDIR)\src $(OBJDIR)\externals $(OBJDIR)\externals\SM32F4-Discovery $(OBJDIR)\externals\SM32F4-Discovery\USB $(OBJDIR)\externals\SM32F4-Discovery\USB\src $(OBJDIR)\startup .dep
 
 #
 # End of user defines

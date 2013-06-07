@@ -30,4 +30,7 @@ void uart_putc(unsigned char c);
 //void LogicAnalyzerTirggerConfig(void);
 //void LogicAnalyzerTirgger(uint8_t t);
 
-volatile char received_string[40];
+void uart_addRxCharacter(char c);
+
+#define UART_RX_BUFF_LEN 40
+extern volatile char received_string[UART_RX_BUFF_LEN];

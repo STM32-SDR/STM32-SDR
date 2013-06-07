@@ -11,7 +11,6 @@
 #include	"stm32f4xx_fsmc.h"
 #include	"stm32f4xx_tim.h"
 #include	"AsciiLib.h"
-#include	"main.h"
 #include	"touch_pad.h"
 #include 	"PSKDet.h"
 #define LCD_REG      (*((volatile unsigned short *) 0x60000000))
@@ -20,8 +19,9 @@
 #define POLY_Y(Z)          ((int32_t)((Points + Z)->X))
 #define POLY_X(Z)          ((int32_t)((Points + Z)->Y))
 #define ABS(X)  ((X) > 0 ? (X) : -(X))
-/* Global variables to set the written text color */__IO uint16_t TextColor =
-		0x0000;
+
+/* Global variables to set the written text color */
+__IO uint16_t TextColor = 0x0000;
 __IO uint16_t BackColor = 0xFFFF;
 __IO uint16_t asciisize = 16;
 
@@ -361,7 +361,9 @@ void LCD_StringLine(uint16_t PosX, uint16_t PosY, char *str)
 	} while (*str != 0);
 }
 
-void LCD_DrawFFT(void)
+// Display the FFT data to the screen.
+// Expect fftData[] to be an array of 256 ints.
+void LCD_DrawFFT(uint8_t fftData[])
 {
 	uint32_t i;
 	uint32_t j;
@@ -373,22 +375,19 @@ void LCD_DrawFFT(void)
 		if (i != temp) {
 
 			for (j = 0; j < 64; j++) {
-				if (j < FFT_Display[i + 8])
+				if (j < fftData[i + 8])
 					Pixel(i + 40, 175 + j, BLUE);
 				else
 					Pixel(i + 40, 175 + j, WHITE);
-
 			}
 		}
-
 	}
 
 	for (j = 0; j < 60; j++)
 		Pixel((int) temp + 40, 179 + j, RED);
 }
 
-void LCD_DrawLine(uint16_t Xpos, uint16_t Ypos, uint16_t Length,
-		uint8_t Direction)
+void LCD_DrawLine(uint16_t Xpos, uint16_t Ypos, uint16_t Length, uint8_t Direction)
 {
 	uint32_t i = 0;
 
@@ -938,12 +937,11 @@ void TFT_Delay(uint32_t nTime)
 
 void Plot_String(uint8_t *string, uint8_t x, uint8_t y)
 {
+	const int CHARACTER_WIDTH = 8;
+
 	while (*string) {
-
 		LCD_PutChar(x, y, *string++);
-
-		x += 8;
-
+		x += CHARACTER_WIDTH;
 	}
 }
 
@@ -952,22 +950,17 @@ void Plot_Integer(int16_t number, uint8_t x, uint8_t y)
 	uint8_t buffer[11] = "         0", index = 9, sign = 0;
 	//   "0123456,789"
 	if (number < 0) {
-
 		number = -number;
-
 		sign = 1;
-
 	}
 
 	while (number > 0) {
 
 		buffer[index--] = number % 10 + 0x30;
-
 		number /= 10;
 
 		if ((index == 6 || index == 2) && number > 0)
 			buffer[index--] = ',';
-
 	}
 
 	if (sign == 1)
@@ -975,7 +968,6 @@ void Plot_Integer(int16_t number, uint8_t x, uint8_t y)
 
 	//Plot_String ( buffer, x, y );
 	LCD_StringLine(x, y, (char*) &buffer[0]);
-
 }
 
 void Plot_Freq(uint32_t number, uint8_t x, uint8_t y)
@@ -995,5 +987,4 @@ void Plot_Freq(uint32_t number, uint8_t x, uint8_t y)
 	}
 	LCD_StringLine(x, y, (char*) &buffer[0]);
 	//Plot_String ( buffer, x, y );
-
 }

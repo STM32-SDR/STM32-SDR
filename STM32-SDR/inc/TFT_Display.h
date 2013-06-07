@@ -79,14 +79,14 @@ void LCD_SetCursor(uint16_t Xpos, uint16_t Ypos);
 void LCD_CharSize(__IO uint16_t size);
 void Pixel(int16_t x, int16_t y, int16_t c);
 
-void LCD_DrawFFT(void);
+void LCD_DrawFFT(uint8_t fftData[]);
 void LCD_PutChar(int16_t PosX, int16_t PosY, char c);
 void LCD_StringLine(uint16_t PosX, uint16_t PosY, char *str);
 void LCD_DrawLine(uint16_t Xpos, uint16_t Ypos, uint16_t Length, uint8_t Direction);
 void LCD_DrawRect(uint16_t Xpos, uint16_t Ypos, uint8_t Height, uint16_t Width);
 void LCD_DrawSquare(uint16_t Xpos, uint16_t Ypos, uint16_t a);
 void LCD_DrawCircle(uint16_t Xpos, uint16_t Ypos, uint16_t Radius);
-;
+
 void LCD_DrawUniLine(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2);
 void LCD_DrawFullRect(uint16_t Xpos, uint16_t Ypos, uint16_t Width, uint16_t Height);
 void LCD_DrawFullCircle(uint16_t Xpos, uint16_t Ypos, uint16_t Radius);

@@ -24,6 +24,13 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_it.h"
 
+#include "usb_bsp.h"
+#include "usb_hcd_int.h"
+#include "usbh_core.h"
+#include "stm32f4xx_conf.h"
+#include "stm32fxxx_it.h"
+
+
 /** @addtogroup STM32F4_Discovery_Peripheral_Examples
  * @{
  */
@@ -155,15 +162,9 @@ void SysTick_Handler(void)
 
 // ------------------------------------------------------------------------------
 // USB Changes:
-#if 0
-#include "usb_bsp.h"
-#include "usb_hcd_int.h"
-#include "usbh_core.h"
-#include "stm32f4xx_conf.h"
-#include "stm32fxxx_it.h"
 
-extern USB_OTG_CORE_HANDLE          USB_OTG_Core_dev;
-extern USBH_HOST                    USB_Host;
+extern USB_OTG_CORE_HANDLE          USB_OTG_Core_dev;   // Defined in main.h (likely)
+extern USBH_HOST                    USB_Host;           // Defined in main.h (likely)
 extern void USB_OTG_BSP_TimerIRQ (void);
 
 /**
@@ -207,7 +208,6 @@ void OTG_HS_IRQHandler(void)
 {
   USBH_OTG_ISR_Handler(&USB_OTG_Core_dev);
 }
-#endif
 
 // ------------------------------------------------------------------------------
 /**

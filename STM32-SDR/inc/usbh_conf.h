@@ -29,69 +29,11 @@
 #ifndef __USBH_CONF__H__
 #define __USBH_CONF__H__
 
-/* Includes ------------------------------------------------------------------*/
-
-/** @addtogroup USBH_OTG_DRIVER
-  * @{
-  */
-  
-/** @defgroup USBH_CONF
-  * @brief usb otg low level driver configuration file
-  * @{
-  */ 
-
-/** @defgroup USBH_CONF_Exported_Defines
-  * @{
-  */ 
 
 #define USBH_MAX_NUM_ENDPOINTS                2
 #define USBH_MAX_NUM_INTERFACES               2
 #define USBH_MSC_MPS_SIZE                 0x200
 
-/**
-  * @}
-  */ 
-
-
-/** @defgroup USBH_CONF_Exported_Types
-  * @{
-  */ 
-/**
-  * @}
-  */ 
-
-
-/** @defgroup USBH_CONF_Exported_Macros
-  * @{
-  */ 
-/**
-  * @}
-  */ 
-
-/** @defgroup USBH_CONF_Exported_Variables
-  * @{
-  */ 
-/**
-  * @}
-  */ 
-
-/** @defgroup USBH_CONF_Exported_FunctionsPrototype
-  * @{
-  */ 
-/**
-  * @}
-  */ 
-
-
 #endif //__USBH_CONF__H__
-
-
-/**
-  * @}
-  */ 
-
-/**
-  * @}
-  */ 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
 
