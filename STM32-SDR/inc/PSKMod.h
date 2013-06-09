@@ -35,11 +35,8 @@
 /* http://www.gnu.org/copyleft/lesser.html			    			*/
 /*==================================================================*/
 
-int m_Ramp;
-int m_pTail;
-int m_pHead;
+
 char GetTxChar(void);
-char XmitBuffer[26];
 
 /* PSK31  generator variables */
 int m_AddEndingZero;
@@ -58,4 +55,9 @@ char GetNextBPSKSymbol(void);
 
 void Update_PSK(void);
 void InitPSKModulator(void);
+
+// Support for transmitting characters and the Tx buffer
+_Bool PSK_addCharToTx(char newChar);
+_Bool PSK_isQueueFull(void);
+_Bool PSK_isQueueEmpty(void);
 

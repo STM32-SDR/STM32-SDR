@@ -350,7 +350,6 @@ void LCD_StringLine(uint16_t PosX, uint16_t PosY, char *str)
 		}
 
 		else if (PosY < 224) {
-
 			PosX = 0;
 			PosY += 16;
 		}
@@ -678,21 +677,16 @@ void LCD_FSMCConfig(void)
 	FSMC_NORSRAMInitStructure.FSMC_DataAddressMux = FSMC_DataAddressMux_Disable;
 	FSMC_NORSRAMInitStructure.FSMC_MemoryType = FSMC_MemoryType_SRAM;
 	FSMC_NORSRAMInitStructure.FSMC_MemoryDataWidth = FSMC_MemoryDataWidth_16b;
-	FSMC_NORSRAMInitStructure.FSMC_BurstAccessMode =
-			FSMC_BurstAccessMode_Disable;
-	FSMC_NORSRAMInitStructure.FSMC_WaitSignalPolarity =
-			FSMC_WaitSignalPolarity_Low;
+	FSMC_NORSRAMInitStructure.FSMC_BurstAccessMode = FSMC_BurstAccessMode_Disable;
+	FSMC_NORSRAMInitStructure.FSMC_WaitSignalPolarity = FSMC_WaitSignalPolarity_Low;
 	FSMC_NORSRAMInitStructure.FSMC_WrapMode = FSMC_WrapMode_Disable;
-	FSMC_NORSRAMInitStructure.FSMC_WaitSignalActive =
-			FSMC_WaitSignalActive_BeforeWaitState;
+	FSMC_NORSRAMInitStructure.FSMC_WaitSignalActive = FSMC_WaitSignalActive_BeforeWaitState;
 	FSMC_NORSRAMInitStructure.FSMC_WriteOperation = FSMC_WriteOperation_Enable;
 	FSMC_NORSRAMInitStructure.FSMC_WaitSignal = FSMC_WaitSignal_Disable;
-	FSMC_NORSRAMInitStructure.FSMC_AsynchronousWait =
-			FSMC_AsynchronousWait_Disable;
+	FSMC_NORSRAMInitStructure.FSMC_AsynchronousWait = FSMC_AsynchronousWait_Disable;
 	FSMC_NORSRAMInitStructure.FSMC_ExtendedMode = FSMC_ExtendedMode_Disable;
 	FSMC_NORSRAMInitStructure.FSMC_WriteBurst = FSMC_WriteBurst_Enable; //disable
-	FSMC_NORSRAMInitStructure.FSMC_ReadWriteTimingStruct =
-			&FSMC_NORSRAMTimingInitStructure;
+	FSMC_NORSRAMInitStructure.FSMC_ReadWriteTimingStruct = &FSMC_NORSRAMTimingInitStructure;
 
 	FSMC_NORSRAMInit(&FSMC_NORSRAMInitStructure);
 	FSMC_NORSRAMTimingInitStructure.FSMC_AddressSetupTime = 0;    //0
@@ -702,8 +696,7 @@ void LCD_FSMCConfig(void)
 	FSMC_NORSRAMTimingInitStructure.FSMC_CLKDivision = 1;	//1
 	FSMC_NORSRAMTimingInitStructure.FSMC_DataLatency = 0;
 	FSMC_NORSRAMTimingInitStructure.FSMC_AccessMode = FSMC_AccessMode_A;
-	FSMC_NORSRAMInitStructure.FSMC_WriteTimingStruct =
-			&FSMC_NORSRAMTimingInitStructure;
+	FSMC_NORSRAMInitStructure.FSMC_WriteTimingStruct = &FSMC_NORSRAMTimingInitStructure;
 	FSMC_NORSRAMInit(&FSMC_NORSRAMInitStructure);
 
 	FSMC_NORSRAMCmd(FSMC_Bank1_NORSRAM1, ENABLE);
@@ -767,8 +760,7 @@ void LCD_ClosedPolyLineRelative(pPoint Points, uint16_t PointCount)
 void LCD_FillPolyLine(pPoint Points, uint16_t PointCount)
 {
 	/*  public-domain code by Darel Rex Finley, 2007 */
-	uint16_t nodes = 0, nodeX[MAX_POLY_CORNERS], pixelX = 0, pixelY = 0, i = 0,
-			j = 0, swap = 0;
+	uint16_t nodes = 0, nodeX[MAX_POLY_CORNERS], pixelX = 0, pixelY = 0, i = 0, j = 0, swap = 0;
 	uint16_t IMAGE_LEFT = 0, IMAGE_RIGHT = 0, IMAGE_TOP = 0, IMAGE_BOTTOM = 0;
 
 	IMAGE_LEFT = IMAGE_RIGHT = Points->X;
@@ -802,8 +794,8 @@ void LCD_FillPolyLine(pPoint Points, uint16_t PointCount)
 
 		for (i = 0; i < PointCount; i++) {
 			if (((POLY_Y(i) < (double) pixelY) && (POLY_Y(j) >= (double) pixelY))
-					|| ((POLY_Y(j) < (double) pixelY)
-							&& (POLY_Y(i) >= (double) pixelY))) {
+					|| ((POLY_Y(j) < (double) pixelY) && (POLY_Y(i) >= (double) pixelY)))
+			{
 				nodeX[nodes++] = (int) (POLY_X(i)
 						+ ((pixelY - POLY_Y(i) )*(POLY_X(j)-POLY_X(i)))/(POLY_Y(j)-POLY_Y(i)));
 			}
@@ -955,7 +947,6 @@ void Plot_Integer(int16_t number, uint8_t x, uint8_t y)
 	}
 
 	while (number > 0) {
-
 		buffer[index--] = number % 10 + 0x30;
 		number /= 10;
 
@@ -970,21 +961,50 @@ void Plot_Integer(int16_t number, uint8_t x, uint8_t y)
 	LCD_StringLine(x, y, (char*) &buffer[0]);
 }
 
-void Plot_Freq(uint32_t number, uint8_t x, uint8_t y)
+
+#define BUFF_SIZE   11
+#define DECIMAL_IDX 6
+void writeNumberToBuffer(uint32_t number, char buffer[])
 {
-	uint8_t buffer[11] = "         0", index = 9;
-	//   "0123456789"
-
+	int index = BUFF_SIZE - 2; // -2 = 0 indexed & room for \0.
 	while (number > 0) {
-
-		buffer[index--] = number % 10 + 0x30;
-
+		buffer[index--] = number % 10 + '0';
 		number /= 10;
 
-		if (index == 6)
+		if (index == DECIMAL_IDX)
 			buffer[index--] = '.';
-
 	}
-	LCD_StringLine(x, y, (char*) &buffer[0]);
-	//Plot_String ( buffer, x, y );
+}
+
+// Return the number of characters to highlight in the frequency display
+// based on how the frequency number will change as the dial spins.
+int numCharChangingByDial(int changeRate) {
+	int colourChangeIdx = BUFF_SIZE - 2; // -2 = 0 indexed & room for \0.
+	int fUnitCopy = changeRate;
+	while (fUnitCopy > 1) {
+		fUnitCopy /= 10;
+		colourChangeIdx--;
+	}
+	if (colourChangeIdx > DECIMAL_IDX) {
+		colourChangeIdx++;
+	}
+	return colourChangeIdx;
+}
+
+void Plot_Freq(uint32_t number, uint8_t x, uint8_t y, uint32_t changeRate)
+{
+	char buffer[BUFF_SIZE] = "         0";
+	writeNumberToBuffer(number, buffer);
+
+	// Display the whole number (in black):
+	LCD_SetTextColor(BLACK);
+	LCD_StringLine(x, y, buffer);
+
+	// Now display the part of the number changing
+	buffer[numCharChangingByDial(changeRate)] = 0;
+	LCD_SetTextColor(BLUE);
+	LCD_StringLine(x, y, buffer);
+
+	// Reset color to black for next text write.
+	LCD_SetTextColor(BLACK);
 }

@@ -75,7 +75,6 @@ int main(void)
 			Check_BT_Flag();
 			if (BT_Flag == 1) {
 				LCD_StringLine(0, 60, "BT  On");
-				LCD_StringLine(0, 110, (char*) &received_string[0]);
 
 				//uart_putc( Start);
 				///for (j=0;j<128;j++) {
@@ -86,8 +85,12 @@ int main(void)
 			}
 			else
 				LCD_StringLine(0, 60, "BT OFF");
+
+			// Display text
+			LCD_StringLine(0, 110, (char*) &received_string[0]);
 		}
 
+		// Process selector switch 1 (has it moved?)
 		check_SS1();
 		if (read_SS1 != old_SS1_position) {
 			process_SS1();
@@ -96,6 +99,7 @@ int main(void)
 		if (SI570_Chk != 3)
 			process_encoder1();
 
+		// Process selector switch 2 (has it moved?)
 		check_SS2();
 		if (read_SS2 != old_SS2_position) {
 			process_SS2();

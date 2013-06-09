@@ -447,6 +447,7 @@ void GetTouchPoint(void)
 	X_Raw = screen.x;
 	Y_Raw = screen.y;
 
+	// TODO: What are these magic numbers?
 	X_Point = (int) ((float) (3873 - X_Raw) / 11.11);
 	Y_Point = (int) (((float) (Y_Raw - 212) / 15.13));
 
@@ -473,6 +474,9 @@ void GetTouchPoint(void)
 			Decrease_Step();
 			TouchCount = 0;
 		} // end Decrease Step
+
+		// Redraw the frequency to update colors.
+		redrawFrequencyOnScreen();
 	}  //End of Frequency Step
 
 	if ((X_Point > 320) && (Y_Point < 48)) {  //Store Default Freq & IQ
@@ -492,13 +496,13 @@ void GetTouchPoint(void)
 	if ((X_Point > 320) && (Y_Point > 192)) {  //TX Selection
 
 		switch (Mode) {
-		case 0:
+		case MODE_SSB:
 			Xmit_SSB_Sequence();
 			break;
-		case 1:
+		case MODE_CW:
 			Xmit_CW_Sequence();
 			break;
-		case 2:
+		case MODE_PSK:
 			Xmit_PSK_Sequence();
 			break;
 		}  // End of switch
@@ -506,26 +510,28 @@ void GetTouchPoint(void)
 		LCD_StringLine(296, 220, "TX");
 	}
 
-	if ((X_Point > 320) && (Y_Point > 144) && (Y_Point < 192)) {  //RX Selection
+	// RX Selection
+	if ((X_Point > 320) && (Y_Point > 144) && (Y_Point < 192)) {
 		Receive_Sequence();
 		//Tx_Flag=0;
 		LCD_StringLine(296, 220, "RX");
 	}
 
-	if ((X_Point > 88) && (X_Point < 128) && (Y_Point < 20) && (Tx_Flag == 0)) { //SSB Mode Selection
-		Mode = 0;
+	// SSB Mode Selection
+	if ((X_Point > 88) && (X_Point < 128) && (Y_Point < 20) && (Tx_Flag == 0)) {
+		Mode = MODE_SSB;
 		Set_Mode_Display();
 	}
 
-	if ((X_Point > 144) && (X_Point < 176) && (Y_Point < 20)
-			&& (Tx_Flag == 0)) {  //CW Mode Selection
-		Mode = 1;
+	// CW Mode Selection
+	if ((X_Point > 144) && (X_Point < 176) && (Y_Point < 20) && (Tx_Flag == 0)) {
+		Mode = MODE_CW;
 		Set_Mode_Display();
 	}
 
-	if ((X_Point > 188) && (X_Point < 228) && (Y_Point < 20)
-			&& (Tx_Flag == 0)) {  //PSK Mode Selection
-		Mode = 2;
+	// PSK Mode Selection
+	if ((X_Point > 188) && (X_Point < 228) && (Y_Point < 20) && (Tx_Flag == 0)) {
+		Mode = MODE_PSK;
 		Set_Mode_Display();
 	}
 

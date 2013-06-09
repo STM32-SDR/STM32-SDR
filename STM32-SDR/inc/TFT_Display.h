@@ -109,6 +109,6 @@ void Display_ULong(uint16_t data, uint8_t XL, uint8_t YL);
 
 void Plot_String(uint8_t *string, uint8_t x, uint8_t y);
 void Plot_Integer(int16_t number, uint8_t x, uint8_t y);
-void Plot_Freq(uint32_t number, uint8_t x, uint8_t y);
+void Plot_Freq(uint32_t number, uint8_t x, uint8_t y, uint32_t changeRate);
 
 #endif /* TFT_DISPLAY_H_ */

@@ -10,6 +10,7 @@
 
 #endif /* ENCODER_1_H_ */
 
+void redrawFrequencyOnScreen(void);
 void init_encoder1(void);
 void Encoder1_GPIO_Config(void);
 void process_encoder1(void);
@@ -21,7 +22,6 @@ void Increase_Step(void);
 
 int16_t read_SS1;
 uint8_t F_Mult;
-uint32_t F_Unit;
 
 uint32_t Freq_Disp;
 uint32_t Freq_Set[16];

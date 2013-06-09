@@ -209,11 +209,9 @@ void init_encoder2(void)
 
 void process_encoder2(void)
 {
-
 	// encoder motion has been detected--determine direction
 	static uint8_t old = { 0 };
-	static int8_t enc_states[] = { 0, 1, -1, 0, -1, 0, 0, 1, 1, 0, 0, -1, 0, -1,
-			1, 0 };
+	static int8_t enc_states[] = { 0, 1, -1, 0, -1, 0, 0, 1, 1, 0, 0, -1, 0, -1, 1, 0 };
 	int8_t tempDIR;
 	static int8_t DIR0;
 
@@ -263,7 +261,7 @@ void process_encoder2(void)
 			if ((IQData[read_SS2] < DataMax[read_SS2]) & (DIR2 > 0))
 				IQData[read_SS2] += IQ_Unit[read_SS2] * DIR2;
 			IQ_Disp = IQData[read_SS2];
-			if ((Tx_Flag == 1) && (Mode == 0))
+			if ((Tx_Flag == 1) && (Mode == MODE_SSB))
 				Set_PGA_Gain(IQData[read_SS2]); //SSB_Level
 			break;
 
@@ -273,7 +271,7 @@ void process_encoder2(void)
 			if ((IQData[read_SS2] < DataMax[read_SS2]) & (DIR2 > 0))
 				IQData[read_SS2] += IQ_Unit[read_SS2] * DIR2;
 			IQ_Disp = IQData[read_SS2];
-			if ((Tx_Flag == 1) && (Mode == 1))
+			if ((Tx_Flag == 1) && (Mode == MODE_CW))
 				Set_DAC_DVC(IQData[read_SS2]); //Set CW_Level
 			break;
 
@@ -283,7 +281,7 @@ void process_encoder2(void)
 			if ((IQData[read_SS2] < DataMax[read_SS2]) & (DIR2 > 0))
 				IQData[read_SS2] += IQ_Unit[read_SS2] * DIR2;
 			IQ_Disp = IQData[read_SS2];
-			if ((Tx_Flag == 1) && (Mode == 2))
+			if ((Tx_Flag == 1) && (Mode == MODE_PSK))
 				Set_DAC_DVC(IQData[read_SS2]); //Set PSK_Level
 			break;
 
@@ -293,9 +291,9 @@ void process_encoder2(void)
 			if ((IQData[read_SS2] < DataMax[read_SS2]) & (DIR2 > 0))
 				IQData[read_SS2] += IQ_Unit[read_SS2] * DIR2;
 			IQ_Disp = IQData[read_SS2];
-			if ((Tx_Flag == 1) && (Mode == 1))
+			if ((Tx_Flag == 1) && (Mode == MODE_CW))
 				Set_HP_Gain(IQData[read_SS2]); //Set ST_Level
-			//if ((Tx_Flag==1)&& (Mode==1)) Set_LO_Gain(IQData[read_SS2] ); //Set ST_Level
+			//if ((Tx_Flag==1)&& (Mode==MODE_CW)) Set_LO_Gain(IQData[read_SS2] ); //Set ST_Level
 			break;
 
 		case 6: //Rx_Amp

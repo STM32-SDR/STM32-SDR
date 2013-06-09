@@ -32,7 +32,7 @@ uint32_t Freq_Disp;
 int16_t ENC_Sens1;
 int8_t DIR1;
 uint8_t F_Mult;
-uint32_t F_Unit;
+uint32_t F_Unit = 100;
 
 uint32_t EEProm_Value;
 
@@ -136,7 +136,7 @@ void init_encoder1(void)
 			Output_Frequency(FOUT);
 			Freq_Disp = Freq_Set[0];
 			LCD_StringLine(234, 20, " 20 M PSK ");
-			Plot_Freq(Freq_Disp, 234, 0);
+			redrawFrequencyOnScreen();
 		}
 	}
 
@@ -146,11 +146,9 @@ void init_encoder1(void)
 
 void process_encoder1(void)
 {
-
 	// encoder motion has been detected--determine direction
 	static uint8_t old = { 0 };
-	static int8_t enc_states[] = { 0, 1, -1, 0, -1, 0, 0, 1, 1, 0, 0, -1, 0, -1,
-			1, 0 };
+	static int8_t enc_states[] = { 0, 1, -1, 0, -1, 0, 0, 1, 1, 0, 0, -1, 0, -1, 1, 0 };
 	int8_t tempDIR;
 	static int8_t DIR0;
 
@@ -171,10 +169,11 @@ void process_encoder1(void)
 	}
 
 	if (DIR1 != 0) {
-
 		check_SS1();
 		switch (read_SS1) {
 
+		// TODO: If frequency hits min or max it gets locked in.
+		// TODO: Remove duplication.
 		case 0:
 			if ((Freq_Set[read_SS1] > Freq_Min)
 					& (Freq_Set[read_SS1] < Freq_Max)) {
@@ -355,7 +354,7 @@ void process_encoder1(void)
 
 		} //end of switch read_input
 
-		Plot_Freq(Freq_Disp, 234, 0);
+		redrawFrequencyOnScreen();
 
 	}
 
@@ -505,8 +504,7 @@ void process_SS1(void)
 
 	}
 
-	Plot_Freq(Freq_Disp, 234, 0);
-
+	redrawFrequencyOnScreen();
 }
 
 void Increase_Step(void)
@@ -558,4 +556,9 @@ void Decrease_Step(void)
 		break;
 	}  // end switch
 } // End Decrease_Step
+
+void redrawFrequencyOnScreen(void)
+{
+	Plot_Freq(Freq_Disp, 234, 0, F_Unit);
+}
 

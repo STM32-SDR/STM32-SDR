@@ -451,12 +451,10 @@ void CalcFreqError(struct Complex IQ)
 	if (m_AFCCaptureOn) {
 		freqerr = m_FferrAve;
 		if ((freqerr > 0.3) || (freqerr < -0.3))
-
 			m_NCOphzinc = m_NCOphzinc + (freqerr * I_CGN);
 		m_FreqError = freqerr * P_CGN;
 
 	}
-
 	else {
 		if ((m_FferrAve * m_FperrAve) > 0.0)
 			freqerr = m_FperrAve;
@@ -692,11 +690,13 @@ void CalcQuality(double angle)
 			m_DevAve= (1.0-1.0/SqTimeK)*m_DevAve + (1.0/SqTimeK)*temp;
 		else
 			m_DevAve= (1.0-1.0/(SqTimeK*2.0))*m_DevAve + (1.0/(SqTimeK*2.0))*temp;
+
 		if(m_OnCount > 20 ) /* fast squelch counter */
 			m_DevAve = 100.0-75.0; /*set to 75% */
 		else
 			m_OnCount++;
 		m_OffCount = 0;
+
 		if( m_QFreqError >= 0.0 ) {
 			m_Pcnt++;
 			m_Ncnt = 0;
@@ -705,13 +705,13 @@ void CalcQuality(double angle)
 			m_Ncnt++;
 			m_Pcnt = 0;
 		}
+
 		if( (m_Pcnt<ELIMIT) && (m_Ncnt<ELIMIT) )
 			m_QFreqError = 0.0;
 	}
 	else
 	{
 		if(!m_PSKmode && ((angle >= PHZ_0_BMIN) && (angle <= PHZ_0_BMAX) ) )
-
 		{
 			temp = angle - 3*PI2/4.0;
 			m_QFreqError = temp;
@@ -722,10 +722,9 @@ void CalcQuality(double angle)
 				m_DevAve=  (1.0-1.0/SqTimeK)*m_DevAve + (1.0/SqTimeK)*temp;
 			else
 				m_DevAve=  (1.0-1.0/(SqTimeK*2.0))*m_DevAve + (1.0/(SqTimeK*2.0))*temp;
+
 			if((m_OffCount > 20) ) {	/* fast squelch counter */
-
 				m_DevAve = 100.0 - 0.0;		/*set to 0% */
-
 			}
 			else m_OffCount++;
 			m_OnCount = 0;
@@ -742,8 +741,8 @@ void CalcQuality(double angle)
 			if( (m_Pcnt<ELIMIT) && (m_Ncnt<ELIMIT) )
 				m_QFreqError = 0.0;
 		}
-
 	}
+
 	if (m_OnCount > 2)
 		m_IMDValid = TRUE;
 	else
@@ -754,6 +753,7 @@ void CalcQuality(double angle)
 			m_SQLevel = 100 - (int) m_DevAve;
 		else
 			m_SQLevel = 100 - (int) m_DevAve;
+
 		if (m_SQLevel >= m_SQThresh)
 			m_SQOpen = TRUE;
 		else

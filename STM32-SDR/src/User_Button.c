@@ -23,7 +23,7 @@
 #include	"arm_math.h"
 
 EXTI_InitTypeDef EXTI_InitStructure;
-uint8_t BT_Flag;
+uint8_t BT_Flag = 0;
 
 uint8_t PB_State;
 
@@ -80,6 +80,10 @@ void BT_Flag_Config(void)
 
 void Check_BT_Flag(void)
 {
+	// Read the link-status of the bluetooth module.
+	// TODO: Replace this with direct query call to the BT module (AT....)
+	//       because if the BT module not on board, pin floats.
+	// TODO: Replace BT_Flag with direct call to a isBluetoothConnected() function (OK in ISR?).
 	BT_Flag = GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_10);
 }
 

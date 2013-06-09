@@ -33,6 +33,7 @@
 #include	"xprintf.h"
 #include	"misc.h"
 #include	"arm_math.h"
+#include	"PSKMod.h"
 
 //USART2
 USART_TypeDef* COM_USART = USART2;
@@ -141,21 +142,6 @@ void USART2_IRQHandler(void)
 {
 	// check if the USART1 receive interrupt flag was set
 	if (USART_GetITStatus(USART2, USART_IT_RXNE )) {
-/*
-		static uint8_t cnt = 0; // this counter is used to determine the string length
-		char t = USART2 ->DR; // the character from the USART2 data register is saved in t
-
-		if (cnt < UART_RX_BUFF_LEN - 2) {
-			received_string[cnt] = t;
-			cnt++;
-		}
-		else // otherwise reset the character counter and print the received string
-		{
-			for (i = 1; i < UART_RX_BUFF_LEN - 2; i++)
-				received_string[i - 1] = received_string[i];
-		}
-		received_string[UART_RX_BUFF_LEN - 3] = t;
-	*/
 		// the character from the USART2 data register is saved in t
 		char rxChar = USART2 ->DR;
 		uart_addRxCharacter(rxChar);
@@ -181,4 +167,7 @@ void uart_addRxCharacter(char rxChar)
 
 		received_string[UART_RX_BUFF_LEN - 3] = rxChar;
 	}
+
+	// Add character for PSK transmission:
+	PSK_addCharToTx(rxChar);
 }

@@ -53,11 +53,11 @@ void DMA1_Stream0_IRQHandler(void)
 		Rcvr_DSP();
 	else
 		switch (Mode) {
-		case 0:
+		case MODE_SSB:
 			Xmit_SSB();
 			break;
 
-		case 1:
+		case MODE_CW:
 			Key_Down = GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_9 );
 			if (Key_Down == 0)
 				key = Amp0;
@@ -66,7 +66,7 @@ void DMA1_Stream0_IRQHandler(void)
 			Xmit_CW();
 			break;
 
-		case 2:
+		case MODE_PSK:
 			Xmit_PSK();
 			break;
 		}  //End of Mode Switch
@@ -292,8 +292,8 @@ void Xmit_PSK(void)
 			FIR_I_In[i] = (q15_t) ((float) TXData * T_lgain);
 			phase_adjust = (float) TXData * T_xgain;
 			FIR_Q_In[i] = (q15_t) (((float) TXData + phase_adjust) * rgain); //
-
 		}
+
 		for (i = 0; i < BUFFERSIZE / 4; i++) {  //changed for 512 sampling using balanced input data
 			FFT_Input[i * 2] = FIR_I_In[i];
 			FFT_Input[i * 2 + 1] = FIR_Q_In[i];
@@ -304,7 +304,7 @@ void Xmit_PSK(void)
 		Process_FFT();
 
 		for (i = 0; i < BUFFERSIZE / 2; i++)				//Output FIR filter results to codec
-		        {
+		{
 			Tx1BufferDMA[2 * i] = (int16_t) FIR_I_Out[i];
 			Tx1BufferDMA[2 * i + 1] = (int16_t) FIR_Q_Out[i];
 		}
@@ -342,7 +342,7 @@ void Xmit_PSK(void)
 		Process_FFT();
 
 		for (i = 0; i < BUFFERSIZE / 2; i++)  //Output FIR filter results to codec
-		        {
+		{
 			Tx0BufferDMA[2 * i] = (int16_t) FIR_I_Out[i];
 			Tx0BufferDMA[2 * i + 1] = (int16_t) FIR_Q_Out[i];
 		}

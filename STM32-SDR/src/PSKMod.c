@@ -24,9 +24,17 @@
 //#define SYM_M90 3		/*Minus 90 deg */
 #define SYM_OFF 4		/*No output */
 #define SYM_ON 5		/*constant output */
+#define PSK_TX_BUFFER_SIZE 26
 
 float S1, S2;
 extern const unsigned int VARICODE_TABLE[256];
+
+int m_Ramp  = 0;
+int m_pTail = 0;
+int m_pHead = 0;
+char XmitBuffer[PSK_TX_BUFFER_SIZE];
+
+
 
 void Update_PSK(void)
 {
@@ -55,16 +63,13 @@ void Update_PSK(void)
 
 void InitPSKModulator(void)
 {
-	int i;
-
 	m_Ramp = 0;
 	m_pTail = 0;
 	m_pHead = 0;
 
-	i = 0;
-	while (i < 26) {
-		XmitBuffer[i] = i + 97; //Fill Buffer with lower case alphabet
-		i++;
+	//Fill Buffer with lower case alphabet
+	for (int i = 0; i < 26; i++) {
+		XmitBuffer[i] = 'a' + i;
 	}
 
 	m_AddEndingZero = TRUE;
@@ -128,31 +133,61 @@ char GetTxChar(void)
 {
 	char ch;
 
-	//if( m_pHead != m_pTail )	/*if something in Queue */
-	//{
-	//	ch = XmitBuffer[m_pTail++] & 0x00FF;
-	//	if( m_pTail >= TX_BUF_SIZE )
-	//		m_pTail = 0;
-	//}
-	//else
-	//	ch = TXTOG_CODE;		/* if que is empty return TXTOG_CODE */
-	//if(m_TempNeedShutoff)
-	//{
-	//	m_TempNeedShutoff = FALSE;
-	//	m_NeedShutoff = TRUE;
-	//}
+	// TODO: Actually transmit our data via PSK.
+// Transmit only if new data is in queue, or transmit all the time?
+#if 0
+	/*if something in Queue */
+	if(!PSK_isQueueEmpty())	{
+		ch = XmitBuffer[m_pTail++] & 0x00FF;
+		if( m_pTail >= PSK_TX_BUFFER_SIZE )
+			m_pTail = 0;
+	}
+	else
+		ch = TXTOG_CODE;		/* if que is empty return TXTOG_CODE */
 
-	//if(m_TempNoSquelchTail)
-	//{
-	//	m_TempNoSquelchTail = FALSE;
-	//	m_NoSquelchTail = TRUE;
-	//}
+	if(m_TempNeedShutoff) {
+		m_TempNeedShutoff = FALSE;
+		m_NeedShutoff = TRUE;
+	}
 
+	if(m_TempNoSquelchTail) {
+		m_TempNoSquelchTail = FALSE;
+		m_NoSquelchTail = TRUE;
+	}
+#else
 	ch = XmitBuffer[m_pTail];
 	m_pTail++;
 	if (m_pTail > 25)
 		m_pTail = 0;
+#endif
 
 	return ch;
 }
 
+// Queue a new character for transmission.
+// Returns 1 if succeeded, 0 if failed (buffer full)
+_Bool PSK_addCharToTx(char newChar)
+{
+	// Queue full?
+	if (PSK_isQueueFull()) {
+		return 0;
+	}
+
+	// Queue the character
+	XmitBuffer[m_pHead++] = newChar;
+	m_pHead %= PSK_TX_BUFFER_SIZE;
+
+	// Success
+	return 1;
+}
+
+_Bool PSK_isQueueFull(void)
+{
+	int nextHead = (m_pHead + 1) % PSK_TX_BUFFER_SIZE;
+	return nextHead == m_pTail;
+}
+
+_Bool PSK_isQueueEmpty(void)
+{
+	return m_pHead == m_pTail;
+}

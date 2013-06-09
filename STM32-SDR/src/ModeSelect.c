@@ -9,7 +9,7 @@
 #include 	"TFT_Display.h"
 #include 	"ModeSelect.h"
 
-uint16_t Mode;
+uint16_t Mode = MODE_SSB;
 
 void Init_Mode(void)
 {
@@ -21,7 +21,7 @@ void Init_Mode(void)
 	LCD_SetTextColor(BLACK);
 	LCD_SetBackColor(WHITE);
 
-	Mode = 0;
+	Mode = MODE_SSB;
 	LCD_StringLine(0, 200, "SSB");
 }
 
@@ -29,17 +29,20 @@ void Set_Mode_Display(void)
 {
 	switch (Mode) {
 
-	case 0:
+	case MODE_SSB:
 		LCD_StringLine(0, 200, "SSB");
 		break;
 
-	case 1:
+	case MODE_CW:
 		LCD_StringLine(0, 200, "CW ");
 		break;
 
-	case 2:
+	case MODE_PSK:
 		LCD_StringLine(0, 200, "PSK");
 		break;
+
+	default:
+		LCD_StringLine(0, 200, "ERR");
 	}
 }
 
