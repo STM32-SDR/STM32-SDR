@@ -72,19 +72,20 @@ CORELIBDIR   = $(LIBSDIR)\CMSIS-Includes
 DEVDIR       = $(LIBSDIR)\STM32F4xx-Includes
 STMSPDDIR    = $(LIBSDIR)\STM32F4xx-StdPeriph-Includes
 USBINCDIR    = $(LIBSDIR)\USB\inc
+GUIINCDIR    = $(LIBSDIR)\STEmbeddedGUI\inc
 LINKER       = .\linker
 
 # Build all .c files in the src/ folder.
 # wildcard needs unix forward-slashes, but build tools need wisdows backslashes, 
 # so give wildcard what it likes, and then convert the results using subst function.
-SRC_TMP = $(wildcard ./src/*.c) $(wildcard ./externals/SM32F4-Discovery/USB/src/*.c)
+SRC_TMP = $(wildcard ./src/*.c) $(wildcard ./externals/SM32F4-Discovery/USB/src/*.c) $(wildcard ./externals/SM32F4-Discovery/STEmbeddedGUI/src/*.c)
 SRC = $(subst /,\,$(SRC_TMP))
 
 # List ASM source files here
 ASRC = .\startup\startup_stm32f4xx.s
  
 # List all user directories here
-UINCDIR = $(DEVDIR) $(CORELIBDIR) $(STMSPDDIR)  $(USBINCDIR) .\inc     
+UINCDIR = $(DEVDIR) $(CORELIBDIR) $(STMSPDDIR)  $(USBINCDIR) $(GUIINCDIR) .\inc     
      
 # List the user directory to look for the libraries here
 ULIBDIR = .\externals\libs
@@ -99,7 +100,7 @@ OPT = -Os
 OBJDIR = obj
 
 # Required directories:
-DIRS = $(OBJDIR) $(OBJDIR)\src $(OBJDIR)\externals $(OBJDIR)\externals\SM32F4-Discovery $(OBJDIR)\externals\SM32F4-Discovery\USB $(OBJDIR)\externals\SM32F4-Discovery\USB\src $(OBJDIR)\startup .dep
+DIRS = $(OBJDIR) $(OBJDIR)\src $(OBJDIR)\externals $(OBJDIR)\externals\SM32F4-Discovery $(OBJDIR)\externals\SM32F4-Discovery\USB $(OBJDIR)\externals\SM32F4-Discovery\USB\src $(OBJDIR)\externals\SM32F4-Discovery\STEmbeddedGUI $(OBJDIR)\externals\SM32F4-Discovery\STEmbeddedGUI\src $(OBJDIR)\startup .dep
 
 #
 # End of user defines
