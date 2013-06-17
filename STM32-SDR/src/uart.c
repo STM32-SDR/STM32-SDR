@@ -34,6 +34,7 @@
 #include	"misc.h"
 #include	"arm_math.h"
 #include	"PSKMod.h"
+#include	"TFT_Display.h"
 
 //USART2
 USART_TypeDef* COM_USART = USART2;
@@ -50,6 +51,9 @@ const uint16_t COM_TX_AF = GPIO_AF_USART2;
 const uint16_t COM_RX_AF = GPIO_AF_USART2;
 
 uint16_t i;
+_Bool buff_Test;
+
+
 
 volatile char received_string[UART_RX_BUFF_LEN]; // this will hold the received string
 
@@ -168,6 +172,15 @@ void uart_addRxCharacter(char rxChar)
 		received_string[UART_RX_BUFF_LEN - 3] = rxChar;
 	}
 
+	LCD_StringLine(0, 110, (char*) &received_string[0]);
+
 	// Add character for PSK transmission:
-	PSK_addCharToTx(rxChar);
+	buff_Test = PSK_addCharToTx(rxChar);
 }
+
+
+
+
+
+
+

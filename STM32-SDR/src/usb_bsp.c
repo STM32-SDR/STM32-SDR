@@ -243,12 +243,12 @@ void USB_OTG_BSP_EnableInterrupt(USB_OTG_CORE_HANDLE *pdev)
 	NVIC_Init(&NVIC_InitStructure);
 
 	/* Enable the Overcurrent Interrupt */
-	NVIC_InitStructure.NVIC_IRQChannel = HOST_OVRCURR_IRQn;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 2;
-	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+	//NVIC_InitStructure.NVIC_IRQChannel = HOST_OVRCURR_IRQn;
+	//NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
+	//NVIC_InitStructure.NVIC_IRQChannelSubPriority = 2;
+	//NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 
-	NVIC_Init(&NVIC_InitStructure);
+	//NVIC_Init(&NVIC_InitStructure);
 }
 
 /**

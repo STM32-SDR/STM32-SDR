@@ -72,9 +72,9 @@ int main(void)
 			LCD_DrawFFT(FFT_Display);
 			LCD_StringLine(0, 130, (char*) &LCD_buffer[0]);
 
-			Check_BT_Flag();
-			if (BT_Flag == 1) {
-				LCD_StringLine(0, 60, "BT  On");
+			//Check_BT_Flag();
+			//if (BT_Flag == 1) {
+			//	LCD_StringLine(0, 60, "BT  On");
 
 				//uart_putc( Start);
 				///for (j=0;j<128;j++) {
@@ -82,12 +82,12 @@ int main(void)
 				///uart_putc( (unsigned char)FFT_Display [2*j+1]);
 				//for (j=0;j<39;j++) 	uart_putc(LCD_buffer[j]);
 				//uart_putc( Stop);
-			}
-			else
-				LCD_StringLine(0, 60, "BT OFF");
+			//}
+			//else
+			//	LCD_StringLine(0, 60, "BT OFF");
 
 			// Display text
-			LCD_StringLine(0, 110, (char*) &received_string[0]);
+			//LCD_StringLine(0, 110, (char*) &received_string[0]);
 		}
 
 		// Process selector switch 1 (has it moved?)
@@ -145,8 +145,8 @@ void initializeHardware(void)
 	User_Button_Config();
 	main_delay(SETUP_DELAY);
 
-	BT_Flag_Config();
-	main_delay(SETUP_DELAY);
+	//BT_Flag_Config();
+	//main_delay(SETUP_DELAY);
 
 	ResetModem(BPSK_MODE);
 	main_delay(SETUP_DELAY);
