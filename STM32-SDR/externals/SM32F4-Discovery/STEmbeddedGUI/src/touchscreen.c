@@ -96,16 +96,16 @@ void TS_Calibration(void)
   GL_SetBackColor(GL_White);
   GL_SetTextColor(GL_Black);
   GL_Clear(White);
-  GL_DisplayAdjStringLine(3 * (LCD_Height / 7), LCD_Width - 25, "Run Calibration.", GL_FALSE);
+  GL_DisplayAdjStringLine(3 * (LCD_Height / 7), LCD_Width - 25, (uint8_t*) "Run Calibration.", GL_FALSE);
   GL_Delay(40);
-  GL_DisplayAdjStringLine(3 * (LCD_Height / 7), LCD_Width - 25, "Run Calibration..", GL_FALSE);
+  GL_DisplayAdjStringLine(3 * (LCD_Height / 7), LCD_Width - 25, (uint8_t*) "Run Calibration..", GL_FALSE);
   GL_Delay(40);
-  GL_DisplayAdjStringLine(3 * (LCD_Height / 7), LCD_Width - 25, "Run Calibration...", GL_FALSE);
+  GL_DisplayAdjStringLine(3 * (LCD_Height / 7), LCD_Width - 25, (uint8_t*) "Run Calibration...", GL_FALSE);
   GL_Delay(30);
   touch_done = 0;
 
   GL_Clear(White);
-  GL_Cross( (LCD_Height / 2), (LCD_Width / 2) ); /* Absolute Central Point */
+  GL_Cross( (LCD_Width / 2), (LCD_Height / 2) ); /* Absolute Central Point */
   while ( touch_done == 0)
   {
     TSC_Read();
@@ -118,7 +118,7 @@ void TS_Calibration(void)
   touch_done = 0;
 
   GL_Clear(White);
-  GL_Cross(1*(LCD_Height / 5), 1*(LCD_Width / 5)); /* Nord-East Corner point */
+  GL_Cross(1*(LCD_Width / 5), 1*(LCD_Height / 5)); /* Nord-East Corner point */
   while ( touch_done == 0)
   {
     TSC_Read();
@@ -131,7 +131,7 @@ void TS_Calibration(void)
   touch_done = 0;
 
   GL_Clear(White);
-  GL_Cross(1*(LCD_Height / 5), 4*(LCD_Width / 5)); /* Nord-West Corner */
+  GL_Cross(4*(LCD_Width / 5), 1*(LCD_Height / 5)); /* Nord-West Corner */
   while ( touch_done == 0)
   {
     TSC_Read();
@@ -144,7 +144,7 @@ void TS_Calibration(void)
   touch_done = 0;
 
   GL_Clear(White);
-  GL_Cross(4*(LCD_Height / 5), 4*(LCD_Width / 5)); /* Sud-West Corner */
+  GL_Cross(4*(LCD_Width / 5), 4*(LCD_Height / 5)); /* Sud-West Corner */
   while ( touch_done == 0)
   {
     TSC_Read();
@@ -157,7 +157,7 @@ void TS_Calibration(void)
   touch_done = 0;
 
   GL_Clear(White);
-  GL_Cross(4*(LCD_Height / 5), 1*(LCD_Width / 5)); /* Sud-East Corner point */
+  GL_Cross(1*(LCD_Width / 5), 4*(LCD_Height / 5)); /* Sud-East Corner point */
   while ( touch_done == 0)
   {
     TSC_Read();
@@ -170,7 +170,7 @@ void TS_Calibration(void)
   touch_done = 0;
 
   GL_Clear(White);
-  GL_Cross( (LCD_Height / 2), (LCD_Width / 2) ); /* Absolute Central Point */
+  GL_Cross( (LCD_Width / 2), (LCD_Height / 2) ); /* Absolute Central Point */
   while ( touch_done == 0)
   {
     TSC_Read();
@@ -183,7 +183,7 @@ void TS_Calibration(void)
   touch_done = 0;
 
   GL_Clear(White);
-  GL_Cross(1*(LCD_Height / 5), 1*(LCD_Width / 5)); /* Nord-East Corner point */
+  GL_Cross(1*(LCD_Width / 5), 1*(LCD_Height / 5)); /* North-East Corner point */
   while ( touch_done == 0)
   {
     TSC_Read();
@@ -196,7 +196,7 @@ void TS_Calibration(void)
   touch_done = 0;
 
   GL_Clear(White);
-  GL_Cross(1*(LCD_Height / 5), 4*(LCD_Width / 5)); /* Nord-West Corner */
+  GL_Cross(4*(LCD_Width / 5), 1*(LCD_Height / 5)); /* North-West Corner */
   while ( touch_done == 0)
   {
     TSC_Read();
@@ -209,7 +209,7 @@ void TS_Calibration(void)
   touch_done = 0;
 
   GL_Clear(White);
-  GL_Cross(4*(LCD_Height / 5), 4*(LCD_Width / 5)); /* Sud-West Corner */
+  GL_Cross(4*(LCD_Width / 5), 4*(LCD_Height / 5)); /* Suoth-West Corner */
   while ( touch_done == 0)
   {
     TSC_Read();
@@ -222,7 +222,7 @@ void TS_Calibration(void)
   touch_done = 0;
 
   GL_Clear(White);
-  GL_Cross(4*(LCD_Height / 5), 1*(LCD_Width / 5)); /* Sud-East Corner point */
+  GL_Cross(1*(LCD_Width / 5), 4*(LCD_Height / 5)); /* South-East Corner point */
   while ( touch_done == 0)
   {
     TSC_Read();
@@ -326,7 +326,7 @@ void TS_Calibration(void)
   F2 = (int32_t)(F * RESCALE_FACTOR);
 
   GL_Clear(White);
-  GL_DisplayAdjStringLine(3 * (LCD_Height / 7), 10 * (LCD_Width / 11), "Calibration done!", GL_FALSE);
+  GL_DisplayAdjStringLine(3 * (LCD_Height / 7), 10 * (LCD_Width / 11), (uint8_t*) "Calibration done!", GL_FALSE);
 
   GL_Delay(25); /* Now show HOME Menu */
   GL_Clear(White);

@@ -223,8 +223,7 @@ void USBH_Process(USB_OTG_CORE_HANDLE *pdev, USBH_HOST *phost)
 	case HOST_USR_INPUT:
 		/*The function should return user response true to move to class state */
 		if (phost->usr_cb->UserInput() == USBH_USR_RESP_OK) {
-			if ((phost->class_cb->Init(pdev, phost))\
- == USBH_OK) {
+			if ((phost->class_cb->Init(pdev, phost)) == USBH_OK) {
 				phost->gState = HOST_CLASS_REQUEST;
 			}
 		}
@@ -266,10 +265,10 @@ void USBH_Process(USB_OTG_CORE_HANDLE *pdev, USBH_HOST *phost)
 
 	case HOST_DEV_DISCONNECTED:
 
-		STM_EVAL_LEDOff(LED_Blue); // added by "STM32"
-		STM_EVAL_LEDOff(LED_Red);  // added by "STM32"
-		STM_EVAL_LEDOff(LED_Green);  // added by "STM32"
-		STM_EVAL_LEDOff(LED_Orange);  // added by "STM32"
+//		STM_EVAL_LEDOff(LED_Blue); // added by "STM32"
+//		STM_EVAL_LEDOff(LED_Red);  // added by "STM32"
+//		STM_EVAL_LEDOff(LED_Green);  // added by "STM32"
+//		STM_EVAL_LEDOff(LED_Orange);  // added by "STM32"
 
 		/* Manage User disconnect operations*/
 		phost->usr_cb->DeviceDisconnected();

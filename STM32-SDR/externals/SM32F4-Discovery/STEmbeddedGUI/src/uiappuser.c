@@ -61,7 +61,9 @@ void LedControlExample_Start_button_Click()
   */
 void LedCtrlScreen_Led1_Switch_Toggle()
 {
+#if 0
   STM_EVAL_LEDToggle(LED1);
+#endif
 }
 
 /**
@@ -72,7 +74,9 @@ void LedCtrlScreen_Led1_Switch_Toggle()
   */
 void LedCtrlScreen_Led2_Switch_Toggle()
 {
+#if 0
   STM_EVAL_LEDToggle(LED2);
+#endif
 }
 
 /**
@@ -83,7 +87,9 @@ void LedCtrlScreen_Led2_Switch_Toggle()
   */
 void LedCtrlScreen_Led3_Switch_Toggle()
 {
+#if 0
   STM_EVAL_LEDToggle(LED3);
+#endif
 }
 
 /**
@@ -94,7 +100,9 @@ void LedCtrlScreen_Led3_Switch_Toggle()
   */
 void LedCtrlScreen_Led4_Switch_Toggle()
 {
+#if 0
   STM_EVAL_LEDToggle(LED4);
+#endif
 }
 
 /**
@@ -106,6 +114,30 @@ void LedCtrlScreen_Led4_Switch_Toggle()
 void LedCtrlScreen_Back_Button_Click()
 {
   Show_LedControlExample();
+}
+
+
+/* based on a example-code from Keil for CS G++ */
+
+/* for caddr_t (typedef char * caddr_t;) */
+#include <sys/types.h>
+
+extern int  __HEAP_START;
+
+caddr_t _sbrk ( int incr )
+{
+  static unsigned char *heap = NULL;
+  unsigned char *prev_heap;
+
+  if (heap == NULL) {
+    heap = (unsigned char *)&__HEAP_START;
+  }
+  prev_heap = heap;
+  /* check removed to show basic approach */
+
+  heap += incr;
+
+  return (caddr_t) prev_heap;
 }
 
 /**

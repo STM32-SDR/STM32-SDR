@@ -17,11 +17,56 @@
 
 #include "stm32f4xx.h"
 
+
 typedef struct
 {
 	int16_t X;
 	int16_t Y;
 } Point, *pPoint;
+
+
+// Set to 1 for rotated 180; set to 0 for right-way-up.
+#define SCREEN_ROTATED_180 0
+
+
+/**
+  * @brief  LCD Control pins
+  */
+#define LCD_NCS_PIN             GPIO_Pin_2
+#define LCD_NCS_GPIO_PORT       GPIOB
+#define LCD_NCS_GPIO_CLK        RCC_APB2Periph_GPIOB
+#define LCD_NWR_PIN             GPIO_Pin_15
+#define LCD_NWR_GPIO_PORT       GPIOD
+#define LCD_NWR_GPIO_CLK        RCC_APB2Periph_GPIOD
+#define LCD_RS_PIN              GPIO_Pin_7
+#define LCD_RS_GPIO_PORT        GPIOD
+#define LCD_RS_GPIO_CLK         RCC_APB2Periph_GPIOD
+
+/**
+  * @brief  LCD SPI Interface pins
+  */
+#define LCD_SPI			            SPI2
+#define LCD_SPI_CLK		          RCC_APB1Periph_SPI2
+#define LCD_SPI_SCK_PIN         GPIO_Pin_13
+#define LCD_SPI_SCK_GPIO_PORT   GPIOB
+#define LCD_SPI_SCK_GPIO_CLK    RCC_APB2Periph_GPIOB
+#define LCD_SPI_MISO_PIN        GPIO_Pin_14
+#define LCD_SPI_MISO_GPIO_PORT  GPIOB
+#define LCD_SPI_MISO_GPIO_CLK   RCC_APB2Periph_GPIOB
+#define LCD_SPI_MOSI_PIN        GPIO_Pin_15
+#define LCD_SPI_MOSI_GPIO_PORT  GPIOB
+#define LCD_SPI_MOSI_GPIO_CLK   RCC_APB2Periph_GPIOB
+
+
+
+
+
+
+
+
+
+
+
 
 #define LCD_COLOR_WHITE          0xFFFF
 #define LCD_COLOR_BLACK          0x0000
@@ -95,7 +140,7 @@ void LCD_PolyLineRelative(pPoint Points, uint16_t PointCount);
 void LCD_ClosedPolyLine(pPoint Points, uint16_t PointCount);
 void LCD_ClosedPolyLineRelative(pPoint Points, uint16_t PointCount);
 void LCD_FillPolyLine(pPoint Points, uint16_t PointCount);
-void LCD_SetDisplayWindow(uint8_t Xpos, uint16_t Ypos, uint8_t Height, uint16_t Width);
+void LCD_SetDisplayWindow(uint8_t Xpos, uint16_t Ypos, uint16_t Height, uint16_t Width);
 void LCD_DrawFullSquare(uint16_t Xpos, uint16_t Ypos, uint16_t a);
 
 void LCD_WriteRAM_Prepare(void);
@@ -110,5 +155,9 @@ void Display_ULong(uint16_t data, uint8_t XL, uint8_t YL);
 void Plot_String(uint8_t *string, uint8_t x, uint8_t y);
 void Plot_Integer(int16_t number, uint8_t x, uint8_t y);
 void Plot_Freq(uint32_t number, uint8_t x, uint8_t y, uint32_t changeRate);
+
+// UNIMPLEMENTED:
+//uint16_t LCD_GetPixel(uint16_t Xpos, uint16_t Ypos);
+uint16_t LCD_ReadReg(uint8_t LCD_Reg);
 
 #endif /* TFT_DISPLAY_H_ */

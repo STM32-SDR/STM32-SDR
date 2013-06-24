@@ -57,8 +57,6 @@ extern __IO uint8_t touch_done;           /*!< touchscreen event status */
 extern __IO uint8_t calibration_done;     /*!< touchscreen calibration status */
 extern __IO uint8_t joy_done;             /*!< joystick event status */
 
-extern uint16_t LCD_Height;               /*!< Screen  Height */
-extern uint16_t LCD_Width;                /*!< Screen  Width */
 /**
   * @}
   */

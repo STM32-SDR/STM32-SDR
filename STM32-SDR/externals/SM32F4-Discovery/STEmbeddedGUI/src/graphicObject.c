@@ -175,11 +175,11 @@ static void GL_DrawRectangle(uint16_t maxX, uint16_t minX, uint8_t maxY, uint8_t
   */
 static void GL_DrawRectangle(uint16_t maxX, uint16_t minX, uint8_t maxY, uint8_t minY)
 {
-  GL_DrawLine(minY, maxX, maxX - minX, GL_Horizontal);
-  GL_DrawLine((minY + maxY - minY), maxX, maxX - minX, GL_Horizontal);
+  GL_DrawLine(maxX, maxX - minX, minY, GL_Horizontal);
+  GL_DrawLine(maxX, (minY + maxY - minY), maxX - minX, GL_Horizontal);
 
-  GL_DrawLine(minY, maxX, maxY - minY, GL_Vertical);
-  GL_DrawLine(minY, (maxX - (maxX - minX) + 1), maxY - minY, GL_Vertical);
+  GL_DrawLine(maxX, minY, maxY - minY, GL_Vertical);
+  GL_DrawLine((maxX - (maxX - minX) + 1), minY, maxY - minY, GL_Vertical);
 }
 
 /**
@@ -197,17 +197,13 @@ static void GL_DrawFilledRectangle(uint16_t maxX, uint16_t minX, uint8_t maxY, u
 
   if ( (maxX > minX + 1) && (maxY > minY - 1) )
   {
-    GL_DrawLine(minY, maxX, maxX - minX, GL_Horizontal);
-    GL_DrawLine((minY + maxY - minY), maxX, maxX - minX, GL_Horizontal);
-
-    GL_DrawLine(minY, maxX, maxY - minY, GL_Vertical);
-    GL_DrawLine(minY, (maxX - (maxX - minX) + 1), maxY - minY, GL_Vertical);
+	  GL_DrawRectangle(maxX, minX, maxY, minY);
   }
 
   GL_SetTextColor(Color);
   for (counter = 1; counter < (maxY - minY); counter++)
   {
-    GL_DrawLine(minY + counter, maxX - 1, maxX - minX - 2, GL_Horizontal);
+    GL_DrawLine(maxX - 1, minY + counter, maxX - minX - 2, GL_Horizontal);
   }
 }
 
@@ -240,6 +236,7 @@ void GL_DrawFilledCircle(uint16_t Xpos, uint8_t Ypos, uint16_t Radius, uint16_t 
   * @param  Color: RGB color of line.
   * @retval None
   */
+// TODO: Check X vs Y?
 static void GL_DrawObliqueLine(uint16_t Ypos1, uint16_t Xpos1, uint16_t Ypos2, uint16_t Xpos2, uint16_t Color)
 {
   uint8_t steep = 0; /* Steepness of line,0 - non-steep (angle 45º-),1 - steep (45º+) */
@@ -363,13 +360,13 @@ static void GL_DrawObliqueLine(uint16_t Ypos1, uint16_t Xpos1, uint16_t Ypos2, u
 /**
   * @brief  Displays a Cross.
   * @param  Xpos: specifies the left X position.
-  * @param  Ypos: specifies the botton Y position.
+  * @param  Ypos: specifies the bottom Y position.
   * @retval None
   */
-void GL_Cross(uint16_t Ypos, uint16_t Xpos)
+void GL_Cross(uint16_t Xpos, uint16_t Ypos)
 {
-  GL_DrawLine(Ypos, Xpos + 30, 60, GL_Horizontal); /* Horizontal Line */
-  GL_DrawLine(Ypos - 30, Xpos, 60, GL_Vertical);   /* Vertical Line   */
+  GL_DrawLine(Xpos + 30, Ypos, 60, GL_Horizontal); /* Horizontal Line */
+  GL_DrawLine(Xpos, Ypos - 30, 60, GL_Vertical);   /* Vertical Line   */
 }
 
 
@@ -384,9 +381,9 @@ void GL_Cross(uint16_t Ypos, uint16_t Xpos)
   */
 void GL_DrawButtonBMP(uint16_t maxX, uint16_t minX, uint16_t maxY, uint16_t minY, uint8_t* ptrBitmap)
 {
-  GL_SetDisplayWindow(maxY, maxX, maxY - minY, maxX - minX);
+  GL_SetDisplayWindow(maxX, maxY, maxY - minY, maxX - minX);
   GL_DrawBMP(ptrBitmap);
-  GL_SetDisplayWindow(LCD_Height - 1, LCD_Width - 1, LCD_Height, LCD_Width);
+  GL_SetDisplayWindow(LCD_Width - 1, LCD_Height - 1, LCD_Height, LCD_Width);
 }
 
 /**
@@ -427,6 +424,8 @@ GL_PageControls_TypeDef* NewLabel (uint16_t ID, const uint8_t* label, GL_Directi
   GL_Label_TypeDef *pControlObj = NULL;
   GL_PageControls_TypeDef * pPageControlObj = NULL;
 
+  // TODO: Change to statically allocated because will eventually run out of heap.
+  // (malloc calls _sbrk(), which has been naively implemented to never recover memory.
   pControlObj = (GL_Label_TypeDef *)malloc(sizeof(GL_Label_TypeDef));
   if (pControlObj)
   {
@@ -945,8 +944,8 @@ GL_PageControls_TypeDef* NewGraphChart ( uint16_t ID, const uint8_t* labelX, con
 
 /**
   * @brief  Add a new Control object to the page
-  * @param  PosX: Coordinate for X axis
-  * @param  PosY: Coordinate for Y axis
+  * @param  PosX: Coordinate for X axis (Low is right; high is left)
+  * @param  PosY: Coordinate for Y axis (Lower is top)
   * @param  *objPTR: Pointer to Object Structure
   * @param  *pagePTR: Pointer to Page Structure
   * @retval GL_ErrStatus - GL_OK if successful, GL_ERROR otherwise
@@ -1457,7 +1456,7 @@ GL_ErrStatus Create_PageObj (GL_Page_TypeDef* pThis)
 GL_ErrStatus DestroyPageControl ( GL_Page_TypeDef* pPage, uint16_t ID )
 {
   uint32_t index = 0;
-  if (!&pPage)
+  if (!pPage)
   {
     return GL_ERROR;
   }
@@ -2756,10 +2755,10 @@ static GL_ErrStatus SetHistogramVisible( GL_PageControls_TypeDef* pTmp, GL_Coord
 
   GL_SetTextColor(GL_Black);
   GL_SetFont(GL_FONT_SMALL);
-  GL_DrawLine( (uint16_t)base_y, max_x, width, GL_Horizontal );        /* X Axis */
-  GL_DrawLine( (uint16_t)(base_y - height), max_x, height, GL_Vertical );  /* Y Axis */
-  GL_DisplayAdjStringLine( (uint16_t)(base_y + 6), max_x + 5, "0", GL_TRUE );
-  GL_DisplayAdjStringLine( offset_y - 5, offset_x + HIST_MARGIN_LENGTH - 9, "0", GL_TRUE );
+  GL_DrawLine( max_x, (uint16_t)base_y, width, GL_Horizontal );        /* X Axis */
+  GL_DrawLine( max_x, (uint16_t)(base_y - height), height, GL_Vertical );  /* Y Axis */
+  GL_DisplayAdjStringLine( (uint16_t)(base_y + 6), max_x + 5, (uint8_t*) "0", GL_TRUE );
+  GL_DisplayAdjStringLine( offset_y - 5, offset_x + HIST_MARGIN_LENGTH - 9, (uint8_t*)"0", GL_TRUE );
 
   for (; index < (pThis->n_points); index++)
   {
@@ -2776,7 +2775,7 @@ static GL_ErrStatus SetHistogramVisible( GL_PageControls_TypeDef* pTmp, GL_Coord
   {
     GL_SetTextColor(GL_Black);
     GL_SetTextColor(GL_Black);
-    GL_DrawLine( (uint16_t)(offset_y - y_step*index), offset_x, 4, GL_Horizontal );
+    GL_DrawLine( offset_x, (uint16_t)(offset_y - y_step*index), 4, GL_Horizontal );
     if ( index == 9)
     {
       GL_DisplayAdjStringLine( (uint16_t)(offset_y - y_step*index - 2 - FONT_LENGTH*2),
@@ -2809,18 +2808,18 @@ static GL_ErrStatus SetHistogramVisible( GL_PageControls_TypeDef* pTmp, GL_Coord
     GL_DrawFilledRectangle( max_x, max_x - x_step + 1, (uint16_t)base_y, (uint16_t)(base_y - (double)((pThis->points[index]) / y_resolution)), GL_Blue );
     max_x = max_x - x_step;
     GL_SetTextColor(GL_Black);
-    GL_DrawLine( (uint16_t)base_y, max_x + 1, 4, GL_Vertical );
+    GL_DrawLine( max_x + 1, (uint16_t)base_y, 4, GL_Vertical );
 
     if (pThis->n_points <= 15)
     {
-      sprintf((char*)value, "%d", index + 1);
+      sprintf((char*)value, "%lu", index + 1);
       GL_DisplayAdjStringLine( (uint16_t)base_y + 6, max_x + 6, (uint8_t*) value, GL_TRUE );
     }
     else if ( pThis->n_points > 15 && pThis->n_points <= 40)
     {
       if ((index + 1) % 3 == 0)
       {
-        sprintf((char*)value, "%d", index + 1);
+        sprintf((char*)value, "%lu", index + 1);
         GL_DisplayAdjStringLine( (uint16_t)(base_y + 6), max_x + 6, (uint8_t*) value, GL_TRUE );
       }
     }
@@ -2828,7 +2827,7 @@ static GL_ErrStatus SetHistogramVisible( GL_PageControls_TypeDef* pTmp, GL_Coord
     {
       if ((index + 1) % 4 == 0)
       {
-        sprintf((char*)value, "%d", index + 1);
+        sprintf((char*)value, "%lu", index + 1);
         GL_DisplayAdjStringLine( (uint16_t)(base_y + 6), max_x + 6, (uint8_t*) value, GL_TRUE );
       }
     }
@@ -2880,17 +2879,17 @@ static GL_ErrStatus SetGraphChartVisible( GL_PageControls_TypeDef* pTmp, GL_Coor
 
   GL_SetTextColor(GL_Black);
   GL_SetFont(GL_FONT_SMALL);
-  GL_DrawLine( (uint16_t)base_y, (uint16_t)max_x, (uint16_t)(width + 2), GL_Horizontal );      /* X Axis */
-  GL_DrawLine( (uint16_t)(base_y - height), (uint16_t)max_x, (uint16_t)height, GL_Vertical );  /* Y Axis */
-  GL_DisplayAdjStringLine( (uint16_t)(base_y + 6), (uint16_t)(max_x + 5), "0", GL_TRUE ); /* min X value*/
-  GL_DisplayAdjStringLine( (uint16_t)(offset_y - 5), (uint16_t)(offset_x + GRAPH_MARGIN_LENGTH - 9), "0", GL_TRUE ); /* min Y value*/
+  GL_DrawLine( (uint16_t)max_x, (uint16_t)base_y, (uint16_t)(width + 2), GL_Horizontal );      /* X Axis */
+  GL_DrawLine( (uint16_t)max_x, (uint16_t)base_y, (uint16_t)height, GL_Vertical );  /* Y Axis */
+  GL_DisplayAdjStringLine( (uint16_t)(base_y + 6), (uint16_t)(max_x + 5), (uint8_t*)"0", GL_TRUE ); /* min X value*/
+  GL_DisplayAdjStringLine( (uint16_t)(offset_y - 5), (uint16_t)(offset_x + GRAPH_MARGIN_LENGTH - 9), (uint8_t*)"0", GL_TRUE ); /* min Y value*/
 
   if (pThis->Background == GL_TRUE)
   {
     /* Display the grid background color (black) */
-    GL_SetDisplayWindow((uint16_t)(base_y - 1), (uint16_t)max_x, (uint16_t)height, (uint16_t)(width + 2));
+    GL_SetDisplayWindow((uint16_t)max_x, (uint16_t)(base_y - 1), (uint16_t)height, (uint16_t)(width + 2));
     GL_Clear(GL_Black);
-    GL_SetDisplayWindow(LCD_Height - 1, LCD_Width - 1, LCD_Height, LCD_Width);
+    GL_SetDisplayWindow(LCD_Width - 1, LCD_Height - 1, LCD_Height, LCD_Width);
     signal_color = GL_Yellow;
   }
 
@@ -2909,15 +2908,15 @@ static GL_ErrStatus SetGraphChartVisible( GL_PageControls_TypeDef* pTmp, GL_Coor
     {
       GL_SetTextColor(GL_Black);
 
-      GL_DrawLine( (uint16_t)(offset_y - y_step*index),
-                   (uint16_t)offset_x,
+      GL_DrawLine( (uint16_t)offset_x,
+                   (uint16_t)(offset_y - y_step*index),
                    4,
                    GL_Horizontal );
 
       GL_SetTextColor(GL_Grey);
 
-      GL_DrawLine( (uint16_t)(offset_y - y_step*index),
-                   (uint16_t)(offset_x - 4),
+      GL_DrawLine( (uint16_t)(offset_x - 4),
+    		  (uint16_t)(offset_y - y_step*index),
                    (uint16_t)(width + 2),
                    GL_Horizontal );
     }
@@ -2954,42 +2953,42 @@ static GL_ErrStatus SetGraphChartVisible( GL_PageControls_TypeDef* pTmp, GL_Coor
   {
     max_x = max_x - x_step;
     GL_SetTextColor(GL_Black);
-    GL_DrawLine( (uint16_t)base_y, (uint16_t)(max_x + 1), 4, GL_Vertical );
+    GL_DrawLine( (uint16_t)(max_x + 1), (uint16_t)base_y, 4, GL_Vertical );
     if (pThis->n_points <= 15)
     {
-      sprintf((char*)value, "%d", index + 1);
+      sprintf((char*)value, "%lu", index + 1);
       GL_DisplayAdjStringLine( (uint16_t)(base_y + 6), (uint16_t)(max_x + 6), (uint8_t*) value, GL_TRUE );
       GL_SetTextColor(GL_Grey);
-      GL_DrawLine( (uint16_t)(base_y - height), (uint16_t)(max_x + 1), (uint16_t)height, GL_Vertical );
+      GL_DrawLine( (uint16_t)(max_x + 1), (uint16_t)(base_y - height), (uint16_t)height, GL_Vertical );
     }
     else if ( pThis->n_points > 15 && pThis->n_points <= 40)
     {
       if ((index + 1) % 3 == 0)
       {
-        sprintf((char*)value, "%d", index + 1);
+        sprintf((char*)value, "%lu", index + 1);
         GL_DisplayAdjStringLine( (uint16_t)(base_y + 6), (uint16_t)(max_x + 6), (uint8_t*) value, GL_TRUE );
         GL_SetTextColor(GL_Grey);
-        GL_DrawLine( (uint16_t)(base_y - height), (uint16_t)(max_x + 1), (uint16_t)height, GL_Vertical );
+        GL_DrawLine( (uint16_t)(max_x + 1), (uint16_t)(base_y - height), (uint16_t)height, GL_Vertical );
       }
     }
     else if ( pThis->n_points > 40 && pThis->n_points <= 70)
     {
       if ((index + 1) % 4 == 0)
       {
-        sprintf((char*)value, "%d", index + 1);
+        sprintf((char*)value, "%lu", index + 1);
         GL_DisplayAdjStringLine( (uint16_t)(base_y + 6), (uint16_t)(max_x + 6), (uint8_t*) value, GL_TRUE );
         GL_SetTextColor(GL_Grey);
-        GL_DrawLine( (uint16_t)(base_y - height), (uint16_t)(max_x + 1), (uint16_t)height, GL_Vertical );
+        GL_DrawLine( (uint16_t)(max_x + 1), (uint16_t)(base_y - height), (uint16_t)height, GL_Vertical );
       }
     }
     else
     {
       if ((index + 1) % 10 == 0)
       {
-        sprintf((char*)value, "%d", index + 1);
+        sprintf((char*)value, "%lu", index + 1);
         GL_DisplayAdjStringLine( (uint16_t)(base_y + 6), (uint16_t)(max_x + 6), (uint8_t*) value, GL_TRUE );
         GL_SetTextColor(GL_Grey);
-        GL_DrawLine( (uint16_t)(base_y - height), (uint16_t)(max_x + 1), (uint16_t)height, GL_Vertical );
+        GL_DrawLine( (uint16_t)(max_x + 1), (uint16_t)(base_y - height), (uint16_t)height, GL_Vertical );
       }
     }
     /* Draw the Grid*/
@@ -4122,6 +4121,7 @@ static void CallEvent(GL_PageControls_TypeDef* pControl)
   }
 }
 
+#if 0
 /**
   * @brief  Set LCD Panel Resolution
   * @param  Lcd_Width: Width of the LCD Panel
@@ -4133,6 +4133,7 @@ void Set_LCD_Resolution( uint16_t Lcd_Width, uint16_t Lcd_Height )
   LCD_Width  = Lcd_Width;
   LCD_Height = Lcd_Height;
 }
+#endif
 
 /**
   * @brief  This function checks the coordinates of the touch screen pressed

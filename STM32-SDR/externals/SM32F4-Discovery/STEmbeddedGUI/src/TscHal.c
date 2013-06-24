@@ -283,7 +283,7 @@ void GL_GPIO_EXTILineConfig(uint8_t GPIO_PortSource, uint8_t GPIO_PinSource)
 #if defined(STM32F2XX) || defined(STM32L1XX_MD)
   SYSCFG_EXTILineConfig(GPIO_PortSource, GPIO_PinSource);
 #else  
-  GPIO_EXTILineConfig(GPIO_PortSource, GPIO_PinSource);
+  GL_GPIO_EXTILineConfig(GPIO_PortSource, GPIO_PinSource);
 #endif
 }
 
@@ -573,8 +573,10 @@ void GL_RCC_APBPeriphClockCmd(uint32_t RCC_APBPeriph, GL_FunctionalState NewStat
   */
 void GL_RCC_AHBPeriphClockCmd(uint32_t RCC_AHBPeriph, GL_FunctionalState NewState)
 {
+#if 0
 #ifndef STM32F2XX
   RCC_AHBPeriphClockCmd(RCC_AHBPeriph, (FunctionalState)NewState);
+#endif
 #endif
 }
 
@@ -649,6 +651,7 @@ void TSC_FLASH_ClearFlag(uint32_t FLASH_FLAG)
 TSC_FLASH_Status TSC_FLASH_ErasePage(uint32_t Page_Address)
 {
   TSC_FLASH_Status TSC_FlashStatus = TSC_FLASH_COMPLETE;
+#if 0
 #ifndef STM32F2XX  
    TSC_FlashStatus = FLASH_ErasePage(Page_Address);
 #else
@@ -667,7 +670,8 @@ TSC_FLASH_Status TSC_FLASH_ErasePage(uint32_t Page_Address)
    }
    TSC_FlashStatus = FLASH_EraseSector(FLASH_Sectors[0][index], VoltageRange_3);
 
-#endif   
+#endif
+#endif
    return TSC_FlashStatus;
 }
 

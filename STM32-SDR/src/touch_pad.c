@@ -447,7 +447,7 @@ void GetTouchPoint(void)
 	X_Raw = screen.x;
 	Y_Raw = screen.y;
 
-	// TODO: What are these magic numbers?
+	// TODO: Change these constants to on-the-fly calibration values.
 	X_Point = (int) ((float) (3873 - X_Raw) / 11.11);
 	Y_Point = (int) (((float) (Y_Raw - 212) / 15.13));
 

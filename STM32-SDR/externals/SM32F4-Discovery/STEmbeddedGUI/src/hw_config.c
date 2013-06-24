@@ -55,6 +55,7 @@
   * @param  None
   * @retval None
   */
+#if 0
 static void HWConfig_JoyParamInit(void)
 {
   JOY_HW_Parameters_TypeDef* pJoyParam = NewJoyHwParamObj ();
@@ -89,8 +90,9 @@ static void HWConfig_JoyParamInit(void)
 
 
 }
+#endif
 
-
+#if 0
 /**
   * @brief  Set Touchscreen Controller parameters
   * @param  None
@@ -127,7 +129,9 @@ static void HWConfig_TSCParamInit(void)
 #endif
 
 }
+#endif
 
+#if 0
 /**
   * @brief  Set LCD Controller Parameters
   * @param  None
@@ -157,6 +161,7 @@ static void HWConfig_LCDParamInit(void)
 #endif
 
 }
+#endif
 
 /**
   * @brief  Set evaluation board Parameters parameters
@@ -165,6 +170,7 @@ static void HWConfig_LCDParamInit(void)
   */
 void HWConfig_SetHardwareParams(void)
 {
+#if 0
   BTN_HW_Parameters_TypeDef* pBtnParam = NewBtnHwParamObj ();
 
   HWConfig_JoyParamInit();
@@ -176,6 +182,7 @@ void HWConfig_SetHardwareParams(void)
   pBtnParam->BTN_Port                    = USER_BUTTON_PORT;
   pBtnParam->BTN_Pin                     = USER_BUTTON_PIN;
   pBtnParam->BTN_Pin_Active              = USER_BUTTON_PIN_ACTIVE;
+#endif
 }
 
 /**

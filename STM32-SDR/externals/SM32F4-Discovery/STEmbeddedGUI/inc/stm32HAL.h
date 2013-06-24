@@ -28,6 +28,7 @@
 #endif
 
 /* Includes --------------------------------------------------------------------*/
+#if 0
 #if defined(STM32F2XX)
 #include "stm32f2xx.h"
 #elif defined(STM32L1XX_MD)
@@ -35,6 +36,8 @@
 #else/* Suppose F1 Series */
 #include "stm32f10x.h"
 #endif
+#endif
+#include "stm32f4xx.h"
 
 
 #ifdef __cplusplus

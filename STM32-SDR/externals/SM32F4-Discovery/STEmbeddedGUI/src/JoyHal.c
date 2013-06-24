@@ -1,3 +1,5 @@
+#if 0
+
 /**
   ******************************************************************************
   * @file    JoyHal.c
@@ -348,3 +350,6 @@ uint8_t GL_GPIO_ReadInputDataBit(GPIO_TypeDef * GPIOx, uint16_t GPIO_Pin)
   */ 
 
 /******************* (C) COPYRIGHT 2011 STMicroelectronics *****END OF FILE****/
+
+
+#endif

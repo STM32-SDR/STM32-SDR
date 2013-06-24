@@ -31,7 +31,7 @@
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-
+#if 0
 #ifdef USE_STM32100B_EVAL
  #include "stm32HAL.h"
  #include "stm32100b_eval_lcd.h"
@@ -53,10 +53,12 @@
 #elif defined (USE_STM32L152_EVAL)
  #include "stm32HAL.h"
  #include "stm32l152_eval_lcd.h"   
-#endif   
+#endif
+#endif
 
 #include "stm32_eval.h"
 #include "graphicObjectTypes.h"
+#include "LcdDriver_ILI9320.h"
 
 /** @addtogroup Embedded_GUI_Library
   * @{
@@ -70,16 +72,6 @@
   * @{
   */
    
-/** 
-  * @brief  LCD_Direction_TypeDef enumeration definition  
-  */
-typedef enum
-{ _0_degree = 0,
-  _90_degree,
-  _180_degree,
-  _270_degree
-}LCD_Direction_TypeDef;
-
 /** 
   * @brief  GL_BusType enumeration definition  
   */
@@ -161,8 +153,6 @@ extern __IO uint16_t          GL_BackColor;
 #define SinglePixel           0x08
 
 #define CursorColor           GL_Black
-//#define GL_TextColor          TextColor
-//#define GL_BackColor          BackColor
 /**
   * @}
   */
@@ -173,8 +163,6 @@ extern __IO uint16_t          GL_BackColor;
 extern __IO uint8_t           GL_Font;
 extern __IO uint8_t           GL_FontWidth;
 extern __IO uint8_t           GL_FontHeight;
-extern uint16_t               LCD_Height;
-extern uint16_t               LCD_Width;
 /**
   * @}
   */
@@ -209,20 +197,15 @@ void GL_LCD_SPIConfig(void);
 void GL_LCD_FSMCConfig(void);
 void GL_LCD_Init(void);
 void GL_LCD_WindowModeDisable(void);
-void LCD_PutPixel(uint16_t Xpos, uint16_t Ypos, uint16_t Color, uint8_t PixelSpec);
-void LCD_FillArea(uint16_t Xpos_Init, uint16_t Ypos_Init, uint16_t Height, uint16_t Width, uint16_t color);
-uint16_t LCD_GetPixel(uint16_t Xpos, uint16_t Ypos);
 void GL_LCD_DrawChar(uint8_t Xpos, uint16_t Ypos, const uint16_t *c);
 void GL_LCD_CtrlLinesWrite(GPIO_TypeDef* GPIOx, uint16_t CtrlPins, GL_SignalActionType BitVal);
 uint16_t GL_LCD_ReadRAM(void);
-void LCD_WriteRAMWord(uint16_t RGB_Code);
 
-void LCD_Change_Direction(LCD_Direction_TypeDef Direction);
+
 void LCD_WriteChar(uint16_t Xpos, uint16_t Ypos, const uint16_t *c);
 void LCD_PrintChar(uint16_t Line, uint16_t Column, uint8_t Ascii);
 void LCD_PrintStringLine(uint16_t Line, uint16_t Column, uint8_t *ptr);
-void LCD_DrawMonoBMP(const uint8_t *Pict, uint16_t Xpos_Init, uint16_t Ypos_Init, uint16_t Height, uint16_t Width);
-void LCD_DrawColorBMP(uint8_t* ptrBitmap, uint16_t Xpos_Init, uint16_t Ypos_Init, uint16_t Height, uint16_t Width);
+
 
 #ifdef __cplusplus
 }

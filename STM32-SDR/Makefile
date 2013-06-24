@@ -94,7 +94,8 @@ ULIBDIR = .\externals\libs
 ULIBS = -lstm32f4xx_peripherals -lstm32f4xx_math -lm
  
 # Define optimisation level here
-OPT = -Os
+#OPT = -Os
+OPT = -O0
 
 # Folder for build intermediates:
 OBJDIR = obj

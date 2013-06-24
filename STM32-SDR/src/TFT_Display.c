@@ -21,8 +21,8 @@
 #define ABS(X)  ((X) > 0 ? (X) : -(X))
 
 /* Global variables to set the written text color */
-__IO uint16_t TextColor = 0x0000;
-__IO uint16_t BackColor = 0xFFFF;
+extern __IO uint16_t LCD_textColor;		// MOVED TO LcdDriver_ILI9320.c
+extern __IO uint16_t LCD_backColor;		// MOVED TO LcdDriver_ILI9320.c
 __IO uint16_t asciisize = 16;
 
 uint16_t TimerPeriod = 0;
@@ -123,53 +123,23 @@ void LCD_Init(void)
 	LCD_WriteReg(0x0007, 0x0173);
 }
 
-void LCD_WriteRAM_Prepare(void)
-{
-	LCD_REG = 0x22;
-}
 
-void LCD_WriteRAM(uint16_t RGB_Code)
-{
-	LCD_RAM = RGB_Code;
-}
 
-void LCD_WriteReg(uint8_t LCD_Reg, uint16_t LCD_RegValue)
-{
-	LCD_REG = LCD_Reg;
-	LCD_RAM = LCD_RegValue;
-}
 
-void LCD_DisplayOn(void)
-{
-	LCD_WriteReg(0x07, 0x0173);
-}
 
-void LCD_DisplayOff(void)
-{
-	LCD_WriteReg(0x07, 0x0000);
-}
 
 void LCD_SetColors(__IO uint16_t _TextColor, __IO uint16_t _BackColor)
 {
-	TextColor = _TextColor;
-	BackColor = _BackColor;
+	LCD_textColor = _TextColor;
+	LCD_backColor = _BackColor;
 }
 
 void LCD_GetColors(__IO uint16_t *_TextColor, __IO uint16_t *_BackColor)
 {
-	*_TextColor = TextColor;
-	*_BackColor = BackColor;
+	*_TextColor = LCD_textColor;
+	*_BackColor = LCD_backColor;
 }
 
-void LCD_SetTextColor(__IO uint16_t Color)
-{
-	TextColor = Color;
-}
-
-void LCD_SetBackColor(__IO uint16_t Color)
-{
-	BackColor = Color;
-}
 
 /* 8x8=8 12x12=12 8x16=16 12x12=14 16x24=24 */
 void LCD_CharSize(__IO uint16_t size)
@@ -177,46 +147,26 @@ void LCD_CharSize(__IO uint16_t size)
 	asciisize = size;
 }
 
-void LCD_Clear(uint16_t Color)
-{
-	uint32_t index = 0;
-	LCD_SetCursor(0x00, 0x00);
-	LCD_WriteRAM_Prepare();
-	for (index = 0; index < 76800; index++) {
-		LCD_RAM = Color;
-		TFT_Delay(200);
 
-	}
-}
-
-//February
-void LCD_SetCursor(uint16_t Xpos, uint16_t Ypos)
-{
-	//LCD_WriteReg(0x21, Xpos);
-	//LCD_WriteReg(0x20, Ypos);
-	LCD_WriteReg(0x20, Xpos);
-	LCD_WriteReg(0x21, Ypos);
-
-}
 
 //February
 void PutPixel(int16_t x, int16_t y)
 {
-	if ((x > 319) || (y > 239))
-		return;
-	//if (( x > 239 )||( y > 319 )) return;
-	LCD_SetCursor(y, x);
-	LCD_WriteRAM_Prepare();
-	LCD_WriteRAM(TextColor);
+	Pixel(x, y, LCD_textColor);
 }
 
 //February
 void Pixel(int16_t x, int16_t y, int16_t c)
 {
-	if ((x > 319) || (y > 239))
+	if ((x >= LCD_PIXEL_WIDTH) || (y >= LCD_PIXEL_HEIGHT))
 		return;
-	//if (( x > 239 )||( y > 319 )) return;
-	LCD_SetCursor(y, x);
+
+	// Set location to write to.
+	// ** CORRECTED TO BE X Y **
+//	LCD_SetCursor(y, x);
+	LCD_SetCursor(x, y);
+
+	// Write one value to LCD RAM, setting the pixel.
 	LCD_WriteRAM_Prepare();
 	LCD_WriteRAM(c);
 }
@@ -248,10 +198,10 @@ void LCD_PutChar(int16_t PosX, int16_t PosY, char c)
 			TmpChar = Buffer[i];
 			for (j = 0; j < 8; j++) {
 				if (((TmpChar >> (7 - j)) & 0x01) == 0x01) {
-					Pixel(PosX + j, PosY + (7 - i), TextColor);
+					Pixel(PosX + j, PosY + (7 - i), LCD_textColor);
 				}
 				else {
-					Pixel(PosX + j, PosY + (7 - i), BackColor);
+					Pixel(PosX + j, PosY + (7 - i), LCD_backColor);
 				}
 			}
 		}
@@ -266,10 +216,10 @@ void LCD_PutChar(int16_t PosX, int16_t PosY, char c)
 			TmpChar = Buffer[i];
 			for (j = 0; j < 8; j++) {
 				if (((TmpChar >> (7 - j)) & 0x01) == 0x01) {
-					Pixel(PosX + j, PosY + (11 - i), TextColor);
+					Pixel(PosX + j, PosY + (11 - i), LCD_textColor);
 				}
 				else {
-					Pixel(PosX + j, PosY + (11 - i), BackColor);
+					Pixel(PosX + j, PosY + (11 - i), LCD_backColor);
 				}
 			}
 		}
@@ -284,11 +234,10 @@ void LCD_PutChar(int16_t PosX, int16_t PosY, char c)
 			TmpChar = Buffer[i];
 			for (j = 0; j < 8; j++) {
 				if (((TmpChar >> (7 - j)) & 0x01) == 0x01) {
-					Pixel(PosX + j, PosY + (15 - i), TextColor);
-
+					Pixel(PosX + j, PosY + (15 - i), LCD_textColor);
 				}
 				else {
-					Pixel(PosX + j, PosY + (15 - i), BackColor);
+					Pixel(PosX + j, PosY + (15 - i), LCD_backColor);
 				}
 			}
 		}
@@ -303,10 +252,10 @@ void LCD_PutChar(int16_t PosX, int16_t PosY, char c)
 			TmpChar = Buffer[i];
 			for (j = 0; j < 12; j++) {
 				if (((TmpChar >> (11 - j)) & (0x01)) == 0x01) {
-					Pixel(PosX + j, PosY + (11 - i), TextColor);
+					Pixel(PosX + j, PosY + (11 - i), LCD_textColor);
 				}
 				else {
-					Pixel(PosX + j, PosY + (11 - i), BackColor);
+					Pixel(PosX + j, PosY + (11 - i), LCD_backColor);
 				}
 			}
 		}
@@ -320,10 +269,10 @@ void LCD_PutChar(int16_t PosX, int16_t PosY, char c)
 			TmpChar = Buffer[i];
 			for (j = 0; j < 16; j++) {
 				if (((TmpChar >> j) & (0x01)) == 0x01) {
-					Pixel(PosX + j, PosY + (23 - i), TextColor);
+					Pixel(PosX + j, PosY + (23 - i), LCD_textColor);
 				}
 				else {
-					Pixel(PosX + j, PosY + (23 - i), BackColor);
+					Pixel(PosX + j, PosY + (23 - i), LCD_backColor);
 				}
 			}
 		}
@@ -339,6 +288,8 @@ void LCD_StringLine(uint16_t PosX, uint16_t PosY, char *str)
 	do {
 		TempChar = *str++;
 		LCD_PutChar(PosX, PosY, TempChar);
+
+		// Word-wrap: If no room left on line, move to next line (if possible)
 		if (PosX < 312) {
 			PosX += 8;
 			if (asciisize == 24) {
@@ -386,43 +337,8 @@ void LCD_DrawFFT(uint8_t fftData[])
 		Pixel((int) temp + 40, 179 + j, RED);
 }
 
-void LCD_DrawLine(uint16_t Xpos, uint16_t Ypos, uint16_t Length, uint8_t Direction)
-{
-	uint32_t i = 0;
 
-	LCD_SetCursor(Xpos, Ypos);
-	if (Direction == LCD_DIR_HORIZONTAL) {
-		LCD_WriteRAM_Prepare(); /* Prepare to write GRAM */
-		for (i = 0; i < Length; i++) {
-			LCD_WriteRAM(TextColor);
-		}
-	}
-	else {
-		for (i = 0; i < Length; i++) {
-			LCD_WriteRAM_Prepare(); /* Prepare to write GRAM */
-			LCD_WriteRAM(TextColor);
-			Xpos++;
-			LCD_SetCursor(Xpos, Ypos);
-		}
-	}
-}
 
-void LCD_DrawRect(uint16_t Xpos, uint16_t Ypos, uint8_t Height, uint16_t Width)
-{
-	int x, y;
-	x = 0;
-	y = 0;
-	while (x < Height + 1) {
-		PutPixel(Xpos + x, Ypos);
-		PutPixel(Xpos + x, Ypos + Width);
-		x++;
-	}
-	while (y < Width + 1) {
-		PutPixel(Xpos, Ypos + y);
-		PutPixel(Xpos + Height, Ypos + y);
-		y++;
-	}
-}
 
 void LCD_DrawSquare(uint16_t Xpos, uint16_t Ypos, uint16_t a)
 {
@@ -784,7 +700,7 @@ void LCD_FillPolyLine(pPoint Points, uint16_t PointCount)
 		}
 	}
 
-	LCD_SetTextColor(BackColor);
+	LCD_SetTextColor(LCD_backColor);
 
 	/*  Loop through the rows of the image. */
 	for (pixelY = IMAGE_TOP; pixelY < IMAGE_BOTTOM; pixelY++) {
@@ -830,10 +746,10 @@ void LCD_FillPolyLine(pPoint Points, uint16_t PointCount)
 				if (nodeX[i + 1] > IMAGE_RIGHT) {
 					nodeX[i + 1] = IMAGE_RIGHT;
 				}
-				LCD_SetTextColor(BackColor);
+				LCD_SetTextColor(LCD_backColor);
 				LCD_DrawLine(pixelY, nodeX[i + 1], nodeX[i + 1] - nodeX[i],
 						LCD_DIR_HORIZONTAL);
-				LCD_SetTextColor(TextColor);
+				LCD_SetTextColor(LCD_textColor);
 				PutPixel(pixelY, nodeX[i + 1]);
 				PutPixel(pixelY, nodeX[i]);
 				/* for (j=nodeX[i]; j<nodeX[i+1]; j++) PutPixel(j,pixelY); */
@@ -842,7 +758,7 @@ void LCD_FillPolyLine(pPoint Points, uint16_t PointCount)
 	}
 
 	/* draw the edges */
-	LCD_SetTextColor(TextColor);
+	LCD_SetTextColor(LCD_textColor);
 }
 
 void LCD_BackLight(int procentai)
@@ -892,28 +808,6 @@ void TIM_Config(void)
 	TIM_OC3Init(TIM1, &TIM_OCInitStructure);
 	TIM_Cmd(TIM1, ENABLE);
 	TIM_CtrlPWMOutputs(TIM1, ENABLE);
-
-}
-//this function has been modified for the ILI9320 display. It has not really been tested
-//nor reviewed for horizotal / vertical switch in February
-
-void LCD_SetDisplayWindow(uint8_t Xpos, uint16_t Ypos, uint8_t Height,
-		uint16_t Width)
-{
-	if (Xpos >= Height) {
-		LCD_WriteReg(0x0050, (Xpos - Height + 1));  //Window X start address
-	}
-	else {
-		LCD_WriteReg(0x0050, 0x0000);
-	}
-	if (Ypos >= Width) {
-		LCD_WriteReg(0x0052, (Ypos - Width + 1));  //Window Y start address
-	}
-	else {
-		LCD_WriteReg(0x0052, 0x0000);
-	}
-	LCD_WriteReg(0x0053, Ypos);   //Window Y end address
-	LCD_SetCursor(Xpos, Ypos);
 
 }
 
@@ -1008,3 +902,4 @@ void Plot_Freq(uint32_t number, uint8_t x, uint8_t y, uint32_t changeRate)
 	// Reset color to black for next text write.
 	LCD_SetTextColor(BLACK);
 }
+

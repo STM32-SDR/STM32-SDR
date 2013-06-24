@@ -50,11 +50,22 @@ ST-Link (Download to the STM32F4-Discovery board):
 
 
 Eclipse:
+--------------------------------------------------
 	http://www.eclipse.org/downloads/
 	File: Eclipse IDE for C/C++ Developers
 
 	Extract the ZIP file anywhere you like.
 	- Create shortcut to desktop of the eclipse.exe file after extraction.
+	
+	Ensure that C/C++ Development plugins installed
+	- Help --> Install new software --> Programming Lanugages
+	  * Autotools
+	  * C/C++....
+	
+Project Setup
+-------------------------------------------------------------
+
+
 
 
 GDB Debugging:

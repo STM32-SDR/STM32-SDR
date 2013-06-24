@@ -37,6 +37,7 @@
    
 
 /* Includes ------------------------------------------------------------------*/
+#if 0
 #if defined(STM32F2XX)
 #include "stm32f2xx.h"
 #elif defined(STM32L1XX_MD)
@@ -44,6 +45,8 @@
 #else/* Suppose F1 Series */
 #include "stm32f10x.h"
 #endif
+#endif
+#include "stm32f4xx.h"
    
 #if USE_STM322xG_EVAL
    #include "stm32_eval.h"
@@ -61,9 +64,11 @@
 #define TSC_I2C_DEVICE_REGISTER     0x82
 #define JOY_I2C_DEVICE_REGISTER     0x88
 
+
 /** 
   * @brief   Touchscreen Controller DEFINES  
-  */ 
+  */
+#if 0
 /* Touchscreen Controller DEFINES for STM3210C-EVAL */
 #ifdef USE_STM3210C_EVAL
   #define TSC_I2C_PORT              I2C1
@@ -137,7 +142,32 @@
   #define TSC_IT_GPIO_PORT          GPIOI
   #define TSC_IT_GPIO_PIN           GPIO_Pin_2     
 #endif
+#endif
 
+// Discovery Board:
+#define TSC_I2C_PORT              I2C1
+#define TSC_I2C_CLK               RCC_APB1Periph_I2C1
+#define TSC_I2C_SDA_GPIO_PIN      GPIO_Pin_6
+#define TSC_I2C_SDA_GPIO_PORT     GPIOB
+#define TSC_I2C_SDA_GPIO_CLK      RCC_APB2Periph_GPIOB
+#define TSC_I2C_SDA_SOURCE        GPIO_PinSource6
+#define TSC_I2C_SDA_AF            GPIO_Remap_I2C1
+#define TSC_I2C_SCL_GPIO_PIN      GPIO_Pin_7
+#define TSC_I2C_SCL_GPIO_PORT     GPIOB
+#define TSC_I2C_SCL_GPIO_CLK      RCC_APB2Periph_GPIOB
+#define TSC_I2C_SCL_SOURCE        GPIO_PinSource7
+#define TSC_I2C_SCL_AF            GPIO_Remap_I2C1
+#define TSC_GPIO_PIN_SOURCE       GPIO_PinSource14
+#define TSC_IT_EXTI_PIN_SOURCE    GPIO_PinSource14
+#define TSC_GPIO_PORT_SOURCE      GPIO_PortSourceGPIOB
+#define TSC_EXTI_IRQ_CHANNEL      EXTI15_10_IRQn
+#define TSC_EXTI_LINE             EXTI_Line14
+#define TSC_IT_GPIO_CLK           RCC_APB2Periph_GPIOB
+#define TSC_IT_GPIO_PORT          GPIOB
+#define TSC_IT_GPIO_PIN           GPIO_Pin_14
+
+
+#if 0
 /** 
   * @brief   Joystick Controller DEFINES  
   */ 
@@ -306,7 +336,9 @@
   #error define a board
 
 #endif
+#endif
 
+#if 0
 /** 
   * @brief   KEY Button Controller DEFINES  
   */ 
@@ -348,6 +380,7 @@
   #define USER_BUTTON_PIN_ACTIVE     Bit_SET
 #else
   #error define a board
+#endif
 #endif
 
 /** 

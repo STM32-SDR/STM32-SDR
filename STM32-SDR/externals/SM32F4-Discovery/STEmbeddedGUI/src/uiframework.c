@@ -60,13 +60,13 @@ GL_Page_TypeDef LedCtrlScreen;
   */
 void Create_LedControlExample(void)
 {
-  GL_PageControls_TypeDef* LED_CTRL = NewLabel(1, "LED Control Example", GL_HORIZONTAL, GL_FONT_BIG, LED_CTRLColor);
-  GL_PageControls_TypeDef* Start_button = NewButton(2, "Start", LedControlExample_Start_button_Click);
-  GL_PageControls_TypeDef* DesignLabel01 = NewLabel(3, "This example allows to switch", GL_HORIZONTAL, GL_FONT_SMALL, DesignLabel01Color);
-  GL_PageControls_TypeDef* DesignLabel02 = NewLabel(4, "On/Off LEDs via switch buttons.", GL_HORIZONTAL, GL_FONT_SMALL, DesignLabel02Color);
+  GL_PageControls_TypeDef* LED_CTRL = NewLabel(1, (uint8_t*)"LED Control Example", GL_HORIZONTAL, GL_FONT_BIG, LCD_COLOR_GREEN);
+  GL_PageControls_TypeDef* Start_button = NewButton(2, (uint8_t*)"Start", LedControlExample_Start_button_Click);
+  GL_PageControls_TypeDef* DesignLabel01 = NewLabel(3, (uint8_t*)"This example allows to switch", GL_HORIZONTAL, GL_FONT_SMALL, DesignLabel01Color);
+  GL_PageControls_TypeDef* DesignLabel02 = NewLabel(4, (uint8_t*)"On/Off LEDs via switch buttons.", GL_HORIZONTAL, GL_FONT_SMALL, DesignLabel02Color);
   Create_PageObj( &LedControlExample );
   AddPageControlObj(311, 17, LED_CTRL, &LedControlExample);
-  AddPageControlObj(187, 135, Start_button, &LedControlExample);
+  AddPageControlObj(50, 135, Start_button, &LedControlExample);
   AddPageControlObj(275, 64, DesignLabel01, &LedControlExample);
   AddPageControlObj(283, 86, DesignLabel02, &LedControlExample);
 }
@@ -79,15 +79,15 @@ void Create_LedControlExample(void)
   */
 void Create_LedCtrlScreen(void)
 {
-  GL_PageControls_TypeDef* Led1_Switch = NewSwitch(5, "LED1 On", "LED1 Off", LedCtrlScreen_Led1_Switch_Toggle);
-  GL_PageControls_TypeDef* Led2_Switch = NewSwitch(6, "LED2 On", "LED2 Off", LedCtrlScreen_Led2_Switch_Toggle);
-  GL_PageControls_TypeDef* Led3_Switch = NewSwitch(7, "LED3 On", "LED3 Off", LedCtrlScreen_Led3_Switch_Toggle);
-  GL_PageControls_TypeDef* Led4_Switch = NewSwitch(8, "LED4 On", "LED4 Off", LedCtrlScreen_Led4_Switch_Toggle);
-  GL_PageControls_TypeDef* LED1_Switch_Label = NewLabel(9, "LED1 Control Switch", GL_HORIZONTAL, GL_FONT_SMALL, LED1_Switch_LabelColor);
-  GL_PageControls_TypeDef* LED2_Switch_Label = NewLabel(10, "LED2 Control Switch", GL_HORIZONTAL, GL_FONT_SMALL, LED2_Switch_LabelColor);
-  GL_PageControls_TypeDef* LED3_Switch_Label = NewLabel(11, "LED3 Control Switch", GL_HORIZONTAL, GL_FONT_SMALL, LED3_Switch_LabelColor);
-  GL_PageControls_TypeDef* LED4_Switch_Label = NewLabel(12, "LED4 Control Switch", GL_HORIZONTAL, GL_FONT_SMALL, LED4_Switch_LabelColor);
-  GL_PageControls_TypeDef* Back_Button = NewButton(13, "Back", LedCtrlScreen_Back_Button_Click);
+  GL_PageControls_TypeDef* Led1_Switch = NewSwitch(5, (uint8_t*)"LED1 On", (uint8_t*)"LED1 Off", LedCtrlScreen_Led1_Switch_Toggle);
+  GL_PageControls_TypeDef* Led2_Switch = NewSwitch(6, (uint8_t*)"LED2 On", (uint8_t*)"LED2 Off", LedCtrlScreen_Led2_Switch_Toggle);
+  GL_PageControls_TypeDef* Led3_Switch = NewSwitch(7, (uint8_t*)"LED3 On", (uint8_t*)"LED3 Off", LedCtrlScreen_Led3_Switch_Toggle);
+  GL_PageControls_TypeDef* Led4_Switch = NewSwitch(8, (uint8_t*)"LED4 On", (uint8_t*)"LED4 Off", LedCtrlScreen_Led4_Switch_Toggle);
+  GL_PageControls_TypeDef* LED1_Switch_Label = NewLabel(9, (uint8_t*)"LED1 Control Switch", GL_HORIZONTAL, GL_FONT_SMALL, LED1_Switch_LabelColor);
+  GL_PageControls_TypeDef* LED2_Switch_Label = NewLabel(10, (uint8_t*)"LED2 Control Switch", GL_HORIZONTAL, GL_FONT_SMALL, LED2_Switch_LabelColor);
+  GL_PageControls_TypeDef* LED3_Switch_Label = NewLabel(11, (uint8_t*)"LED3 Control Switch", GL_HORIZONTAL, GL_FONT_SMALL, LED3_Switch_LabelColor);
+  GL_PageControls_TypeDef* LED4_Switch_Label = NewLabel(12, (uint8_t*)"LED4 Control Switch", GL_HORIZONTAL, GL_FONT_SMALL, LED4_Switch_LabelColor);
+  GL_PageControls_TypeDef* Back_Button = NewButton(13, (uint8_t*)"Back", LedCtrlScreen_Back_Button_Click);
   Create_PageObj( &LedCtrlScreen );
   AddPageControlObj(104, 10, Led1_Switch, &LedCtrlScreen);
   AddPageControlObj(103, 50, Led2_Switch, &LedCtrlScreen);

@@ -83,8 +83,13 @@ void Check_BT_Flag(void)
 	// Read the link-status of the bluetooth module.
 	// TODO: Replace this with direct query call to the BT module (AT....)
 	//       because if the BT module not on board, pin floats.
-	// TODO: Replace BT_Flag with direct call to a isBluetoothConnected() function (OK in ISR?).
+	// TODO: Replace BT_Flag with direct call to a isBluetoothConnected() function.
 	BT_Flag = GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_10);
+}
+
+// TODO: Switch BT_Flag to using a function like this:
+int IsBTConnected(void) {
+	return GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_10);
 }
 
 //===============================================================================

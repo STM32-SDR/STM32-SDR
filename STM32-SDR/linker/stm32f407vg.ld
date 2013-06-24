@@ -15,7 +15,12 @@ ENTRY(Reset_Vector)
 
 top_of_stack	=	ORIGIN(RAM) + LENGTH(RAM);
 
+/*
 Heap_Size	=	0;
+
+Heap to 16K, set for the GUI framework which allocates on the heap.
+*/
+Heap_Size	=	0x3E80;
 
 Stack_Size	=	0x400;
 
@@ -117,6 +122,8 @@ SECTIONS
     . = . + Stack_Size;
     . = ALIGN(4);
   } >RAM
+  
+  PROVIDE(__HEAP_START = _end );
 
   /* CORE COUPLED MEMORY section, code must be located here explicitly            */
   /* Example: extern int foo(void) __attribute__ ((section (".ccmtext"))); */
