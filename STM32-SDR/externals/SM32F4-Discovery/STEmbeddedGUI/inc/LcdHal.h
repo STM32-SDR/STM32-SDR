@@ -57,29 +57,10 @@
 #endif
 
 #include "stm32_eval.h"
-#include "graphicObjectTypes.h"
 #include "LcdDriver_ILI9320.h"
 
-/** @addtogroup Embedded_GUI_Library
-  * @{
-  */
-
-/** @addtogroup LcdHal 
-  * @{
-  */ 
-
-/** @defgroup LcdHal_Exported_Types
-  * @{
-  */
-   
-/** 
-  * @brief  GL_BusType enumeration definition  
-  */
 typedef enum {GL_SPI = 0, GL_FSMC = 1, GL_OTHER = 2} GL_BusType;
 
-/** 
-  * @brief  GL_FlagStatus, GL_ITStatus enumeration definition  
-  */
 typedef enum {GL_RESET = 0, GL_SET = !GL_RESET} GL_FlagStatus, GL_ITStatus;
 
 /** 
@@ -89,6 +70,17 @@ typedef enum
 { GL_LOW   = Bit_RESET,
   GL_HIGH  = Bit_SET
 }GL_SignalActionType;
+
+// Supported fonts for SetFont
+typedef enum
+{
+	GL_FONTOPTION_16x24,
+	GL_FONTOPTION_12x12,
+	GL_FONTOPTION_8x16,
+	GL_FONTOPTION_8x12,
+	GL_FONTOPTION_8x12Bold,
+	GL_FONTOPTION_8x8,
+} GL_FontOption;
 
 typedef struct   
 { 
@@ -106,105 +98,68 @@ typedef struct
     GL_BusType     LCD_Connection_Mode;
 }LCD_HW_Parameters_TypeDef;
 
-/**
-  * @}
-  */
-
-/** @defgroup LcdHal_Imported_Variables
-  * @{
-  */
 extern __IO uint16_t          GL_TextColor;
 extern __IO uint16_t          GL_BackColor;
-/**
-  * @}
-  */
 
-/** @defgroup LcdHal_Exported_Constants
-  * @{
-  */
+/*LcdHal_Exported_Constants */
 #define GL_OFF                0x00
 #define GL_ON                 0x01
 
 /* LCD color */
-#define GL_White              White
-#define GL_Black              Black
-#define GL_Grey               Grey
-#define GL_Blue               Blue
-#define GL_Blue2              Blue2
-#define GL_Red                Red
-#define GL_Magenta            Magenta
-#define GL_Green              Green
-#define GL_Cyan               Cyan
-#define GL_Yellow             Yellow
+#define GL_White              LCD_COLOR_WHITE
+#define GL_Black              LCD_COLOR_BLACK
+#define GL_Grey               LCD_COLOR_GREY
+#define GL_Blue               LCD_COLOR_BLUE
+#define GL_Blue2              LCD_COLOR_NAVY
+#define GL_Red                LCD_COLOR_RED
+#define GL_Magenta            LCD_COLOR_MAGENTA
+#define GL_Green              LCD_COLOR_GREEN
+#define GL_Cyan               LCD_COLOR_CYAN
+#define GL_Yellow             LCD_COLOR_YELLOW
 
 #define GL_Horizontal         0x00
 #define GL_Vertical           0x01
 
-#define GL_FONT_BIG           0x00
-#define GL_FONT_SMALL         0x01
-#define GL_FONT_BIG_WIDTH       16
-#define GL_FONT_BIG_HEIGHT      24
-#define GL_FONT_SMALL_WIDTH      8
-#define GL_FONT_SMALL_HEIGHT    12
-
-#define FirstPixel            0x01
-#define MiddlePixel           0x02
-#define LastPixel             0x04
-#define SinglePixel           0x08
+#define GL_FONT_BIG           GL_FONTOPTION_16x24
+#define GL_FONT_SMALL         GL_FONTOPTION_8x16
 
 #define CursorColor           GL_Black
-/**
-  * @}
-  */
 
-/** @defgroup LcdHal_Exported_Variables
-  * @{
-  */
-extern __IO uint8_t           GL_Font;
-extern __IO uint8_t           GL_FontWidth;
-extern __IO uint8_t           GL_FontHeight;
-/**
-  * @}
-  */
 
-/** @defgroup LcdHal_Exported_Macros
-  * @{
-  */
 
-/**
-  * @}
-  */
-
-/** @defgroup LcdHal_Exported_Functions
-  * @{
-  */
 LCD_HW_Parameters_TypeDef* NewLcdHwParamObj (void);
 void GL_SetTextColor(__IO uint16_t TextColor);
 void GL_SetBackColor(__IO uint16_t BackColor);
 void GL_Clear(uint16_t Color);
-void GL_LCD_DrawCharTransparent(uint16_t Xpos, uint16_t Ypos, const uint16_t *c); /* 16bit char */
-void GL_LCD_DisplayChar(uint16_t Line, uint16_t Column, uint8_t Ascii, GL_bool Trasparent_Flag);
-void GL_DisplayAdjStringLine(uint16_t Line, uint16_t Column, uint8_t *ptr, GL_bool Transparent_Flag);
 void GL_SetDisplayWindow(uint16_t Xpos, uint16_t Ypos, uint16_t Height, uint16_t Width);
 void GL_DrawLine(uint16_t Xpos, uint16_t Ypos, uint16_t Length, uint8_t Direction);
 void GL_LCD_DrawRect(uint8_t Xpos, uint16_t Ypos, uint8_t Height, uint16_t Width);
 void GL_LCD_DrawCircle(uint8_t Xpos, uint16_t Ypos, uint16_t Radius);
-void GL_DrawBMP(uint8_t* ptrBitmap);
-void GL_SetFont(uint8_t uFont);
+//void GL_DrawBMP(uint8_t* ptrBitmap);
 void GL_BackLightSwitch(uint8_t u8_State);
 void GL_BUSConfig(GL_BusType busType);
-void GL_LCD_SPIConfig(void);
-void GL_LCD_FSMCConfig(void);
+//void GL_LCD_SPIConfig(void);
+//void GL_LCD_FSMCConfig(void);
 void GL_LCD_Init(void);
 void GL_LCD_WindowModeDisable(void);
-void GL_LCD_DrawChar(uint8_t Xpos, uint16_t Ypos, const uint16_t *c);
+
+
 void GL_LCD_CtrlLinesWrite(GPIO_TypeDef* GPIOx, uint16_t CtrlPins, GL_SignalActionType BitVal);
 uint16_t GL_LCD_ReadRAM(void);
 
 
-void LCD_WriteChar(uint16_t Xpos, uint16_t Ypos, const uint16_t *c);
-void LCD_PrintChar(uint16_t Line, uint16_t Column, uint8_t Ascii);
-void LCD_PrintStringLine(uint16_t Line, uint16_t Column, uint8_t *ptr);
+// TODO: Remove
+void GL_DisplayAdjStringLine(uint16_t Line, uint16_t Column, uint8_t *ptr, _Bool isTransparent);
+
+
+// NEW FUNCTIONS (by Brian)
+void GL_SetFont(uint8_t uFont);
+uint16_t GL_GetFontLetterWidth(void);
+uint16_t GL_GetFontLetterHeight(void);
+void GL_PrintString(uint16_t x, uint16_t y, const char *str, _Bool isTransparent);
+void GL_PrintChar(uint16_t x, uint16_t y, char c, _Bool isTransparent);
+
+void GL_TestDisplayScreen(void);
 
 
 #ifdef __cplusplus
@@ -212,17 +167,3 @@ void LCD_PrintStringLine(uint16_t Line, uint16_t Column, uint8_t *ptr);
 #endif
 
 #endif /*__LCD_HAL_H */
-
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
-
-/******************* (C) COPYRIGHT 2011 STMicroelectronics *****END OF FILE****/

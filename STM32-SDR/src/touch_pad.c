@@ -429,10 +429,10 @@ void Draw_Touch_Point(uint16_t x, uint16_t y)
 {
 	LCD_DrawUniLine(x - 12, y, x + 13, y);
 	LCD_DrawUniLine(x, y - 12, x, y + 13);
-	Pixel(x + 1, y + 1, RED);
-	Pixel(x - 1, y + 1, RED);
-	Pixel(x + 1, y - 1, RED);
-	Pixel(x - 1, y - 1, RED);
+	Pixel(x + 1, y + 1, LCD_COLOR_RED);
+	Pixel(x - 1, y + 1, LCD_COLOR_RED);
+	Pixel(x + 1, y - 1, LCD_COLOR_RED);
+	Pixel(x - 1, y - 1, LCD_COLOR_RED);
 	LCD_DrawCircle(x, y, 6);
 }
 

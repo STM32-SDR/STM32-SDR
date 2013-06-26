@@ -9,27 +9,39 @@ extern "C" {
 #include "stm32_eval.h"
 
 
+/*
+ * LCD Colours
+ */
+#define LCD_COLOR_WHITE          0xFFFF
+#define LCD_COLOR_BLACK          0x0000
+#define LCD_COLOR_GREY           0xF7DE
+#define LCD_COLOR_LGRAY          0xC618
+#define LCD_COLOR_DGRAY          0x7BEF
+#define LCD_COLOR_DGREEN         0x03E0
+#define LCD_COLOR_DCYAN          0x03EF
+#define LCD_COLOR_MAROON         0x7800
+#define LCD_COLOR_PURPLE         0x780F
+#define LCD_COLOR_OLIVE          0x7BE0
+#define LCD_COLOR_BLUE           0x001F
+#define LCD_COLOR_BLUE2          0x051F
+#define LCD_COLOR_NAVY           0x000F
+#define LCD_COLOR_RED            0xF800
+#define LCD_COLOR_MAGENTA        0xF81F
+#define LCD_COLOR_GREEN          0x07E0
+#define LCD_COLOR_CYAN           0x7FFF
+#define LCD_COLOR_YELLOW         0xFFE0
+
 
 // From LcdHal.h
-
 #define LCD_ILI9320 0x9320
 #define LCD_SPFD5408 0x5408
 extern __IO uint32_t LCDType;
 
 
 
-
 // Actual screen size:
-#define ACTUAL_SCREEN_WIDTH  ((uint16_t) 240)
-#define ACTUAL_SCREEN_HEIGHT ((uint16_t) 320)
-
-typedef enum
-{
-	_0_degree = 0,
-	_90_degree,
-	_180_degree,
-	_270_degree
-}LCD_Direction_TypeDef;
+#define LCD_ACTUAL_SCREEN_WIDTH  ((uint16_t) 240)
+#define LCD_ACTUAL_SCREEN_HEIGHT ((uint16_t) 320)
 
 /**
  * LCD_Direction_TypeDef enumeration definition
@@ -37,63 +49,40 @@ typedef enum
 // Set to 0, 90, 180, or 270
 #define LCD_ROTATION 270
 #if LCD_ROTATION == 0
-	#define LCD_Height  ACTUAL_SCREEN_HEIGHT
-	#define LCD_Width   ACTUAL_SCREEN_WIDTH
+	#define LCD_HEIGHT  LCD_ACTUAL_SCREEN_HEIGHT
+	#define LCD_WIDTH   LCD_ACTUAL_SCREEN_WIDTH
 #elif LCD_ROTATION == 90
-	#define LCD_Height  ACTUAL_SCREEN_WIDTH
-	#define LCD_Width   ACTUAL_SCREEN_HEIGHT
+	#define LCD_HEIGHT  LCD_ACTUAL_SCREEN_WIDTH
+	#define LCD_WIDTH   LCD_ACTUAL_SCREEN_HEIGHT
 #elif LCD_ROTATION == 180
-	#define LCD_Height  ACTUAL_SCREEN_HEIGHT
-	#define LCD_Width   ACTUAL_SCREEN_WIDTH
+	#define LCD_HEIGHT  LCD_ACTUAL_SCREEN_HEIGHT
+	#define LCD_WIDTH   LCD_ACTUAL_SCREEN_WIDTH
 #elif LCD_ROTATION == 270
-	#define LCD_Height  ACTUAL_SCREEN_WIDTH
-	#define LCD_Width   ACTUAL_SCREEN_HEIGHT
+	#define LCD_HEIGHT  LCD_ACTUAL_SCREEN_WIDTH
+	#define LCD_WIDTH   LCD_ACTUAL_SCREEN_HEIGHT
 #else
 	#error Must define LCD_ROTATION to be a direction
 #endif
 
-extern LCD_Direction_TypeDef LCD_Direction;
-
-/*
- * Screen rotation for direct graphic-ram writes.
- */
-// Work with the direct LCD RAM access
-#define R3_CMALWAYS_SET	0x1000
-#define R3_HORZ_DEC		0x0000
-#define R3_HORZ_INC		0x0010
-#define R3_VERT_DEC		0x0000
-#define R3_VERT_INC		0x0020
-#define R3_ADDR_HORIZ	0x0000
-#define R3_ADDR_VERT	0x0008
-#if SCREEN_ROTATED_180 == 1
-// Invert
-#define MAKE_R3_CMD(normal)	((normal) ^ (R3_HORZ_INC | R3_VERT_INC | R3_ADDR_VERT))
-#else
-// When upright
-#define MAKE_R3_CMD(normal)	(normal)
-#endif
-
-/* Set GRAM write direction and BGR = 1 */
-/* I/D=00 (Horizontal : decrement, Vertical : decrement) */
-/* AM=1 (address is updated in vertical writing direction) */
-#define LCDDRIVER_R3CMD_HDEC_VDEC_ADDRVERT	0x1008
-/* Set GRAM write direction and BGR = 1 */
-/* I/D = 01 (Horizontal : increment, Vertical : decrement) */
-/* AM = 1 (address is updated in vertical writing direction) */
-#define LCDDRIVER_R3CMD_HINC_VDEC_ADDRVERT	0x1018
-#define LCDDRIVER_R3CMD_DEFAULT LCDDRIVER_R3CMD_HINC_VDEC_ADDRVERT
 
 
+// TODO: Remove these.
 #define LCD_DIR_HORIZONTAL       0x0000
 #define LCD_DIR_VERTICAL         0x0001
 
+// Directions used for creating a line. Specify the start point, and then the direction.
+typedef enum
+{
+	LCD_WriteRAMDir_Right = 0,
+	LCD_WriteRAMDir_Down,
+	LCD_WriteRAMDir_Left,
+	LCD_WriteRAMDir_Up
+} LCD_WriteRAM_Direction;
 
 
+// TODO: Remove?
 void LCD_WriteRAMWord(uint16_t RGB_Code);
-void LCD_Change_Direction(LCD_Direction_TypeDef Direction);
-void LCD_DrawMonoBMP(const uint8_t *Pict, uint16_t Xpos_Init, uint16_t Ypos_Init, uint16_t Height, uint16_t Width);
 void LCD_DrawColorBMP(uint8_t* ptrBitmap, uint16_t Xpos_Init, uint16_t Ypos_Init, uint16_t Height, uint16_t Width);
-void LCD_FillArea(uint16_t Xpos_Init, uint16_t Ypos_Init, uint16_t Height, uint16_t Width, uint16_t color);
 
 
 uint16_t LCD_ReadReg(uint8_t LCD_Reg);
@@ -115,7 +104,7 @@ uint16_t LCD_GetPixel(uint16_t Xpos, uint16_t Ypos);
 
 // From TFT_Display.h
 //void LCD_Reset(void);
-//void LCD_Init(void);
+void LCD_Init(void);
 //void TIM_Config(void);
 //void LCD_CtrlLinesConfig(void);
 //void LCD_FSMCConfig(void);
@@ -151,6 +140,9 @@ void LCD_DrawRect(uint16_t Xpos, uint16_t Ypos, uint8_t Height, uint16_t Width);
 //void LCD_DrawFullSquare(uint16_t Xpos, uint16_t Ypos, uint16_t a);
 //
 
+void LCD_DrawBMP16Bit(int x, int y, int height, int width, const uint16_t* pBitmap, _Bool revByteOrder);
+void LCD_DrawBMP1Bit(int x, int y, int height, int width, const uint16_t* pBitmap, _Bool revBitOrder);
+void LCD_DrawBMP1BitTransparent(int x, int y, int height, int width, const uint16_t* pBitmap, _Bool revBitOrder);
 
 
 // Low-level access routines.
@@ -158,13 +150,13 @@ void LCD_WriteRAM_Prepare(void);
 void LCD_WriteRAM(uint16_t RGB_Code);
 void LCD_WriteReg(uint8_t LCD_Reg, uint16_t LCD_RegValue);
 void LCD_SetCursor(uint16_t Xpos, uint16_t Ypos);
-void LCD_SetDisplayWindow(uint8_t Xpos, uint16_t Ypos, uint16_t Height, uint16_t Width);
+void LCD_SetDisplayWindow(uint16_t Xpos, uint16_t Ypos, uint16_t Height, uint16_t Width);
 
 // Setup routines
 void LCD_DisplayOn(void);
 void LCD_DisplayOff(void);
+void LCD_BackLight(int procentai);
 
-//void LCD_BackLight(int procentai);
 //
 //void Display_ULong(uint16_t data, uint8_t XL, uint8_t YL);
 //
@@ -175,6 +167,7 @@ void LCD_DisplayOff(void);
 uint16_t LCD_ReadReg(uint8_t LCD_Reg);
 
 void LCD_TestDisplayScreen(void);
+
 
 
 #ifdef __cplusplus

@@ -1,3 +1,4 @@
+#if 0
 /*
  * AsciiLib.c
  *
@@ -1002,3 +1003,4 @@ void GetASCIICode5(short int * pBuffer,unsigned char ASCII)
 
 
 
+#endif

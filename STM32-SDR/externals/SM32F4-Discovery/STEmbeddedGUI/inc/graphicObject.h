@@ -78,25 +78,25 @@ extern __IO uint8_t joy_done;             /*!< joystick event status */
   */
 /*----- High layer function -----*/
                                     
-GL_PageControls_TypeDef* NewButton (uint16_t ID, const uint8_t* label,
+GL_PageControls_TypeDef* NewButton (uint16_t ID, const char* label,
                                     void (*pEventHandler)(void));
                                     
-GL_PageControls_TypeDef* NewCheckbox (uint16_t ID, const uint8_t* label,
+GL_PageControls_TypeDef* NewCheckbox (uint16_t ID, const char* label,
                                        void (*pEventHandler)(void));
                                        
-GL_PageControls_TypeDef* NewSwitch (uint16_t ID, const uint8_t* label_1, const uint8_t* label_2,
+GL_PageControls_TypeDef* NewSwitch (uint16_t ID, const char* label_1, const char* label_2,
                                     void (*pEventHandler)(void));
 
 /* Label handler **************************************************************/ 
-GL_PageControls_TypeDef* NewLabel (uint16_t ID, const uint8_t* label, GL_Direction direction,
-                                    __IO uint8_t FontSize, __IO uint16_t Colour);
+GL_PageControls_TypeDef* NewLabel (uint16_t ID, const char* label, GL_Direction direction,
+									GL_FontOption FontSize, __IO uint16_t Colour);
 
-GL_ErrStatus Set_Label ( GL_Page_TypeDef* pPage, uint16_t ID, const uint8_t* label );
+GL_ErrStatus Set_Label ( GL_Page_TypeDef* pPage, uint16_t ID, const char* label );
 
-GL_ErrStatus Get_Label ( GL_Page_TypeDef* pPage, uint16_t ID, uint8_t* label );
+GL_ErrStatus Get_Label ( GL_Page_TypeDef* pPage, uint16_t ID, char* label );
 
 /* Slidebar handler ***********************************************************/                                   
-GL_PageControls_TypeDef* NewSlidebar (uint16_t ID, const uint8_t* label,
+GL_PageControls_TypeDef* NewSlidebar (uint16_t ID, const char* label,
                                       GL_Direction direction, void (*pEventHandler)(void));
                                       
 uint8_t Get_SlidebarValue ( GL_Page_TypeDef* pPage, uint16_t ID );  
@@ -110,16 +110,16 @@ GL_ErrStatus SetIconImage(GL_Page_TypeDef* pPage, uint16_t ID,
                           const uint8_t* pImage, uint16_t Width, uint8_t Height);
 
 /* Histogram handler **********************************************************/                                       
-GL_PageControls_TypeDef* NewHistogram (uint16_t ID, const uint8_t* labelX,
-                                       const uint8_t* labelY, int16_t data_points[],
+GL_PageControls_TypeDef* NewHistogram (uint16_t ID, const char* labelX,
+                                       const char* labelY, int16_t data_points[],
                                        uint8_t n_points);
 
 GL_ErrStatus SetHistogramPoints( GL_Page_TypeDef* pPage, uint16_t ID,
                                  int16_t data_points[], uint8_t n_points );
 
 /* Graph handler **************************************************************/                                        
-GL_PageControls_TypeDef* NewGraphChart (uint16_t ID, const uint8_t* labelX,
-                                        const uint8_t* labelY, int16_t data_points[],
+GL_PageControls_TypeDef* NewGraphChart (uint16_t ID, const char* labelX,
+                                        const char* labelY, int16_t data_points[],
                                         uint8_t n_points, GL_bool Background );
 
 GL_ErrStatus SetGraphChartPoints( GL_Page_TypeDef* pPage, uint16_t ID,
@@ -127,15 +127,15 @@ GL_ErrStatus SetGraphChartPoints( GL_Page_TypeDef* pPage, uint16_t ID,
 /* Radio Button handler *******************************************************/ 
 GL_RadioButtonGrp_TypeDef* NewRadioButtonGrp (uint16_t ID);
 
-GL_PageControls_TypeDef* AddRadioOption (GL_RadioButtonGrp_TypeDef* pThis, const uint8_t* label, void (*pEventHandler)(void));
+GL_PageControls_TypeDef* AddRadioOption (GL_RadioButtonGrp_TypeDef* pThis, const char* label, void (*pEventHandler)(void));
 
 /* ComboBox handler ***********************************************************/ 
 GL_PageControls_TypeDef* NewComboBoxGrp (uint16_t ID);
-GL_ErrStatus AddComboOption (GL_ComboBoxGrp_TypeDef* pThis, const uint8_t* label, void (*pEventHandler)(void));
+GL_ErrStatus AddComboOption (GL_ComboBoxGrp_TypeDef* pThis, const char* label, void (*pEventHandler)(void));
 uint8_t GetComboOptionActive(GL_Page_TypeDef* pPage, uint16_t ID);
 GL_ErrStatus ResetComboOptionActive(GL_Page_TypeDef* pPage, uint16_t ID);
-const uint8_t* GetComboOptionLabel(GL_Page_TypeDef* pPage, uint16_t ID);
-GL_ErrStatus SetComboOptionLabel(GL_Page_TypeDef* pPage, uint16_t ID, const uint8_t* label);
+const char* GetComboOptionLabel(GL_Page_TypeDef* pPage, uint16_t ID);
+GL_ErrStatus SetComboOptionLabel(GL_Page_TypeDef* pPage, uint16_t ID, const char* label);
 
 /* Graphic Page handler *******************************************************/ 
 GL_ErrStatus Create_PageObj (GL_Page_TypeDef* pThis);
@@ -163,8 +163,6 @@ void GL_DrawButtonBMP(uint16_t maxX, uint16_t minX, uint16_t maxY,
 GL_bool GetObjStatus(GL_Page_TypeDef* pThis, uint16_t ID);
 
 GL_ErrStatus RefreshPageControl( GL_Page_TypeDef* pPage, uint16_t ID);
-
-void Set_LCD_Resolution( uint16_t Lcd_Width, uint16_t Lcd_Height );
 
 void NullFunc(void);
 

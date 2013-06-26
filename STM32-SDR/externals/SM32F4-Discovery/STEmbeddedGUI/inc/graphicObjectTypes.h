@@ -29,6 +29,7 @@
    
 /* Includes ------------------------------------------------------------------*/
 #include "stm32HAL.h"
+#include "LcdHal.h"
 
 /** @addtogroup Embedded_GUI_Library
   * @{
@@ -60,6 +61,9 @@
 #define HIST_MARGIN_LENGTH                   20
 #define GRAPH_MARGIN_LENGTH                  18
 
+#define GL_BUTTON_TEXT_COLOR				LCD_COLOR_WHITE
+
+//#define USE_2D_OBJECTS 1
 /**
   * @}
   */
@@ -163,8 +167,8 @@ typedef struct GL_LabelObj GL_Label_TypeDef;
 struct GL_LabelObj
 {
   uint16_t          ID;
-  uint8_t           label[MAX_LABEL_LENGTH];
-  __IO uint8_t      FontSize;
+  char              label[MAX_LABEL_LENGTH];
+  GL_FontOption     FontSize;
   GL_bool           Control_Visible;
   uint16_t          Colour;
   GL_Direction      Direction;
@@ -183,7 +187,7 @@ struct GL_ButtonObj
   uint8_t*          ImageClickedPTR;
   uint8_t*          ImageUnClickedPTR;
 #endif
-  uint8_t           label[MAX_BUTTON_LABEL_LENGTH];
+  char           label[MAX_BUTTON_LABEL_LENGTH];
   GL_bool           isObjectTouched;
   GL_bool           Control_Visible;
   void              (*EventHandler)(void);
@@ -202,7 +206,7 @@ struct GL_CheckboxObj
   uint8_t*          ImageCheckedPTR;
   uint8_t*          ImageUnCheckedPTR;
 #endif
-  uint8_t           label[MAX_CHECKBOX_LABEL_LENGTH];
+  char           label[MAX_CHECKBOX_LABEL_LENGTH];
   GL_bool           IsChecked;
   GL_bool           Control_Visible;
   void              (*EventHandler)(void);
@@ -221,8 +225,8 @@ struct GL_SwitchObj
   uint8_t*          ImageClickedPTR;
   uint8_t*          ImageUnClickedPTR;
 #endif
-  uint8_t           label_1[MAX_SWITCH_LABEL_LENGTH];
-  uint8_t           label_2[MAX_SWITCH_LABEL_LENGTH];
+  char           label_1[MAX_SWITCH_LABEL_LENGTH];
+  char           label_2[MAX_SWITCH_LABEL_LENGTH];
   GL_bool           isObjectTouched;
   GL_bool           Control_Visible;
   void              (*EventHandler)(void);
@@ -241,7 +245,7 @@ struct GL_RadioButtonGrp
   uint16_t                 ID;
   uint16_t                 RadioOptionCount;
   GL_PageControls_TypeDef* RadioOptions[MAX_RADIO_OPTIONS];
-  GL_PageControls_TypeDef* (*AddRadioOption)( GL_RadioButtonGrp_TypeDef* pThis, const uint8_t* label, void (*pEventHandler)(void) );
+  GL_PageControls_TypeDef* (*AddRadioOption)( GL_RadioButtonGrp_TypeDef* pThis, const char* label, void (*pEventHandler)(void) );
 };
 
 /** 
@@ -254,7 +258,7 @@ struct GL_RadioButtonOptionObj
   uint8_t*                   ImageCheckedPTR;
   uint8_t*                   ImageUnCheckedPTR;
 #endif
-  uint8_t                    label[MAX_RADIO_OPTION_LABEL_LENGTH];
+  char                    label[MAX_RADIO_OPTION_LABEL_LENGTH];
   GL_bool                    IsChecked;
   GL_bool                    Control_Visible;
   void                       (*EventHandler)(void);
@@ -280,7 +284,7 @@ struct GL_ComboBoxGrp
   GL_bool                   Control_Visible;
   uint16_t                  ComboOptionCount;
   GL_ComboOption_TypeDef*   ComboOptions[MAX_COMBO_OPTIONS];
-  GL_ErrStatus              (*AddComboOption)( GL_ComboBoxGrp_TypeDef* pThis, const uint8_t* label, void (*pEventHandler)(void) );
+  GL_ErrStatus              (*AddComboOption)( GL_ComboBoxGrp_TypeDef* pThis, const char* label, void (*pEventHandler)(void) );
 };
 
 /** 
@@ -291,7 +295,7 @@ struct GL_ComboOptionObj
   __IO uint16_t             BackColor;
   __IO uint16_t             TextColor;
   GL_ComboBoxGrp_TypeDef*   ComboBoxGrp;
-  uint8_t                   label[MAX_COMBO_LABEL_LENGTH];
+  char                   label[MAX_COMBO_LABEL_LENGTH];
   GL_bool                   IsActive;
   void                      (*EventHandler)(void);
 };
@@ -326,7 +330,7 @@ struct GL_SlidebarObj
   uint8_t*           ImageCursorPTR;
   uint8_t*           ImageBackgroundPTR;
 #endif
-  uint8_t            label[MAX_SLIDE_LABEL_LENGTH];
+  char            label[MAX_SLIDE_LABEL_LENGTH];
   GL_Direction       Direction;
   uint8_t            Width;
   uint8_t            Length;
@@ -348,8 +352,8 @@ typedef struct GL_HistogramObj GL_Histogram_TypeDef;
 struct GL_HistogramObj
 {
   uint16_t      ID;
-  uint8_t       label_X[MAX_HIST_LABEL_LENGTH];
-  uint8_t       label_Y[MAX_HIST_LABEL_LENGTH];
+  char          label_X[MAX_HIST_LABEL_LENGTH];
+  char          label_Y[MAX_HIST_LABEL_LENGTH];
   int16_t       points[MAX_HIST_POINTS];
   uint8_t       n_points;
   GL_bool       Control_Visible;
@@ -364,8 +368,8 @@ typedef struct GL_GraphChartObj GL_GraphChart_TypeDef;
 struct GL_GraphChartObj
 {
   uint16_t      ID;
-  uint8_t       label_X[MAX_GRAPH_LABEL_LENGTH];
-  uint8_t       label_Y[MAX_GRAPH_LABEL_LENGTH];
+  char       label_X[MAX_GRAPH_LABEL_LENGTH];
+  char       label_Y[MAX_GRAPH_LABEL_LENGTH];
   int16_t       points[MAX_GRAPH_POINTS];
   uint8_t       n_points;
   GL_bool       Background;

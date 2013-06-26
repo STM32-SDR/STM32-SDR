@@ -23,6 +23,7 @@
 #include	"usbh_usr.h"
 
 #include 	"LcdDriver_ILI9320.h"
+#include	"LcdHal.h"
 
 #include	"uiframework.h"
 
@@ -55,17 +56,12 @@ int main(void)
 {
 	initializeHardware();
 
-	LCD_TestDisplayScreen();
-//	Show_HomeScreen();
+//	LCD_TestDisplayScreen();
+//	GL_TestDisplayScreen();
+	Show_HomeScreen();
 
 	while (1) {
 		continue;
-		// for debugging the LCD routines.
-		LCD_SetTextColor(RED);
-		LCD_DrawLine(0, 50, 20, LCD_DIR_HORIZONTAL);
-		LCD_StringLine(0, 100, "123456789a123456789b123456789c123456789d123456789e123456789f123456789g");
-
-
 		if (DSP_Flag == 1) {
 			for (int16_t j = 0; j < 128; j++) {
 				//Changed for getting right display with SR6.3

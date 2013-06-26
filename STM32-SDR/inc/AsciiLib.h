@@ -1,4 +1,7 @@
+#if 0
 /*
+
+
  * AsciiLib.h
  *
  *  Created on: Dec 19, 2012
@@ -21,3 +24,4 @@ void GetASCIICode4(unsigned char* pBuffer, unsigned char ASCII);
 void GetASCIICode5(short int * pBuffer, unsigned char ASCII);
 
 #endif /* ASCIILIB_H_ */
+#endif

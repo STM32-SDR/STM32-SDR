@@ -1,4 +1,6 @@
+#include <assert.h>
 #include <stdlib.h>
+#include "stm32_eval.h"
 #include "LcdDriver_ILI9320.h"
 
 
@@ -9,7 +11,7 @@
 #define LCD_RAM      (*((volatile unsigned short *) 0x60020000))
 
 
-// Work with the direct LCD RAM access
+// Work with the direct LCD RAM access & rotation
 #define R3_CMALWAYS_SET	  0x1000
 #define R3_VERTICAL_BIT   5		// Set 0 for Increment, 1 for decrement
 #define R3_HORIZONTAL_BIT 4		// Set 0 for Increment, 1 for decrement
@@ -25,60 +27,331 @@
 #define LCD_ROTATE_GETX(x,y) (x)
 #define LCD_ROTATE_GETY(x,y) (y)
 #define BUILD_R3_CMD(horizontalIncDec, verticalIncDec, addressDir) \
-		(R3_CMALWAYS_SET | (horizontalIncDec << R3_VERTICAL_BIT) | (verticalIncDec << R3_HORIZONTAL_BIT) | (addressDir << R3_ADDRESS_BIT))
+		(R3_CMALWAYS_SET | (verticalIncDec << R3_VERTICAL_BIT) | (horizontalIncDec << R3_HORIZONTAL_BIT) | (addressDir << R3_ADDRESS_BIT))
 #elif LCD_ROTATION == 90
 #define LCD_ROTATE_GETX(x,y) (y)
-#define LCD_ROTATE_GETY(x,y) (ACTUAL_SCREEN_HEIGHT - (x) - 1)
+#define LCD_ROTATE_GETY(x,y) (LCD_ACTUAL_SCREEN_HEIGHT - (x) - 1)
 #define BUILD_R3_CMD(horizontalIncDec, verticalIncDec, addressDir) \
-		((R3_CMALWAYS_SET) | (!(verticalIncDec) << R3_VERTICAL_BIT) | ((horizontalIncDec) << R3_HORIZONTAL_BIT) | (!(addressDir) << R3_ADDRESS_BIT))
+		((R3_CMALWAYS_SET) | (!(horizontalIncDec) << R3_VERTICAL_BIT) | ((verticalIncDec) << R3_HORIZONTAL_BIT) | (!(addressDir) << R3_ADDRESS_BIT))
 #elif LCD_ROTATION == 180
-#define LCD_ROTATE_GETX(x,y) (ACTUAL_SCREEN_WIDTH - (x) - 1)
-#define LCD_ROTATE_GETY(x,y) (ACTUAL_SCREEN_HEIGHT - (y) - 1)
+#define LCD_ROTATE_GETX(x,y) (LCD_ACTUAL_SCREEN_WIDTH - (x) - 1)
+#define LCD_ROTATE_GETY(x,y) (LCD_ACTUAL_SCREEN_HEIGHT - (y) - 1)
 #define BUILD_R3_CMD(horizontalIncDec, verticalIncDec, addressDir) \
-		((R3_CMALWAYS_SET) | (!(horizontalIncDec) << R3_VERTICAL_BIT) | (!(verticalIncDec) << R3_HORIZONTAL_BIT) | ((addressDir) << R3_ADDRESS_BIT))
+		((R3_CMALWAYS_SET) | (!(verticalIncDec) << R3_VERTICAL_BIT) | (!(horizontalIncDec) << R3_HORIZONTAL_BIT) | ((addressDir) << R3_ADDRESS_BIT))
 #elif LCD_ROTATION == 270
-#define LCD_ROTATE_GETX(x,y) (ACTUAL_SCREEN_WIDTH - (y) - 1)
+#define LCD_ROTATE_GETX(x,y) (LCD_ACTUAL_SCREEN_WIDTH - (y) - 1)
 #define LCD_ROTATE_GETY(x,y) (x)
 #define BUILD_R3_CMD(horizontalIncDec, verticalIncDec, addressDir) \
-		((R3_CMALWAYS_SET) | ((verticalIncDec) << R3_VERTICAL_BIT) | (!(horizontalIncDec) << R3_HORIZONTAL_BIT) | (!(addressDir) << R3_ADDRESS_BIT))
+		((R3_CMALWAYS_SET) | ((horizontalIncDec) << R3_VERTICAL_BIT) | (!(verticalIncDec) << R3_HORIZONTAL_BIT) | (!(addressDir) << R3_ADDRESS_BIT))
 #else
 #error Must define LCD_ROTATION to be a direction
 #endif
 
 
-void assert(_Bool condition)
-{
-	volatile int bugger = 0;
-	if (!condition) {
-		while (1)
-			bugger ++;
-	}
-}
-
-
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-//
-//		From LcdHal.c
-//
-//
-//////////////////////////////////////////////////////////////////////////////////////////////////////
-//#include "gl_fonts.h"
-#include "stm32_eval.h"
-
-
-LCD_Direction_TypeDef LCD_Direction = _0_degree;
-__IO uint32_t LCDType = LCD_ILI9320;
-
-
-
-// FROM TFT_DISPLAY (top stuff)
+// Colours for Monochrome images.
 __IO uint16_t LCD_textColor = 0x0000;
 __IO uint16_t LCD_backColor = 0xFFFF;
 
 
+// Private functions
+static void TFT_Delay(uint32_t nTime);
+static void LCD_Reset(void);
+static void LCD_CtrlLinesConfig(void);
+static void LCD_FSMCConfig(void);
+static void TIM_Config(void);
 
+
+void __assert_func(const char *file, int line, const char *assertFunc, const char *e)
+{
+	volatile int bugger = 0;
+	while (1)
+		bugger ++;
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+//		Initialization
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+void LCD_Init(void)
+{
+	LCD_CtrlLinesConfig();
+	TFT_Delay(3000);
+
+	LCD_Reset();
+	TFT_Delay(3000);
+
+	LCD_FSMCConfig();
+	TFT_Delay(3000);
+	TIM_Config();
+	LCD_BackLight(100);
+
+	LCD_WriteReg(0x00E5, 0x8000);
+	LCD_WriteReg(0x0000, 0x0001);
+	LCD_WriteReg(0x0001, 0x0100);
+	LCD_WriteReg(0x0002, 0x0700);
+	LCD_WriteReg(0x0003, 0x1030);
+	LCD_WriteReg(0x0004, 0x0000);
+	LCD_WriteReg(0x0008, 0x0202);
+	LCD_WriteReg(0x0009, 0x0000);
+	LCD_WriteReg(0x000A, 0x0000);
+	LCD_WriteReg(0x000C, 0x0000);
+	LCD_WriteReg(0x000D, 0x0000);
+	LCD_WriteReg(0x000F, 0x0000);
+
+	LCD_WriteReg(0x0010, 0x0000);
+	LCD_WriteReg(0x0011, 0x0000);
+	LCD_WriteReg(0x0012, 0x0000);
+	LCD_WriteReg(0x0013, 0x0000);
+
+	LCD_WriteReg(0x0010, 0x17B0);
+	LCD_WriteReg(0x0011, 0x0037);
+	TFT_Delay(50); // Delay 50ms
+	LCD_WriteReg(0x0012, 0x013B);
+	TFT_Delay(50); // Delay 50ms
+	LCD_WriteReg(0x0013, 0x1800);
+	LCD_WriteReg(0x0029, 0x000F);
+	TFT_Delay(50); // Delay 50ms
+	LCD_WriteReg(0x0020, 0x0000);
+	LCD_WriteReg(0x0021, 0x0000);
+
+	LCD_WriteReg(0x0030, 0x0000);
+	LCD_WriteReg(0x0031, 0x0007);
+	LCD_WriteReg(0x0032, 0x0103);
+	LCD_WriteReg(0x0035, 0x0407);
+	LCD_WriteReg(0x0036, 0x090F);
+	LCD_WriteReg(0x0037, 0x0404);
+	LCD_WriteReg(0x0038, 0x0400);
+	LCD_WriteReg(0x0039, 0x0404);
+	LCD_WriteReg(0x003C, 0x0000);
+	LCD_WriteReg(0x003D, 0x0400);
+
+	LCD_WriteReg(0x0050, 0x0000);
+	LCD_WriteReg(0x0051, 0x00EF);
+	LCD_WriteReg(0x0052, 0x0000);
+	LCD_WriteReg(0x0053, 0x013F);
+	LCD_WriteReg(0x0060, 0x2700);
+	LCD_WriteReg(0x0061, 0x0001);
+	LCD_WriteReg(0x006A, 0x0000);
+
+	LCD_WriteReg(0x0080, 0x0000);
+	LCD_WriteReg(0x0081, 0x0000);
+	LCD_WriteReg(0x0082, 0x0000);
+	LCD_WriteReg(0x0083, 0x0000);
+	LCD_WriteReg(0x0084, 0x0000);
+	LCD_WriteReg(0x0085, 0x0000);
+
+	LCD_WriteReg(0x0090, 0x0010);
+	LCD_WriteReg(0x0092, 0x0000);
+	LCD_WriteReg(0x0093, 0x0003);
+	LCD_WriteReg(0x0095, 0x0110);
+	LCD_WriteReg(0x0097, 0x0000);
+	LCD_WriteReg(0x0098, 0x0000);
+	LCD_WriteReg(0x0007, 0x0173);
+}
+
+
+
+
+static void TFT_Delay(uint32_t nTime)
+{
+	static __IO uint32_t TimingDelay;
+	TimingDelay = nTime;
+
+	while (TimingDelay != 0) {
+		TimingDelay--;
+	}
+}
+
+static void LCD_CtrlLinesConfig(void)
+{
+
+	GPIO_InitTypeDef GPIO_InitStructure;
+
+	//Added Explicit Reset on Pin B1
+	/* Enable LCD Reset GPIO clock */
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
+
+	/* LCD reset pin configuration -------------------------------------------------*/
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+	GPIO_Init(GPIOB, &GPIO_InitStructure);
+	//
+
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD | RCC_AHB1Periph_GPIOE, ENABLE);
+	RCC_AHB3PeriphClockCmd(RCC_AHB3Periph_FSMC, ENABLE);
+
+	GPIO_PinAFConfig(GPIOD, GPIO_PinSource0, GPIO_AF_FSMC );		// D2
+	GPIO_PinAFConfig(GPIOD, GPIO_PinSource1, GPIO_AF_FSMC );		// D3
+	GPIO_PinAFConfig(GPIOD, GPIO_PinSource4, GPIO_AF_FSMC );		// NOE -> RD
+	GPIO_PinAFConfig(GPIOD, GPIO_PinSource5, GPIO_AF_FSMC );		// NWE -> WR
+	GPIO_PinAFConfig(GPIOD, GPIO_PinSource7, GPIO_AF_FSMC );		// NE1 -> CS
+	GPIO_PinAFConfig(GPIOD, GPIO_PinSource8, GPIO_AF_FSMC );		// D13
+	GPIO_PinAFConfig(GPIOD, GPIO_PinSource9, GPIO_AF_FSMC );		// D14
+	GPIO_PinAFConfig(GPIOD, GPIO_PinSource10, GPIO_AF_FSMC );		// D15
+	GPIO_PinAFConfig(GPIOD, GPIO_PinSource11, GPIO_AF_FSMC );		// A16 -> RS
+	GPIO_PinAFConfig(GPIOD, GPIO_PinSource14, GPIO_AF_FSMC );		// D0
+	GPIO_PinAFConfig(GPIOD, GPIO_PinSource15, GPIO_AF_FSMC );		// D1
+
+	GPIO_PinAFConfig(GPIOE, GPIO_PinSource7, GPIO_AF_FSMC );		// D4
+	GPIO_PinAFConfig(GPIOE, GPIO_PinSource8, GPIO_AF_FSMC );		// D5
+	GPIO_PinAFConfig(GPIOE, GPIO_PinSource9, GPIO_AF_FSMC );		// D6
+	GPIO_PinAFConfig(GPIOE, GPIO_PinSource10, GPIO_AF_FSMC );		// D7
+	GPIO_PinAFConfig(GPIOE, GPIO_PinSource11, GPIO_AF_FSMC );		// D8
+	GPIO_PinAFConfig(GPIOE, GPIO_PinSource12, GPIO_AF_FSMC );		// D9
+	GPIO_PinAFConfig(GPIOE, GPIO_PinSource13, GPIO_AF_FSMC );		// D10
+	GPIO_PinAFConfig(GPIOE, GPIO_PinSource14, GPIO_AF_FSMC );		// D11
+	GPIO_PinAFConfig(GPIOE, GPIO_PinSource15, GPIO_AF_FSMC );		// D12
+
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_4
+			| GPIO_Pin_5 | GPIO_Pin_7 | GPIO_Pin_8 | GPIO_Pin_9 | GPIO_Pin_10
+			| GPIO_Pin_11 | GPIO_Pin_14 | GPIO_Pin_15;
+
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+	//GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	//GPIO_InitStructure.GPIO_OType = GPIO_OType_OD;
+	//GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_UP;
+	GPIO_Init(GPIOD, &GPIO_InitStructure);
+
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_7 | GPIO_Pin_8 | GPIO_Pin_9
+			| GPIO_Pin_10 | GPIO_Pin_11 | GPIO_Pin_12 | GPIO_Pin_13
+			| GPIO_Pin_14 | GPIO_Pin_15;
+
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+	//GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	//GPIO_InitStructure.GPIO_OType = GPIO_OType_OD;
+	//GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_UP;
+	GPIO_Init(GPIOE, &GPIO_InitStructure);
+}
+
+
+static TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
+static TIM_OCInitTypeDef TIM_OCInitStructure;
+static void TIM_Config(void)
+{
+	GPIO_InitTypeDef GPIO_InitStructure;
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
+	GPIO_Init(GPIOA, &GPIO_InitStructure);
+	GPIO_PinAFConfig(GPIOA, GPIO_PinSource8, GPIO_AF_TIM1 );
+
+	uint16_t TimerPeriod = (SystemCoreClock / 17570) - 1;
+	uint16_t Channel1Pulse = (uint16_t) (((uint32_t) 99 * (TimerPeriod - 1)) / 100);
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1, ENABLE);
+
+	TIM_TimeBaseStructure.TIM_Prescaler = 0;
+	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
+	TIM_TimeBaseStructure.TIM_Period = TimerPeriod;
+	TIM_TimeBaseStructure.TIM_ClockDivision = 0;
+	TIM_TimeBaseStructure.TIM_RepetitionCounter = 0;
+	TIM_TimeBaseInit(TIM1, &TIM_TimeBaseStructure);
+
+	TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM2;
+	TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
+	TIM_OCInitStructure.TIM_OutputNState = TIM_OutputNState_Enable;
+	TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_Low;
+	TIM_OCInitStructure.TIM_OCNPolarity = TIM_OCNPolarity_High;
+	TIM_OCInitStructure.TIM_OCIdleState = TIM_OCIdleState_Set;
+	TIM_OCInitStructure.TIM_OCNIdleState = TIM_OCIdleState_Reset;
+	//TIM_OCInitStructure.TIM_Pulse = Channel3Pulse;
+	TIM_OCInitStructure.TIM_Pulse = Channel1Pulse;
+	TIM_OC3Init(TIM1, &TIM_OCInitStructure);
+	TIM_Cmd(TIM1, ENABLE);
+	TIM_CtrlPWMOutputs(TIM1, ENABLE);
+}
+
+
+void LCD_BackLight(int procentOn)
+{
+	if (procentOn > 100) {
+		procentOn = 100;
+	}
+	if (procentOn < 0) {
+		procentOn = 0;
+	}
+
+	uint16_t TimerPeriod = (SystemCoreClock / 17570) - 1;
+	uint16_t channel1Pulse =
+			(uint16_t) (((uint32_t) procentOn * (TimerPeriod - 1)) / 100);
+	TIM_TimeBaseStructure.TIM_Period = TimerPeriod;
+	TIM_OCInitStructure.TIM_Pulse = channel1Pulse;
+	TIM_OC1Init(TIM1, &TIM_OCInitStructure);
+}
+
+static void LCD_FSMCConfig(void)
+{
+	FSMC_NORSRAMInitTypeDef FSMC_NORSRAMInitStructure;
+	FSMC_NORSRAMTimingInitTypeDef FSMC_NORSRAMTimingInitStructure;
+	FSMC_NORSRAMTimingInitStructure.FSMC_AddressSetupTime = 0;  //0
+	FSMC_NORSRAMTimingInitStructure.FSMC_AddressHoldTime = 0;   //0
+	FSMC_NORSRAMTimingInitStructure.FSMC_DataSetupTime = 2;     //3
+	FSMC_NORSRAMTimingInitStructure.FSMC_BusTurnAroundDuration = 0;
+	FSMC_NORSRAMTimingInitStructure.FSMC_CLKDivision = 1;     //1
+	FSMC_NORSRAMTimingInitStructure.FSMC_DataLatency = 0;
+	FSMC_NORSRAMTimingInitStructure.FSMC_AccessMode = FSMC_AccessMode_A;
+
+	FSMC_NORSRAMInitStructure.FSMC_Bank = FSMC_Bank1_NORSRAM1;
+	FSMC_NORSRAMInitStructure.FSMC_DataAddressMux = FSMC_DataAddressMux_Disable;
+	FSMC_NORSRAMInitStructure.FSMC_MemoryType = FSMC_MemoryType_SRAM;
+	FSMC_NORSRAMInitStructure.FSMC_MemoryDataWidth = FSMC_MemoryDataWidth_16b;
+	FSMC_NORSRAMInitStructure.FSMC_BurstAccessMode = FSMC_BurstAccessMode_Disable;
+	FSMC_NORSRAMInitStructure.FSMC_WaitSignalPolarity = FSMC_WaitSignalPolarity_Low;
+	FSMC_NORSRAMInitStructure.FSMC_WrapMode = FSMC_WrapMode_Disable;
+	FSMC_NORSRAMInitStructure.FSMC_WaitSignalActive = FSMC_WaitSignalActive_BeforeWaitState;
+	FSMC_NORSRAMInitStructure.FSMC_WriteOperation = FSMC_WriteOperation_Enable;
+	FSMC_NORSRAMInitStructure.FSMC_WaitSignal = FSMC_WaitSignal_Disable;
+	FSMC_NORSRAMInitStructure.FSMC_AsynchronousWait = FSMC_AsynchronousWait_Disable;
+	FSMC_NORSRAMInitStructure.FSMC_ExtendedMode = FSMC_ExtendedMode_Disable;
+	FSMC_NORSRAMInitStructure.FSMC_WriteBurst = FSMC_WriteBurst_Enable; //disable
+	FSMC_NORSRAMInitStructure.FSMC_ReadWriteTimingStruct = &FSMC_NORSRAMTimingInitStructure;
+
+	FSMC_NORSRAMInit(&FSMC_NORSRAMInitStructure);
+	FSMC_NORSRAMTimingInitStructure.FSMC_AddressSetupTime = 0;    //0
+	FSMC_NORSRAMTimingInitStructure.FSMC_AddressHoldTime = 0;	//0
+	FSMC_NORSRAMTimingInitStructure.FSMC_DataSetupTime = 4;	//3
+	FSMC_NORSRAMTimingInitStructure.FSMC_BusTurnAroundDuration = 0;
+	FSMC_NORSRAMTimingInitStructure.FSMC_CLKDivision = 1;	//1
+	FSMC_NORSRAMTimingInitStructure.FSMC_DataLatency = 0;
+	FSMC_NORSRAMTimingInitStructure.FSMC_AccessMode = FSMC_AccessMode_A;
+	FSMC_NORSRAMInitStructure.FSMC_WriteTimingStruct = &FSMC_NORSRAMTimingInitStructure;
+	FSMC_NORSRAMInit(&FSMC_NORSRAMInitStructure);
+
+	FSMC_NORSRAMCmd(FSMC_Bank1_NORSRAM1, ENABLE);
+}
+
+static void LCD_Reset(void)
+{
+	/* Power Down the reset */
+	GPIO_WriteBit(GPIOB, GPIO_Pin_1, Bit_RESET);
+
+	/* wait for a delay to insure registers erasing */
+	TFT_Delay(0x4FFF);
+
+	/* Power on the reset */
+	GPIO_WriteBit(GPIOB, GPIO_Pin_1, Bit_SET);
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+//		From LcdHal.c
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+//#include "gl_fonts.h"
+
+__IO uint32_t LCDType = LCD_ILI9320;
 
 
 //#if defined (USE_STM3210E_EVAL) || defined (USE_STM32100E_EVAL) || defined (USE_STM322xG_EVAL)
@@ -93,183 +366,6 @@ void LCD_WriteRAMWord(uint16_t RGB_Code)
 	LCD_WriteRAM(RGB_Code);
 }
 //#endif /* USE_STM3210E_EVAL */
-
-/**
- * @brief  LCD_Change_Direction
- * @param  Direction: The Drawing Direction
- *         This parameter can be one of the following values:
- *     @arg  _0_degree
- *     @arg  _90_degree
- *     @arg  _180_degree
- *     @arg  _270_degree
- * @retval None
- */
-void LCD_Change_Direction(LCD_Direction_TypeDef Direction)
-{
-	LCD_Direction = Direction;
-
-	if (LCD_Direction == _0_degree) {
-		/* Set GRAM write direction and BGR = 1 */
-		/* I/D=01 (Horizontal : increment, Vertical : decrement) */
-		/* AM=1 (address is updated in vertical writing direction) */
-		LCD_WriteReg(R3, MAKE_R3_CMD(0x1018));
-	}
-	else if (LCD_Direction == _90_degree) {
-		/* Set GRAM write direction and BGR = 1 */
-		/* I/D=11 (Horizontal : increment, Vertical : increment) */
-		/* AM=0 (address is updated in horizontal writing direction) */
-		LCD_WriteReg(R3, MAKE_R3_CMD(0x1030));
-	}
-	else if (LCD_Direction == _180_degree) {
-		/* Set GRAM write direction and BGR = 1 */
-		/* I/D=10 (Horizontal : decrement, Vertical : increment) */
-		/* AM=1 (address is updated in vertical writing direction) */
-		LCD_WriteReg(R3, MAKE_R3_CMD(0x1028));
-	}
-	else if (LCD_Direction == _270_degree) {
-		/* Set GRAM write direction and BGR = 1 */
-		/* I/D=00 (Horizontal : decrement, Vertical : decrement) */
-		/* AM=0 (address is updated in horizontal writing direction) */
-		LCD_WriteReg(R3, MAKE_R3_CMD(0x1000));
-	}
-}
-
-
-#if 0
-/**
- * @brief  LCD_DrawMonoBMP
- * @param  *Pict:   The pointer to the image
- * @param  Xpos_Init: The X axis position
- * @param  Ypos_Init: The Y axis position
- * @param  Height:    The Height of the image
- * @param  Width:     The Width of the image
- * @retval None
- */
-void LCD_DrawMonoBMP(const uint8_t *Pict, uint16_t Xpos_Init, uint16_t Ypos_Init, uint16_t Height, uint16_t Width)
-{
-	int32_t index = 0, counter = 0;
-
-	if (LCD_Direction == _0_degree) {
-		LCD_SetDisplayWindow(Xpos_Init, Ypos_Init, Height, Width);
-		/* Set GRAM write direction and BGR = 1 */
-		/* I/D=00 (Horizontal : decrement, Vertical : decrement) */
-		/* AM=1 (address is updated in vertical writing direction) */
-		LCD_WriteReg(R3, MAKE_R3_CMD(0x1008));
-	}
-	else if (LCD_Direction == _90_degree) {
-		LCD_SetDisplayWindow(Xpos_Init + Width - 1, Ypos_Init, Width, Height);
-		/* Set GRAM write direction and BGR = 1 */
-		/* I/D=01 (Horizontal : increment, Vertical : decrement) */
-		/* AM=0 (address is updated in horizontal writing direction) */
-		LCD_WriteReg(R3, MAKE_R3_CMD(0x1010));
-	}
-	else if (LCD_Direction == _180_degree) {
-		LCD_SetDisplayWindow(Xpos_Init + Height - 1, Ypos_Init + Width - 1, Height, Width);
-		/* Set GRAM write direction and BGR = 1 */
-		/* I/D=11 (Horizontal : increment, Vertical : increment) */
-		/* AM=1 (address is updated in vertical writing direction) */
-		LCD_WriteReg(R3, MAKE_R3_CMD(0x1038));
-	}
-	else if (LCD_Direction == _270_degree) {
-		LCD_SetDisplayWindow(Xpos_Init, Ypos_Init + Height - 1, Width, Height);
-		/* Set GRAM write direction and BGR = 1 */
-		/* I/D=10 (Horizontal : decrement, Vertical : increment) */
-		/* AM=0 (address is updated in horizontal writing direction) */
-		LCD_WriteReg(R3, MAKE_R3_CMD(0x1020));
-	}
-
-	LCD_SetCursor(Xpos_Init, Ypos_Init);
-
-	if ((LCDType == LCD_ILI9320) || (LCDType == LCD_SPFD5408)) {
-		/* Prepare to write GRAM */
-		LCD_WriteRAM_Prepare();
-	}
-
-	for (index = 0; index < (Height * Width) / 8; index++) {
-		for (counter = 7; counter >= 0; counter--) {
-			if ((Pict[index] & (1 << counter)) == 0x00) {
-				LCD_WriteRAM(LCD_backColor);
-			}
-			else {
-				LCD_WriteRAM(LCD_textColor);
-			}
-		}
-	}
-
-	if ((LCDType == LCD_ILI9320) || (LCDType == LCD_SPFD5408)) {
-		if (pLcdHwParam.LCD_Connection_Mode == GL_SPI) {
-			GL_LCD_CtrlLinesWrite(pLcdHwParam.LCD_Ctrl_Port_NCS, pLcdHwParam.LCD_Ctrl_Pin_NCS, GL_HIGH);
-		}
-	}
-	LCD_Change_Direction(LCD_Direction);
-	GL_SetDisplayWindow(LCD_Width - 1, LCD_Height - 1, LCD_Height, LCD_Width);
-}
-#endif
-
-#if 0
-/**
- * @brief  Fill area with color.
- * @param  maxX: Maximum X coordinate
- * @param  minX: Minimum X coordinate
- * @param  maxY: Maximum Y coordinate
- * @param  minY: Minimum Y coordinate
- * @param  ptrBitmap: pointer to the image
- * @retval None
- */
-void LCD_FillArea(uint16_t Xpos_Init, uint16_t Ypos_Init, uint16_t Height, uint16_t Width, uint16_t color)
-{
-	uint32_t area = 0;
-	uint32_t index = 0;
-
-	area = Width * Height;
-	if (LCD_Direction == _0_degree) {
-		GL_SetDisplayWindow(Xpos_Init, Ypos_Init, Height, Width);
-		/* Set GRAM write direction and BGR = 1 */
-		/* I/D=00 (Horizontal : decrement, Vertical : decrement) */
-		/* AM=1 (address is updated in vertical writing direction) */
-		LCD_WriteReg(R3, MAKE_R3_CMD(0x1008));
-	}
-	else if (LCD_Direction == _90_degree) {
-		GL_SetDisplayWindow(Xpos_Init + Width - 1, Ypos_Init, Width, Height);
-		/* Set GRAM write direction and BGR = 1 */
-		/* I/D=01 (Horizontal : increment, Vertical : decrement) */
-		/* AM=0 (address is updated in horizontal writing direction) */
-		LCD_WriteReg(R3, MAKE_R3_CMD(0x1010));
-	}
-	else if (LCD_Direction == _180_degree) {
-		GL_SetDisplayWindow(Xpos_Init + Height - 1, Ypos_Init + Width - 1, Height, Width);
-		/* Set GRAM write direction and BGR = 1 */
-		/* I/D=11 (Horizontal : increment, Vertical : increment) */
-		/* AM=1 (address is updated in vertical writing direction) */
-		LCD_WriteReg(R3, MAKE_R3_CMD(0x1038));
-	}
-	else if (LCD_Direction == _270_degree) {
-		GL_SetDisplayWindow(Xpos_Init, Ypos_Init + Height - 1, Width, Height);
-		/* Set GRAM write direction and BGR = 1 */
-		/* I/D=10 (Horizontal : decrement, Vertical : increment) */
-		/* AM=0 (address is updated in horizontal writing direction) */
-		LCD_WriteReg(R3, MAKE_R3_CMD(0x1020));
-	}
-
-	LCD_SetCursor(Xpos_Init, Ypos_Init);
-
-	if ((LCDType == LCD_ILI9320) || (LCDType == LCD_SPFD5408)) {
-		LCD_WriteRAM_Prepare(); /* Prepare to write GRAM */
-	}
-
-	for (index = 0; index < area; index++) {
-		LCD_WriteRAM(color);
-	}
-
-	if ((LCDType == LCD_ILI9320) || (LCDType == LCD_SPFD5408)) {
-		if (pLcdHwParam.LCD_Connection_Mode == GL_SPI) {
-			GL_LCD_CtrlLinesWrite(pLcdHwParam.LCD_Ctrl_Port_NCS, pLcdHwParam.LCD_Ctrl_Pin_NCS, GL_HIGH);
-		}
-	}
-	LCD_Change_Direction(LCD_Direction);
-	GL_SetDisplayWindow(LCD_Width - 1, LCD_Height - 1, LCD_Height, LCD_Width);
-}
-#endif
 
 /**
  * @brief  LCD_DrawColorBMP
@@ -353,51 +449,18 @@ void LCD_DrawColorBMP(uint8_t* ptrBitmap, uint16_t Xpos_Init, uint16_t Ypos_Init
 
 
 
-// ***********************************************************************************8
-// Low level access routines
-// ***********************************************************************************8
+// ***********************************************************************************
+// Register access routines
+// ***********************************************************************************
+void LCD_WriteReg(uint8_t LCD_Reg, uint16_t LCD_RegValue)
+{
+	LCD_REG = LCD_Reg;
+	LCD_RAM = LCD_RegValue;
+}
 void LCD_WriteRAM_Prepare(void)
 {
 	LCD_REG = 0x22;
 }
-
-uint16_t LCD_ReadReg(uint8_t LCD_Reg)
-{
-	// TODO: Not sure if this works; copied from a different file (stm32100e_eval_lcd.c).
-	/* Write 16-bit Index (then Read Reg) */
-	LCD_REG = LCD_Reg;
-	/* Read 16-bit Reg */
-	uint16_t regValue = LCD_RAM;
-	regValue = LCD_RAM;
-	regValue = LCD_RAM;
-	regValue = LCD_RAM;
-	regValue = LCD_RAM;
-	regValue = LCD_RAM;
-	regValue = LCD_RAM;
-	regValue = LCD_RAM;
-	regValue = LCD_RAM;
-	return regValue;
-}
-
-/**
-  * @brief  Reads the LCD RAM.
-  * @param  None
-  * @retval uint16_t - LCD RAM Value.
-  */
-uint16_t LCD_ReadRAM(void)
-{
-    return LCD_ReadReg(R34);
-}
-
-typedef enum
-{
-	LCD_WriteRAMDir_Right = 0,
-	LCD_WriteRAMDir_Left,
-	LCD_WriteRAMDir_Up,
-	LCD_WriteRAMDir_Down
-} LCD_WriteRAM_Direction;
-
-
 void LCD_WriteRAM_PrepareDir(LCD_WriteRAM_Direction direction)
 {
 	uint16_t r3Cmd = 0;
@@ -428,7 +491,7 @@ void LCD_WriteRAM_PrepareDir(LCD_WriteRAM_Direction direction)
 		/* Set GRAM write direction and BGR = 1 */
 		/* I/D=00 (Horizontal : increment, Vertical : increment) */
 		/* AM=1 (address is updated in vertical writing direction) */
-		r3Cmd = MAKE_R3_CMD(0x1038);
+		//		r3Cmd = MAKE_R3_CMD(0x1038);
 		r3Cmd = BUILD_R3_CMD(R3_INCRCEMENT, R3_INCRCEMENT, R3_CHANGEADDR_Y);
 		break;
 	default:
@@ -438,7 +501,6 @@ void LCD_WriteRAM_PrepareDir(LCD_WriteRAM_Direction direction)
 
 	LCD_WriteRAM_Prepare();
 }
-
 void LCD_WriteRAM(uint16_t RGB_Code)
 {
 	LCD_RAM = RGB_Code;
@@ -449,55 +511,78 @@ void LCD_WriteRAM(uint16_t RGB_Code)
 	TFT_Delay(10);
 }
 
-void LCD_WriteReg(uint8_t LCD_Reg, uint16_t LCD_RegValue)
+
+
+uint16_t LCD_ReadReg(uint8_t LCD_Reg)
 {
+	// TODO: Not sure if this works; copied from a different file (stm32100e_eval_lcd.c).
+	/* Write 16-bit Index (then Read Reg) */
 	LCD_REG = LCD_Reg;
-	LCD_RAM = LCD_RegValue;
+	/* Read 16-bit Reg */
+	uint16_t regValue = LCD_RAM;
+	regValue = LCD_RAM;
+	regValue = LCD_RAM;
+	return regValue;
+}
+uint16_t LCD_ReadRAM(void)
+{
+    return LCD_ReadReg(R34);
 }
 
+// ***********************************************************************************
+// Register access routines
+// ***********************************************************************************
 /**
- * @brief  Sets a display window used for RAM writes.
+ * @brief  Sets a display window used for RAM writes. When calling this function to restrict
+ *         the write window from within a function, that function should also re-call this
+ *         function to reset the write-window back to the full screen.
  * @param  x: specifies the X top left corner.
  * @param  y: specifies the Y top left corner.
- * @param  Height: display window height.
- * @param  Width: display window width.
+ * @param  height: display window height.
+ * @param  width: display window width.
  * @retval None
  */
-void LCD_SetDisplayWindow(uint8_t x, uint16_t y, uint16_t Height, uint16_t Width)
+void LCD_SetDisplayWindow(uint16_t x, uint16_t y, uint16_t height, uint16_t width)
 {
 	uint16_t rotatedY1 = LCD_ROTATE_GETY(x, y);
-	uint16_t rotatedY2 = LCD_ROTATE_GETY(x + Width - 1, y + Height - 1);
+	uint16_t rotatedY2 = LCD_ROTATE_GETY(x + width - 1, y + height - 1);
 	uint16_t rotatedX1 = LCD_ROTATE_GETX(x, y);
-	uint16_t rotatedX2 = LCD_ROTATE_GETX(x + Width - 1, y + Height - 1);
+	uint16_t rotatedX2 = LCD_ROTATE_GETX(x + width - 1, y + height - 1);
 
-#define MAX(a, b) ((a)>(b)?(a):(b))
-#define MIN(a, b) ((a)<(b)?(a):(b))
+	#define MAX(a, b) ((a)>(b)?(a):(b))
+	#define MIN(a, b) ((a)<(b)?(a):(b))
 
-	LCD_WriteReg(0x0050, MIN(rotatedX1, rotatedX2)); // Window X start address
-	LCD_WriteReg(0x0051, MAX(rotatedX1, rotatedX2)); // Window X end address
-	LCD_WriteReg(0x0052, MIN(rotatedY1, rotatedY2)); // Window Y start address
-	LCD_WriteReg(0x0053, MAX(rotatedY1, rotatedY2)); // Window Y end address
+	uint16_t xStart = MIN(rotatedX1, rotatedX2);
+	uint16_t xEnd   = MAX(rotatedX1, rotatedX2);
+	uint16_t yStart = MIN(rotatedY1, rotatedY2);
+	uint16_t yEnd   = MAX(rotatedY1, rotatedY2);
+
+	xStart = MAX(0, xStart);
+	xEnd   = MIN(LCD_ACTUAL_SCREEN_WIDTH-1, xEnd);
+	yStart = MAX(0, yStart);
+	yEnd   = MIN(LCD_ACTUAL_SCREEN_HEIGHT-1, yEnd);
+
+	LCD_WriteReg(0x0050, xStart); // Window X start address
+	LCD_WriteReg(0x0051, xEnd); // Window X end address
+	LCD_WriteReg(0x0052, yStart); // Window Y start address
+	LCD_WriteReg(0x0053, yEnd); // Window Y end address
 
 	LCD_SetCursor(x, y);
 }
 void LCD_ResetDisplayWindow(void)
 {
-	LCD_SetDisplayWindow(0, 0, LCD_Height, LCD_Width);
+	LCD_SetDisplayWindow(0, 0, LCD_HEIGHT, LCD_WIDTH);
 }
-
-
 void LCD_SetCursor(uint16_t Xpos, uint16_t Ypos)
 {
 	LCD_WriteReg(0x20, LCD_ROTATE_GETX(Xpos, Ypos));
 	LCD_WriteReg(0x21, LCD_ROTATE_GETY(Xpos, Ypos));
 }
 
-
 void LCD_DisplayOn(void)
 {
 	LCD_WriteReg(0x07, 0x0173);
 }
-
 void LCD_DisplayOff(void)
 {
 	LCD_WriteReg(0x07, 0x0000);
@@ -505,119 +590,6 @@ void LCD_DisplayOff(void)
 
 
 
-// Draw a 16-bit bitmap to the screen.
-// Image Generation Tip:
-// 	Use Gimp, load image, File --> Export, type C source code,
-// 	"Save as RGB454 (16-bit)"
-void LCD_DrawBMP16Bit(int x, int y, int height, int width, uint16_t* pBitmap, _Bool revByteOrder)
-{
-	int numPixels = width * height;
-
-	LCD_SetDisplayWindow(x, y, height, width);
-	LCD_WriteRAM_PrepareDir(LCD_WriteRAMDir_Right);
-
-	// Push bitmap data to screen.
-	for (int wordNum = 0; wordNum < numPixels; wordNum++) {
-		uint16_t color = (*(pBitmap + wordNum));
-		if (revByteOrder) {
-			color = ((color & 0x00FF) << 8) | ((color & 0xFF00) >> 8);
-		}
-		LCD_WriteRAM( color );
-	}
-	LCD_ResetDisplayWindow();
-}
-
-// Draw a 1-bit bitmap (monochrome) to the screen.
-// Assume each row of bits starts on a new byte (i.e., pad last byte per row with 0 bits)
-void LCD_DrawBMP1Bit(int x, int y, int height, int width, uint8_t* pBitmap, _Bool revBitOrder)
-{
-	LCD_SetDisplayWindow(x, y, height, width);
-	LCD_WriteRAM_PrepareDir(LCD_WriteRAMDir_Right);
-
-	// Push bitmap data to screen.
-	int byte = 0;
-	for (int row = 0; row < height; row++) {
-		for (int col = 0; col < width; col++) {
-			// Setup the byte:
-			if (col % 8 == 0 && col > 0) {
-				byte++;
-			}
-
-			int bit = col % 8;
-			if (revBitOrder) {
-				bit = 7 - bit;
-			}
-
-			uint8_t turnOn = pBitmap[byte] & (1 << bit);
-			if (turnOn) {
-				LCD_WriteRAM( LCD_textColor );
-			} else {
-				LCD_WriteRAM( LCD_backColor );
-			}
-		}
-		// Assume next row starts on new byte:
-		byte++;
-	}
-	LCD_ResetDisplayWindow();
-}
-
-// ***********************************************************************************
-// Drawing Routines
-// ***********************************************************************************
-void LCD_SetTextColor(__IO uint16_t Color)
-{
-	LCD_textColor = Color;
-}
-
-void LCD_SetBackColor(__IO uint16_t Color)
-{
-	LCD_backColor = Color;
-}
-
-void LCD_Clear(uint16_t Color)
-{
-	LCD_ResetDisplayWindow();
-	LCD_WriteRAM_PrepareDir(LCD_WriteRAMDir_Right);
-
-	for (uint16_t y = 0; y < LCD_Height; y++) {
-		for (uint16_t x = 0; x < LCD_Width; x++) {
-			LCD_WriteRAM(Color);
-		}
-	}
-}
-
-void LCD_DrawLine(uint16_t Xpos, uint16_t Ypos, uint16_t Length, uint8_t Direction)
-{
-	LCD_SetCursor(Xpos, Ypos);
-	switch (Direction) {
-	case LCD_DIR_HORIZONTAL: LCD_WriteRAM_PrepareDir(LCD_WriteRAMDir_Right); break;
-	case LCD_DIR_VERTICAL:   LCD_WriteRAM_PrepareDir(LCD_WriteRAMDir_Down); break;
-	default: assert(0);
-	}
-
-	for (uint16_t i = 0; i < Length; i++) {
-		LCD_WriteRAM(LCD_textColor);
-	}
-}
-
-void LCD_DrawRect(uint16_t Xpos, uint16_t Ypos, uint8_t Height, uint16_t Width)
-{
-	LCD_DrawLine(Xpos, Ypos, Width, LCD_DIR_HORIZONTAL);
-	LCD_DrawLine(Xpos, Ypos + Height - 1, Width, LCD_DIR_HORIZONTAL);
-	LCD_DrawLine(Xpos, Ypos, Height, LCD_DIR_VERTICAL);
-	LCD_DrawLine(Xpos + Width - 1, Ypos, Height, LCD_DIR_VERTICAL);
-}
-
-
-
-
-/**
- * @brief  Draw one pixel at position given by Xpos, Ypos of color Color.
- * @param  Xpos: specifies X position
- * @param  Ypos: specifies Y position
- * @param  Color: RGB color of point
- * @retval None
- */
 void LCD_PutPixel(uint16_t Xpos, uint16_t Ypos, uint16_t Color)
 {
 	LCD_SetCursor(Xpos, Ypos);
@@ -625,14 +597,12 @@ void LCD_PutPixel(uint16_t Xpos, uint16_t Ypos, uint16_t Color)
 	LCD_WriteRAM(Color);
 }
 
-/**
- * @brief  Get color of pixel located at appropriate position
- * @param  Xpos: specifies X position
- * @param  Ypos: specifies Y position
- * @retval uint16_t - RGB color of required pixel.
- */
 uint16_t LCD_GetPixel(uint16_t Xpos, uint16_t Ypos)
 {
+	// TODO: Unable to have GetPixel working.
+	// - Data sheet suggests have to read ram twice, but does not seem to help.
+	// - Perhaps TTY debugging would help be able to display values quickly?
+#if 0
 	uint16_t tmpColor = 0, tmpRed = 0, tmpBlue = 0;
 
 	/*Read the color of given pixel*/
@@ -659,7 +629,155 @@ uint16_t LCD_GetPixel(uint16_t Xpos, uint16_t Ypos)
 	tmpColor |= (tmpRed | tmpBlue);
 
 	return tmpColor;
+#else
+	return 0;
+#endif
 }
+
+
+// ***********************************************************************************
+// Drawing Routines
+// ***********************************************************************************
+/*
+ * Draw a 16-bit bitmap to the screen.
+ *  Image Generation Tip:
+ *  	Use Gimp, load image, File --> Export, type C source code,
+ *  	"Save as RGB454 (16-bit)"
+ */
+void LCD_DrawBMP16Bit(int x, int y, int height, int width, const uint16_t* pBitmap, _Bool revByteOrder)
+{
+	int numPixels = width * height;
+
+	LCD_SetDisplayWindow(x, y, height, width);
+	LCD_WriteRAM_PrepareDir(LCD_WriteRAMDir_Right);
+
+	// Push bitmap data to screen.
+	for (int wordNum = 0; wordNum < numPixels; wordNum++) {
+		uint16_t color = (*(pBitmap + wordNum));
+		if (revByteOrder) {
+			color = ((color & 0x00FF) << 8) | ((color & 0xFF00) >> 8);
+		}
+		LCD_WriteRAM( color );
+	}
+	LCD_ResetDisplayWindow();
+}
+
+// Draw a 1-bit bitmap (monochrome) to the screen.
+// Assume each row of bits starts on a new word (i.e., pad last word per row with 0 bits)
+void LCD_DrawBMP1Bit(int x, int y, int height, int width, const uint16_t* pBitmap, _Bool revBitOrder)
+{
+	LCD_SetDisplayWindow(x, y, height, width);
+	LCD_WriteRAM_PrepareDir(LCD_WriteRAMDir_Right);
+
+	// Push bitmap data to screen.
+	int word = 0;
+	for (int row = 0; row < height; row++) {
+		for (int col = 0; col < width; col++) {
+
+			// On screen?
+			if (x < 0 || x + col >= LCD_WIDTH || y < 0 || y + row >= LCD_HEIGHT) {
+				continue;
+			}
+
+			// Setup the word:
+			if (col % 16 == 0 && col > 0) {
+				word++;
+			}
+
+			int bit = col % 16;
+			if (revBitOrder) {
+				bit = 15 - bit;
+			}
+
+			uint16_t turnOn = pBitmap[word] & (1 << bit);
+			if (turnOn) {
+				LCD_WriteRAM( LCD_textColor );
+			} else {
+				LCD_WriteRAM( LCD_backColor );
+			}
+		}
+		// Assume next row starts on new byte:
+		word++;
+	}
+	LCD_ResetDisplayWindow();
+}
+
+// Draw a 1-bit bitmap transparent (monochrome) to the screen.
+// Assume each row of bits starts on a new word (i.e., pad last word per row with 0 bits)
+// TODO: If this is fast enough, use the pixel-by-pixel approach for transparent and non (reduce duplication)
+void LCD_DrawBMP1BitTransparent(int x, int y, int height, int width, const uint16_t* pBitmap, _Bool revBitOrder)
+{
+	// Push bitmap data to screen.
+	int word = 0;
+	for (int row = 0; row < height; row++) {
+		for (int col = 0; col < width; col++) {
+
+			// On screen?
+			if (x < 0 || x + col >= LCD_WIDTH || y < 0 || y + row >= LCD_HEIGHT) {
+				continue;
+			}
+
+			// Setup the word:
+			if (col % 16 == 0 && col > 0) {
+				word++;
+			}
+
+			int bit = col % 16;
+			if (revBitOrder) {
+				bit = 15 - bit;
+			}
+
+			uint16_t turnOn = pBitmap[word] & (1 << bit);
+			if (turnOn) {
+				LCD_PutPixel(x + col, y + row, LCD_textColor);
+			} else {
+				// Nothing; it's transparent!
+			}
+		}
+		// Assume next row starts on new byte:
+		word++;
+	}
+}
+
+void LCD_SetTextColor(__IO uint16_t Color)
+{
+	LCD_textColor = Color;
+}
+
+void LCD_SetBackColor(__IO uint16_t Color)
+{
+	LCD_backColor = Color;
+}
+
+void LCD_Clear(uint16_t Color)
+{
+	LCD_ResetDisplayWindow();
+	LCD_WriteRAM_PrepareDir(LCD_WriteRAMDir_Right);
+
+	for (uint16_t y = 0; y < LCD_HEIGHT; y++) {
+		for (uint16_t x = 0; x < LCD_WIDTH; x++) {
+			LCD_WriteRAM(Color);
+		}
+	}
+}
+
+void LCD_DrawLine(uint16_t xStart, uint16_t yStart, uint16_t length, LCD_WriteRAM_Direction direction)
+{
+	LCD_SetCursor(xStart, yStart);
+	LCD_WriteRAM_PrepareDir(direction);
+	for (uint16_t i = 0; i < length; i++) {
+		LCD_WriteRAM(LCD_textColor);
+	}
+}
+
+void LCD_DrawRect(uint16_t Xpos, uint16_t Ypos, uint8_t Height, uint16_t Width)
+{
+	LCD_DrawLine(Xpos, Ypos, Width, LCD_WriteRAMDir_Right);
+	LCD_DrawLine(Xpos, Ypos + Height - 1, Width, LCD_WriteRAMDir_Right);
+	LCD_DrawLine(Xpos, Ypos, Height, LCD_WriteRAMDir_Down);
+	LCD_DrawLine(Xpos + Width - 1, Ypos, Height, LCD_WriteRAMDir_Down);
+}
+
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -668,52 +786,65 @@ uint16_t LCD_GetPixel(uint16_t Xpos, uint16_t Ypos)
 void LCD_TestDisplayScreen(void)
 {
 	// Test clear screen
-	LCD_Clear(Blue);
-	LCD_Clear(Red);
-	LCD_Clear(Green);
-	LCD_Clear(Yellow);
-	LCD_Clear(Black);
+	LCD_Clear(LCD_COLOR_BLUE);
+	LCD_Clear(LCD_COLOR_RED);
+	LCD_Clear(LCD_COLOR_GREEN);
+	LCD_Clear(LCD_COLOR_YELLOW);
+	LCD_Clear(LCD_COLOR_BLACK);
 
 	// Test horizontal and vertical lines
 	// Lines from origin (top-left)
-	LCD_SetTextColor(White);
-	LCD_DrawLine(0,0, 100, LCD_DIR_HORIZONTAL);
-	LCD_DrawLine(0,10, 100, LCD_DIR_HORIZONTAL);
-	LCD_SetTextColor(Yellow);
+	LCD_SetTextColor(LCD_COLOR_WHITE);
+	LCD_DrawLine(0,0, 100, LCD_WriteRAMDir_Right);
+	LCD_DrawLine(0,10, 100, LCD_WriteRAMDir_Right);
+	LCD_SetTextColor(LCD_COLOR_YELLOW);
 	LCD_DrawLine(0,0, 100, LCD_DIR_VERTICAL);
 
 	// Lines into bottom right corner.
-	LCD_SetTextColor(Red);
-	LCD_DrawLine(LCD_Width-200-1,LCD_Height-1, 200, LCD_DIR_HORIZONTAL);
-	LCD_SetTextColor(Green);
-	LCD_DrawLine(LCD_Width-1,LCD_Height-50-1, 50, LCD_DIR_VERTICAL);
+	LCD_SetTextColor(LCD_COLOR_RED);
+	LCD_DrawLine(LCD_WIDTH-200-1,LCD_HEIGHT-1, 200, LCD_WriteRAMDir_Right);
+	LCD_SetTextColor(LCD_COLOR_GREEN);
+	LCD_DrawLine(LCD_WIDTH-1,LCD_HEIGHT-50-1, 50, LCD_WriteRAMDir_Down);
 
 	// Draw + in middle of screen
-	int midX = LCD_Width / 2;
-	int midY = LCD_Height / 2;
-	LCD_SetBackColor(Blue);
-	uint8_t data[] = {
+	int midX = LCD_WIDTH / 2;
+	int midY = LCD_HEIGHT / 2;
+	int crossLen = 50;
+	LCD_SetTextColor(LCD_COLOR_RED);
+	LCD_DrawLine(midX, midY, crossLen, LCD_WriteRAMDir_Right);
+	LCD_SetTextColor(LCD_COLOR_GREEN);
+	LCD_DrawLine(midX, midY, crossLen, LCD_WriteRAMDir_Down);
+	LCD_SetTextColor(LCD_COLOR_BLUE);
+	LCD_DrawLine(midX, midY, crossLen, LCD_WriteRAMDir_Left);
+	LCD_SetTextColor(LCD_COLOR_YELLOW);
+	LCD_DrawLine(midX, midY, crossLen, LCD_WriteRAMDir_Up);
+
+	LCD_SetBackColor(LCD_COLOR_BLUE);
+	uint16_t data[] = {
 			0xFF, 0x00, 0xCC, 0x33, 0xAA, 0x55,
 			0xFF, 0x00, 0xCC, 0x33, 0xAA, 0x55,
 			0xFF, 0x00, 0xCC, 0x33, 0xAA, 0x55,
 			0xFF, 0x00, 0xCC, 0x33, 0xAA, 0x55,
 			0xFF, 0x00, 0xCC, 0x33, 0xAA, 0x55,
 	};
-	LCD_SetTextColor(White);
-	LCD_DrawBMP1Bit(midX, midY, 5, 48, data, 0);
+	LCD_SetTextColor(LCD_COLOR_WHITE);
+	LCD_DrawBMP1Bit(midX+75, midY+75, 5, 48, data, 0);
 
 
 	// Test DrawRect
-	LCD_SetTextColor(Red);
+	LCD_SetTextColor(LCD_COLOR_RED);
 	LCD_DrawRect(10, 50, 150, 50);
-	LCD_SetTextColor(Green);
+	LCD_SetTextColor(LCD_COLOR_GREEN);
 	LCD_DrawRect(60, 50, 150, 50);
-	LCD_SetTextColor(Blue);
+	LCD_SetTextColor(LCD_COLOR_BLUE);
 	LCD_DrawRect(110, 50, 150, 50);
 
 	// Test Display Off/On
 	LCD_DisplayOff();
 	LCD_DisplayOn();
+	LCD_BackLight(50);
+	LCD_BackLight(0);
+	LCD_BackLight(100);
 
 	// Test drawing a bitmap
 	extern const struct {
@@ -725,15 +856,17 @@ void LCD_TestDisplayScreen(void)
 	} gimp_image;
 	LCD_DrawBMP16Bit(0,0, gimp_image.height, gimp_image.width, (uint16_t*) gimp_image.pixel_data, 0);
 
+	#if 0
 	// Test put/get pixel
 	LCD_PutPixel(10, 10, 0x1234);
 	assert(LCD_GetPixel(10, 10) == 0x1234);
 	LCD_PutPixel(10, 10, Red);
-	assert(LCD_GetPixel(10, 10) == Red);
+	assert(LCD_GetPixel(10, 10) == LCD_COLOR_RED);
 	LCD_PutPixel(10, 10, Green);
-	assert(LCD_GetPixel(10, 10) == Green);
+	assert(LCD_GetPixel(10, 10) == LCD_COLOR_GREEN);
 	LCD_PutPixel(10, 10, Blue);
-	assert(LCD_GetPixel(10, 10) == Blue);
+	assert(LCD_GetPixel(10, 10) == LCD_COLOR_BLUE);
+	#endif
 
 	volatile int a = 0;
 	while (1)

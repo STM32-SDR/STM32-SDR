@@ -53,6 +53,7 @@ typedef struct tFont
   * @brief  exported fonts  
   */
 extern gl_sFONT GL_Font16x24;
+extern gl_sFONT GL_Font8x16;
 extern gl_sFONT GL_Font12x12;
 extern gl_sFONT GL_Font8x12;
 extern gl_sFONT GL_Font8x12_bold;

@@ -326,16 +326,6 @@
 #define R231                LCD_REG_231
 #define R239                LCD_REG_239
 
-#define White               LCD_COLOR_WHITE
-#define Black               LCD_COLOR_BLACK
-#define Grey                LCD_COLOR_GREY
-#define Blue                LCD_COLOR_BLUE
-#define Blue2               LCD_COLOR_BLUE2
-#define Red                 LCD_COLOR_RED
-#define Magenta             LCD_COLOR_MAGENTA
-#define Green               LCD_COLOR_GREEN
-#define Cyan                LCD_COLOR_CYAN
-#define Yellow              LCD_COLOR_YELLOW
 
 #define Line0               LCD_LINE_0
 #define Line1               LCD_LINE_1

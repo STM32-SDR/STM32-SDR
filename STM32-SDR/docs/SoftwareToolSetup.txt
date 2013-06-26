@@ -64,7 +64,24 @@ Eclipse:
 	
 Project Setup
 -------------------------------------------------------------
-
+1.  Right-click empty area in Project Explorer
+  --> Import 
+  --> Git --> Projects from Git, click Next
+  --> URI, click Next
+  --> Paste URI from GitHub.com for project:
+      https://github.com/ve7pke/STM32-SDR.git
+      Enter GitHub.com's user name and password.
+      Optional: "Store in Secure Store" so you don't have to retype password later.
+      Click Next
+  --> For Branch Selection, choose "master" and click Next.
+  --> Local Destination:
+      Choose a folder on your computer where the files will be located.
+        Suggestion: C:\GitRepositories\STM32-SDR
+        (but anything will work)
+      Initial branch: Master
+      Remote name: origin
+      Click Next
+  --> ...
 
 
 

@@ -120,7 +120,7 @@ int main_GUI(void)
 #endif
 
 	/*Initialize cursor*/
-	GL_Clear(White);
+	GL_Clear(LCD_COLOR_WHITE);
 	CursorInit(GL_NULL);
 
 	/* Menu Initialisation*/
