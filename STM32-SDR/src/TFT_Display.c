@@ -56,196 +56,48 @@ void LCD_CharSize(__IO uint16_t size)
 //February
 void PutPixel(int16_t x, int16_t y)
 {
-	Pixel(x, y, LCD_textColor);
+	LCD_PutPixel(x, y, LCD_textColor);
 }
 
-//February
-void Pixel(int16_t x, int16_t y, int16_t c)
-{
-	if ((x >= LCD_PIXEL_WIDTH) || (y >= LCD_PIXEL_HEIGHT))
-		return;
 
-	// Set location to write to.
-	// ** CORRECTED TO BE X Y **
-//	LCD_SetCursor(y, x);
-	LCD_SetCursor(x, y);
-
-	// Write one value to LCD RAM, setting the pixel.
-	LCD_WriteRAM_Prepare();
-	LCD_WriteRAM(c);
-}
-
-//void Display_ULong ( uint16_t data, uint8_t XL, uint8_t YL)	{
-
-//	XL = XL+32; // Based on 16 bit being limited to 65000( 5-1 places * 8 pixels)
-
-//	while ( data > 0 )	{
-
-//		//LCD_Write_Character ( ( data % 10 ) + 0x30, col--, row, invert );
-//		LCD_PutChar(XL, YL, ( data % 10+ 0x30 ));
-//        XL  -= 8;
-//		data	/=	10;
-//		}
-//	}
-
-#if 0
-//February
-void LCD_PutChar(int16_t PosX, int16_t PosY, char c)
-{
-	uint8_t i = 0;
-	uint8_t j = 0;
-	if (asciisize == 8) {
-		uint8_t Buffer[8];
-		uint8_t TmpChar = 0;
-
-		GetASCIICode1(Buffer, c);
-		for (i = 0; i < 8; i++) {
-			TmpChar = Buffer[i];
-			for (j = 0; j < 8; j++) {
-				if (((TmpChar >> (7 - j)) & 0x01) == 0x01) {
-					Pixel(PosX + j, PosY + (7 - i), LCD_textColor);
-				}
-				else {
-					Pixel(PosX + j, PosY + (7 - i), LCD_backColor);
-				}
-			}
-		}
-	}
-	//----------------------------------------------------------------------------
-	if (asciisize == 12) {
-		uint8_t Buffer[12];
-		uint8_t TmpChar = 0;
-
-		GetASCIICode2(Buffer, c);
-		for (i = 0; i < 12; i++) {
-			TmpChar = Buffer[i];
-			for (j = 0; j < 8; j++) {
-				if (((TmpChar >> (7 - j)) & 0x01) == 0x01) {
-					Pixel(PosX + j, PosY + (11 - i), LCD_textColor);
-				}
-				else {
-					Pixel(PosX + j, PosY + (11 - i), LCD_backColor);
-				}
-			}
-		}
-	}
-	//----------------------------------------------------------------------------
-	if (asciisize == 16) {
-		unsigned char Buffer[16];
-		uint8_t TmpChar = 0;
-
-		GetASCIICode4(Buffer, c);
-		for (i = 0; i < 16; i++) {
-			TmpChar = Buffer[i];
-			for (j = 0; j < 8; j++) {
-				if (((TmpChar >> (7 - j)) & 0x01) == 0x01) {
-					Pixel(PosX + j, PosY + (15 - i), LCD_textColor);
-				}
-				else {
-					Pixel(PosX + j, PosY + (15 - i), LCD_backColor);
-				}
-			}
-		}
-	}
-	//----------------------------------------------------------------------------
-	if (asciisize == 14) {
-		short int Buffer[12];
-		uint16_t TmpChar = 0;
-
-		GetASCIICode3(Buffer, c);
-		for (i = 0; i < 12; i++) {
-			TmpChar = Buffer[i];
-			for (j = 0; j < 12; j++) {
-				if (((TmpChar >> (11 - j)) & (0x01)) == 0x01) {
-					Pixel(PosX + j, PosY + (11 - i), LCD_textColor);
-				}
-				else {
-					Pixel(PosX + j, PosY + (11 - i), LCD_backColor);
-				}
-			}
-		}
-	}
-	//----------------------------------------------------------------------------
-	if (asciisize == 24) {
-		short int Buffer[24];
-		uint16_t TmpChar = 0;
-		GetASCIICode5(Buffer, c);
-		for (i = 0; i < 24; i++) {
-			TmpChar = Buffer[i];
-			for (j = 0; j < 16; j++) {
-				if (((TmpChar >> j) & (0x01)) == 0x01) {
-					Pixel(PosX + j, PosY + (23 - i), LCD_textColor);
-				}
-				else {
-					Pixel(PosX + j, PosY + (23 - i), LCD_backColor);
-				}
-			}
-		}
-	}
-	//----------------------------------------------------------------------------
-}
-#endif
 
 //February
 void LCD_StringLine(uint16_t PosX, uint16_t PosY, char *str)
 {
-#if 1
-	GL_PrintString(PosX, PosY, str, 0);
-#else
-	char TempChar;
-
-	do {
-		TempChar = *str++;
-//		LCD_PutChar(PosX, PosY, TempChar);
-		GL_PrintChar(PosX, PosY, TempChar, 0);
-
-		// Word-wrap: If no room left on line, move to next line (if possible)
-		if (PosX < 312) {
-			PosX += 8;
-			if (asciisize == 24) {
-				PosX += 8;
-			}
-			else if (asciisize == 14) {
-				PosX += 4;
-			}
-		}
-
-		else if (PosY < 224) {
-			PosX = 0;
-			PosY += 16;
-		}
-		else {
-			PosX = 0;
-			PosY = 0;
-		}
-	} while (*str != 0);
-#endif
+	// The +12 is for the font height
+	// (This function designed for providing the Y coord as distance from bottom of screen, relative to bottom of text.
+	GL_PrintString(PosX, LCD_HEIGHT - PosY - GL_GetFontLetterHeight(), str, 0);
 }
 
 // Display the FFT data to the screen.
 // Expect fftData[] to be an array of 256 ints.
 void LCD_DrawFFT(uint8_t fftData[])
 {
-	uint32_t i;
-	uint32_t j;
-	float temp;
+	const int OFFSET_X    =  40;
+	const int OFFSET_Y    =   0;   // Was 175 in old coord system.
+	const int FFT_WIDTH   = 240;
+	const int FFT_HEIGHT  =  64;
+	const int SELFREQ_ADJ =   4;
 
-	temp = (float) (NCO_Frequency - 125) / 15.625;
+	float selectedFreqX = (float) (NCO_Frequency - 125) / 15.625;
+	if (selectedFreqX < 0) {
+		selectedFreqX = 0;
+	}
 
-	for (i = 0; i < 240; i++) {
-		if (i != temp) {
+	for (int x = 0; x < FFT_WIDTH; x++) {
+		if (x != selectedFreqX) {
 
-			for (j = 0; j < 64; j++) {
-				if (j < fftData[i + 8])
-					Pixel(i + 40, 175 + j, LCD_COLOR_BLUE);
+			for (int y = 0; y < FFT_HEIGHT; y++) {
+				if (y >= fftData[x + 8])
+					LCD_PutPixel(x + OFFSET_X, y + OFFSET_Y, LCD_COLOR_BLUE);
 				else
-					Pixel(i + 40, 175 + j, LCD_COLOR_WHITE);
+					LCD_PutPixel(x + OFFSET_X, y + OFFSET_Y, LCD_COLOR_WHITE);
 			}
 		}
 	}
 
-	for (j = 0; j < 60; j++)
-		Pixel((int) temp + 40, 179 + j, LCD_COLOR_RED);
+	for (int y = 0; y < FFT_HEIGHT - SELFREQ_ADJ; y++)
+		LCD_PutPixel((int) selectedFreqX + OFFSET_X, y + OFFSET_Y + SELFREQ_ADJ, LCD_COLOR_RED);
 }
 
 

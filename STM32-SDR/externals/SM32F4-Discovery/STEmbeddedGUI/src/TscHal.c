@@ -53,7 +53,7 @@ extern uint32_t TSC_Value_Y;
 extern uint32_t EndAddr;
 extern uint32_t CalibrationAddr;
 extern __IO uint8_t calibration_done;
-extern __IO uint8_t touch_done;
+
 
 /* Touchscreen Hardware Parameters Structure */
 TSC_HW_Parameters_TypeDef pTscHwParam;

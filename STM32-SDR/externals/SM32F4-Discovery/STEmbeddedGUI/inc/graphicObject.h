@@ -53,9 +53,7 @@
   * @{
   */
 extern GL_Page_TypeDef* PagesList[];      /*!< Pointer to page list */
-extern __IO uint8_t touch_done;           /*!< touchscreen event status */
 extern __IO uint8_t calibration_done;     /*!< touchscreen calibration status */
-extern __IO uint8_t joy_done;             /*!< joystick event status */
 
 /**
   * @}

@@ -42,6 +42,7 @@ float PSK_Gain;
 
 void DMA1_Stream0_IRQHandler(void)
 {
+	// TODO: Charley: DMA1 ISR seems to be called too frequently and does not allow normal processing to continue.
 	//Check to see which set of buffers are currently in use
 	DMA_RX_Memory = DMA_GetCurrentMemoryTarget(DMA1_Stream0 );
 	DMA_TX_Memory = DMA_GetCurrentMemoryTarget(DMA1_Stream5 );
@@ -49,9 +50,10 @@ void DMA1_Stream0_IRQHandler(void)
 	//Turn on pin PD12 to indicate the start of IRQ processing
 	GPIO_WriteBit(DMA_GPIO, DMA_IRQ, Bit_SET);
 
-	if (Tx_Flag == 0)
+	if (Tx_Flag == 0) {
 		Rcvr_DSP();
-	else
+	}
+	else {
 		switch (Mode) {
 		case MODE_SSB:
 			Xmit_SSB();
@@ -70,6 +72,7 @@ void DMA1_Stream0_IRQHandler(void)
 			Xmit_PSK();
 			break;
 		}  //End of Mode Switch
+	}
 
 	//Turn off pin  PD12 to indicate end of IRQ processing
 	GPIO_WriteBit(DMA_GPIO, DMA_IRQ, Bit_RESET);

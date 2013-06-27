@@ -32,6 +32,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include "TSHal.h"
 
 /** @addtogroup Embedded_GUI_Library
  * @{
@@ -101,10 +102,9 @@ __IO uint32_t vu32_gTimeOutCount = 0;
 __IO uint8_t vu8_gTouchEnable = 1;
 __IO uint8_t vu8_gSleepState = 0;
 uint8_t ValidTouchDetected = 0;
-/* Set to 0 to disable The Automatic Backlight Switch Off */__IO uint8_t vu8_gPowerSaveOption = 1;
-/* touch_done global variable is used to handle the Touch event/interrupt.
- touch_done must be defined as external variable in main application using this library */__IO uint8_t touch_done = 0;
-__IO uint8_t joy_done = 0;
+/* Set to 0 to disable The Automatic Backlight Switch Off */
+__IO uint8_t vu8_gPowerSaveOption = 1;
+
 __IO uint8_t calibration_done = 0;
 
 /**
@@ -144,7 +144,7 @@ static GL_ErrStatus SetHistogramVisible(GL_PageControls_TypeDef*, GL_Coordinate_
 static GL_ErrStatus SetGraphChartVisible(GL_PageControls_TypeDef*, GL_Coordinate_TypeDef);
 
 static void SlidebarCursorPreDraw(GL_PageControls_TypeDef* pControl, GL_bool);
-static GL_ObjDimensions_TypeDef GetObjSize(GL_PageControls_TypeDef* pPageControl);
+//static GL_ObjDimensions_TypeDef GetObjSize(GL_PageControls_TypeDef* pPageControl);
 static GL_Coordinate_TypeDef GetObjCoordinates(GL_Page_TypeDef* pPage, uint16_t ID);
 static GL_ErrStatus SetPage(GL_Page_TypeDef* pThis, GL_bool bVal);
 static void GL_DrawRectangle(uint16_t maxX, uint16_t minX, uint8_t maxY, uint8_t minY);
@@ -3059,6 +3059,8 @@ static GL_Coordinate_TypeDef GetObjCoordinates(GL_Page_TypeDef* pPage, uint16_t 
 	return null;
 }
 
+
+#if 0
 /**
  * @brief  This function return the object Lenght size (X & Y)
  * @param  *pPageControl: Pointer to PageControls object
@@ -3111,6 +3113,7 @@ static GL_ObjDimensions_TypeDef GetObjSize(GL_PageControls_TypeDef* pPageControl
 	}
 	return dimensions;
 }
+#endif
 
 /**
  * @brief  This function Enable or Disable (Hide) the Page.
@@ -3401,6 +3404,14 @@ static void CallPreEvents(GL_PageControls_TypeDef* pControl)
 	}
 }
 
+_Bool isTouchInsideRegion(uint16_t touchX, uint16_t touchY, GL_Coordinate_TypeDef region)
+{
+	_Bool isInXRange = (touchX >= region.MinX) && (touchX <= region.MaxX);
+	_Bool isInYRange = (touchY >= region.MinY) && (touchY <= region.MaxY);
+	return isInXRange && isInYRange;
+}
+
+
 /**
  * @brief  Depending on the Coordinates of the Touch Screen pressed, this
  *         function does the processing and executes the proper function.
@@ -3409,57 +3420,48 @@ static void CallPreEvents(GL_PageControls_TypeDef* pControl)
  */
 void ProcessInputData(void)
 {
-	uint16_t p_index, c_index;
-	GL_Coordinate_TypeDef tmpCoord;
-	GL_ObjDimensions_TypeDef tmpSize;
+	if (TS_HasNewTouchEvent()) {
+		uint16_t touchX = 0, touchY = 0;
+		TS_GetTouchEventCoords(&touchX, &touchY);
 
-	if (touch_done || joy_done) {
+		// Handle sleep mode
 		if (vu8_gSleepState == 1) {
 			GL_BackLightSwitch(GL_ON);
 			vu8_gSleepState = 0;
 		}
+
+		// Handle active mode
 		else if ((vu8_gTouchEnable == 1) && (vu8_gSleepState == 0)) {
 			vu32_gTimeOutCount = 0;
-			for (p_index = 0; p_index < PageCount; p_index++) {
-				if (PagesList[p_index]->Page_Active == GL_TRUE) {
-					for (c_index = 0; c_index < PagesList[p_index]->ControlCount; c_index++) {
-						tmpCoord = PagesList[p_index]->PageControls[c_index]->objCoordinates;
-						tmpSize = GetObjSize(PagesList[p_index]->PageControls[c_index]);
-						if (touch_done) {
-							if (CompareCoordinates(tmpCoord.MaxX, tmpCoord.MaxX - tmpSize.Length + 1, tmpCoord.MaxY,
-							        tmpCoord.MaxY - tmpSize.Height)) {
-								CursorDraw(Cursor->X, Cursor->Y, CUR_DRAW_BEH);
-								CallPreEvents(PagesList[p_index]->PageControls[c_index]);
-								CallEvent(PagesList[p_index]->PageControls[c_index]);
-								CursorDraw(Cursor->X, Cursor->Y, CUR_READ_DRAW_CUR);
-								u32_TSYCoordinate = 0;
-								touch_done = 0;
-								GL_Delay(15);
-								break;
-							}
-						}
-						else {
-							if (joy_done) {
-								if (CompareJoyCoordinates((uint16_t) tmpCoord.MaxX,
-								        (uint16_t) (tmpCoord.MaxX - tmpSize.Length), (uint8_t) tmpCoord.MaxY,
-								        (uint8_t) (tmpCoord.MaxY - tmpSize.Height))) {
-									CursorDraw(Cursor->X, Cursor->Y, CUR_DRAW_BEH);
-									CallPreEvents(PagesList[p_index]->PageControls[c_index]);
-									CallEvent(PagesList[p_index]->PageControls[c_index]);
-									CursorDraw(Cursor->X, Cursor->Y, CUR_READ_DRAW_CUR);
-									u32_TSYCoordinate = 0;
-									joy_done = 0;
-									GL_Delay(20);
-									break;
-								}
-							}
+
+			// Find the current page.
+			for (uint16_t pageIdx = 0; pageIdx < PageCount; pageIdx++) {
+				GL_Page_TypeDef *pPage = PagesList[pageIdx];
+
+				if (pPage->Page_Active == GL_TRUE) {
+					// Find the touched component.
+					for (uint16_t controlIdx = 0; controlIdx < pPage->ControlCount; controlIdx++) {
+						GL_PageControls_TypeDef *pControl = pPage->PageControls[controlIdx];
+
+						GL_Coordinate_TypeDef controlRegion = pControl->objCoordinates;
+						// TODO: remove.
+//						GL_ObjDimensions_TypeDef tmpSize = GetObjSize(pControl);
+//						if (CompareCoordinates(tmpCoord.MaxX, tmpCoord.MaxX - tmpSize.Length + 1, tmpCoord.MaxY,
+//								tmpCoord.MaxY - tmpSize.Height)) {
+						if (isTouchInsideRegion(touchX, touchY, controlRegion)) {
+
+							CallPreEvents(pControl);
+							CallEvent(pControl);
+
+							break;
 						}
 					}
 				}
 			}
 		}
-		touch_done = 0;
-		joy_done = 0;
+		TS_ClearTouchEvent();
+		// TODO: Why delay after servicing touch event?
+		GL_Delay(15);
 	}
 }
 
@@ -3532,45 +3534,7 @@ static void CallEvent(GL_PageControls_TypeDef* pControl)
 	}
 }
 
-#if 0
-/**
- * @brief  Set LCD Panel Resolution
- * @param  LCD_WIDTH: Width of the LCD Panel
- * @param  Lcd_Height: Height of the LCD Panel
- * @retval None
- */
-void Set_LCD_Resolution( uint16_t width, uint16_t height )
-{
-	LCD_WIDTH = width;
-	LCD_HEIGHT = height;
-}
-#endif
 
-/**
- * @brief  This function checks the coordinates of the touch screen pressed
- *         converted in LCD ones and depending on the level of the menu
- *         checks if the press is valid or not.
- * @param  u16_XMax: Maximum X coordinate for valid touch
- * @param  u16_XMin: Minimum X coordinate for valid touch
- * @param  u8_YMax: Maximum Y coordinate for valid touch
- * @param  u8_YMin: Minimum Y coordinate for valid touch
- * @retval valid touch detected (1) or not-valid touch detected (0).
- */
-uint8_t CompareCoordinates(uint16_t u16_XMax, uint16_t u16_XMin, uint16_t u16_YMax, uint16_t u16_YMin)
-{
-	if ((u32_TSXCoordinate <= u16_XMin) || (u32_TSXCoordinate >= u16_XMax - 5)) {
-		ValidTouchDetected = 0;
-		return 0;
-	}
-	else if ((u32_TSYCoordinate < u16_YMin) || (u32_TSYCoordinate > u16_YMax)) {
-		ValidTouchDetected = 0;
-		return 0;
-	}
-	else {
-		ValidTouchDetected = 1;
-		return 1;
-	}
-}
 
 /**
  * @brief  This function checks the coordinates of the Joystick Pointer
@@ -3627,8 +3591,10 @@ void GL_Delay(uint32_t nTime)
 {
 	TimingDelay = nTime;
 
-	while (TimingDelay != 0)
-		;
+	// TODO: Adjust code to have actual expected timing?
+	while (TimingDelay != 0) {
+		TimingDelay--;
+	}
 
 }
 

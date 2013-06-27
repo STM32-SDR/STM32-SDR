@@ -24,6 +24,7 @@
 
 #include 	"LcdDriver_ILI9320.h"
 #include	"LcdHal.h"
+#include	"TSHal.h"
 
 #include	"uiframework.h"
 
@@ -58,11 +59,27 @@ int main(void)
 
 //	LCD_TestDisplayScreen();
 //	GL_TestDisplayScreen();
-	Show_HomeScreen();
+
+	/*
+	 * Small demo for GUI:
+	 */
+//	Show_HomeScreen();
+//	while (1) {
+//		// Process touch events.
+//		ProcessInputData();
+//	}
 
 	while (1) {
-		continue;
+		// TODO: Charley: Switch to the if(DSP_Flag...) code when DMA is working.
+#if 1
+		// Show the FFT sometimes (prevent continual re-draw).
+		// Remove once DMA working.
+		static int showFFTSometimes = 0;
+		showFFTSometimes = (showFFTSometimes + 1) % 100;
+		if (DSP_Flag == 1 || showFFTSometimes == 0) {
+#else
 		if (DSP_Flag == 1) {
+#endif
 			for (int16_t j = 0; j < 128; j++) {
 				//Changed for getting right display with SR6.3
 				FFT_Output[j] = (uint8_t) (6 * log((float32_t) (FFT_Magnitude[j] + 1)));
@@ -99,6 +116,9 @@ int main(void)
 			LCD_StringLine(0, 110, (char*) &received_string[0]);
 		}
 
+		/*
+		 * Selector Switches
+		 */
 		// Process selector switch 1 (has it moved?)
 		check_SS1();
 		if (read_SS1 != old_SS1_position) {
@@ -116,8 +136,17 @@ int main(void)
 		}
 		process_encoder2();
 
+		/*
+		 * USB
+		 */
 		// Process any pending USB events
 		USBH_Process(&USB_OTG_Core_dev, &USB_Host);
+
+		/*
+		 * Touch Events
+		 */
+		Old_HandleTouchEvent();
+		ProcessInputData();
 
 	} //while
 
@@ -130,10 +159,7 @@ void initializeHardware(void)
 	LCD_Init();
 	main_delay(SETUP_DELAY);
 
-	touch_init();
-	main_delay(SETUP_DELAY);
-
-	touch_interrupt_init();
+	TS_Initialize();
 	main_delay(SETUP_DELAY);
 
 	I2C_GPIO_Init();

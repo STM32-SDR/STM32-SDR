@@ -57,45 +57,6 @@ typedef struct
 
 
 
-
-
-
-
-
-
-#if 0
-
-
-#define LCD_COLOR_WHITE          0xFFFF
-#define LCD_COLOR_BLACK          0x0000
-#define LCD_COLOR_GREY           0xF7DE
-#define LCD_COLOR_BLUE           0x001F
-#define LCD_COLOR_BLUE2          0x051F
-#define LCD_COLOR_RED            0xF800
-#define LCD_COLOR_MAGENTA        0xF81F
-#define LCD_COLOR_GREEN          0x07E0
-#define LCD_COLOR_CYAN           0x7FFF
-#define LCD_COLOR_YELLOW         0xFFE0
-
-#define   BLACK        0x0000
-#define   NAVY         0x000F
-#define   DGREEN       0x03E0
-#define   DCYAN        0x03EF
-#define   MAROON       0x7800
-#define   PURPLE       0x780F
-#define   OLIVE        0x7BE0
-#define   GREY         0xF7DE
-#define   LGRAY        0xC618
-#define   DGRAY        0x7BEF
-#define   BLUE         0x001F
-#define   GREEN        0x07E0
-#define   CYAN         0x07FF
-#define   RED          0xF800
-#define   MAGENTA      0xF81F
-#define   YELLOW       0xFFE0
-#define   WHITE        0xFFFF
-#endif
-
 #define LCD_DIR_HORIZONTAL       0x0000
 #define LCD_DIR_VERTICAL         0x0001
 
@@ -121,7 +82,7 @@ void LCD_GetColors(__IO uint16_t *_TextColor, __IO uint16_t *_BackColor);
 //void LCD_Clear(uint16_t Color);
 void LCD_SetCursor(uint16_t Xpos, uint16_t Ypos);
 void LCD_CharSize(__IO uint16_t size);
-void Pixel(int16_t x, int16_t y, int16_t c);
+//void Pixel(int16_t x, int16_t y, int16_t c);
 
 void LCD_DrawFFT(uint8_t fftData[]);
 //void LCD_PutChar(int16_t PosX, int16_t PosY, char c);

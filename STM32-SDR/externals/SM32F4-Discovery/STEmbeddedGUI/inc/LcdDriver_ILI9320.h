@@ -91,39 +91,11 @@ void LCD_PutPixel(uint16_t Xpos, uint16_t Ypos, uint16_t Color);
 uint16_t LCD_GetPixel(uint16_t Xpos, uint16_t Ypos);
 
 
-
-
-
-
-
-
-
-
-
-
-
 // From TFT_Display.h
-//void LCD_Reset(void);
 void LCD_Init(void);
-//void TIM_Config(void);
-//void LCD_CtrlLinesConfig(void);
-//void LCD_FSMCConfig(void);
-//
-//void TFT_Delay(__IO uint32_t nTime);
-//
-//void PutPixel(int16_t x, int16_t y);
-//
-//void LCD_SetColors(__IO uint16_t _TextColor, __IO uint16_t _BackColor);
-//void LCD_GetColors(__IO uint16_t *_TextColor, __IO uint16_t *_BackColor);
 void LCD_SetTextColor(__IO uint16_t Color);
 void LCD_SetBackColor(__IO uint16_t Color);
 void LCD_Clear(uint16_t Color);
-//void LCD_CharSize(__IO uint16_t size);
-//void Pixel(int16_t x, int16_t y, int16_t c);
-//
-//void LCD_DrawFFT(uint8_t fftData[]);
-//void LCD_PutChar(int16_t PosX, int16_t PosY, char c);
-//void LCD_StringLine(uint16_t PosX, uint16_t PosY, char *str);
 void LCD_DrawLine(uint16_t Xpos, uint16_t Ypos, uint16_t Length, uint8_t Direction);
 void LCD_DrawRect(uint16_t Xpos, uint16_t Ypos, uint8_t Height, uint16_t Width);
 //void LCD_DrawSquare(uint16_t Xpos, uint16_t Ypos, uint16_t a);
@@ -138,8 +110,9 @@ void LCD_DrawRect(uint16_t Xpos, uint16_t Ypos, uint8_t Height, uint16_t Width);
 //void LCD_ClosedPolyLineRelative(pPoint Points, uint16_t PointCount);
 //void LCD_FillPolyLine(pPoint Points, uint16_t PointCount);
 //void LCD_DrawFullSquare(uint16_t Xpos, uint16_t Ypos, uint16_t a);
-//
 
+
+// Image drawing functions
 void LCD_DrawBMP16Bit(int x, int y, int height, int width, const uint16_t* pBitmap, _Bool revByteOrder);
 void LCD_DrawBMP1Bit(int x, int y, int height, int width, const uint16_t* pBitmap, _Bool revBitOrder);
 void LCD_DrawBMP1BitTransparent(int x, int y, int height, int width, const uint16_t* pBitmap, _Bool revBitOrder);
@@ -157,15 +130,7 @@ void LCD_DisplayOn(void);
 void LCD_DisplayOff(void);
 void LCD_BackLight(int procentai);
 
-//
-//void Display_ULong(uint16_t data, uint8_t XL, uint8_t YL);
-//
-//void Plot_String(uint8_t *string, uint8_t x, uint8_t y);
-//void Plot_Integer(int16_t number, uint8_t x, uint8_t y);
-//void Plot_Freq(uint32_t number, uint8_t x, uint8_t y, uint32_t changeRate);
-
-uint16_t LCD_ReadReg(uint8_t LCD_Reg);
-
+// Test function
 void LCD_TestDisplayScreen(void);
 
 
