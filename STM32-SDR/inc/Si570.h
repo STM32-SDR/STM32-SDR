@@ -33,9 +33,7 @@ unsigned long RFREQ_INT, RFREQ_FRAC;
 float HS_DIV, N1;
 double RFREQ, Old_RFREQ, FXTAL;
 long FOUT;  //, delta_freq;
-//long		delta_freq, offset;
 double F0;
-//int 		encoder_index;
 unsigned char SI570_Chk;
 //===================================================================
 

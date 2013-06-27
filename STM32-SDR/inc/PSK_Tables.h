@@ -36,8 +36,6 @@
 /*  http://www.gnu.org/copyleft/lesser.html                             */
 /* //////////////////////////////////////////////////////////////////// */
 
-
-
 /* bit sync half distance table                                  */
 /* index any position 0 to 15 and it returns a position halfway from the index */
 const int HALF_TBL[16] = {
@@ -58,9 +56,6 @@ const int HALF_TBL[16] = {
 		6,	/* 14          */
 		7	/* 15          */
 };
-
-
-
 
 
 /* each character is separated by two zeros. The bits are sent msbit first. */
@@ -323,29 +318,6 @@ const unsigned int VARICODE_TABLE[256] = {
 		0xB5B0	/* ASCII = 255	101101011011                  */
 };
 
-/* For the QPSK modulator/demodulator, rate 1/2 constraint length 5 */
-/*   convolutional FEC coding is used.                              */
-/* The generator polynomials used are:                              */
-/*  g1(x) = x^4 + x^3           + 1		= 0x19                      */
-/*  g0(x) = x^4	+       x^2 + x + 1		= 0x17                      */
-/*                                                                  */
-/*                                g1(x)                             */
-/*              /----+--------+--------------------------+          */
-/*            /      |        |                          |          */
-/* symbol msb       ---      ---      ---      ---      ---         */
-/*                 | b4|<---| b3|<---| b2|<---| b1|<---| b0| <-invrtd data in */
-/* symbol lsb       ---      ---      ---      ---      ---         */
-/*            \      |                 |        |        |          */
-/*              \----+-----------------+--------+--------+          */
-/*                                g0(x)                             */
-/*                                                                  */
-/* Lookup table to get symbol from non-inverted data stream         */
-//const char ConvolutionCodeTable[32] =
-//{
-//	2, 1, 3, 0, 3, 0, 2, 1,
-//	0, 3, 1, 2, 1, 2, 0, 3,
-//	1, 2, 0, 3, 0, 3, 1, 2,
-//	3, 0, 2, 1, 2, 1, 3, 0
-//};
+
 
 

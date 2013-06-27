@@ -14,8 +14,6 @@
  Current Date:	09/25/2006
 
  ======================================================================*/
-
-//#include	"NUE_PSK_Header.h"
 #include	"PSKDet.h"
 #include	"arm_math.h"
 

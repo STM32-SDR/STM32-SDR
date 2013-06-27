@@ -4,7 +4,6 @@
  *  Created on: Sep 30, 2012
  *      Author: CharleyK
  */
-#define I2S_Standard_Phillips           ((uint16_t)0x0000)
 #define I2S_Standard_MSB                ((uint16_t)0x0010)
 #define CODEC_MCLK_ENABLED
 
@@ -15,13 +14,11 @@
 #define CODEC_I2S_GPIO_AF              GPIO_AF_SPI3
 #define CODEC_I2S_IRQ                  SPI3_IRQn
 #define CODEC_I2S_GPIO_CLOCK           (RCC_AHB1Periph_GPIOC | RCC_AHB1Periph_GPIOA)
-//#define CODEC_I2S_WS_PIN               GPIO_Pin_4
 #define CODEC_I2S_WS_PIN               GPIO_Pin_15  //chh changed to free up PA4 for SPI1 interface
 #define CODEC_I2S_SCK_PIN              GPIO_Pin_10
 #define CODEC_I2S_SD_PIN               GPIO_Pin_12
 #define CODEC_I2Sext_SD_PIN            GPIO_Pin_11
 #define CODEC_I2S_MCK_PIN              GPIO_Pin_7
-//#define CODEC_I2S_WS_PINSRC            GPIO_PinSource4
 #define CODEC_I2S_WS_PINSRC            GPIO_PinSource15 //chh changed to free up PA4 for SPI1 interface
 #define CODEC_I2S_SCK_PINSRC           GPIO_PinSource10
 #define CODEC_I2S_SD_PINSRC            GPIO_PinSource12

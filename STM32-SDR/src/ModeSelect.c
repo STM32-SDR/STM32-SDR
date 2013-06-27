@@ -20,7 +20,6 @@ void Init_Mode(void)
 	LCD_StringLine(188, 0, " PSK ");
 	LCD_SetTextColor(BLACK);
 	LCD_SetBackColor(WHITE);
-
 	Mode = MODE_SSB;
 	LCD_StringLine(0, 200, "SSB");
 }

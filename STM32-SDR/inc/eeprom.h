@@ -5,7 +5,6 @@
  *      Author: CharleyK
  */
 
-unsigned char EEProm_Chk;
 
 void EEProm_Test(void);
 void check_eeprom(void);

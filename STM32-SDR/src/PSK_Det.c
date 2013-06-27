@@ -10,17 +10,15 @@
 #include "Psk_Tables.h"
 #include "arm_math.h"
 #include "DSP_Processing.h"
-//#include "Init_DMA.h"
 #include  "uart.h"
 #include  "User_Button.h"  //BT Flag reference
+
 /* define some constants  */
 #define PHZ_180_BMIN	(0.0)			/* 0         */
 #define PHZ_180_BMAX	(PI2/2.0)		/* Pi        */
 #define PHZ_0_BMIN	(PI2/2.0)		/* Pi        */
 #define PHZ_0_BMAX	(PI2)			/* 2Pi       */
-
 #define SYMBOL_RATE31 	31.25	/* 31.25 Symbols per Second */
-
 #define Ts (.032)			/* Ts == symbol period */
 
 #define AFC_OFF 0
@@ -43,7 +41,6 @@ double m_SymbolRate;
 
 void ResetModem(int mode)
 {
-	//int m_PSKmode;
 	int i;
 
 	for (i = 0; i < 40; i++) {
@@ -53,14 +50,12 @@ void ResetModem(int mode)
 
 	count = 0;
 	char_count = 0;
-	//m_PSKmode = BPSK_MODE;
 
 	InitPSK(8000);
 	CPSKInitDet();
-
 	InitPSKModulator();
 
-}
+	}
 /* //////////////////////////////////////////////////////////////////// */
 
 void CPSKInitDet(void)

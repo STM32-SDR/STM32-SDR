@@ -23,15 +23,7 @@
  *
  ******************************************************************************
  */
-//#include "xprintf.h"
+
 void uart_init(void);
 void uart_deinit(void);
 void uart_putc(unsigned char c);
-//void LogicAnalyzerTirggerConfig(void);
-//void LogicAnalyzerTirgger(uint8_t t);
-
-void uart_addRxCharacter(char c);
-void uart_dispFunctionKey(uint8_t d);
-
-#define UART_RX_BUFF_LEN 40
-extern volatile char received_string[UART_RX_BUFF_LEN];

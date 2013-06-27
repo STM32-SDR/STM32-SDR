@@ -94,7 +94,7 @@ void Audio_DMA_Init(void)
 	Delay(10000);
 
 	//Turn On Stream0 Transaction Complete Interrupt )
-	DMA_ITConfig(DMA1_Stream0, DMA_IT_TC, ENABLE);
+	//DMA_ITConfig(DMA1_Stream0, DMA_IT_TC, ENABLE);
 }
 
 void Audio_DMA_Start(void)

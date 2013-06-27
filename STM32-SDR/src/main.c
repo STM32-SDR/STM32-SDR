@@ -66,28 +66,11 @@ int main(void)
 
 			DSP_Flag = 0;
 
-
-
 			// Redraw the screen
 			LCD_DrawFFT(FFT_Display);
 			LCD_StringLine(0, 130, (char*) &LCD_buffer[0]);
 
-			//Check_BT_Flag();
-			//if (BT_Flag == 1) {
-			//	LCD_StringLine(0, 60, "BT  On");
 
-				//uart_putc( Start);
-				///for (j=0;j<128;j++) {
-				//uart_putc( (unsigned char)FFT_Display [2*j]);
-				///uart_putc( (unsigned char)FFT_Display [2*j+1]);
-				//for (j=0;j<39;j++) 	uart_putc(LCD_buffer[j]);
-				//uart_putc( Stop);
-			//}
-			//else
-			//	LCD_StringLine(0, 60, "BT OFF");
-
-			// Display text
-			//LCD_StringLine(0, 110, (char*) &received_string[0]);
 		}
 
 		// Process selector switch 1 (has it moved?)
@@ -159,9 +142,6 @@ void initializeHardware(void)
 
 	DSP_Flag = 0;
 
-	Audio_DMA_Start();
-	main_delay(SETUP_DELAY);
-
 	uart_init();
 	main_delay(SETUP_DELAY);
 
@@ -211,11 +191,15 @@ void initializeHardware(void)
 			&USR_Callbacks     // In /usbh_usr.c (user callback)
 	);
 	main_delay(SETUP_DELAY);
+
+	Audio_DMA_Start();			//Get everything up and running before starting DMA Interrupt
+	main_delay(SETUP_DELAY);
+
 }
 
 void displaySplashScreen(void)
 {
-	LCD_StringLine(200, 100, "STM32 SDR V2.4");
+	LCD_StringLine(200, 100, "STM32 SDR V2.5");
 	LCD_StringLine(200, 80, __DATE__);
 	LCD_StringLine(200, 60, __TIME__);
 	main_delay(5000000);

@@ -8,9 +8,6 @@
 #include "TFT_Display.h" //Included for putting up testing info
 
 //===================================================================
-
-//long						FOUT_multiplier, FOUT_divisor, Display_multiplier, Display_divisor;
-
 unsigned char si570_read[6];
 unsigned char SI570_Chk;
 unsigned const char HS_DIV_VALUE_char[6] = { 4, 5, 6, 7, 9, 11 };
@@ -20,7 +17,7 @@ float HS_DIV, N1;
 double RFREQ, Old_RFREQ, FXTAL;
 long FOUT;  //, delta_freq;
 double F0;
-//long	offset;
+
 
 /*======================================================================*/
 void Si570_StartUp(void)
@@ -34,22 +31,12 @@ void Si570_StartUp(void)
 
 void Output_Frequency(long Freq_Out)
 {
-	//int Disp4;
-	//double Disp5;
-	//int Disp6;
-
 	if (Freq_Out < 0)
 		Freq_Out = -Freq_Out;
 
 	Set_HS_DIV_N1(Freq_Out);
 
 	RFREQ = ((double) Freq_Out) * HS_DIV * N1 / FXTAL;
-
-	//Disp4 = (int)RFREQ;
-	//Disp5 = RFREQ - (double)Disp4;
-	//Disp6 = (int)(Disp5*10000.0);
-	//Plot_Integer ( Disp4, 100, 40 );
-	//Plot_Integer ( Disp6, 100, 60 );
 
 	Pack_Si570_registers(si570_read);
 
@@ -62,12 +49,7 @@ void Output_Frequency(long Freq_Out)
 /*======================================================================*/
 
 void Compute_FXTAL(void)
-{
-	//double Disp0;
-	//int Disp1;
-	//double Disp2;
-	//int Disp3;
-
+	{
 	Recall_F0();
 
 	Read_Si570_registers(si570_read);
@@ -76,13 +58,7 @@ void Compute_FXTAL(void)
 
 	FXTAL = F0 * HS_DIV * N1 / RFREQ;
 
-	//Disp0 = FXTAL/1000000.0;
-	//Disp1 = (int)Disp0;
-	//Disp2 = Disp0 - (double)Disp1;
-	//Disp3 = (int)(Disp2*10000.0);
-	//Plot_Integer ( Disp1, 100, 0 );
-	//Plot_Integer ( Disp3, 100, 20 );
-}
+	}
 
 /*======================================================================*/
 
@@ -162,19 +138,15 @@ void Set_HS_DIV_N1(long Freq_long)
 
 	N1 = (float) temp_N1;
 
-	//Plot_Integer ( temp_HS_DIV, 100, 80 );
-	//Plot_Integer ( temp_N1, 100, 100 );
-}
+	} // end of Set_HS_DIV_N1
 
 //===================================================================
 
 void Pack_Si570_registers(unsigned char reg[])
-{
-	//long	temp;
+	{
 	reg[0] = ((HS_DIV - 4.0) * 32.0) + ((N1 - 1.0) / 4.0);
 	reg[1] = (((char) (N1 - 1.0) & 0b0000011)) << 6;
 	RFREQ_INT = (uint32_t) RFREQ;
-	//reg[1]	=	reg[1] + RFREQ / 16.0;
 	reg[1] = reg[1] | RFREQ_INT >> 4;
 	RFREQ_FRAC = (long) ((RFREQ - (double) RFREQ_INT) * twoto28th);
 	reg[5] = RFREQ_FRAC & 0xFF;
@@ -183,22 +155,14 @@ void Pack_Si570_registers(unsigned char reg[])
 	reg[2] = (RFREQ_FRAC >> 24) & 0x0F;
 	RFREQ_INT = RFREQ_INT << 4 & 0xF0;
 	reg[2] = reg[2] | RFREQ_INT;
-
-	//Plot_Integer ( reg[0], 0, 120 );
-	//Plot_Integer ( reg[1], 0, 100 );
-	//Plot_Integer ( reg[2], 0, 80 );
-	//Plot_Integer ( reg[3], 0, 60 );
-	//Plot_Integer ( reg[4], 0, 40 );
-	//Plot_Integer ( reg[5], 0, 20 );
-}
+	}
 
 //===================================================================
 
 void Unpack_Si570_registers(unsigned char reg[])
-{
+	{
 	HS_DIV = ((reg[0] & 0b11100000) >> 5) + 4;
-	N1 = ((reg[0] & 0b00011111) << 2) +
-			((reg[1] & 0b11000000) >> 6) + 1;
+	N1 = ((reg[0] & 0b00011111) << 2) + ((reg[1] & 0b11000000) >> 6) + 1;
 	RFREQ_INT = (reg[1] & 0b00111111);
 	RFREQ_INT = (RFREQ_INT << 4) + ((reg[2] & 0b11110000) >> 4);
 	RFREQ_FRAC = (reg[2] & 0b00001111);
@@ -206,26 +170,26 @@ void Unpack_Si570_registers(unsigned char reg[])
 	RFREQ_FRAC = (RFREQ_FRAC << 8) + reg[4];
 	RFREQ_FRAC = (RFREQ_FRAC << 8) + reg[5];
 	RFREQ = RFREQ_INT + RFREQ_FRAC / twoto28th;
-}
+	}
 
 void Check_SI570(void)
-{
+	{
 	SI570_Chk = I2C_ReadSlave(SI570_Addr, 135);
-}
+	}
 
 //===================================================================
 
 void Read_Si570_registers(unsigned char read[])
-{
+	{
 	unsigned char i;
 	for (i = 0; i < 6; i++)
 		read[i] = I2C_ReadSlave( SI570_Addr, i + 7);
-}
+	}
 
 //===================================================================
 
 void Write_Si570_registers(unsigned char write[])
-{
+	{
 	char i;
 	i = I2C_ReadSlave( SI570_Addr, 137);
 	I2C_WriteRegister( SI570_Addr, 137, i | 0x10);	//	Freeze DCO
@@ -233,16 +197,13 @@ void Write_Si570_registers(unsigned char write[])
 	i = I2C_ReadSlave( SI570_Addr, 137);
 	I2C_WriteRegister( SI570_Addr, 137, i & ~0x10);	//	Unfreeze DCO
 
-	//if ( Large_RFREQ_Change (  ) || ( encoder_index < 7 ) )	{  // changed from John's code since we are
-	//not yet using encoder_index
-
 	if (Large_RFREQ_Change()) {
 		i = I2C_ReadSlave( SI570_Addr, 135);
 		I2C_WriteRegister( SI570_Addr, 135, i | 0x40);	//	New Freq Applied
 		while (I2C_ReadSlave( SI570_Addr, 135) & 0x40)
 			;
+		}
 	}
-}
 
 //===================================================================
 
