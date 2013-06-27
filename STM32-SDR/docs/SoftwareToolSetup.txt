@@ -84,7 +84,6 @@ Project Setup
   --> ...
 
 
-
 GDB Debugging:
 	Directions: http://hertaville.com/2012/09/16/part-3-debugging-openocd-0-6-0/
 

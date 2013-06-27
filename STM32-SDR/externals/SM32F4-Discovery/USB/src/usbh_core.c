@@ -270,6 +270,7 @@ void USBH_Process(USB_OTG_CORE_HANDLE *pdev, USBH_HOST *phost)
 //		STM_EVAL_LEDOff(LED_Green);  // added by "STM32"
 //		STM_EVAL_LEDOff(LED_Orange);  // added by "STM32"
 
+
 		/* Manage User disconnect operations*/
 		phost->usr_cb->DeviceDisconnected();
 

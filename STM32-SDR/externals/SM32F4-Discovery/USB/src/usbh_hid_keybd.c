@@ -215,6 +215,7 @@ static void KEYBRD_Decode(uint8_t *pbuf)
 	uint8_t jx;
 	uint8_t error;
 	uint8_t output;
+	uint8_t functionKey;
 
 	nbr_keys = 0;
 	nbr_keys_new = 0;
@@ -271,8 +272,10 @@ static void KEYBRD_Decode(uint8_t *pbuf)
 			output = HID_KEYBRD_Key[HID_KEYBRD_Codes[key_newest]];
 		}
 
+		functionKey = HID_KEYBRD_Codes[key_newest];
+
 		/* call user process handle */
-		USR_KEYBRD_ProcessData(output);
+		USR_KEYBRD_ProcessData(output, functionKey);
 	}
 	else {
 		key_newest = 0x00;

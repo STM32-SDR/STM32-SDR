@@ -7,10 +7,11 @@
 #include 	"PSKDet.h"
 #include 	"PSKMod.h"
 #include 	"PSK_TX_ShapeTable.h"
+#include 	"TFT_Display.h"
 
 //#define TXOFF_CODE 2	/* control code that can be placed in the input by Ctrl-Q */
 //#define TXON_CODE 3		/* ditto for Ctrl-S */
-//#define TXTOG_CODE 1
+#define TXTOG_CODE 1
 
 //#define PHZ_0 0			/*specify various signal phase states */
 //#define PHZ_90 1
@@ -24,7 +25,7 @@
 //#define SYM_M90 3		/*Minus 90 deg */
 #define SYM_OFF 4		/*No output */
 #define SYM_ON 5		/*constant output */
-#define PSK_TX_BUFFER_SIZE 26
+#define PSK_TX_BUFFER_SIZE 40
 
 float S1, S2;
 extern const unsigned int VARICODE_TABLE[256];
@@ -67,10 +68,11 @@ void InitPSKModulator(void)
 	m_pTail = 0;
 	m_pHead = 0;
 
-	//Fill Buffer with lower case alphabet
-	for (int i = 0; i < 26; i++) {
-		XmitBuffer[i] = 'a' + i;
+	//Clear Xmit Buffer
+	for (int i = 0; i < PSK_TX_BUFFER_SIZE-2; i++) {
+		XmitBuffer[i] = ' ';
 	}
+	XmitBuffer[PSK_TX_BUFFER_SIZE-1] = '\0';
 
 	m_AddEndingZero = TRUE;
 	m_SymbolRate = SYMBOL_RATE31;
@@ -100,8 +102,19 @@ char GetNextBPSKSymbol(void)
 		}
 		else {
 			ch = GetTxChar(); /*get next character to xmit */
-			m_TxShiftReg = VARICODE_TABLE[ch & 0xFF];
-			symb = SYM_P180; /*Start with a zero */
+
+			switch( ch ) {
+
+				case TXTOG_CODE:
+					symb = SYM_P180;
+					break;
+
+				default: /*get next VARICODE codeword to send */
+					m_TxShiftReg = VARICODE_TABLE[ ch&0xFF ];
+					symb = SYM_P180;	/*Start with a zero */
+					break;
+			}
+
 		}
 	}
 	else /* is not end of code word so send next bit */
@@ -133,33 +146,15 @@ char GetTxChar(void)
 {
 	char ch;
 
-	// TODO: Actually transmit our data via PSK.
-// Transmit only if new data is in queue, or transmit all the time?
-#if 0
-	/*if something in Queue */
 	if(!PSK_isQueueEmpty())	{
-		ch = XmitBuffer[m_pTail++] & 0x00FF;
-		if( m_pTail >= PSK_TX_BUFFER_SIZE )
-			m_pTail = 0;
+		ch = XmitBuffer[0] & 0x00FF;
+		for (int i = 0; i < m_pTail; i++) XmitBuffer[i] = XmitBuffer[i+1]; //shift contents left one character
+		for(int i = m_pTail; i < PSK_TX_BUFFER_SIZE - 2; i++) XmitBuffer[i] = 32; //put spaces in remaining empty spaces
+		m_pTail--;
+		LCD_StringLine(0, 90, (char*) &XmitBuffer[0]);
 	}
 	else
 		ch = TXTOG_CODE;		/* if que is empty return TXTOG_CODE */
-
-	if(m_TempNeedShutoff) {
-		m_TempNeedShutoff = FALSE;
-		m_NeedShutoff = TRUE;
-	}
-
-	if(m_TempNoSquelchTail) {
-		m_TempNoSquelchTail = FALSE;
-		m_NoSquelchTail = TRUE;
-	}
-#else
-	ch = XmitBuffer[m_pTail];
-	m_pTail++;
-	if (m_pTail > 25)
-		m_pTail = 0;
-#endif
 
 	return ch;
 }
@@ -174,20 +169,26 @@ _Bool PSK_addCharToTx(char newChar)
 	}
 
 	// Queue the character
-	XmitBuffer[m_pHead++] = newChar;
-	m_pHead %= PSK_TX_BUFFER_SIZE;
+	XmitBuffer[m_pTail++] = newChar;
+	//m_pHead %= PSK_TX_BUFFER_SIZE;
+	LCD_StringLine(0, 90, (char*) &XmitBuffer[0]);
 
 	// Success
 	return 1;
 }
 
+
+
+
 _Bool PSK_isQueueFull(void)
 {
-	int nextHead = (m_pHead + 1) % PSK_TX_BUFFER_SIZE;
-	return nextHead == m_pTail;
+
+	//int nextHead = (m_pHead + 1) % PSK_TX_BUFFER_SIZE;
+	return 38 == m_pTail;//if  38 == m_pTail then return 1 else return 0
 }
+
 
 _Bool PSK_isQueueEmpty(void)
 {
-	return m_pHead == m_pTail;
+	return 0 == m_pTail;
 }

@@ -658,8 +658,8 @@ void DecodeSymb(struct Complex newsamp)
 			}
 
 			LCD_buffer[37] = ch;
-			if (BT_Flag == 1)
-				uart_putc(ch);  // turn off char by char transmission
+			//if (BT_Flag == 1)
+			//uart_putc(ch);  // turn off char by char transmission
 		}
 		GotChar = FALSE;
 	}

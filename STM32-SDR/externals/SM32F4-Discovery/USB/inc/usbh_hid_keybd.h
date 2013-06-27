@@ -99,7 +99,7 @@ extern HID_cb_TypeDef HID_KEYBRD_cb;
  * @{
  */
 void USR_KEYBRD_Init(void);
-void USR_KEYBRD_ProcessData(uint8_t pbuf);
+void USR_KEYBRD_ProcessData(uint8_t pbuf, uint8_t d);
 /**
  * @}
  */

@@ -28,7 +28,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "usbh_usr.h"
 #include "usbh_hid_keybd.h"
-#include "uart.h"
+#include "Keyboard_Input.h"
 
 USBH_Usr_cb_TypeDef USR_Callbacks = {
 		USBH_USR_Init,
@@ -314,14 +314,21 @@ void USR_KEYBRD_Init(void)
  * @param  data : Keyboard data to be displayed
  * @retval None
  */
-void USR_KEYBRD_ProcessData(uint8_t data)
+void USR_KEYBRD_ProcessData(uint8_t data1,uint8_t data2 )
 {
 	USB_debugEvent(__LINE__);
 
 	// Skip control characters like enter, bell, escape..
-	if (data >= ' ') {
-		uart_addRxCharacter(data);
+	if (data1 >= ' ' && data2 < 112) {
+		kybd_addCharacter(data1);
 	}
+
+	if (data2 >=112 && data2<=121) {
+
+		data2 = data2 -112;
+		kybd_dispFunctionKey(data2);
+	}
+
 }
 
 /**

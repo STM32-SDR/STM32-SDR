@@ -1,3 +1,9 @@
 /.dep
 /obj
+*.hex
+*.bin
+*.elf
+*.map
+/.metadata
+
 

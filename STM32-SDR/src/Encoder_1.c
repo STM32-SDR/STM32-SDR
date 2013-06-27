@@ -176,7 +176,7 @@ void process_encoder1(void)
 		// TODO: Remove duplication.
 		case 0:
 			if ((Freq_Set[read_SS1] > Freq_Min)
-					& (Freq_Set[read_SS1] < Freq_Max)) {
+					&& (Freq_Set[read_SS1] < Freq_Max)) {
 				Freq_Set[read_SS1] += DIR1 * F_Unit;
 				FOUT = Freq_Set[read_SS1] * F_Mult;
 				if (SI570_Chk != 3)
@@ -187,7 +187,7 @@ void process_encoder1(void)
 
 		case 1:
 			if ((Freq_Set[read_SS1] > Freq_Min)
-					& (Freq_Set[read_SS1] < Freq_Max)) {
+					&& (Freq_Set[read_SS1] < Freq_Max)) {
 				Freq_Set[read_SS1] += DIR1 * F_Unit;
 				FOUT = Freq_Set[read_SS1] * F_Mult;
 				if (SI570_Chk != 3)
@@ -198,7 +198,7 @@ void process_encoder1(void)
 
 		case 2:
 			if ((Freq_Set[read_SS1] > Freq_Min)
-					& (Freq_Set[read_SS1] < Freq_Max)) {
+					&& (Freq_Set[read_SS1] < Freq_Max)) {
 				Freq_Set[read_SS1] += DIR1 * F_Unit;
 				FOUT = Freq_Set[read_SS1] * F_Mult;
 				if (SI570_Chk != 3)
@@ -209,7 +209,7 @@ void process_encoder1(void)
 
 		case 3:
 			if ((Freq_Set[read_SS1] > Freq_Min)
-					& (Freq_Set[read_SS1] < Freq_Max)) {
+					&& (Freq_Set[read_SS1] < Freq_Max)) {
 				Freq_Set[read_SS1] += DIR1 * F_Unit;
 				FOUT = Freq_Set[read_SS1] * F_Mult;
 				if (SI570_Chk != 3)
@@ -220,7 +220,7 @@ void process_encoder1(void)
 
 		case 4:
 			if ((Freq_Set[read_SS1] > Freq_Min)
-					& (Freq_Set[read_SS1] < Freq_Max)) {
+					&& (Freq_Set[read_SS1] < Freq_Max)) {
 				Freq_Set[read_SS1] += DIR1 * F_Unit;
 				FOUT = Freq_Set[read_SS1] * F_Mult;
 				if (SI570_Chk != 3)
@@ -231,7 +231,7 @@ void process_encoder1(void)
 
 		case 5:
 			if ((Freq_Set[read_SS1] > Freq_Min)
-					& (Freq_Set[read_SS1] < Freq_Max)) {
+					&& (Freq_Set[read_SS1] < Freq_Max)) {
 				Freq_Set[read_SS1] += DIR1 * F_Unit;
 				FOUT = Freq_Set[read_SS1] * F_Mult;
 				if (SI570_Chk != 3)
@@ -242,7 +242,7 @@ void process_encoder1(void)
 
 		case 6:
 			if ((Freq_Set[read_SS1] > Freq_Min)
-					& (Freq_Set[read_SS1] < Freq_Max)) {
+					&& (Freq_Set[read_SS1] < Freq_Max)) {
 				Freq_Set[read_SS1] += DIR1 * F_Unit;
 				FOUT = Freq_Set[read_SS1] * F_Mult;
 				if (SI570_Chk != 3)
@@ -253,7 +253,7 @@ void process_encoder1(void)
 
 		case 7:
 			if ((Freq_Set[read_SS1] > Freq_Min)
-					& (Freq_Set[read_SS1] < Freq_Max)) {
+					&& (Freq_Set[read_SS1] < Freq_Max)) {
 				Freq_Set[read_SS1] += DIR1 * F_Unit;
 				FOUT = Freq_Set[read_SS1] * F_Mult;
 				if (SI570_Chk != 3)
@@ -264,7 +264,7 @@ void process_encoder1(void)
 
 		case 8:
 			if ((Freq_Set[read_SS1] > Freq_Min)
-					& (Freq_Set[read_SS1] < Freq_Max)) {
+					&& (Freq_Set[read_SS1] < Freq_Max)) {
 				Freq_Set[read_SS1] += DIR1 * F_Unit;
 				FOUT = Freq_Set[read_SS1] * F_Mult;
 				if (SI570_Chk != 3)
@@ -275,7 +275,7 @@ void process_encoder1(void)
 
 		case 9:
 			if ((Freq_Set[read_SS1] > Freq_Min)
-					& (Freq_Set[read_SS1] < Freq_Max)) {
+					&& (Freq_Set[read_SS1] < Freq_Max)) {
 				Freq_Set[read_SS1] += DIR1 * F_Unit;
 				FOUT = Freq_Set[read_SS1] * F_Mult;
 				if (SI570_Chk != 3)
@@ -286,7 +286,7 @@ void process_encoder1(void)
 
 		case 10:
 			if ((Freq_Set[read_SS1] > Freq_Min)
-					& (Freq_Set[read_SS1] < Freq_Max)) {
+					&& (Freq_Set[read_SS1] < Freq_Max)) {
 				Freq_Set[read_SS1] += DIR1 * F_Unit;
 				FOUT = Freq_Set[read_SS1] * F_Mult;
 				if (SI570_Chk != 3)
@@ -297,7 +297,7 @@ void process_encoder1(void)
 
 		case 11:
 			if ((Freq_Set[read_SS1] > Freq_Min)
-					& (Freq_Set[read_SS1] < Freq_Max)) {
+					&& (Freq_Set[read_SS1] < Freq_Max)) {
 				Freq_Set[read_SS1] += DIR1 * F_Unit;
 				FOUT = Freq_Set[read_SS1] * F_Mult;
 				if (SI570_Chk != 3)
@@ -308,7 +308,7 @@ void process_encoder1(void)
 
 		case 12:
 			if ((Freq_Set[read_SS1] > Freq_Min)
-					& (Freq_Set[read_SS1] < Freq_Max)) {
+					&& (Freq_Set[read_SS1] < Freq_Max)) {
 				Freq_Set[read_SS1] += DIR1 * F_Unit;
 				FOUT = Freq_Set[read_SS1] * F_Mult;
 				if (SI570_Chk != 3)
@@ -319,7 +319,7 @@ void process_encoder1(void)
 
 		case 13:
 			if ((Freq_Set[read_SS1] > Freq_Min)
-					& (Freq_Set[read_SS1] < Freq_Max)) {
+					&& (Freq_Set[read_SS1] < Freq_Max)) {
 				Freq_Set[read_SS1] += DIR1 * F_Unit;
 				FOUT = Freq_Set[read_SS1] * F_Mult;
 				if (SI570_Chk != 3)
