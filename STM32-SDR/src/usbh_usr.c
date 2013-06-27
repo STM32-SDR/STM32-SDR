@@ -323,6 +323,7 @@ void USR_KEYBRD_ProcessData(uint8_t data1,uint8_t data2 )
 		kybd_addCharacter(data1);
 	}
 
+	// Check the Function Keys F1 thru F10
 	if (data2 >=112 && data2<=121) {
 
 		data2 = data2 -112;

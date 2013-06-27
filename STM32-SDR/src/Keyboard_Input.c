@@ -48,25 +48,25 @@ Plot_Integer((int16_t) data, 0, 60);
 
 switch(data) {
 
-case 0: if(PSK_isQueueEmpty) String2Buffer(" CQ CQ CQ de W5BAA W5BAA ");
+case 0: if(PSK_isQueueEmpty()) String2Buffer(" CQ CQ CQ de W5BAA W5BAA ");
 break;
 
-case 1: if(PSK_isQueueEmpty) String2Buffer("  de W5BAA ");
+case 1: if(PSK_isQueueEmpty()) String2Buffer("  de W5BAA ");
 break;
 
-case 2: if(PSK_isQueueEmpty) String2Buffer(" tnx for  call, handle is Charley ");
+case 2: if(PSK_isQueueEmpty()) String2Buffer(" tnx for  call, handle is Charley ");
 break;
 
-case 3: if(PSK_isQueueEmpty) String2Buffer("  QTH is Marble Falls,  near Austin ");
+case 3: if(PSK_isQueueEmpty()) String2Buffer("  QTH is Marble Falls,  near Austin ");
 break;
 
-case 4: if(PSK_isQueueEmpty) String2Buffer("  Rig is homebrew PSK xcvr @ 2 watts");
+case 4: if(PSK_isQueueEmpty()) String2Buffer("  Rig is homebrew PSK xcvr @ 2 watts");
 break;
 
-case 5: if(PSK_isQueueEmpty) String2Buffer(" BTU ");
+case 5: if(PSK_isQueueEmpty()) String2Buffer(" BTU ");
 break;
 
-case 6: if(PSK_isQueueEmpty) String2Buffer("  de W5BAA k");
+case 6: if(PSK_isQueueEmpty()) String2Buffer("  de W5BAA k");
 break;
 }
 

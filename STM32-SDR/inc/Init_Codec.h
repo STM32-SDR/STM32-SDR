@@ -1,11 +1,11 @@
 /*
- * I2C_Init.h
+ *
  *
  *  Created on: Sep 27, 2012
  *      Author: CharleyK
  */
 #define CODEC_ADDRESS                   0x18<<1
-#define AUDIO_RESET_GPIO_CLK           RCC_AHB1Periph_GPIOB //Redefinition for TFT
+#define AUDIO_RESET_GPIO_CLK           RCC_AHB1Periph_GPIOB
 #define AUDIO_RESET_PIN                GPIO_Pin_0
 #define AUDIO_RESET_GPIO               GPIOB
 #define Codec_Pause						1

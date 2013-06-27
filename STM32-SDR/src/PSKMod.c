@@ -13,16 +13,9 @@
 //#define TXON_CODE 3		/* ditto for Ctrl-S */
 #define TXTOG_CODE 1
 
-//#define PHZ_0 0			/*specify various signal phase states */
-//#define PHZ_90 1
-//#define PHZ_180 2
-//#define PHZ_270 3
-//#define PHZ_OFF 4
 
 #define SYM_NOCHANGE 0	/*Stay the same phase */
-//#define SYM_P90 1		/*Plus 90  deg */
 #define SYM_P180 2		/*Plus 180 deg */
-//#define SYM_M90 3		/*Minus 90 deg */
 #define SYM_OFF 4		/*No output */
 #define SYM_ON 5		/*constant output */
 #define PSK_TX_BUFFER_SIZE 40

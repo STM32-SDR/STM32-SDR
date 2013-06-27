@@ -19,6 +19,7 @@ void Init_Mode(void)
 	LCD_StringLine(88, 0, " SSB ");
 	LCD_StringLine(144, 0, " CW ");
 	LCD_StringLine(188, 0, " PSK ");
+
 	LCD_SetTextColor(LCD_COLOR_BLACK);
 	LCD_SetBackColor(LCD_COLOR_WHITE);
 

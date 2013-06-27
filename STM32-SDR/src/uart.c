@@ -33,8 +33,6 @@
 #include	"xprintf.h"
 #include	"misc.h"
 #include	"arm_math.h"
-#include	"PSKMod.h"
-#include	"TFT_Display.h"
 
 //USART2
 USART_TypeDef* COM_USART = USART2;
@@ -51,11 +49,6 @@ const uint16_t COM_TX_AF = GPIO_AF_USART2;
 const uint16_t COM_RX_AF = GPIO_AF_USART2;
 
 uint16_t i;
-_Bool buff_Test;
-
-
-
-volatile char received_string[UART_RX_BUFF_LEN]; // this will hold the received string
 
 void uart_init()
 {
@@ -63,14 +56,13 @@ void uart_init()
 	NVIC_InitTypeDef NVIC_InitStructure; // this is used to configure the NVIC (nested vector interrupt controller)
 	GPIO_InitTypeDef GPIO_InitStructure;
 	/* USARTx configured as follow:
-	 - BaudRate = 230400 baud
+	 - BaudRate = 115200 baud
 	 - Word Length = 8 Bits
 	 - One Stop Bit
 	 - No parity
 	 - Hardware flow control disabled (RTS and CTS signals)
 	 - Receive and transmit enabled
 	 */
-	//USART_InitStructure.USART_BaudRate = 230400;
 	USART_InitStructure.USART_BaudRate = 115200;
 	USART_InitStructure.USART_WordLength = USART_WordLength_8b;
 	USART_InitStructure.USART_StopBits = USART_StopBits_1;
@@ -117,16 +109,11 @@ void uart_init()
 
 	/* Enable USART */
 	USART_Cmd(COM_USART, ENABLE);
-	//USART_SendData(USART2, (uint8_t) 'o');
 
 	/* Attach ChaN's xprintf interface */
 	xdev_out(uart_putc);
 
-	for (i = 0; i < UART_RX_BUFF_LEN; i++) {
-		received_string[i] = ' ';
-	}
-	received_string[UART_RX_BUFF_LEN - 1] = '\0';
-}
+    }
 
 void uart_deinit(void)
 {
@@ -148,35 +135,10 @@ void USART2_IRQHandler(void)
 	if (USART_GetITStatus(USART2, USART_IT_RXNE )) {
 		// the character from the USART2 data register is saved in t
 		char rxChar = USART2 ->DR;
-		uart_addRxCharacter(rxChar);
 	}
 }
 
-void uart_addRxCharacter(char rxChar)
-{
-	// Count characters already inserted
-	static uint8_t cnt = 0;
 
-	// Have we filled the buffer yet?
-	if (cnt < UART_RX_BUFF_LEN - 2) {
-		// Not full: fill from left to right.
-		received_string[cnt] = rxChar;
-		cnt++;
-	}
-	else {
-		// Already full, shift characters in buffer left one spat and
-		// append new character to end.
-		for (i = 1; i < UART_RX_BUFF_LEN - 2; i++)
-			received_string[i - 1] = received_string[i];
-
-		received_string[UART_RX_BUFF_LEN - 3] = rxChar;
-	}
-
-	LCD_StringLine(0, 110, (char*) &received_string[0]);
-
-	// Add character for PSK transmission:
-	buff_Test = PSK_addCharToTx(rxChar);
-}
 
 
 
