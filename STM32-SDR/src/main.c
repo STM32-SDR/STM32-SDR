@@ -43,9 +43,9 @@ __ALIGN_BEGIN USBH_HOST USB_Host __ALIGN_END;
 /*
  * PROTOTYPES
  */
-void initializeHardware(void);
-void displaySplashScreen(void);
-void main_delay(uint32_t numLoops);
+static void initializeHardware(void);
+static void displaySplashScreen(void);
+static void main_delay(uint32_t numLoops);
 
 /*
  * FUNCTIONS
@@ -122,11 +122,16 @@ int main(void)
 		Old_HandleTouchEvent();
 		ProcessInputData();
 
+		/*
+		 * Handle general deferred events from the ISR.
+		 */
+		DelayEvent_ProcessDelayedEvents();
+
 	} //while
 
 } //main
 
-void initializeHardware(void)
+static void initializeHardware(void)
 {
 	const int SETUP_DELAY = 100;
 
@@ -223,7 +228,7 @@ void initializeHardware(void)
 
 }
 
-void displaySplashScreen(void)
+static void displaySplashScreen(void)
 {
 	// Test drawing a bitmap from smile_image.c
 	extern const struct {
@@ -241,10 +246,10 @@ void displaySplashScreen(void)
 	LCD_StringLine(200, 100, "STM32 SDR V2.6");
 	LCD_StringLine(200, 80, __DATE__);
 	LCD_StringLine(200, 60, __TIME__);
-	main_delay(50000000);
+	main_delay(20000000);
 }
 
-void main_delay(uint32_t numLoops)
+static void main_delay(uint32_t numLoops)
 {
 	volatile uint32_t i, j;
 

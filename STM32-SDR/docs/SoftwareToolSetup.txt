@@ -95,6 +95,7 @@ GDB Debugging:
 		Download Binaries: http://www.freddiechopin.info/en/download/category/4-openocd
 		- Currently using 0.7x
 		- Newer versions should work.
+		- File is a .7z, may need 7Zip to open: http://www.7-zip.org/
 
 		Requires STM Link to be installed for USB drivers
 
@@ -112,7 +113,9 @@ GDB Debugging:
 		- Launch the GDB server:  (change exe name and path as apporpriate)
 			openocd-x64-0.7.0 -f C:\PathToYourStuff\openocd-0.7.0\scripts\board\stm32f4discovery.cfg
 			openocd-0.7.0 -f C:\PathToYourStuff\openocd-0.7.0\scripts\board\stm32f4discovery.cfg
-		  Ex:
+			
+		  Examples (based on where you installed it):
+			openocd-x64-0.7.0 -f C:\Development\openocd-0.7.0\scripts\board\stm32f4discovery.cfg
 			openocd-x64-0.7.0 -f E:\Work\DFM\DaveHAMRadio\openocd-0.7.0\scripts\board\stm32f4discovery.cfg
 
 		Should see:
@@ -129,6 +132,18 @@ GDB Debugging:
 		Leave the command window open so GDB server executes while trying to debug.
 
 		- Via eclipse, configure the debug settings (as per directions above) and then just debug.
+			URL:     http://hertaville.com/2012/09/16/part-3-debugging-openocd-0-6-0/
+			Section: Debugging in Eclipse Using OpenOCD
+		
+		Trouble shooting:
+		- Unit not connected (or driver not installed) if you see:
+				Info : This adapter doesn't support configurable speed
+				Error: open failed
+				in procedure 'transport'
+				in procedure 'init'
+		- You missed the -f argument if you see
+				Runtime Error: embedded:startup.tcl:47: Can't find openocd.cfg
+				
 
 Git Resources:
 ----------------------

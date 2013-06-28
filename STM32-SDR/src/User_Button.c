@@ -22,8 +22,9 @@
 #include 	"xprintf.h"
 #include	"arm_math.h"
 
+#include	"PSKMod.h"
+
 EXTI_InitTypeDef EXTI_InitStructure;
-uint8_t BT_Flag = 0;
 
 uint8_t PB_State;
 
@@ -78,17 +79,9 @@ void BT_Flag_Config(void)
 	GPIO_Init(GPIOB, &GPIO_InitStructure);
 }
 
-void Check_BT_Flag(void)
-{
-	// Read the link-status of the bluetooth module.
-	// TODO: Replace this with direct query call to the BT module (AT....)
-	//       because if the BT module not on board, pin floats.
-	// TODO: Replace BT_Flag with direct call to a isBluetoothConnected() function.
-	BT_Flag = GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_10);
-}
 
-// TODO: Switch BT_Flag to using a function like this:
-int IsBTConnected(void) {
+_Bool IsBTConnected(void)
+{
 	return GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_10);
 }
 
@@ -115,4 +108,35 @@ void EXTI0_IRQHandler(void)
 }
 
 //===============================================================================
+
+
+/*
+ * Delayed Event Handling
+ */
+static uint32_t s_delayEventsTriggered = 0;
+
+// Called from main.
+void DelayEvent_ProcessDelayedEvents(void)
+{
+	// Handle the marked event.
+	if (s_delayEventsTriggered & DelayEvent_DisplayStoreIQ) {
+		LCD_StringLine(0, 40, "Store   IQ");
+	}
+	if (s_delayEventsTriggered & DelayEvent_DisplayStoreFreq) {
+		LCD_StringLine(234, 40, "Store Freq");
+	}
+	if (s_delayEventsTriggered & DelayEvent_DisplayPSKXMitBuffer) {
+		LCD_StringLine(0, 90, (char*) &XmitBuffer[0]);
+	}
+
+	// Clear all the marked events.
+	s_delayEventsTriggered = 0;
+}
+
+// Called from ISR.
+void DelayEvent_TriggerEvent(DelayEvent_Event event)
+{
+	s_delayEventsTriggered |= event;
+}
+
 

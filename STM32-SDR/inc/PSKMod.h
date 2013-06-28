@@ -35,6 +35,9 @@
 /* http://www.gnu.org/copyleft/lesser.html			    			*/
 /*==================================================================*/
 
+// Exported for display in the ISR.
+extern char XmitBuffer[];
+
 
 char GetTxChar(void);
 

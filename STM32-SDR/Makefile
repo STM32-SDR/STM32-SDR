@@ -106,6 +106,7 @@ OPT = -Os
 OBJDIR = obj
 
 # Required directories:
+# TODO: Fix directory creation/comilation to make it more generic.
 DIRS = $(OBJDIR) $(OBJDIR)\src $(OBJDIR)\externals $(OBJDIR)\externals\SM32F4-Discovery $(OBJDIR)\externals\SM32F4-Discovery\USB $(OBJDIR)\externals\SM32F4-Discovery\USB\src $(OBJDIR)\externals\SM32F4-Discovery\STEmbeddedGUI $(OBJDIR)\externals\SM32F4-Discovery\STEmbeddedGUI\src $(OBJDIR)\startup .dep
 
 #

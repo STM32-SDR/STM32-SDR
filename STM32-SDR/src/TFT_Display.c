@@ -10,7 +10,6 @@
 #include	"stm32f4xx_rcc.h"
 #include	"stm32f4xx_fsmc.h"
 #include	"stm32f4xx_tim.h"
-#include	"AsciiLib.h"
 #include	"touch_pad.h"
 #include 	"PSKDet.h"
 #define MAX_POLY_CORNERS   200

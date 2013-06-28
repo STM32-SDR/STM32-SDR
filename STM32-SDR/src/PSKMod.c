@@ -8,6 +8,7 @@
 #include 	"PSKMod.h"
 #include 	"PSK_TX_ShapeTable.h"
 #include 	"TFT_Display.h"
+#include	"User_Button.h"
 
 //#define TXOFF_CODE 2	/* control code that can be placed in the input by Ctrl-Q */
 //#define TXON_CODE 3		/* ditto for Ctrl-S */
@@ -145,8 +146,8 @@ char GetTxChar(void)
 		for(int i = m_pTail; i < PSK_TX_BUFFER_SIZE - 2; i++) XmitBuffer[i] = 32; //put spaces in remaining empty spaces
 		m_pTail--;
 
-		// TODO: Charley: This is called from the ISR, but screen code is not threadsafe. We must move to non ISR location.
-		// LCD_StringLine(0, 90, (char*) &XmitBuffer[0]);
+		// LCD code is not thread safe, so trigger a delayed event to display the XMitBuffer to the LCD.
+		DelayEvent_TriggerEvent(DelayEvent_DisplayStoreFreq);
 	}
 	else
 		ch = TXTOG_CODE;		/* if que is empty return TXTOG_CODE */

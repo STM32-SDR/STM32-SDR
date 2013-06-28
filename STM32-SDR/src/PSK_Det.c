@@ -653,7 +653,7 @@ void DecodeSymb(struct Complex newsamp)
 			}
 
 			LCD_buffer[37] = ch;
-			//if (BT_Flag == 1)
+			//if (IsBTConnected())
 			//uart_putc(ch);  // turn off char by char transmission
 		}
 		GotChar = FALSE;

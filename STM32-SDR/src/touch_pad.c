@@ -12,6 +12,8 @@
 #include "ChangeOver.h"
 #include "ModeSelect.h"
 #include "TSDriver_ADS7843.h"
+#include "User_Button.h"
+
 
 static int16_t TouchCount = 0;
 
@@ -150,8 +152,9 @@ void EXTI9_5_IRQHandler(void)
 
 	//Handle Encoder #2 PB interrupt
 	if (EXTI_GetITStatus(EXTI_Line7) != RESET) {
-		// TODO: Charley: Cannot call LCD routines from in ISR; rework to display in non-ISR.
-		//LCD_StringLine(0, 40, "Store   IQ");
+		// LCD code is not thread safe, so trigger a delayed event to display the "Store IQ" message.
+		DelayEvent_TriggerEvent(DelayEvent_DisplayStoreIQ);
+
 		DelayUS(10);
 		Store_IQ_Data();
 		DelayUS(10);
@@ -160,8 +163,9 @@ void EXTI9_5_IRQHandler(void)
 
 	//Handle Encoder #1 PB interrupt
 	if (EXTI_GetITStatus(EXTI_Line8) != RESET) {
-		// TODO: Charley: Cannot call LCD routines from in ISR; rework to display in non-ISR.
-		//LCD_StringLine(234, 40, "Store Freq");
+		// LCD code is not thread safe, so trigger a delayed event to display the "Store Freq" message.
+		DelayEvent_TriggerEvent(DelayEvent_DisplayStoreFreq);
+
 		DelayUS(10);
 		Store_SI570_Data();
 		DelayUS(10);
