@@ -417,7 +417,7 @@ GL_PageControls_TypeDef* NewLabel(uint16_t ID, const char* label, GL_Direction d
 	GL_Label_TypeDef *pControlObj = NULL;
 	GL_PageControls_TypeDef * pPageControlObj = NULL;
 
-	// TODO: Change to statically allocated because will eventually run out of heap.
+	// TODO: Change to statically allocated because will eventually run out of heap if called repeatedly.
 	// (malloc calls _sbrk(), which has been naively implemented to never recover memory.
 	pControlObj = (GL_Label_TypeDef *) malloc(sizeof(GL_Label_TypeDef));
 	if (pControlObj) {
@@ -1816,7 +1816,7 @@ static GL_ErrStatus SetSwitchVisible(GL_PageControls_TypeDef* pTmp, GL_Coordinat
 }
 
 
-// TODO: Get rest working: Radio, Check, ....
+// TODO: Get rest working: Radio button, Check box, ....
 
 /**
  * @brief  Show the Control Object at the specified coordinates.
@@ -3444,7 +3444,7 @@ void ProcessInputData(void)
 						GL_PageControls_TypeDef *pControl = pPage->PageControls[controlIdx];
 
 						GL_Coordinate_TypeDef controlRegion = pControl->objCoordinates;
-						// TODO: remove.
+						// TODO: remove when touch known to work with new code.
 //						GL_ObjDimensions_TypeDef tmpSize = GetObjSize(pControl);
 //						if (CompareCoordinates(tmpCoord.MaxX, tmpCoord.MaxX - tmpSize.Length + 1, tmpCoord.MaxY,
 //								tmpCoord.MaxY - tmpSize.Height)) {
@@ -3460,7 +3460,7 @@ void ProcessInputData(void)
 			}
 		}
 		TS_ClearTouchEvent();
-		// TODO: Why delay after servicing touch event?
+		// TODO: Why delay after servicing touch event? Debounce?
 		GL_Delay(15);
 	}
 }

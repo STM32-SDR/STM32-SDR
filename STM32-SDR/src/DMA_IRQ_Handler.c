@@ -42,7 +42,6 @@ float PSK_Gain;
 
 void DMA1_Stream0_IRQHandler(void)
 {
-	// TODO: Charley: DMA1 ISR seems to be called too frequently and does not allow normal processing to continue.
 	//Check to see which set of buffers are currently in use
 	DMA_RX_Memory = DMA_GetCurrentMemoryTarget(DMA1_Stream0 );
 	DMA_TX_Memory = DMA_GetCurrentMemoryTarget(DMA1_Stream5 );
@@ -168,7 +167,6 @@ void Xmit_SSB(void)
 	}		//End of Buffer 1 Processing
 
 	else  //Transfer I/Q data and fill FFT buffer on inactive buffer
-
 	{
 		for (i = 0; i < BUFFERSIZE / 2; i++) {
 			FIR_I_In[i] = (q15_t) ((float) Rx0BufferDMA[2 * i] * T_lgain);

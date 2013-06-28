@@ -3,6 +3,7 @@
 *.hex
 *.bin
 *.elf
+STM32-SDR_rom.elf
 *.map
 /.metadata
 

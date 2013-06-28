@@ -22,7 +22,10 @@
 #define R3_CHANGEADDR_X   0		// Does address change in X or Y first?
 #define R3_CHANGEADDR_Y   1
 
-
+/* Example: */
+/* Set GRAM write direction and BGR = 1 */
+/* I/D=00 (Horizontal : increment, Vertical : increment) */
+/* AM=1 (address is updated in horizontal writing direction) */
 #if LCD_ROTATION == 0
 #define LCD_ROTATE_GETX(x,y) (x)
 #define LCD_ROTATE_GETY(x,y) (y)
@@ -156,12 +159,19 @@ void LCD_Init(void)
 
 static void TFT_Delay(uint32_t nTime)
 {
+	static volatile int threadWatch = 0;
+	threadWatch++;
+	assert(threadWatch == 1);
+
 	static __IO uint32_t TimingDelay;
 	TimingDelay = nTime;
 
 	while (TimingDelay != 0) {
 		TimingDelay--;
 	}
+	assert(threadWatch == 1);
+	threadWatch--;
+	assert(threadWatch == 0);
 }
 
 static void LCD_CtrlLinesConfig(void)
@@ -292,6 +302,7 @@ void LCD_BackLight(int procentOn)
 	TIM_OC1Init(TIM1, &TIM_OCInitStructure);
 }
 
+// Configure the Flexible Static Memory Controller to map the LCD RAM to processor RAM.
 static void LCD_FSMCConfig(void)
 {
 	FSMC_NORSRAMInitTypeDef FSMC_NORSRAMInitStructure;
@@ -349,23 +360,8 @@ static void LCD_Reset(void)
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 //		From LcdHal.c
 //////////////////////////////////////////////////////////////////////////////////////////////////////
-//#include "gl_fonts.h"
-
 __IO uint32_t LCDType = LCD_ILI9320;
 
-
-//#if defined (USE_STM3210E_EVAL) || defined (USE_STM32100E_EVAL) || defined (USE_STM322xG_EVAL)
-/**
- * @brief  Writes 1 word to the LCD RAM.
- * @param  RGB_Code: the pixel color in RGB mode (5-6-5).
- * @retval None
- */
-void LCD_WriteRAMWord(uint16_t RGB_Code)
-{
-	LCD_WriteRAM_Prepare();
-	LCD_WriteRAM(RGB_Code);
-}
-//#endif /* USE_STM3210E_EVAL */
 
 /**
  * @brief  LCD_DrawColorBMP
@@ -448,50 +444,126 @@ void LCD_DrawColorBMP(uint8_t* ptrBitmap, uint16_t Xpos_Init, uint16_t Ypos_Init
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
+#define DEBUG_REGMISMATCH 0
+#if DEBUG_REGMISMATCH == 1
+volatile int threadWatch_LCDREG = 0;
+volatile int LCDRegMismatchCount_A1 = 0;
+volatile int LCDRegMismatchCount_A2 = 0;
+volatile int LCDRegMismatchCount_A3 = 0;
+volatile int LCDRegMismatchCount_A4 = 0;
+volatile uint8_t LCDRegMismatch_BadReg = 0;
+volatile int LCDRegMismatchCount_B1 = 0;
+volatile int LCDRegMismatchCount_B2 = 0;
+volatile int LCDRegMismatchCount_B3 = 0;
+volatile int LCDRegMismatchCount_B4 = 0;
+#endif
 
 // ***********************************************************************************
 // Register access routines
 // ***********************************************************************************
-void LCD_WriteReg(uint8_t LCD_Reg, uint16_t LCD_RegValue)
+void LCD_WriteReg(uint8_t selectedReg, uint16_t regValue)
 {
-	LCD_REG = LCD_Reg;
-	LCD_RAM = LCD_RegValue;
+	// Catch threadsafe problem.
+	static uint8_t threadSafeCheck = 0;
+	assert(threadSafeCheck == 0);
+	threadSafeCheck++;
+	assert(threadSafeCheck == 1);
+
+	// TODO: Charley: Is it OK to read from LCD_REG? Should it be correct?
+	// TODO: Charley: Which LCD controller are we using? SSD1289 or ILI9320?
+#if DEBUG_REGMISMATCH == 1
+	LCD_REG = selectedReg;
+
+	if (LCD_REG != selectedReg) {
+		LCDRegMismatch_BadReg = LCD_REG;
+		LCDRegMismatchCount_A1++;
+		if (LCD_REG != selectedReg) {
+			LCDRegMismatchCount_A2++;
+			if (LCD_REG != selectedReg) {
+				LCDRegMismatchCount_A3++;
+				LCD_REG = selectedReg;
+				if (LCD_REG != selectedReg) {
+					LCDRegMismatchCount_A4++;
+				}
+			}
+		}
+	}
+#else
+	// Loop until the value is set correctly
+	uint8_t count = 0;
+	do {
+		LCD_REG = selectedReg;
+		if (count++ > 100) {
+			assert(0);
+			break;
+		}
+	} while (LCD_REG != selectedReg);
+#endif
+
+
+	LCD_RAM = regValue;
+
+	// Catch threadsafe problem.
+	assert(threadSafeCheck == 1);
+	threadSafeCheck--;
+	assert(threadSafeCheck == 0);
 }
 void LCD_WriteRAM_Prepare(void)
 {
+	// Catch threadsafe problem.
+	static uint8_t threadSafeCheck = 0;
+	assert(threadSafeCheck == 0);
+	threadSafeCheck++;
+	assert(threadSafeCheck == 1);
+
+#if DEBUG_REGMISMATCH == 1
 	LCD_REG = 0x22;
+	if (LCD_REG != 0x22) {
+		LCDRegMismatchCount_B1++;
+		if (LCD_REG != 0x22) {
+			LCDRegMismatchCount_B2++;
+			if (LCD_REG != 0x22) {
+				LCDRegMismatchCount_B3++;
+				LCD_REG = 0x22;
+				if (LCD_REG != 0x22) {
+					LCDRegMismatchCount_B4++;
+				}
+			}
+		}
+	}
+#else
+	// Loop until the value is set correctly
+	uint8_t count = 0;
+	do {
+		LCD_REG = 0x22;
+		if (count++ > 100) {
+			assert(0);
+			return;
+		}
+	} while (LCD_REG != 0x22);
+#endif
+
+	// Catch threadsafe problem.
+	assert(threadSafeCheck == 1);
+	threadSafeCheck--;
+	assert(threadSafeCheck == 0);
 }
+
 void LCD_WriteRAM_PrepareDir(LCD_WriteRAM_Direction direction)
 {
 	uint16_t r3Cmd = 0;
 
 	switch (direction) {
 	case LCD_WriteRAMDir_Right:
-		/* Set GRAM write direction and BGR = 1 */
-		/* I/D=00 (Horizontal : increment, Vertical : increment) */
-		/* AM=1 (address is updated in horizontal writing direction) */
-		//		r3Cmd = MAKE_R3_CMD(0x1030);
 		r3Cmd = BUILD_R3_CMD(R3_INCRCEMENT, R3_INCRCEMENT, R3_CHANGEADDR_X);
 		break;
 	case LCD_WriteRAMDir_Left:
-		/* Set GRAM write direction and BGR = 1 */
-		/* I/D=01 (Horizontal : decrement, Vertical : increment) */
-		/* AM=0 (address is updated in horizontal writing direction) */
-		//		r3Cmd = MAKE_R3_CMD(0x1020);
 		r3Cmd = BUILD_R3_CMD(R3_DECREMENT, R3_INCRCEMENT, R3_CHANGEADDR_X);
 		break;
 	case LCD_WriteRAMDir_Up:
-		/* Set GRAM write direction and BGR = 1 */
-		/* I/D=00 (Horizontal : increment, Vertical : decrement) */
-		/* AM=1 (address is updated in vertical writing direction) */
-		//		r3Cmd = MAKE_R3_CMD(0x1018);
 		r3Cmd = BUILD_R3_CMD(R3_INCRCEMENT, R3_DECREMENT, R3_CHANGEADDR_Y);
 		break;
 	case LCD_WriteRAMDir_Down:
-		/* Set GRAM write direction and BGR = 1 */
-		/* I/D=00 (Horizontal : increment, Vertical : increment) */
-		/* AM=1 (address is updated in vertical writing direction) */
-		//		r3Cmd = MAKE_R3_CMD(0x1038);
 		r3Cmd = BUILD_R3_CMD(R3_INCRCEMENT, R3_INCRCEMENT, R3_CHANGEADDR_Y);
 		break;
 	default:
@@ -506,7 +578,6 @@ void LCD_WriteRAM(uint16_t RGB_Code)
 	LCD_RAM = RGB_Code;
 
 	// TODO: Why is this delay needed? Without it, nothing appears on LCD!??
-	extern void TFT_Delay(uint32_t nTime);
 	//	TFT_Delay(50);
 	TFT_Delay(10);
 }
@@ -608,19 +679,7 @@ uint16_t LCD_GetPixel(uint16_t Xpos, uint16_t Ypos)
 	/*Read the color of given pixel*/
 	LCD_WriteRAM_PrepareDir(LCD_WriteRAMDir_Right);
 	LCD_SetCursor(Xpos, Ypos);
-//	tmpColor = LCD_ReadRAM();
-
-	uint16_t regValue = LCD_RAM;
-	regValue = LCD_RAM;
-	regValue = LCD_RAM;
-	regValue = LCD_RAM;
-	regValue = LCD_RAM;
-	regValue = LCD_RAM;
-	regValue = LCD_RAM;
-	regValue = LCD_RAM;
-	regValue = LCD_RAM;
-
-	tmpColor = regValue;
+	tmpColor = LCD_ReadRAM();
 
 	/*Swap the R and B color channels*/
 	tmpRed = (tmpColor & Blue) << 11;

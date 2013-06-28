@@ -13,8 +13,6 @@
 #include	"AsciiLib.h"
 #include	"touch_pad.h"
 #include 	"PSKDet.h"
-#define LCD_REG      (*((volatile unsigned short *) 0x60000000))
-#define LCD_RAM      (*((volatile unsigned short *) 0x60020000))
 #define MAX_POLY_CORNERS   200
 #define POLY_Y(Z)          ((int32_t)((Points + Z)->X))
 #define POLY_X(Z)          ((int32_t)((Points + Z)->Y))
@@ -85,14 +83,17 @@ void LCD_DrawFFT(uint8_t fftData[])
 	}
 
 	for (int x = 0; x < FFT_WIDTH; x++) {
-		if (x != selectedFreqX) {
+		// Don't draw at same place as line to avoid flickering.
+		if (x == (int) selectedFreqX) {
+			continue;
+		}
 
-			for (int y = 0; y < FFT_HEIGHT; y++) {
-				if (y >= fftData[x + 8])
-					LCD_PutPixel(x + OFFSET_X, y + OFFSET_Y, LCD_COLOR_BLUE);
-				else
-					LCD_PutPixel(x + OFFSET_X, y + OFFSET_Y, LCD_COLOR_WHITE);
-			}
+		// Plot this column of the FFT.
+		for (int y = 0; y < FFT_HEIGHT; y++) {
+			if (y < fftData[x + 8])
+				LCD_PutPixel(x + OFFSET_X, FFT_HEIGHT - y + OFFSET_Y, LCD_COLOR_BLUE);
+			else
+				LCD_PutPixel(x + OFFSET_X, FFT_HEIGHT - y + OFFSET_Y, LCD_COLOR_WHITE);
 		}
 	}
 

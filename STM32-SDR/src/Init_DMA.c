@@ -78,19 +78,9 @@ void Audio_DMA_Init(void)
 	Delay(10000);
 
 	//Startup DMA Processing
-	// TODO: Charley: Without long delays, DMA ISR not called; with delays it's called too often.
-#if 0
-	// This seems to trigger the DMA isr (DMA1_Stream0_IRQHandler) continually
-	DMA_Cmd(DMA1_Stream0, ENABLE);
-	Delay(10000000);
-	DMA_Cmd(DMA1_Stream5, ENABLE);
-	Delay(10000000);
-#else
-	// This seems to never trigger the DMA ISR (DMA1_Stream0_IRQHandler)
 	DMA_Cmd(DMA1_Stream0, ENABLE);
 	DMA_Cmd(DMA1_Stream5, ENABLE);
 	Delay(10000);
-#endif
 
 	//Setup & Turn On DMA General Interrupt
 	NVIC_InitTypeDef NVIC_InitStructure;

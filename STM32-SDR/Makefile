@@ -93,9 +93,14 @@ ULIBDIR = .\externals\libs
 # List all user libraries here
 ULIBS = -lstm32f4xx_peripherals -lstm32f4xx_math -lm
  
-# Define optimisation level here
-#OPT = -Os
-OPT = -O0
+# Define optimisation level here 
+# (-O0 useful for debugging because variables not optimized out; however, seems to interfere with DMA ISR)
+# TODO: Why does -O0 cause the DMA ISR DMA1_Stream0_IRQHandler() to not function?
+#   Note that in Init_DMA.c::Audio_DMA_Init(), adding a big delay (Delay(10000000);) after each of 
+#   DMA_Cmd(DMA1_Stream0, ENABLE); and DMA_Cmd(DMA1_Stream5, ENABLE); with -O0 causes the IRQ to be triggered
+#   continually; without these delays, the IRQ is never triggered.
+OPT = -Os
+#OPT = -O0	
 
 # Folder for build intermediates:
 OBJDIR = obj

@@ -178,29 +178,21 @@ void GL_LCD_DrawCircle(uint8_t Xpos, uint16_t Ypos, uint16_t Radius)
 	CurY = Radius;
 
 	while (CurX <= CurY) {
-		LCD_SetCursor(Xpos + CurX, Ypos + CurY);
-		LCD_WriteRAMWord(GL_TextColor);
+		LCD_PutPixel(Xpos + CurX, Ypos + CurY, GL_TextColor);
 
-		LCD_SetCursor(Xpos + CurX, Ypos - CurY);
-		LCD_WriteRAMWord(GL_TextColor);
+		LCD_PutPixel(Xpos + CurX, Ypos - CurY, GL_TextColor);
 
-		LCD_SetCursor(Xpos - CurX, Ypos + CurY);
-		LCD_WriteRAMWord(GL_TextColor);
+		LCD_PutPixel(Xpos - CurX, Ypos + CurY, GL_TextColor);
 
-		LCD_SetCursor(Xpos - CurX, Ypos - CurY);
-		LCD_WriteRAMWord(GL_TextColor);
+		LCD_PutPixel(Xpos - CurX, Ypos - CurY, GL_TextColor);
 
-		LCD_SetCursor(Xpos + CurY, Ypos + CurX);
-		LCD_WriteRAMWord(GL_TextColor);
+		LCD_PutPixel(Xpos + CurY, Ypos + CurX, GL_TextColor);
 
-		LCD_SetCursor(Xpos + CurY, Ypos - CurX);
-		LCD_WriteRAMWord(GL_TextColor);
+		LCD_PutPixel(Xpos + CurY, Ypos - CurX, GL_TextColor);
 
-		LCD_SetCursor(Xpos - CurY, Ypos + CurX);
-		LCD_WriteRAMWord(GL_TextColor);
+		LCD_PutPixel(Xpos - CurY, Ypos + CurX, GL_TextColor);
 
-		LCD_SetCursor(Xpos - CurY, Ypos - CurX);
-		LCD_WriteRAMWord(GL_TextColor);
+		LCD_PutPixel(Xpos - CurY, Ypos - CurX, GL_TextColor);
 
 		if (D < 0) {
 			D += (CurX << 2) + 6;

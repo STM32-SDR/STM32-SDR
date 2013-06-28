@@ -144,7 +144,9 @@ char GetTxChar(void)
 		for (int i = 0; i < m_pTail; i++) XmitBuffer[i] = XmitBuffer[i+1]; //shift contents left one character
 		for(int i = m_pTail; i < PSK_TX_BUFFER_SIZE - 2; i++) XmitBuffer[i] = 32; //put spaces in remaining empty spaces
 		m_pTail--;
-		LCD_StringLine(0, 90, (char*) &XmitBuffer[0]);
+
+		// TODO: Charley: This is called from the ISR, but screen code is not threadsafe. We must move to non ISR location.
+		// LCD_StringLine(0, 90, (char*) &XmitBuffer[0]);
 	}
 	else
 		ch = TXTOG_CODE;		/* if que is empty return TXTOG_CODE */

@@ -32,6 +32,8 @@ void Old_HandleTouchEvent(void)
 	// Convert to the "old" coordinates of:
 	// X Origin: On Left
 	// Y Origin: On bottom
+	// Note, before calibration is done (using old hard-coded values), this is what we already get.
+	// Once Calibration is working, the vertical axis may need to be inverted here.
 	X_Point = X_Point + 0;
 	Y_Point = Y_Point + 0;
 //	Y_Point = LCD_HEIGHT - Y_Point - 1;
@@ -55,20 +57,20 @@ void Old_HandleTouchEvent(void)
 		if (TouchCount == 2) {  //Increase Step
 			Increase_Step();
 			TouchCount = 0;
-		} //end Increase step
+		}
 
 		if (TouchCount == -2) { //Decrease Step
 			Decrease_Step();
 			TouchCount = 0;
-		} // end Decrease Step
+		}
 
 		// Redraw the frequency to update colors.
 		redrawFrequencyOnScreen();
-	}  //End of Frequency Step
+	}
 
 	if ((X_Point > 320) && (Y_Point < 48)) {  //Store Default Freq & IQ
 		Store_Defaults();  //Both Encoder 1 & 2 Defaults Stored, see Encoder_2.c
-	}  //End of Store Defaults
+	}
 
 	if ((X_Point > 320) && (Y_Point > 48) && (Y_Point < 96)) {  //USB Selection
 		rgain = -0.5;
@@ -129,7 +131,7 @@ void Old_HandleTouchEvent(void)
  * ****************************************************************/
 static void DelayUS(vu32 cnt)
 {
-	uint16_t i;
+	uint32_t i;
 	for (i = 0; i < cnt; i++) {
 		uint8_t us = 12;
 		while (us--) {
@@ -148,7 +150,8 @@ void EXTI9_5_IRQHandler(void)
 
 	//Handle Encoder #2 PB interrupt
 	if (EXTI_GetITStatus(EXTI_Line7) != RESET) {
-		LCD_StringLine(0, 40, "Store   IQ");
+		// TODO: Charley: Cannot call LCD routines from in ISR; rework to display in non-ISR.
+		//LCD_StringLine(0, 40, "Store   IQ");
 		DelayUS(10);
 		Store_IQ_Data();
 		DelayUS(10);
@@ -157,7 +160,8 @@ void EXTI9_5_IRQHandler(void)
 
 	//Handle Encoder #1 PB interrupt
 	if (EXTI_GetITStatus(EXTI_Line8) != RESET) {
-		LCD_StringLine(234, 40, "Store Freq");
+		// TODO: Charley: Cannot call LCD routines from in ISR; rework to display in non-ISR.
+		//LCD_StringLine(234, 40, "Store Freq");
 		DelayUS(10);
 		Store_SI570_Data();
 		DelayUS(10);

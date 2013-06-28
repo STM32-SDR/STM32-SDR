@@ -66,7 +66,7 @@ extern __IO uint32_t LCDType;
 
 
 
-// TODO: Remove these.
+// TODO: Remove these when possible.
 #define LCD_DIR_HORIZONTAL       0x0000
 #define LCD_DIR_VERTICAL         0x0001
 
@@ -81,7 +81,6 @@ typedef enum
 
 
 // TODO: Remove?
-void LCD_WriteRAMWord(uint16_t RGB_Code);
 void LCD_DrawColorBMP(uint8_t* ptrBitmap, uint16_t Xpos_Init, uint16_t Ypos_Init, uint16_t Height, uint16_t Width);
 
 

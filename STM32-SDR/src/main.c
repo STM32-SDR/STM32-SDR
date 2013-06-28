@@ -45,7 +45,7 @@ __ALIGN_BEGIN USBH_HOST USB_Host __ALIGN_END;
  */
 void initializeHardware(void);
 void displaySplashScreen(void);
-void main_delay(int numLoops);
+void main_delay(uint32_t numLoops);
 
 /*
  * FUNCTIONS
@@ -70,16 +70,7 @@ int main(void)
 //	}
 
 	while (1) {
-		// TODO: Charley: Switch to the if(DSP_Flag...) code when DMA is working.
-#if 0
-		// Show the FFT sometimes (prevent continual re-draw).
-		// Remove once DMA working.
-		static int showFFTSometimes = 0;
-		showFFTSometimes = (showFFTSometimes + 1) % 100;
-		if (DSP_Flag == 1 || showFFTSometimes == 0) {
-#else
 		if (DSP_Flag == 1) {
-#endif
 			for (int16_t j = 0; j < 128; j++) {
 				//Changed for getting right display with SR6.3
 				FFT_Output[j] = (uint8_t) (6 * log((float32_t) (FFT_Magnitude[j] + 1)));
@@ -234,15 +225,28 @@ void initializeHardware(void)
 
 void displaySplashScreen(void)
 {
-	LCD_StringLine(200, 100, "STM32 SDR V2.5");
+	// Test drawing a bitmap from smile_image.c
+	extern const struct {
+		unsigned int 	 width;
+		unsigned int 	 height;
+		unsigned int 	 bytes_per_pixel; /* 2:RGB16, 3:RGB, 4:RGBA */
+		char         	*comment;
+		unsigned char	 pixel_data[320 * 240 * 2 + 1];
+	} gimp_image;
+	LCD_DrawBMP16Bit(0,0, gimp_image.height, gimp_image.width, (uint16_t*) gimp_image.pixel_data, 0);
+
+	LCD_SetTextColor(LCD_COLOR_BLACK);
+	LCD_SetBackColor(LCD_COLOR_WHITE);
+
+	LCD_StringLine(200, 100, "STM32 SDR V2.6");
 	LCD_StringLine(200, 80, __DATE__);
 	LCD_StringLine(200, 60, __TIME__);
-	main_delay(5000000);
+	main_delay(50000000);
 }
 
-void main_delay(int numLoops)
+void main_delay(uint32_t numLoops)
 {
-	volatile int i, j;
+	volatile uint32_t i, j;
 
 	for (i = 0; i < numLoops; i++) {
 		j++;
