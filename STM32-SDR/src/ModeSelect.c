@@ -45,6 +45,7 @@ void Set_Mode_Display(void)
 
 	default:
 		LCD_StringLine(0, 200, "ERR");
+		break;
 	}
 }
 

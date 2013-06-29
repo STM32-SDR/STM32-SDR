@@ -1,3 +1,5 @@
+// LCD Driver for the ILI9320 chip.
+
 #include <assert.h>
 #include <stdlib.h>
 #include "stm32_eval.h"
@@ -470,7 +472,6 @@ void LCD_WriteReg(uint8_t selectedReg, uint16_t regValue)
 	assert(threadSafeCheck == 1);
 
 	// TODO: Charley: Is it OK to read from LCD_REG? Should it be correct?
-	// TODO: Charley: Which LCD controller are we using? SSD1289 or ILI9320?
 #if DEBUG_REGMISMATCH == 1
 	LCD_REG = selectedReg;
 

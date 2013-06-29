@@ -118,11 +118,13 @@ void LCD_DrawBMP1BitTransparent(int x, int y, int height, int width, const uint1
 
 
 // Low-level access routines.
-void LCD_WriteRAM_Prepare(void);
+void LCD_SetDisplayWindow(uint16_t Xpos, uint16_t Ypos, uint16_t Height, uint16_t Width);
+void LCD_WriteRAM_PrepareDir(LCD_WriteRAM_Direction direction);
 void LCD_WriteRAM(uint16_t RGB_Code);
+
 void LCD_WriteReg(uint8_t LCD_Reg, uint16_t LCD_RegValue);
 void LCD_SetCursor(uint16_t Xpos, uint16_t Ypos);
-void LCD_SetDisplayWindow(uint16_t Xpos, uint16_t Ypos, uint16_t Height, uint16_t Width);
+
 
 // Setup routines
 void LCD_DisplayOn(void);

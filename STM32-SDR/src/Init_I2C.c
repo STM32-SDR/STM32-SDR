@@ -9,7 +9,6 @@
 #include	"stm32f4xx_rcc.h"
 #include 	"stm32f4xx_i2c.h"
 #include 	"Init_I2C.h"
-__IO uint32_t Timeout = I2C_LONG_TIMEOUT;
 
 void I2C_GPIO_Init(void)
 {
@@ -67,7 +66,7 @@ uint32_t I2C_WriteRegister(uint8_t DeviceAddr, uint8_t RegisterAddr,
 	uint32_t result = 0;
 
 	/*!< While the bus is busy */
-	Timeout = I2C_LONG_TIMEOUT;
+	__IO uint32_t Timeout = I2C_LONG_TIMEOUT;
 	while (I2C_GetFlagStatus(I2C1, I2C_FLAG_BUSY )) {
 		if ((Timeout--) == 0)
 			return 1; //TIMEOUT_UserCallback();
@@ -127,7 +126,7 @@ uint32_t I2C_WriteRegister_N(uint8_t DeviceAddr, uint8_t RegisterAddr,
 	uint8_t i;
 
 	/*!< While the bus is busy */
-	Timeout = I2C_LONG_TIMEOUT;
+	__IO uint32_t Timeout = I2C_LONG_TIMEOUT;
 	while (I2C_GetFlagStatus(I2C1, I2C_FLAG_BUSY )) {
 		if ((Timeout--) == 0)
 			return 1; //TIMEOUT_UserCallback();
@@ -196,7 +195,7 @@ uint32_t I2C_ReadSlave(uint8_t Address, uint8_t Register)
 	uint32_t result = 0;
 
 	/*!< While the bus is busy */
-	Timeout = I2C_LONG_TIMEOUT;
+	__IO uint32_t Timeout = I2C_LONG_TIMEOUT;
 	while (I2C_GetFlagStatus(I2C1, I2C_FLAG_BUSY )) {
 		if ((Timeout--) == 0)
 			return 1; //Codec_TIMEOUT_UserCallback();
@@ -294,7 +293,7 @@ uint32_t I2C_WriteEEProm(uint16_t RegisterAddr, uint8_t RegisterValue)
 	uint32_t result = 0;
 
 	/*!< While the bus is busy */
-	Timeout = I2C_SHORT_TIMEOUT;
+	__IO uint32_t Timeout = I2C_SHORT_TIMEOUT;
 	while (I2C_GetFlagStatus(I2C1, I2C_FLAG_BUSY )) {
 		if ((Timeout--) == 0)
 			return 1; //TIMEOUT_UserCallback();
@@ -365,7 +364,7 @@ uint32_t I2C_ReadEEProm(uint16_t RegisterAddr)
 	uint32_t result = 0;
 
 	/*!< While the bus is busy */
-	Timeout = I2C_LONG_TIMEOUT;
+	__IO uint32_t Timeout = I2C_LONG_TIMEOUT;
 	while (I2C_GetFlagStatus(I2C1, I2C_FLAG_BUSY )) {
 		if ((Timeout--) == 0)
 			return 1; //Codec_TIMEOUT_UserCallback();
