@@ -24,16 +24,16 @@
 #include	"ChangeOver.h"
 #include	"ModeSelect.h"
 #include	"Encoder_1.h"
+#include	"assert.h"
 
 EXTI_InitTypeDef EXTI_InitStructure;
 
+#define NUM_OPTIONS 16
 int16_t read_SS2;
-int16_t IQData[16];
-int16_t DataMin[16];
-int16_t DataMax[16];
-int16_t IQ_Unit[16];
-
-int16_t IQ_Disp;
+int16_t IQData[NUM_OPTIONS];
+int16_t DataMin[NUM_OPTIONS];
+int16_t DataMax[NUM_OPTIONS];
+int16_t IQ_Unit[NUM_OPTIONS];
 
 int16_t ENC_Sens2;
 int8_t DIR2;
@@ -87,16 +87,16 @@ void Encoder2_GPIO_Config(void)
 
 void Set_Initial_IQ_Data(void)
 {
-	IQData[0] = 0;  //Rx_Audio
+	IQData[0] = 0;   //Rx_Audio
 	IQData[1] = 20;  //Rx_RF
 	IQData[2] = 20;  //SSB_Level
-	IQData[3] = 0;  //CW_Level
-	IQData[4] = 0;  //PSK_Level
-	IQData[5] = 0;  //ST_Level
-	IQData[6] = 5000;  //Rx_Amp
-	IQData[7] = 0;  //Rx_Phase
-	IQData[8] = 5000;  //Tx_Amp
-	IQData[9] = 0;  //Rx_Phase
+	IQData[3] = 0;   //CW_Level
+	IQData[4] = 0;   //PSK_Level
+	IQData[5] = 0;   //ST_Level
+	IQData[6] = 5000;//Rx_Amp
+	IQData[7] = 0;   //Rx_Phase
+	IQData[8] = 5000;//Tx_Amp
+	IQData[9] = 0;   //Rx_Phase
 	IQData[10] = 0;  //Microphone Bias
 	IQData[11] = 0;
 	IQData[12] = 0;
@@ -107,7 +107,7 @@ void Set_Initial_IQ_Data(void)
 
 void Set_Minimums(void)
 {
-	DataMin[0] = -127;
+	DataMin[0] = DAC_GAIN_MIN;
 	DataMin[1] = 0;
 	DataMin[2] = 0;
 	DataMin[3] = -127;
@@ -127,7 +127,7 @@ void Set_Minimums(void)
 
 void Set_Maximums(void)
 {
-	DataMax[0] = 48;
+	DataMax[0] = DAC_GAIN_MAX;
 	DataMax[1] = 80;
 	DataMax[2] = 80;
 	DataMax[3] = 29;
@@ -147,7 +147,7 @@ void Set_Maximums(void)
 
 void Set_IQ_Units(void)
 {
-	IQ_Unit[0] = 4;
+	IQ_Unit[0] = 1;
 	IQ_Unit[1] = 1;
 	IQ_Unit[2] = 1;
 	IQ_Unit[3] = 1;
@@ -196,7 +196,7 @@ void init_encoder2(void)
 
 	ENC_Sens2 = 2;
 	check_SS2();
-	process_SS2();
+	display_SS2();
 
 	//Set Codec Parameters //will probably move these statements elsewhere
 	Set_DAC_DVC(IQData[0]);  //Set RX_Audio
@@ -231,113 +231,83 @@ void process_encoder2(void)
 		DIR0 = 0;
 	}
 
+	// Do we have a change?
 	if (DIR2 != 0) {
 		check_SS2();
+
+		/*
+		 * Check the limits
+		 */
+		int16_t currentValue = IQData[read_SS2];
+		int16_t newValue = currentValue + IQ_Unit[read_SS2] * DIR2;
+		int16_t minValue = DataMin[read_SS2];
+		int16_t maxValue = DataMax[read_SS2];
+		if (newValue < minValue) {
+			newValue = minValue;
+		}
+		if (newValue > maxValue) {
+			newValue = maxValue;
+		}
+
+		// Set the value
+		if (read_SS2 >= 0 && read_SS2 < NUM_OPTIONS) {
+			IQData[read_SS2] = newValue;
+			Plot_Integer(newValue, 0, 0);
+		}
+
+		/*
+		 * Process each option individually as needed.
+		 */
 		switch (read_SS2) {
 
 		case 0: //Rx_Audio
-			if ((IQData[read_SS2] > DataMin[read_SS2]) & (DIR2 < 0))
-				IQData[read_SS2] += IQ_Unit[read_SS2] * DIR2;
-			if ((IQData[read_SS2] < DataMax[read_SS2]) & (DIR2 > 0))
-				IQData[read_SS2] += IQ_Unit[read_SS2] * DIR2;
-			IQ_Disp = IQData[read_SS2];
 			if (Tx_Flag == 0)
 				Set_DAC_DVC(IQData[read_SS2]); //Set RX_Audio
 			break;
 
 		case 1: //Rx_RF
-			if ((IQData[read_SS2] > DataMin[read_SS2]) & (DIR2 < 0))
-				IQData[read_SS2] += IQ_Unit[read_SS2] * DIR2;
-			if ((IQData[read_SS2] < DataMax[read_SS2]) & (DIR2 > 0))
-				IQData[read_SS2] += IQ_Unit[read_SS2] * DIR2;
-			IQ_Disp = IQData[read_SS2];
 			if (Tx_Flag == 0)
 				Set_PGA_Gain(IQData[read_SS2]); //Set Rx_RF
 			break;
 
 		case 2: //SSB_Level
-			if ((IQData[read_SS2] > DataMin[read_SS2]) & (DIR2 < 0))
-				IQData[read_SS2] += IQ_Unit[read_SS2] * DIR2;
-			if ((IQData[read_SS2] < DataMax[read_SS2]) & (DIR2 > 0))
-				IQData[read_SS2] += IQ_Unit[read_SS2] * DIR2;
-			IQ_Disp = IQData[read_SS2];
 			if ((Tx_Flag == 1) && (Mode == MODE_SSB))
 				Set_PGA_Gain(IQData[read_SS2]); //SSB_Level
 			break;
 
 		case 3: //CW_Level
-			if ((IQData[read_SS2] > DataMin[read_SS2]) & (DIR2 < 0))
-				IQData[read_SS2] += IQ_Unit[read_SS2] * DIR2;
-			if ((IQData[read_SS2] < DataMax[read_SS2]) & (DIR2 > 0))
-				IQData[read_SS2] += IQ_Unit[read_SS2] * DIR2;
-			IQ_Disp = IQData[read_SS2];
 			if ((Tx_Flag == 1) && (Mode == MODE_CW))
 				Set_DAC_DVC(IQData[read_SS2]); //Set CW_Level
 			break;
 
 		case 4:  //PSK_Level
-			if ((IQData[read_SS2] > DataMin[read_SS2]) & (DIR2 < 0))
-				IQData[read_SS2] += IQ_Unit[read_SS2] * DIR2;
-			if ((IQData[read_SS2] < DataMax[read_SS2]) & (DIR2 > 0))
-				IQData[read_SS2] += IQ_Unit[read_SS2] * DIR2;
-			IQ_Disp = IQData[read_SS2];
 			if ((Tx_Flag == 1) && (Mode == MODE_PSK))
 				Set_DAC_DVC(IQData[read_SS2]); //Set PSK_Level
 			break;
 
 		case 5:  //Side Tone Level
-			if ((IQData[read_SS2] > DataMin[read_SS2]) & (DIR2 < 0))
-				IQData[read_SS2] += IQ_Unit[read_SS2] * DIR2;
-			if ((IQData[read_SS2] < DataMax[read_SS2]) & (DIR2 > 0))
-				IQData[read_SS2] += IQ_Unit[read_SS2] * DIR2;
-			IQ_Disp = IQData[read_SS2];
 			if ((Tx_Flag == 1) && (Mode == MODE_CW))
 				Set_HP_Gain(IQData[read_SS2]); //Set ST_Level
 			//if ((Tx_Flag==1)&& (Mode==MODE_CW)) Set_LO_Gain(IQData[read_SS2] ); //Set ST_Level
 			break;
 
 		case 6: //Rx_Amp
-			if ((IQData[read_SS2] > DataMin[read_SS2]) & (DIR2 < 0))
-				IQData[read_SS2] += IQ_Unit[read_SS2] * DIR2;
-			if ((IQData[read_SS2] < DataMax[read_SS2]) & (DIR2 > 0))
-				IQData[read_SS2] += IQ_Unit[read_SS2] * DIR2;
-			IQ_Disp = IQData[read_SS2];
 			R_lgain = ((float) IQData[read_SS2]) / 10000.0;
 			break;
 
 		case 7:  //Rx_Phase
-			if ((IQData[read_SS2] > DataMin[read_SS2]) & (DIR2 < 0))
-				IQData[read_SS2] += IQ_Unit[read_SS2] * DIR2;
-			if ((IQData[read_SS2] < DataMax[read_SS2]) & (DIR2 > 0))
-				IQData[read_SS2] += IQ_Unit[read_SS2] * DIR2;
-			IQ_Disp = IQData[read_SS2];
 			R_xgain = ((float) IQData[read_SS2]) / 10000.0;
 			break;
 
 		case 8:  //Tx_Amp
-			if ((IQData[read_SS2] > DataMin[read_SS2]) & (DIR2 < 0))
-				IQData[read_SS2] += IQ_Unit[read_SS2] * DIR2;
-			if ((IQData[read_SS2] < DataMax[read_SS2]) & (DIR2 > 0))
-				IQData[read_SS2] += IQ_Unit[read_SS2] * DIR2;
-			IQ_Disp = IQData[read_SS2];
 			T_lgain = ((float) IQData[read_SS2]) / 10000.0;
 			break;
 
 		case 9:  //Tx_Phase
-			if ((IQData[read_SS2] > DataMin[read_SS2]) & (DIR2 < 0))
-				IQData[read_SS2] += IQ_Unit[read_SS2] * DIR2;
-			if ((IQData[read_SS2] < DataMax[read_SS2]) & (DIR2 > 0))
-				IQData[read_SS2] += IQ_Unit[read_SS2] * DIR2;
-			IQ_Disp = IQData[read_SS2];
 			T_xgain = ((float) IQData[read_SS2]) / 10000.0;
 			break;
 
 		case 10:  //Microphone Bias
-			if ((IQData[read_SS2] > DataMin[read_SS2]) & (DIR2 < 0))
-				IQData[read_SS2] += IQ_Unit[read_SS2] * DIR2;
-			if ((IQData[read_SS2] < DataMax[read_SS2]) & (DIR2 > 0))
-				IQData[read_SS2] += IQ_Unit[read_SS2] * DIR2;
-			IQ_Disp = IQData[read_SS2];
 			if (IQData[read_SS2] == 0)
 				Turn_Off_Bias();
 			if (IQData[read_SS2] == 1)
@@ -347,7 +317,6 @@ void process_encoder2(void)
 		} //end of switch read_input
 
 	}
-	Plot_Integer(IQ_Disp, 0, 0);
 
 }   //end of process_encoder
 
@@ -355,99 +324,38 @@ void check_SS2(void)
 {
 	//Read PC1,2,3,4 as four bit word
 	read_SS2 = ~GPIO_ReadInputData(GPIOC ) >> 1 & 0x000F;
-
 }
 
-void process_SS2(void)
+void display_SS2(void)
 {
-	//Read PC1,2,3,4 as four bit word
-
+	// Display the heading
 	switch (read_SS2) {
-
-	case 0:
-		IQ_Disp = IQData[read_SS2];
-		LCD_StringLine(0, 20, " Rx_Audio ");
+	case 0:  LCD_StringLine(0, 20, " Rx_Audio "); break;
+	case 1:  LCD_StringLine(0, 20, "   Rx_RF  "); break;
+	case 2:  LCD_StringLine(0, 20, " SSB_Level"); break;
+	case 3:  LCD_StringLine(0, 20, " CW_Level "); break;
+	case 4:	 LCD_StringLine(0, 20, " PSK Level"); break;
+	case 5:  LCD_StringLine(0, 20, " ST_Level "); break;
+	case 6:  LCD_StringLine(0, 20, "   Rx_Amp "); break;
+	case 7:  LCD_StringLine(0, 20, " Rx_Phase "); break;
+	case 8:  LCD_StringLine(0, 20, "   Tx_Amp "); break;
+	case 9:  LCD_StringLine(0, 20, " Tx_Phase "); break;
+	case 10: LCD_StringLine(0, 20, " Mic Bias "); break;
+	case 11: LCD_StringLine(0, 20, " Future 1 "); break;
+	case 12: LCD_StringLine(0, 20, " Future 2 "); break;
+	case 13: LCD_StringLine(0, 20, " Future 3 "); break;
+	case 14: LCD_StringLine(0, 20, " Future 4 "); break;
+	case 15: LCD_StringLine(0, 20, " Future 5 "); break;
+	default:
+		assert(0);
 		break;
-
-	case 1:
-		IQ_Disp = IQData[read_SS2];
-		LCD_StringLine(0, 20, "   Rx_RF  ");
-		break;
-
-	case 2:
-		IQ_Disp = IQData[read_SS2];
-		LCD_StringLine(0, 20, " SSB_Level");
-		break;
-
-	case 3:
-		IQ_Disp = IQData[read_SS2];
-		LCD_StringLine(0, 20, " CW_Level ");
-		break;
-
-	case 4:
-		IQ_Disp = IQData[read_SS2];
-		LCD_StringLine(0, 20, " PSK Level");
-		break;
-
-	case 5:
-		IQ_Disp = IQData[read_SS2];
-		LCD_StringLine(0, 20, " ST_Level ");
-		break;
-
-	case 6:
-		IQ_Disp = IQData[read_SS2];
-		LCD_StringLine(0, 20, "   Rx_Amp ");
-		break;
-
-	case 7:
-		IQ_Disp = IQData[read_SS2];
-		LCD_StringLine(0, 20, " Rx_Phase ");
-		break;
-
-	case 8:
-		IQ_Disp = IQData[read_SS2];
-		LCD_StringLine(0, 20, "   Tx_Amp ");
-		break;
-
-	case 9:
-		IQ_Disp = IQData[read_SS2];
-		LCD_StringLine(0, 20, " Tx_Phase ");
-		break;
-
-	case 10:
-		IQ_Disp = IQData[read_SS2];
-		LCD_StringLine(0, 20, " Mic Bias ");
-		break;
-
-	case 11:
-		IQ_Disp = IQData[read_SS2];
-		LCD_StringLine(0, 20, " Future 1 ");
-		break;
-
-	case 12:
-		IQ_Disp = IQData[read_SS2];
-		LCD_StringLine(0, 20, " Future 2 ");
-		break;
-
-	case 13:
-		IQ_Disp = IQData[read_SS2];
-		LCD_StringLine(0, 20, " Future 3 ");
-		break;
-
-	case 14:
-		IQ_Disp = IQData[read_SS2];
-		LCD_StringLine(0, 20, " Future 4 ");
-		break;
-
-	case 15:
-		IQ_Disp = IQData[read_SS2];
-		LCD_StringLine(0, 20, " Future 5 ");
-		break;
-
 	}
 
-	Plot_Integer(IQ_Disp, 0, 0);
-
+	// Display the number:
+	if (read_SS2 >= 0 && read_SS2 <= NUM_OPTIONS) {
+		int16_t displayValue = IQData[read_SS2];
+		Plot_Integer(displayValue, 0, 0);
+	}
 }
 
 void Store_Defaults(void)
@@ -462,6 +370,6 @@ void Store_Defaults(void)
 	Set_Initial_IQ_Data();
 	Store_IQ_Data();
 	check_SS2();
-	process_SS2();
+	display_SS2();
 }
 

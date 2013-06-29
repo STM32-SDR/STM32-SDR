@@ -6,11 +6,15 @@
  */
 #include 	"Init_Codec.h"
 #include 	"Init_I2C.h"
+#include	"Codec_Gains.h"
 
 void Set_HP_Gain(int HP_gain)
 {
 
-	I2C_WriteRegister(CODEC_ADDRESS, 0x00, 0x01);
+	// Check for error writing.
+	if (I2C_WriteRegister(CODEC_ADDRESS, 0x00, 0x01) != 0) {
+		return;
+	}
 	Delay(Codec_Pause);
 
 	I2C_WriteRegister(CODEC_ADDRESS, 0x10, HP_gain);
@@ -24,8 +28,10 @@ void Set_HP_Gain(int HP_gain)
 
 void Set_LO_Gain(int LO_gain)
 {
-
-	I2C_WriteRegister(CODEC_ADDRESS, 0x00, 0x01);
+	// Check for error writing.
+	if (I2C_WriteRegister(CODEC_ADDRESS, 0x00, 0x01) != 0) {
+		return;
+	}
 	Delay(Codec_Pause);
 
 	I2C_WriteRegister(CODEC_ADDRESS, 0x12, LO_gain);
@@ -40,12 +46,15 @@ void Set_LO_Gain(int LO_gain)
 void Set_PGA_Gain(int PGA_gain)
 {
 
-	if (PGA_gain < 0)
-		PGA_gain = 0;
-	if (PGA_gain > 95)
-		PGA_gain = 95;
+	if (PGA_gain < PGA_GAIN_MIN)
+		PGA_gain = PGA_GAIN_MIN;
+	if (PGA_gain > PGA_GAIN_MAX)
+		PGA_gain = PGA_GAIN_MAX;
 
-	I2C_WriteRegister(CODEC_ADDRESS, 0x00, 0x01);
+	// Check for failure accessing I2C.
+	if (I2C_WriteRegister(CODEC_ADDRESS, 0x00, 0x01) != 0) {
+		return;
+	}
 	Delay(Codec_Pause);
 
 	I2C_WriteRegister(CODEC_ADDRESS, 0x3B, PGA_gain);
@@ -60,14 +69,17 @@ void Set_PGA_Gain(int PGA_gain)
 void Set_DAC_DVC(int DAC_gain)
 {
 
-	if (DAC_gain > 48)
-		DAC_gain = 48;
-	if (DAC_gain < -127)
-		DAC_gain = -127;
+	if (DAC_gain > DAC_GAIN_MAX)
+		DAC_gain = DAC_GAIN_MAX;
+	if (DAC_gain < DAC_GAIN_MIN)
+		DAC_gain = DAC_GAIN_MIN;
 	if (DAC_gain < 0)
 		DAC_gain += 256;
 
-	I2C_WriteRegister(CODEC_ADDRESS, 0x00, 0x00);
+	// Check for error writing.
+	if (I2C_WriteRegister(CODEC_ADDRESS, 0x00, 0x00) != 0) {
+		return;
+	}
 	Delay(Codec_Pause);
 
 	I2C_WriteRegister(CODEC_ADDRESS, 0x41, DAC_gain);
@@ -82,14 +94,17 @@ void Set_DAC_DVC(int DAC_gain)
 void Set_ADC_DVC(int ADC_gain)
 {
 
-	if (ADC_gain > 40)
-		ADC_gain = 40;
-	if (ADC_gain < -24)
-		ADC_gain = -24;
+	if (ADC_gain > ADC_GAIN_MAX)
+		ADC_gain = ADC_GAIN_MAX;
+	if (ADC_gain < ADC_GAIN_MIN)
+		ADC_gain = ADC_GAIN_MIN;
 	if (ADC_gain < 0)
 		ADC_gain += 127;
 
-	I2C_WriteRegister(CODEC_ADDRESS, 0x00, 0x00);
+	// Check for error writing.
+	if (I2C_WriteRegister(CODEC_ADDRESS, 0x00, 0x00) != 0) {
+		return;
+	}
 	Delay(Codec_Pause);
 
 	I2C_WriteRegister(CODEC_ADDRESS, 0x53, ADC_gain);
@@ -103,8 +118,10 @@ void Set_ADC_DVC(int ADC_gain)
 //Microphone Power Handling
 void Turn_On_Bias(void)
 {
-
-	I2C_WriteRegister(CODEC_ADDRESS, 0x00, 0x01);
+	// Check for error writing.
+	if (I2C_WriteRegister(CODEC_ADDRESS, 0x00, 0x01) != 0) {
+		return;
+	}
 	Delay(Codec_Pause);
 
 	I2C_WriteRegister(CODEC_ADDRESS, 0x33, 0x40);
@@ -114,7 +131,10 @@ void Turn_On_Bias(void)
 void Turn_Off_Bias(void)
 {
 
-	I2C_WriteRegister(CODEC_ADDRESS, 0x00, 0x01);
+	// Check for error writing.
+	if (I2C_WriteRegister(CODEC_ADDRESS, 0x00, 0x01) != 0) {
+		return;
+	}
 	Delay(Codec_Pause);
 
 	I2C_WriteRegister(CODEC_ADDRESS, 0x33, 0x00);
@@ -126,7 +146,10 @@ void Turn_Off_Bias(void)
 //Disconnect Everything from PGA input
 void Disconnect_PGA(void)
 {
-	I2C_WriteRegister(CODEC_ADDRESS, 0x00, 0x01);
+	// Check for error writing.
+	if (I2C_WriteRegister(CODEC_ADDRESS, 0x00, 0x01) != 0) {
+		return;
+	}
 	Delay(Codec_Pause);
 
 	I2C_WriteRegister(CODEC_ADDRESS, 0x34, 0x00);

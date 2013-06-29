@@ -5,6 +5,14 @@
  *      Author: CharleyK
  */
 
+// Min/Max gain constants
+#define PGA_GAIN_MIN 0
+#define PGA_GAIN_MAX 95
+#define DAC_GAIN_MIN -127
+#define DAC_GAIN_MAX 48
+#define ADC_GAIN_MIN -24
+#define ADC_GAIN_MAX 40
+
 #ifndef CODEC_GAINS_H_
 #define CODEC_GAINS_H_
 

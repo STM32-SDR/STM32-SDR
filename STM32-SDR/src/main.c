@@ -105,7 +105,7 @@ int main(void)
 		// Process selector switch 2 (has it moved?)
 		check_SS2();
 		if (read_SS2 != old_SS2_position) {
-			process_SS2();
+			display_SS2();
 			old_SS2_position = read_SS2;
 		}
 		process_encoder2();
