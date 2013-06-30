@@ -81,34 +81,14 @@ void LCD_DrawFFT(uint8_t fftData[])
 		selectedFreqX = 0;
 	}
 
-#if 0
-	// Draw the FFT using put pixel writes.
-	for (int x = 0; x < FFT_WIDTH; x++) {
-		// Don't draw at same place as line to avoid flickering.
-		if (x == (int) selectedFreqX) {
-			continue;
-		}
-
-		// Plot this column of the FFT.
-		for (int y = 0; y < FFT_HEIGHT; y++) {
-			if (y < fftData[x + 8])
-				LCD_PutPixel(x + OFFSET_X, FFT_HEIGHT - y + OFFSET_Y, LCD_COLOR_BLUE);
-			else
-				LCD_PutPixel(x + OFFSET_X, FFT_HEIGHT - y + OFFSET_Y, LCD_COLOR_WHITE);
-		}
-	}
-
-	for (int y = 0; y < FFT_HEIGHT - SELFREQ_ADJ; y++)
-		LCD_PutPixel((int) selectedFreqX + OFFSET_X, y + OFFSET_Y + SELFREQ_ADJ, LCD_COLOR_RED);
-
-#else
-	// Draw the FFT using direct memory writes.
+	// Draw the FFT using direct memory writes (fast).
 	LCD_SetDisplayWindow(OFFSET_X, OFFSET_Y, FFT_HEIGHT, FFT_WIDTH);
 	LCD_WriteRAM_PrepareDir(LCD_WriteRAMDir_Down);
 
 	for (int x = 0; x < FFT_WIDTH; x++) {
 		// Plot this column of the FFT.
 		for (int y = 0; y < FFT_HEIGHT; y++) {
+
 			// Check for the Red line:
 			if (x == (int) selectedFreqX) {
 				// Leave some white at the top
@@ -120,7 +100,7 @@ void LCD_DrawFFT(uint8_t fftData[])
 			}
 
 			// Check if in the data
-			else if (y < fftData[x + 8]) {
+			else if (FFT_HEIGHT - y < fftData[x + 8]) {
 				LCD_WriteRAM(LCD_COLOR_BLUE);
 			}
 
@@ -130,7 +110,6 @@ void LCD_DrawFFT(uint8_t fftData[])
 			}
 		}
 	}
-#endif
 
 }
 
