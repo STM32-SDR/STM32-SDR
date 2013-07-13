@@ -53,20 +53,6 @@ extern __IO uint32_t u32_TSYCoordinate;
 /** @defgroup graphicObject_Private_Defines
  * @{
  */
-#define BUTTON_SLICE_LENGTH             8
-#define SLIDEBAR_CURSOR_LENGTH          6
-#define SLIDEBAR_CENTRAL_LENGTH         27
-#define SLIDEBAR_OFFSET_LENGTH          4
-#define SLIDEBAR_PIECE_LENGTH           4
-#define SLIDEBAR_HEIGHT                 18
-#define BUTTON_HEIGHT                   26
-#define BUTTON_PIECE_LENGTH             8
-#define RBUTTON_OPT_SIZE                20
-#define RADIO_BUTTON_RADIUS             9
-#define COMBOBOX_SIZE                   22
-#define CHECKBOX_SIZE                   20
-#define PAGE_MAX_NUM                    50
-#define TIMEOUT                         1000000
 
 /**
  * @}
@@ -168,11 +154,7 @@ static void GL_DrawRectangle(uint16_t maxX, uint16_t minX, uint8_t maxY, uint8_t
  */
 static void GL_DrawRectangle(uint16_t maxX, uint16_t minX, uint8_t maxY, uint8_t minY)
 {
-	GL_DrawLine(maxX, maxX - minX, minY, GL_Horizontal);
-	GL_DrawLine(maxX, (minY + maxY - minY), maxX - minX, GL_Horizontal);
-
-	GL_DrawLine(maxX, minY, maxY - minY, GL_Vertical);
-	GL_DrawLine((maxX - (maxX - minX) + 1), minY, maxY - minY, GL_Vertical);
+	LCD_DrawRect(minX, minY, maxY-minY+1, maxX-minX+1);
 }
 
 /**
@@ -417,7 +399,7 @@ GL_PageControls_TypeDef* NewLabel(uint16_t ID, const char* label, GL_Direction d
 	GL_Label_TypeDef *pControlObj = NULL;
 	GL_PageControls_TypeDef * pPageControlObj = NULL;
 
-	// TODO: Change to statically allocated because will eventually run out of heap if called repeatedly.
+	// Possible Improvement: Change to statically allocated because will eventually run out of heap if called repeatedly.
 	// (malloc calls _sbrk(), which has been naively implemented to never recover memory.
 	pControlObj = (GL_Label_TypeDef *) malloc(sizeof(GL_Label_TypeDef));
 	if (pControlObj) {
@@ -901,140 +883,250 @@ GL_PageControls_TypeDef* NewGraphChart(uint16_t ID, const char* labelX, const ch
 	return pPageControlObj;
 }
 
+
+/**
+ * @brief  Create and initialize a custom UI widget
+ * @param  ID: Widget ID
+ * @param  pGetWidth: Function pointer to function which gets widget's width.
+ * @param  pGetHeight: Function pointer to function which gets widget's height.
+ * @param  pEventHandler: Function pointer to function which handles click events.
+ * @param  pDrawHandler: Function pointer to function which draws the widget
+ * @retval GL_PageControls_TypeDef* - The created Object pointer
+ */
+GL_PageControls_TypeDef* NewCustomWidget (
+		uint16_t ID,
+		uint16_t (*pGetWidth)(void),
+		uint16_t (*pGetHeight)(void),
+		void (*pEventHandler)(void),
+		void (*pDrawHandler)(void)
+		)
+{
+	GL_PageControls_TypeDef *pPageControlObj = NULL;
+	GL_Custom_TypeDef *pControlObj = NULL;
+
+	pControlObj = (GL_Custom_TypeDef *) malloc(sizeof(GL_Custom_TypeDef));
+
+	if (pControlObj) {
+		pControlObj->ID = ID;
+		pControlObj->Control_Visible = GL_TRUE;
+		pControlObj->GetWidth = pGetWidth;
+		pControlObj->GetHeight = pGetHeight;
+		pControlObj->EventHandler = pEventHandler;
+		pControlObj->DrawHandler = pDrawHandler;
+
+		pPageControlObj = (GL_PageControls_TypeDef*) malloc(sizeof(GL_PageControls_TypeDef));
+		if (pPageControlObj) {
+			pPageControlObj->objPTR = (void*) pControlObj;
+			pPageControlObj->objType = GL_CUSTOM;
+		}
+		else {
+			free(pControlObj);
+			pControlObj = NULL;
+		}
+	}
+	return pPageControlObj;
+}
+
+/**
+ * @brief  Show the Control Object
+ * @param  *pThis: Pointer to Object Structure
+ * @retval GL_ErrStatus - GL_OK if successful, GL_ERROR otherwise
+ */
+static GL_ErrStatus SetCustomVisible(GL_PageControls_TypeDef* pTmp, GL_Coordinate_TypeDef objCoordinates)
+{
+	GL_Custom_TypeDef* pThis = (GL_Custom_TypeDef*) (pTmp->objPTR);
+	if (!pThis) {
+		return GL_ERROR;
+	}
+	pThis->Control_Visible = GL_TRUE;
+	if (pTmp->objType == GL_CUSTOM) {
+		pThis->DrawHandler();
+	}
+
+	return GL_OK;
+}
+
+
 /**
  * @brief  Add a new Control object to the page
- * @param  PosX: Coordinate for X axis (Low is right; high is left)
- * @param  PosY: Coordinate for Y axis (Lower is top)
+ * @param  PosX: Coordinate for left side X axis (Lower is towards left oy screen)
+ * @param  PosY: Coordinate for top Y axis (Lower is towards top of screen)
  * @param  *objPTR: Pointer to Object Structure
  * @param  *pagePTR: Pointer to Page Structure
  * @retval GL_ErrStatus - GL_OK if successful, GL_ERROR otherwise
  */
 GL_ErrStatus AddPageControlObj(uint16_t PosX, uint16_t PosY, GL_PageControls_TypeDef* objPTR, GL_Page_TypeDef* pagePTR)
 {
-	if (pagePTR->ControlCount < MAX_CTRL_X_PAGE) {
-		GL_Coordinate_TypeDef objCoordinates;
-		GL_ComboBoxGrp_TypeDef* pTmpComboBoxGrp = NULL;
-		GL_ComboBoxGrp_TypeDef* pTmpComboBoxGrp1 = NULL;
-
-		memset(&objCoordinates, 0x00, sizeof(GL_Coordinate_TypeDef));
-		if ((PosX > LCD_WIDTH )|| (PosY > LCD_HEIGHT)){
+	// Validate number of controls on page
+	if (pagePTR->ControlCount >= MAX_CTRL_X_PAGE) {
 		return GL_ERROR;
 	}
 
-		objCoordinates.MaxX = PosX;
-		objCoordinates.MinY = PosY;
 
-		if (objPTR->objType == GL_LABEL) {
-			GL_Label_TypeDef* pTmp = ((GL_Label_TypeDef*) (objPTR->objPTR));
-			objPTR->SetObjVisible = SetLabelVisible;
-			objPTR->ID = pTmp->ID;
-			if (pTmp->Direction == GL_LEFT_VERTICAL || pTmp->Direction == GL_RIGHT_VERTICAL) {
-				objCoordinates.MaxX = PosY;
-				objCoordinates.MinY = PosX;
-			}
-		}
-		else if (objPTR->objType == GL_COMBOBOX) {
-			GL_PageControls_TypeDef* tmpComboBoxGrpBrother;
-			objCoordinates.MinX = PosX - COMBOBOX_SIZE;
-			objCoordinates.MaxY = PosY + COMBOBOX_SIZE;
-			objPTR->SetObjVisible = SetComboBoxVisible;
-			objPTR->objCoordinates = objCoordinates;
-			pagePTR->PageControls[pagePTR->ControlCount] = objPTR;
-			pagePTR->ControlCount++;
-			pTmpComboBoxGrp1 = ((GL_ComboBoxGrp_TypeDef*) (objPTR->objPTR));
-			objPTR->ID = pTmpComboBoxGrp1->ID;
+	GL_Coordinate_TypeDef objCoordinates;
+	GL_ComboBoxGrp_TypeDef* pTmpComboBoxGrp = NULL;
+	GL_ComboBoxGrp_TypeDef* pTmpComboBoxGrp1 = NULL;
 
-			if (pTmpComboBoxGrp1->Secondary == GL_FALSE) {
-				tmpComboBoxGrpBrother = NewComboBoxGrp(00);
-				pTmpComboBoxGrp = ((GL_ComboBoxGrp_TypeDef*) (tmpComboBoxGrpBrother->objPTR));
-				pTmpComboBoxGrp->PrimaryComboOpt = objPTR;
-				pTmpComboBoxGrp->Secondary = GL_TRUE;
-#ifndef USE_2D_OBJECTS
-				pTmpComboBoxGrp->ImageUnClickedPTR = (uint8_t*) ArrowDownUntouched;
-				pTmpComboBoxGrp->ImageClickedPTR = (uint8_t*) ArrowDownTouched;
-#endif
-				AddPageControlObj((uint16_t) (PosX - COMBOBOX_SIZE), (uint8_t) PosY, tmpComboBoxGrpBrother, pagePTR);
-			}
-			return GL_OK;
-		}
-		else {
-			if (objPTR->objType == GL_BUTTON || objPTR->objType == GL_SWITCH) {
-				objCoordinates.MinX = PosX - BUTTON_PIECE_LENGTH;
-				objCoordinates.MaxY = PosY + BUTTON_HEIGHT;
-				if (objPTR->objType == GL_BUTTON) {
-					GL_Button_TypeDef* pTmp = ((GL_Button_TypeDef*) (objPTR->objPTR));
-					objPTR->SetObjVisible = SetButtonVisible;
-					objPTR->ID = pTmp->ID;
-				}
-				else {
-					GL_Switch_TypeDef* pTmp = ((GL_Switch_TypeDef*) (objPTR->objPTR));
-					objPTR->SetObjVisible = SetSwitchVisible;
-					objPTR->ID = pTmp->ID;
-				}
-			}
-			else if (objPTR->objType == GL_RADIO_BUTTON) {
-				GL_RadioOption_TypeDef* pTmp = ((GL_RadioOption_TypeDef*) (objPTR->objPTR));
-				objPTR->SetObjVisible = SetRadioButtonVisible;
-				objPTR->ID = pTmp->RadioButtonGrp->ID;
-				objCoordinates.MinX = PosX - RBUTTON_OPT_SIZE;
-				objCoordinates.MaxY = PosY + RBUTTON_OPT_SIZE;
-			}
-			else if (objPTR->objType == GL_CHECKBOX) {
-				GL_Checkbox_TypeDef* pTmp = ((GL_Checkbox_TypeDef*) (objPTR->objPTR));
-				objPTR->SetObjVisible = SetCheckboxVisible;
-				objPTR->ID = pTmp->ID;
-				objCoordinates.MinX = PosX - CHECKBOX_SIZE;
-				objCoordinates.MaxY = PosY + CHECKBOX_SIZE;
-			}
-			else if (objPTR->objType == GL_ICON) {
-				GL_Icon_TypeDef* pTmp = ((GL_Icon_TypeDef*) (objPTR->objPTR));
-				objPTR->SetObjVisible = SetIconVisible;
-				objPTR->ID = pTmp->ID;
-				objCoordinates.MinX = PosX - pTmp->ImageWidth;
-				objCoordinates.MaxY = PosY + pTmp->ImageHeight;
-			}
-			else if (objPTR->objType == GL_SLIDEBAR) {
-				GL_Slidebar_TypeDef* pTmp = ((GL_Slidebar_TypeDef*) (objPTR->objPTR));
-				objPTR->SetObjVisible = SetSlidebarVisible;
-				objPTR->ID = pTmp->ID;
-				if (pTmp->Direction == GL_HORIZONTAL) {
-					objCoordinates.MinX = PosX - SLIDEBAR_PIECE_LENGTH;
-					objCoordinates.MaxY = PosY + SLIDEBAR_HEIGHT;
-				}
-				else if (pTmp->Direction == GL_LEFT_VERTICAL) {
-					objCoordinates.MaxX = PosX;
-					objCoordinates.MinX = PosX - SLIDEBAR_HEIGHT;
-					objCoordinates.MaxY = PosY + (SLIDEBAR_CENTRAL_LENGTH + 2) * SLIDEBAR_PIECE_LENGTH;
-					objCoordinates.MinY = PosY;
-				}
-				else if (pTmp->Direction == GL_RIGHT_VERTICAL) {
-					objCoordinates.MaxX = PosX;
-					objCoordinates.MinX = PosX - SLIDEBAR_HEIGHT;
-					objCoordinates.MaxY = PosY + (SLIDEBAR_CENTRAL_LENGTH + 2) * SLIDEBAR_PIECE_LENGTH
-					        + SLIDEBAR_PIECE_LENGTH;
-					objCoordinates.MinY = PosY + SLIDEBAR_PIECE_LENGTH;
-				}
-			}
-			else if (objPTR->objType == GL_HISTOGRAM) {
-				GL_Histogram_TypeDef* pTmp = ((GL_Histogram_TypeDef*) (objPTR->objPTR));
-				objPTR->SetObjVisible = SetHistogramVisible;
-				objPTR->ID = pTmp->ID;
-			}
-			else if (objPTR->objType == GL_GRAPH_CHART) {
-				GL_GraphChart_TypeDef* pTmp = ((GL_GraphChart_TypeDef*) (objPTR->objPTR));
-				objPTR->SetObjVisible = SetGraphChartVisible;
-				objPTR->ID = pTmp->ID;
-			}
-		}
+	memset(&objCoordinates, 0x00, sizeof(GL_Coordinate_TypeDef));
+	if ((PosX > LCD_WIDTH ) || (PosY > LCD_HEIGHT)){
+		return GL_ERROR;
+	}
 
+	objCoordinates.MinX = PosX;
+	objCoordinates.MinY = PosY;
+
+	switch (objPTR->objType) {
+	case GL_LABEL:
+	{
+		GL_Label_TypeDef* pTmp = ((GL_Label_TypeDef*) (objPTR->objPTR));
+		objPTR->SetObjVisible = SetLabelVisible;
+		objPTR->ID = pTmp->ID;
+		if (pTmp->Direction == GL_LEFT_VERTICAL || pTmp->Direction == GL_RIGHT_VERTICAL) {
+			objCoordinates.MinX = PosY;
+			objCoordinates.MinY = PosX;
+		}
+		break;
+	}
+
+	case GL_COMBOBOX:
+	{
+		GL_PageControls_TypeDef* tmpComboBoxGrpBrother;
+		objCoordinates.MaxX = PosX + COMBOBOX_SIZE;
+		objCoordinates.MaxY = PosY + COMBOBOX_SIZE;
+		objPTR->SetObjVisible = SetComboBoxVisible;
 		objPTR->objCoordinates = objCoordinates;
-
 		pagePTR->PageControls[pagePTR->ControlCount] = objPTR;
 		pagePTR->ControlCount++;
+		pTmpComboBoxGrp1 = ((GL_ComboBoxGrp_TypeDef*) (objPTR->objPTR));
+		objPTR->ID = pTmpComboBoxGrp1->ID;
+
+		if (pTmpComboBoxGrp1->Secondary == GL_FALSE) {
+			tmpComboBoxGrpBrother = NewComboBoxGrp(00);
+			pTmpComboBoxGrp = ((GL_ComboBoxGrp_TypeDef*) (tmpComboBoxGrpBrother->objPTR));
+			pTmpComboBoxGrp->PrimaryComboOpt = objPTR;
+			pTmpComboBoxGrp->Secondary = GL_TRUE;
+			#ifndef USE_2D_OBJECTS
+				pTmpComboBoxGrp->ImageUnClickedPTR = (uint8_t*) ArrowDownUntouched;
+				pTmpComboBoxGrp->ImageClickedPTR = (uint8_t*) ArrowDownTouched;
+			#endif
+			AddPageControlObj((uint16_t) (PosX - COMBOBOX_SIZE), (uint8_t) PosY, tmpComboBoxGrpBrother, pagePTR);
+		}
 		return GL_OK;
+		break;
 	}
-	else
-		return GL_ERROR;
+
+	case GL_BUTTON:	// fall through
+	case GL_SWITCH:
+	{
+		int width = 0;
+		if (objPTR->objType == GL_BUTTON) {
+			GL_Button_TypeDef* pTmp = ((GL_Button_TypeDef*) (objPTR->objPTR));
+			objPTR->SetObjVisible = SetButtonVisible;
+			objPTR->ID = pTmp->ID;
+			width = (p_strlen(pTmp->label) + 1) * BUTTON_PIECE_LENGTH;
+		}
+		else {
+			GL_Switch_TypeDef* pTmp = ((GL_Switch_TypeDef*) (objPTR->objPTR));
+			objPTR->SetObjVisible = SetSwitchVisible;
+			objPTR->ID = pTmp->ID;
+			width = (p_strlen(pTmp->label_1) + 1) * BUTTON_PIECE_LENGTH;
+		}
+
+		objCoordinates.MaxY = PosY + BUTTON_HEIGHT;
+		objCoordinates.MaxX = PosX + width;
+		break;
+	}
+
+	case GL_RADIO_BUTTON:
+	{
+		GL_RadioOption_TypeDef* pTmp = ((GL_RadioOption_TypeDef*) (objPTR->objPTR));
+		objPTR->SetObjVisible = SetRadioButtonVisible;
+		objPTR->ID = pTmp->RadioButtonGrp->ID;
+		objCoordinates.MaxX = PosX + RBUTTON_OPT_SIZE;
+		objCoordinates.MaxY = PosY + RBUTTON_OPT_SIZE;
+		break;
+	}
+	case GL_CHECKBOX:
+	{
+		GL_Checkbox_TypeDef* pTmp = ((GL_Checkbox_TypeDef*) (objPTR->objPTR));
+		objPTR->SetObjVisible = SetCheckboxVisible;
+		objPTR->ID = pTmp->ID;
+		objCoordinates.MaxX = PosX + CHECKBOX_SIZE;
+		objCoordinates.MaxY = PosY + CHECKBOX_SIZE;
+		break;
+	}
+
+	case GL_ICON:
+	{
+		GL_Icon_TypeDef* pTmp = ((GL_Icon_TypeDef*) (objPTR->objPTR));
+		objPTR->SetObjVisible = SetIconVisible;
+		objPTR->ID = pTmp->ID;
+		objCoordinates.MaxX = PosX + pTmp->ImageWidth;
+		objCoordinates.MaxY = PosY + pTmp->ImageHeight;
+		break;
+	}
+
+	case GL_SLIDEBAR:
+	{
+		GL_Slidebar_TypeDef* pTmp = ((GL_Slidebar_TypeDef*) (objPTR->objPTR));
+		objPTR->SetObjVisible = SetSlidebarVisible;
+		objPTR->ID = pTmp->ID;
+		if (pTmp->Direction == GL_HORIZONTAL) {
+			objCoordinates.MaxX = PosX + SLIDEBAR_PIECE_LENGTH;
+			objCoordinates.MaxY = PosY + SLIDEBAR_HEIGHT;
+		}
+		else if (pTmp->Direction == GL_LEFT_VERTICAL) {
+			objCoordinates.MinX = PosX;
+			objCoordinates.MaxX = PosX + SLIDEBAR_HEIGHT;
+			objCoordinates.MinY = PosY;
+			objCoordinates.MaxY = PosY + (SLIDEBAR_CENTRAL_LENGTH + 2) * SLIDEBAR_PIECE_LENGTH;
+		}
+		else if (pTmp->Direction == GL_RIGHT_VERTICAL) {
+			objCoordinates.MinX = PosX;
+			objCoordinates.MaxX = PosX + SLIDEBAR_HEIGHT;
+			objCoordinates.MinY = PosY + SLIDEBAR_PIECE_LENGTH;
+			objCoordinates.MaxY = PosY + (SLIDEBAR_CENTRAL_LENGTH + 2) * SLIDEBAR_PIECE_LENGTH
+					+ SLIDEBAR_PIECE_LENGTH;
+		}
+		break;
+	}
+
+	case GL_HISTOGRAM:
+	{
+		GL_Histogram_TypeDef* pTmp = ((GL_Histogram_TypeDef*) (objPTR->objPTR));
+		objPTR->SetObjVisible = SetHistogramVisible;
+		objPTR->ID = pTmp->ID;
+		break;
+	}
+	case GL_GRAPH_CHART:
+	{
+		GL_GraphChart_TypeDef* pTmp = ((GL_GraphChart_TypeDef*) (objPTR->objPTR));
+		objPTR->SetObjVisible = SetGraphChartVisible;
+		objPTR->ID = pTmp->ID;
+		break;
+	}
+
+	case GL_CUSTOM:
+	{
+		GL_Custom_TypeDef* pTmp = ((GL_Custom_TypeDef*) (objPTR->objPTR));
+		objPTR->SetObjVisible = SetCustomVisible;
+		objPTR->ID = pTmp->ID;
+		objCoordinates.MinX = PosX;
+		objCoordinates.MaxX = PosX + pTmp->GetWidth()-1;
+		objCoordinates.MinY = PosY;
+		objCoordinates.MaxY = PosY + pTmp->GetHeight()-1;
+		break;
+	}
+
+	default:
+		assert(0);
+	}
+
+	objPTR->objCoordinates = objCoordinates;
+
+	pagePTR->PageControls[pagePTR->ControlCount] = objPTR;
+	pagePTR->ControlCount++;
+	return GL_OK;
 }
 
 /**
@@ -1587,6 +1679,26 @@ GL_ErrStatus DestroyPageControl(GL_Page_TypeDef* pPage, uint16_t ID)
 				return GL_OK;
 			}
 		}
+		else if (pPage->PageControls[index]->objType == GL_CUSTOM) {
+			GL_Custom_TypeDef* pTmp;
+			pTmp = (GL_Custom_TypeDef*) (pPage->PageControls[index]->objPTR);
+
+			if (pTmp->ID == ID) {
+				free(pPage->PageControls[index]->objPTR);
+				pPage->PageControls[index]->objPTR = GL_NULL;
+				free(pPage->PageControls[index]);
+				if (index != pPage->ControlCount - 1) {
+					pPage->PageControls[index] = pPage->PageControls[pPage->ControlCount - 1];
+					pPage->PageControls[pPage->ControlCount - 1] = GL_NULL;
+					pPage->ControlCount--;
+				}
+				else {
+					pPage->PageControls[index] = GL_NULL;
+					pPage->ControlCount--;
+				}
+				return GL_OK;
+			}
+		}
 		index++;
 	}
 	return GL_ERROR;
@@ -1630,8 +1742,7 @@ GL_ErrStatus DestroyPage(GL_Page_TypeDef * pPage)
 		}
 		else if (pPage->PageControls[index]->objType == GL_RADIO_BUTTON) {
 			GL_RadioButtonGrp_TypeDef* pTmp;
-			pTmp =
-			        (GL_RadioButtonGrp_TypeDef*) (((GL_RadioOption_TypeDef*) pPage->PageControls[index]->objPTR)->RadioButtonGrp);
+			pTmp = (GL_RadioButtonGrp_TypeDef*) (((GL_RadioOption_TypeDef*) pPage->PageControls[index]->objPTR)->RadioButtonGrp);
 			DestroyPageControl(pPage, pTmp->ID);
 		}
 		else if (pPage->PageControls[index]->objType == GL_COMBOBOX) {
@@ -1657,6 +1768,11 @@ GL_ErrStatus DestroyPage(GL_Page_TypeDef * pPage)
 		else if (pPage->PageControls[index]->objType == GL_GRAPH_CHART) {
 			GL_GraphChart_TypeDef* pTmp;
 			pTmp = (GL_GraphChart_TypeDef*) (pPage->PageControls[index]->objPTR);
+			DestroyPageControl(pPage, pTmp->ID);
+		}
+		else if (pPage->PageControls[index]->objType == GL_CUSTOM) {
+			GL_Custom_TypeDef* pTmp;
+			pTmp = (GL_Custom_TypeDef*) (pPage->PageControls[index]->objPTR);
 			DestroyPageControl(pPage, pTmp->ID);
 		}
 		index--;
@@ -1710,16 +1826,22 @@ static void GL_DrawButton(GL_Coordinate_TypeDef objCoordinates, uint8_t* pLeftBm
 	int offset = 0;	// For debugging which segment is where.
 	int textLen = p_strlen(pText);
 	for (int slice = 0; slice <= textLen; slice++) {
+		// Select the texture (all same width)
 		uint8_t *pData = pCenterBmp;
 		if (slice == 0) {
 			pData = pLeftBmp;
 		} else if (slice == textLen) {
 			pData = pRightBmp;
 		}
+
+		// Draw the texture at the correct location.
+		// Parameter order: maxX, minX, maxY, minY, image
 		GL_DrawButtonBMP(
 				objCoordinates.MinX + (slice + 1) * BUTTON_SLICE_LENGTH,
 				objCoordinates.MinX + (slice) * BUTTON_SLICE_LENGTH,
-				objCoordinates.MaxY+offset, objCoordinates.MinY+offset, pData);
+				objCoordinates.MaxY + offset,
+				objCoordinates.MinY + offset,
+				pData);
 //		offset += 10;
 	}
 
@@ -1731,6 +1853,9 @@ static void GL_DrawButton(GL_Coordinate_TypeDef objCoordinates, uint8_t* pLeftBm
 	const uint16_t BUTTON_TEXT_OFFSET_X = 5;
 	const uint16_t BUTTON_TEXT_OFFSET_Y = 5;
 	GL_PrintString(objCoordinates.MinX + BUTTON_TEXT_OFFSET_X, objCoordinates.MinY + BUTTON_TEXT_OFFSET_Y, pText, GL_TRUE);
+
+	GL_SetTextColor(LCD_COLOR_MAGENTA);
+	GL_DrawRectangle(objCoordinates.MaxX, objCoordinates.MinX, objCoordinates.MaxY, objCoordinates.MinY);
 }
 
 /**
@@ -2420,6 +2545,7 @@ static GL_ErrStatus SetGraphChartVisible(GL_PageControls_TypeDef* pTmp, GL_Coord
 	height = LCD_HEIGHT - GRAPH_MARGIN_LENGTH * 9 / 2;
 
 	x_step = (double) (width) / (pThis->n_points);
+
 	y_step = (double) (height / 11);
 
 	GL_SetTextColor(GL_Black);
@@ -3055,6 +3181,15 @@ static GL_Coordinate_TypeDef GetObjCoordinates(GL_Page_TypeDef* pPage, uint16_t 
 			}
 			index++;
 		}
+		if (pPage->PageControls[index]->objType == GL_CUSTOM) {
+			GL_Custom_TypeDef* pTmp;
+			pTmp = (GL_Custom_TypeDef*) (pPage->PageControls[index]->objPTR);
+
+			if (pTmp->ID == ID) {
+				return pPage->PageControls[index]->objCoordinates;
+			}
+			index++;
+		}
 	}
 	return null;
 }
@@ -3456,6 +3591,11 @@ void ProcessInputData(void)
 							break;
 						}
 					}
+
+					// Once once page is found to be active, bail out because
+					// we could have switched to a new page and would now
+					// double process the event.
+					break;
 				}
 			}
 		}
@@ -3529,6 +3669,12 @@ static void CallEvent(GL_PageControls_TypeDef* pControl)
 		pTmp = (GL_Slidebar_TypeDef*) (pControl->objPTR);
 		((GL_Slidebar_TypeDef*) pTmp)->EventHandler();
 		break;
+
+	case GL_CUSTOM:
+		pTmp = (GL_Custom_TypeDef*) (pControl->objPTR);
+		((GL_Custom_TypeDef*) pTmp)->EventHandler();
+		break;
+
 	default:
 		break;
 	}

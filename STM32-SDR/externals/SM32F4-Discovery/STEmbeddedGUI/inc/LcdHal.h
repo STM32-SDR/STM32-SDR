@@ -153,7 +153,7 @@ void GL_DisplayAdjStringLine(uint16_t Line, uint16_t Column, uint8_t *ptr, _Bool
 
 
 // NEW FUNCTIONS (by Brian)
-void GL_SetFont(uint8_t uFont);
+void GL_SetFont(GL_FontOption uFont);
 uint16_t GL_GetFontLetterWidth(void);
 uint16_t GL_GetFontLetterHeight(void);
 void GL_PrintString(uint16_t x, uint16_t y, const char *str, _Bool isTransparent);

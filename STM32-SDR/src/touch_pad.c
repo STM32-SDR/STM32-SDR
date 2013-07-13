@@ -37,8 +37,7 @@ void Old_HandleTouchEvent(void)
 	// Note, before calibration is done (using old hard-coded values), this is what we already get.
 	// Once Calibration is working, the vertical axis may need to be inverted here.
 	X_Point = X_Point + 0;
-	Y_Point = Y_Point + 0;
-//	Y_Point = LCD_HEIGHT - Y_Point - 1;
+	Y_Point = LCD_HEIGHT - Y_Point - 1;
 
 
 

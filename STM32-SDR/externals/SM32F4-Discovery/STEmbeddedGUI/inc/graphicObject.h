@@ -45,6 +45,22 @@
   * @{
   */
 #define GL_NULL  0x00
+
+#define BUTTON_SLICE_LENGTH             8
+#define SLIDEBAR_CURSOR_LENGTH          6
+#define SLIDEBAR_CENTRAL_LENGTH         27
+#define SLIDEBAR_OFFSET_LENGTH          4
+#define SLIDEBAR_PIECE_LENGTH           4
+#define SLIDEBAR_HEIGHT                 18
+#define BUTTON_HEIGHT                   26
+#define BUTTON_PIECE_LENGTH             8
+#define RBUTTON_OPT_SIZE                20
+#define RADIO_BUTTON_RADIUS             9
+#define COMBOBOX_SIZE                   22
+#define CHECKBOX_SIZE                   20
+#define PAGE_MAX_NUM                    50
+#define TIMEOUT                         1000000
+
 /**
   * @}
   */
@@ -134,6 +150,15 @@ uint8_t GetComboOptionActive(GL_Page_TypeDef* pPage, uint16_t ID);
 GL_ErrStatus ResetComboOptionActive(GL_Page_TypeDef* pPage, uint16_t ID);
 const char* GetComboOptionLabel(GL_Page_TypeDef* pPage, uint16_t ID);
 GL_ErrStatus SetComboOptionLabel(GL_Page_TypeDef* pPage, uint16_t ID, const char* label);
+
+/* Custom Widget **************************************************************/
+GL_PageControls_TypeDef* NewCustomWidget (
+		uint16_t ID,
+		uint16_t (*pGetWidth)(void),
+		uint16_t (*pGetHeight)(void),
+		void (*pEventHandler)(void),
+		void (*pDrawHandler)(void)
+		);
 
 /* Graphic Page handler *******************************************************/ 
 GL_ErrStatus Create_PageObj (GL_Page_TypeDef* pThis);

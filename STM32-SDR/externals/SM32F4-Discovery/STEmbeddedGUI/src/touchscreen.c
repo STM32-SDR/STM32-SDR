@@ -19,6 +19,8 @@
  ******************************************************************************
  */
 
+// TODO: Remove touchscreen.h/c once all functionality moved to TSHal.h/.c
+
 /* Includes ------------------------------------------------------------------*/
 #include "touchscreen.h"
 #include "graphicObject.h"
@@ -47,7 +49,7 @@
 /* Private macros ------------------------------------------------------------*/
 #define TS_ReadCalibrationVaraible(offset)  (*(__IO uint32_t*)(CalibrationAddr + offset))
 /* Private variables ---------------------------------------------------------*/
-int32_t A2 = 0, B2 = 0, C2 = 0, D2 = 0, E2 = 0, F2 = 0;
+static int32_t A2 = 0, B2 = 0, C2 = 0, D2 = 0, E2 = 0, F2 = 0;
 
 /* Pointer to Penultimate Flash Memory Address */
 uint32_t EndAddr = 0;
@@ -62,12 +64,13 @@ __IO uint32_t NbrOfPage = 0x00;
 __IO TSC_FLASH_Status TSC_FlashStatus;
 __IO TSC_Flash_TestStatus TSC_MemoryProgramStatus;
 /* Private function prototypes -----------------------------------------------*/
-static void TS_SaveCalibrationVariables(void);
+void TS_SaveCalibrationVariables(void);
 /* Private functions ---------------------------------------------------------*/
 
 
 __IO uint8_t touch_done = 0;	// From graphicObject.c (so it will compile)
 
+#if 0
 /**
  * @brief  Calibrate TouchScreen coordinates by LCD touch in 5 points
  * @param  None
@@ -328,13 +331,14 @@ void TS_Calibration(void)
 
 	TS_SaveCalibrationVariables();
 }
+#endif
 
 /**
  * @brief  Save TouchScreen 5 points calibration coordinates
  * @param  None
  * @retval None
  */
-static void TS_SaveCalibrationVariables(void)
+void TS_SaveCalibrationVariables(void)
 {
 	int32_t Data[7];
 	/********************* FLASH PROGRAMMING FOR SAVING "calibration_done" variable **********************/
@@ -375,7 +379,7 @@ void TS_CheckCalibration(void)
 	/*  CalibrationAddr = (uint32_t)(EndAddr-0x404); */
 
 	if ((TS_ReadCalibrationVaraible(CalibrationDone_Offset) & 0x000000FF) != 1) {
-		TS_Calibration();
+//		TS_Calibration();
 	}
 	else {
 		calibration_done = 1;
@@ -390,6 +394,7 @@ void TS_CheckCalibration(void)
 	F2 = (TS_ReadCalibrationVaraible(F2_Offset) );
 }
 
+#if 0
 /**
  * @brief  Returns the Display y-axis Coordinate corresponding to Touch y-axis coordinate.
  *         X and Y are inverted because the display is meant in Landscape
@@ -429,6 +434,8 @@ uint16_t getDisplayCoordinateY(uint16_t x_touch, uint16_t y_touch)
 	}
 	return Yd;
 }
+
+#endif
 
 /**
  * @brief  Returns calibration status

@@ -130,7 +130,8 @@ typedef enum{
     GL_COMBOBOX = 7,
     GL_SLIDEBAR = 8,
     GL_HISTOGRAM = 9,
-    GL_GRAPH_CHART = 10
+    GL_GRAPH_CHART = 10,
+    GL_CUSTOM = 11
 }GL_ObjType;
 
 /** 
@@ -368,12 +369,29 @@ typedef struct GL_GraphChartObj GL_GraphChart_TypeDef;
 struct GL_GraphChartObj
 {
   uint16_t      ID;
-  char       label_X[MAX_GRAPH_LABEL_LENGTH];
-  char       label_Y[MAX_GRAPH_LABEL_LENGTH];
+  char          label_X[MAX_GRAPH_LABEL_LENGTH];
+  char          label_Y[MAX_GRAPH_LABEL_LENGTH];
   int16_t       points[MAX_GRAPH_POINTS];
   uint8_t       n_points;
   GL_bool       Background;
   GL_bool       Control_Visible;
+};
+
+
+/* Forward declaration for circular typedefs */
+typedef struct GL_CustomObj GL_Custom_TypeDef;
+
+/**
+  * @brief  GL_CustomObj struct definition
+  */
+struct GL_CustomObj
+{
+  uint16_t          ID;
+  GL_bool           Control_Visible;
+  uint16_t          (*GetWidth)(void);
+  uint16_t          (*GetHeight)(void);
+  void              (*EventHandler)(void);
+  void              (*DrawHandler)(void);
 };
 
 /** 

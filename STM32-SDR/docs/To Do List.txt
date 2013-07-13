@@ -1,0 +1,16 @@
+
+
+
+Brian's To Do List
+- Have calibration work without screens?
+  - Hardcode it out?!?
+- Test changing a lable's text and updating.
+- Create GUI screen for existing components.
+	- Options component
+	- Frequency component
+	- FFT component
+	- Make a change mode button.
+- Change Makefile to allow easier compilation of multiple directories
+- Store calibration constants in EEPROM; validate on read.
+- Re-engineer I2C access into: high level access {EEPROM, ..., ...}, low level {I2C commands}
+- Check-in coding standard

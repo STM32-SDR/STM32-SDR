@@ -71,7 +71,7 @@ void LCD_StringLine(uint16_t PosX, uint16_t PosY, char *str)
 void LCD_DrawFFT(uint8_t fftData[])
 {
 	const int OFFSET_X    =  40;
-	const int OFFSET_Y    =   0;   // Was 175 in old coord system.
+	const int OFFSET_Y    =   0;
 	const int FFT_WIDTH   = 240;
 	const int FFT_HEIGHT  =  64;
 	const int SELFREQ_ADJ =   4;
@@ -89,7 +89,7 @@ void LCD_DrawFFT(uint8_t fftData[])
 		// Plot this column of the FFT.
 		for (int y = 0; y < FFT_HEIGHT; y++) {
 
-			// Check for the Red line:
+			// Draw red line for selected frequency
 			if (x == (int) selectedFreqX) {
 				// Leave some white at the top
 				if (y <= SELFREQ_ADJ) {
@@ -99,7 +99,7 @@ void LCD_DrawFFT(uint8_t fftData[])
 				}
 			}
 
-			// Check if in the data
+			// Draw data
 			else if (FFT_HEIGHT - y < fftData[x + 8]) {
 				LCD_WriteRAM(LCD_COLOR_BLUE);
 			}

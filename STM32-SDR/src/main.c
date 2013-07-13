@@ -26,7 +26,7 @@
 #include	"LcdHal.h"
 #include	"TSHal.h"
 
-#include	"uiframework.h"
+#include	"screen_all.h"
 
 const uint32_t CODEC_FREQUENCY = 8000;
 
@@ -57,17 +57,17 @@ int main(void)
 {
 	initializeHardware();
 
-//	LCD_TestDisplayScreen();
-//	GL_TestDisplayScreen();
-
 	/*
-	 * Small demo for GUI:
+	 * Startup the GUI
 	 */
-//	Show_HomeScreen();
-//	while (1) {
-//		// Process touch events.
-//		ProcessInputData();
-//	}
+	Screen_CreateAllScreens();
+	Screen_ShowScreen(&g_screenCalibrate);
+#if 0
+	while (1) {
+		// Process touch events.
+		ProcessInputData();
+	}
+#endif
 
 	while (1) {
 		if (DSP_Flag == 1) {
@@ -86,8 +86,6 @@ int main(void)
 			// Redraw the screen
 			LCD_DrawFFT(FFT_Display);
 			LCD_StringLine(0, 130, (char*) &LCD_buffer[0]);
-
-
 		}
 
 		/*

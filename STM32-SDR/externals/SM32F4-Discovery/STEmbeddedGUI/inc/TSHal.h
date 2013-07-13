@@ -10,7 +10,13 @@
 #include <stdint.h>
 #include "LcdHal.h"
 
-#define TS_NUM_CALIBRATION_TARGETS     5
+#define TS_NUM_CALIBRATION_POINTS 5
+typedef struct
+{
+	int16_t X;
+	int16_t Y;
+} CalibrationPoint;
+
 
 /*
  * Initialization
@@ -32,9 +38,7 @@ void  TS_ClearTouchEvent(void);
 /*
  * Calibration Functions
  */
-// TODO: Implement this (code in touchscreen.c)
 _Bool TS_IsCalibrated(void);
 void  TS_GetUncalibratedTouchEvent(uint16_t *pX, uint16_t *pY);
-// What should we pass in?!?
-void  TS_SetCalibrationData(void);
 void  TS_GetCalibrationTarget(int pointNumber, uint16_t *pXTarg, uint16_t *pYTarg);
+void  TS_SetCalibrationData(CalibrationPoint touchedPoints[TS_NUM_CALIBRATION_POINTS]);
