@@ -391,7 +391,7 @@ struct GL_CustomObj
   uint16_t          (*GetWidth)(void);
   uint16_t          (*GetHeight)(void);
   void              (*EventHandler)(void);
-  void              (*DrawHandler)(void);
+  void              (*DrawHandler)(_Bool force);
 };
 
 /** 

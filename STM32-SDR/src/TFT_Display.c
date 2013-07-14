@@ -66,55 +66,6 @@ void LCD_StringLine(uint16_t PosX, uint16_t PosY, char *str)
 	GL_PrintString(PosX, LCD_HEIGHT - PosY - GL_GetFontLetterHeight(), str, 0);
 }
 
-// Display the FFT data to the screen.
-// Expect fftData[] to be an array of 256 ints.
-void LCD_DrawFFT(uint8_t fftData[])
-{
-	const int OFFSET_X    =  40;
-	const int OFFSET_Y    =   0;
-	const int FFT_WIDTH   = 240;
-	const int FFT_HEIGHT  =  64;
-	const int SELFREQ_ADJ =   4;
-
-	float selectedFreqX = (float) (NCO_Frequency - 125) / 15.625;
-	if (selectedFreqX < 0) {
-		selectedFreqX = 0;
-	}
-
-	// Draw the FFT using direct memory writes (fast).
-	LCD_SetDisplayWindow(OFFSET_X, OFFSET_Y, FFT_HEIGHT, FFT_WIDTH);
-	LCD_WriteRAM_PrepareDir(LCD_WriteRAMDir_Down);
-
-	for (int x = 0; x < FFT_WIDTH; x++) {
-		// Plot this column of the FFT.
-		for (int y = 0; y < FFT_HEIGHT; y++) {
-
-			// Draw red line for selected frequency
-			if (x == (int) selectedFreqX) {
-				// Leave some white at the top
-				if (y <= SELFREQ_ADJ) {
-					LCD_WriteRAM(LCD_COLOR_WHITE);
-				} else {
-					LCD_WriteRAM(LCD_COLOR_RED);
-				}
-			}
-
-			// Draw data
-			else if (FFT_HEIGHT - y < fftData[x + 8]) {
-				LCD_WriteRAM(LCD_COLOR_BLUE);
-			}
-
-			// Otherwise it's not data
-			else {
-				LCD_WriteRAM(LCD_COLOR_WHITE);
-			}
-		}
-	}
-
-}
-
-
-
 
 void LCD_DrawSquare(uint16_t Xpos, uint16_t Ypos, uint16_t a)
 {

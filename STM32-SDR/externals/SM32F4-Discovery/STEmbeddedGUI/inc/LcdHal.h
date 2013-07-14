@@ -129,7 +129,9 @@ extern __IO uint16_t          GL_BackColor;
 
 LCD_HW_Parameters_TypeDef* NewLcdHwParamObj (void);
 void GL_SetTextColor(__IO uint16_t TextColor);
+uint16_t GL_GetTextColor(void);
 void GL_SetBackColor(__IO uint16_t BackColor);
+uint16_t GL_GetBackColor(void);
 void GL_Clear(uint16_t Color);
 void GL_SetDisplayWindow(uint16_t Xpos, uint16_t Ypos, uint16_t Height, uint16_t Width);
 void GL_DrawLine(uint16_t Xpos, uint16_t Ypos, uint16_t Length, uint8_t Direction);

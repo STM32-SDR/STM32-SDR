@@ -22,7 +22,7 @@ static CalibrationPoint s_touchedReadings[TS_NUM_CALIBRATION_POINTS];
 static uint16_t calibration_GetWidth(void);
 static uint16_t calibration_GetHeight(void);
 static void calibration_Click(void);
-static void calibration_Draw(void);
+static void calibration_Draw(_Bool force);
 
 
 /**
@@ -83,11 +83,15 @@ static void calibration_Click(void)
 		return;
 	}
 
-	calibration_Draw();
+	calibration_Draw(1);
 }
 
-static void calibration_Draw(void)
+static void calibration_Draw(_Bool force)
 {
+	if (!force) {
+		return;
+	}
+
 	// Clear screen
 	GL_Clear(LCD_COLOR_GREY);
 

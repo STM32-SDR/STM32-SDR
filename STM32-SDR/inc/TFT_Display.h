@@ -84,7 +84,7 @@ void LCD_SetCursor(uint16_t Xpos, uint16_t Ypos);
 void LCD_CharSize(__IO uint16_t size);
 //void Pixel(int16_t x, int16_t y, int16_t c);
 
-void LCD_DrawFFT(uint8_t fftData[]);
+//void LCD_DrawFFT(uint8_t fftData[]);
 //void LCD_PutChar(int16_t PosX, int16_t PosY, char c);
 void LCD_StringLine(uint16_t PosX, uint16_t PosY, char *str);
 //void LCD_DrawLine(uint16_t Xpos, uint16_t Ypos, uint16_t Length, uint8_t Direction);

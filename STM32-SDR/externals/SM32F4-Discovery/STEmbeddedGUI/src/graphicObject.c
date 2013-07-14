@@ -135,6 +135,7 @@ static GL_Coordinate_TypeDef GetObjCoordinates(GL_Page_TypeDef* pPage, uint16_t 
 static GL_ErrStatus SetPage(GL_Page_TypeDef* pThis, GL_bool bVal);
 static void GL_DrawRectangle(uint16_t maxX, uint16_t minX, uint8_t maxY, uint8_t minY);
 
+static void CallRedrawPageControlOpportunity(GL_PageControls_TypeDef* pControl);
 /**
  * @}
  */
@@ -898,7 +899,7 @@ GL_PageControls_TypeDef* NewCustomWidget (
 		uint16_t (*pGetWidth)(void),
 		uint16_t (*pGetHeight)(void),
 		void (*pEventHandler)(void),
-		void (*pDrawHandler)(void)
+		void (*pDrawHandler)(_Bool force)
 		)
 {
 	GL_PageControls_TypeDef *pPageControlObj = NULL;
@@ -940,7 +941,7 @@ static GL_ErrStatus SetCustomVisible(GL_PageControls_TypeDef* pTmp, GL_Coordinat
 	}
 	pThis->Control_Visible = GL_TRUE;
 	if (pTmp->objType == GL_CUSTOM) {
-		pThis->DrawHandler();
+		pThis->DrawHandler(1);
 	}
 
 	return GL_OK;
@@ -1138,25 +1139,35 @@ GL_ErrStatus AddPageControlObj(uint16_t PosX, uint16_t PosY, GL_PageControls_Typ
  */
 GL_ErrStatus Set_Label(GL_Page_TypeDef* pPage, uint16_t ID, const char* label)
 {
-	GL_Label_TypeDef* pTmp;
-	uint32_t index = 0;
-
 	if (!pPage) {
 		return GL_ERROR;
 	}
 
 	if (p_strlen(label) > 0) {
 		/* search for the required label */
-		while (index < pPage->ControlCount) {
+		for (uint32_t index = 0; index < pPage->ControlCount; index++) {
 			if (pPage->PageControls[index]->objType == GL_LABEL) {
-				pTmp = (GL_Label_TypeDef*) (pPage->PageControls[index]->objPTR);
+				GL_PageControls_TypeDef* pPageCtrl = pPage->PageControls[index];
+				GL_Label_TypeDef* pLabel = (GL_Label_TypeDef*) (pPageCtrl->objPTR);
 
-				if (pTmp->ID == ID) {
-					GL_SetStringFieldValue(pTmp->label, label, MAX_LABEL_LENGTH);
+				if (pLabel->ID == ID) {
+					// Clear current label:
+					if (pLabel->Control_Visible) {
+						uint16_t oldColor = pLabel->Colour;
+						pLabel->Colour = GL_GetBackColor();
+						pPageCtrl->SetObjVisible(pPageCtrl, pPageCtrl->objCoordinates);
+						pLabel->Colour = oldColor;
+					}
+
+					GL_SetStringFieldValue(pLabel->label, label, MAX_LABEL_LENGTH);
+
+					// Redraw:
+					if (pLabel->Control_Visible) {
+						pPageCtrl->SetObjVisible(pPageCtrl, pPageCtrl->objCoordinates);
+					}
 					return GL_OK;
 				}
 			}
-			index++;
 		}
 	}
 	return GL_ERROR;
@@ -1823,7 +1834,6 @@ static GL_ErrStatus SetLabelVisible(GL_PageControls_TypeDef* pTmp, GL_Coordinate
 
 static void GL_DrawButton(GL_Coordinate_TypeDef objCoordinates, uint8_t* pLeftBmp, uint8_t* pCenterBmp, uint8_t* pRightBmp, const char* pText)
 {
-	int offset = 0;	// For debugging which segment is where.
 	int textLen = p_strlen(pText);
 	for (int slice = 0; slice <= textLen; slice++) {
 		// Select the texture (all same width)
@@ -1839,10 +1849,9 @@ static void GL_DrawButton(GL_Coordinate_TypeDef objCoordinates, uint8_t* pLeftBm
 		GL_DrawButtonBMP(
 				objCoordinates.MinX + (slice + 1) * BUTTON_SLICE_LENGTH,
 				objCoordinates.MinX + (slice) * BUTTON_SLICE_LENGTH,
-				objCoordinates.MaxY + offset,
-				objCoordinates.MinY + offset,
+				objCoordinates.MaxY,
+				objCoordinates.MinY,
 				pData);
-//		offset += 10;
 	}
 
 
@@ -1853,9 +1862,6 @@ static void GL_DrawButton(GL_Coordinate_TypeDef objCoordinates, uint8_t* pLeftBm
 	const uint16_t BUTTON_TEXT_OFFSET_X = 5;
 	const uint16_t BUTTON_TEXT_OFFSET_Y = 5;
 	GL_PrintString(objCoordinates.MinX + BUTTON_TEXT_OFFSET_X, objCoordinates.MinY + BUTTON_TEXT_OFFSET_Y, pText, GL_TRUE);
-
-	GL_SetTextColor(LCD_COLOR_MAGENTA);
-	GL_DrawRectangle(objCoordinates.MaxX, objCoordinates.MinX, objCoordinates.MaxY, objCoordinates.MinY);
 }
 
 /**
@@ -3289,8 +3295,7 @@ GL_ErrStatus ShowPage(GL_Page_TypeDef* pPage, GL_bool bVal)
 		CursorDraw(Cursor->X, Cursor->Y, CUR_READ_BEH);
 	}
 	else {
-		GL_Clear(GL_White);
-		/* GL_Clear(GL_Cyan); */
+//		GL_Clear(GL_White);
 		CursorDraw(Cursor->X, Cursor->Y, CUR_READ_BEH);
 	}
 	pPage->SetPage(pPage, bVal);
@@ -3605,6 +3610,32 @@ void ProcessInputData(void)
 	}
 }
 
+
+/**
+ * @brief  Give each widget on the screen the chance to redraw itself if it has changed.
+ * @param  None
+ * @retval None
+ */
+void UpdateScreenWithChanges(void)
+{
+	// Find the current page.
+	for (uint16_t pageIdx = 0; pageIdx < PageCount; pageIdx++) {
+		GL_Page_TypeDef *pPage = PagesList[pageIdx];
+
+		if (pPage->Page_Active == GL_TRUE) {
+			// Redraw each widget if needed
+			for (uint16_t controlIdx = 0; controlIdx < pPage->ControlCount; controlIdx++) {
+				GL_PageControls_TypeDef *pControl = pPage->PageControls[controlIdx];
+				CallRedrawPageControlOpportunity(pControl);
+			}
+
+			// Once one page is found to be active and processed, bail out.
+			break;
+		}
+	}
+
+}
+
 /**
  * @brief  "Do nothing" function
  * @param  None
@@ -3680,6 +3711,24 @@ static void CallEvent(GL_PageControls_TypeDef* pControl)
 	}
 }
 
+/**
+ * @brief  Give the widget a chance to redraw itself (if needed)
+ * @param  *pControl: pointer to PageControl object
+ * @retval None
+ */
+static void CallRedrawPageControlOpportunity(GL_PageControls_TypeDef* pControl)
+{
+	void* pTmp;
+	switch (pControl->objType) {
+	case GL_CUSTOM:
+		pTmp = (GL_Custom_TypeDef*) (pControl->objPTR);
+		((GL_Custom_TypeDef*) pTmp)->DrawHandler(0);
+		break;
+
+	default:
+		break;
+	}
+}
 
 
 /**

@@ -58,10 +58,6 @@ void  TS_GetTouchEventCoords(uint16_t *pX, uint16_t *pY)
 	TSDriver_GetRawTouchEventCoords(&rawX, &rawY);
 
 	// Apply calibration:
-	// TODO: Make calibration non-hard-coded
-//	*pX = (uint16_t) ((float) (3873 - rawX) / 11.11);
-//	*pY = LCD_HEIGHT - (uint16_t) (((float) (rawY - 212) / 15.13));
-
 	*pX = getDisplayCoordinateX(rawX, rawY);
 	*pY = getDisplayCoordinateY(rawX, rawY);
 }
@@ -221,8 +217,9 @@ static uint16_t getDisplayCoordinateX(uint16_t x_touch, uint16_t y_touch)
 	float temp = (A2 * x_touch + B2 * y_touch + C2) / RESCALE_FACTOR;
 	uint16_t Xd = (uint16_t) (temp);
 
-	// Avoid wrap-around/off-screen
-	if (Xd >= LCD_WIDTH) {
+	// Avoid too far off screen (over/underflow).
+	// Note that touch screen sensor may extend beyond LCD.
+	if (Xd >= LCD_WIDTH*2) {
 		Xd = LCD_WIDTH - 1;
 	}
 	return Xd;
@@ -232,8 +229,9 @@ static uint16_t getDisplayCoordinateY(uint16_t x_touch, uint16_t y_touch)
 	float temp = (D2 * x_touch + E2 * y_touch + F2) / RESCALE_FACTOR;
 	uint16_t Yd = (uint16_t) (temp);
 
-	// Avoid wrap-around/off-screen
-	if (Yd >= LCD_HEIGHT) {
+	// Avoid too far off screen (over/underflow).
+	// Note that touch screen sensor may extend beyond LCD.
+	if (Yd >= LCD_HEIGHT*2) {
 		Yd = LCD_HEIGHT - 1;
 	}
 	return Yd;

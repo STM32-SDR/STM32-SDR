@@ -22,7 +22,7 @@ void Set_Maximums(void);
 void Set_IQ_Units(void);
 void Store_Defaults(void);
 
-int16_t read_SS2;
+extern int16_t read_SS2;
 int16_t IQData[16];
 int16_t DataMin[16];
 int16_t DataMax[16];

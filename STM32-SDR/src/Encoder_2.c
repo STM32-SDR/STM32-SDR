@@ -85,6 +85,7 @@ void Encoder2_GPIO_Config(void)
 
 }
 
+
 void Set_Initial_IQ_Data(void)
 {
 	IQData[0] = 0;   //Rx_Audio
@@ -96,7 +97,7 @@ void Set_Initial_IQ_Data(void)
 	IQData[6] = 5000;//Rx_Amp
 	IQData[7] = 0;   //Rx_Phase
 	IQData[8] = 5000;//Tx_Amp
-	IQData[9] = 0;   //Rx_Phase
+	IQData[9] = 0;   //Tx_Phase
 	IQData[10] = 0;  //Microphone Bias
 	IQData[11] = 0;
 	IQData[12] = 0;
@@ -187,10 +188,10 @@ void init_encoder2(void)
 	T_xgain = (float) IQData[7] / 10000.0;
 
 	rgain = 0.5;					//temp location, move to sequencer
-	LCD_StringLine(0, 220, "USB");
+//	LCD_StringLine(0, 220, "USB");
 
 	Tx_Flag = 0;
-	LCD_StringLine(296, 220, "RX");  //temp location, move to sequencer
+//	LCD_StringLine(296, 220, "RX");  //temp location, move to sequencer
 
 	Receive_Sequence();
 
@@ -353,6 +354,7 @@ void display_SS2(void)
 
 	// Display the number:
 	if (read_SS2 >= 0 && read_SS2 <= NUM_OPTIONS) {
+//		int16_t displayValue = IQData[read_SS2];
 		int16_t displayValue = IQData[read_SS2];
 		Plot_Integer(displayValue, 0, 0);
 	}
@@ -360,13 +362,13 @@ void display_SS2(void)
 
 void Store_Defaults(void)
 {
-	LCD_StringLine(234, 40, " Default  ");
+//	LCD_StringLine(234, 40, " Default  ");
 	Set_Initial_SI570_Data();
 	Store_SI570_Data();
 	check_SS1();
 	process_SS1();
 
-	LCD_StringLine(0, 40, " Default  ");
+//	LCD_StringLine(0, 40, " Default  ");
 	Set_Initial_IQ_Data();
 	Store_IQ_Data();
 	check_SS2();

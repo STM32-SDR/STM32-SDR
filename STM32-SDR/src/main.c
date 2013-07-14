@@ -30,8 +30,8 @@
 
 const uint32_t CODEC_FREQUENCY = 8000;
 
-uint8_t FFT_Display[256];
-uint8_t FFT_Output[128];
+//uint8_t FFT_Display[256];
+//uint8_t FFT_Output[128];
 int16_t old_SS1_position;
 int16_t old_SS2_position;
 
@@ -62,32 +62,8 @@ int main(void)
 	 */
 	Screen_CreateAllScreens();
 	Screen_ShowScreen(&g_screenCalibrate);
-#if 0
-	while (1) {
-		// Process touch events.
-		ProcessInputData();
-	}
-#endif
 
 	while (1) {
-		if (DSP_Flag == 1) {
-			for (int16_t j = 0; j < 128; j++) {
-				//Changed for getting right display with SR6.3
-				FFT_Output[j] = (uint8_t) (6 * log((float32_t) (FFT_Magnitude[j] + 1)));
-
-				if (FFT_Output[j] > 64)
-					FFT_Output[j] = 64;
-				FFT_Display[2 * j] = FFT_Output[j];
-				FFT_Display[2 * j + 1] = (FFT_Output[j] + FFT_Output[j + 1]) / 2;
-			}
-
-			DSP_Flag = 0;
-
-			// Redraw the screen
-			LCD_DrawFFT(FFT_Display);
-			LCD_StringLine(0, 130, (char*) &LCD_buffer[0]);
-		}
-
 		/*
 		 * Selector Switches
 		 */
@@ -115,19 +91,24 @@ int main(void)
 		USBH_Process(&USB_OTG_Core_dev, &USB_Host);
 
 		/*
+		 * Handle general deferred events from the ISR.
+		 */
+		DelayEvent_ProcessDelayedEvents();
+
+		/*
 		 * Touch Events
 		 */
 		Old_HandleTouchEvent();
 		ProcessInputData();
 
 		/*
-		 * Handle general deferred events from the ISR.
+		 * Redraw the screen (as needed)
 		 */
-		DelayEvent_ProcessDelayedEvents();
+		UpdateScreenWithChanges();
+		DSP_Flag = 0;
 
-	} //while
-
-} //main
+	}
+}
 
 static void initializeHardware(void)
 {
@@ -168,8 +149,6 @@ static void initializeHardware(void)
 
 	SetAFCLimit(1000);
 	main_delay(SETUP_DELAY);
-
-	DSP_Flag = 0;
 
 	uart_init();
 	main_delay(SETUP_DELAY);
@@ -238,12 +217,12 @@ static void displaySplashScreen(void)
 	} gimp_image;
 	LCD_DrawBMP16Bit(0,0, gimp_image.height, gimp_image.width, (uint16_t*) gimp_image.pixel_data, 0);
 
-	LCD_SetTextColor(LCD_COLOR_BLACK);
-	LCD_SetBackColor(LCD_COLOR_WHITE);
+	GL_SetTextColor(LCD_COLOR_BLACK);
+	GL_SetBackColor(LCD_COLOR_WHITE);
 
-	LCD_StringLine(200, 100, "STM32 SDR V2.6");
-	LCD_StringLine(200, 80, __DATE__);
-	LCD_StringLine(200, 60, __TIME__);
+	GL_PrintString(200, 140, "STM32 SDR V2.6", 0);
+	GL_PrintString(200, 160, __DATE__, 0);
+	GL_PrintString(200, 180, __TIME__, 0);
 	main_delay(20000000);
 }
 

@@ -30,8 +30,10 @@ void Screen_ShowScreen(GL_Page_TypeDef *pNewScreen)
 	if (s_pCurrentScreen != 0) {
 		s_pCurrentScreen->ShowPage(s_pCurrentScreen, GL_FALSE);
 	}
-	GL_Clear(LCD_COLOR_WHITE);
-	GL_SetTextColor(LCD_COLOR_BLACK);
+	GL_Clear(LCD_COLOR_DGRAY);
+//	GL_Clear(LCD_COLOR_BLACK);
+	GL_SetBackColor(LCD_COLOR_DGRAY);
+	GL_SetTextColor(LCD_COLOR_WHITE);
 	pNewScreen->ShowPage(pNewScreen, GL_TRUE);
 	s_pCurrentScreen = pNewScreen;
 }

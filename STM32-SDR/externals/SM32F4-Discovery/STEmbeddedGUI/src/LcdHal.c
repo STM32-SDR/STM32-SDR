@@ -87,6 +87,10 @@ void GL_SetTextColor(__IO uint16_t GL_NewTextColor)
 	GL_TextColor = GL_NewTextColor;
 	LCD_SetTextColor(GL_TextColor);
 }
+uint16_t GL_GetTextColor(void)
+{
+	return GL_TextColor;
+}
 
 /**
  * @brief  Sets the Background color.
@@ -97,6 +101,10 @@ void GL_SetBackColor(__IO uint16_t color)
 {
 	GL_BackColor = color;
 	LCD_SetBackColor(GL_BackColor);
+}
+uint16_t GL_GetBackColor(void)
+{
+	return GL_BackColor;
 }
 
 /**
@@ -346,6 +354,7 @@ void GL_PrintChar(uint16_t x, uint16_t y, char c, _Bool isTransparent)
 
 void GL_TestDisplayScreen(void)
 {
+#if 0
 	LCD_Clear(LCD_COLOR_BLUE);
 
 	/*
@@ -379,4 +388,5 @@ void GL_TestDisplayScreen(void)
 	volatile int a = 0;
 	while (1)
 		a ++;
+#endif
 }

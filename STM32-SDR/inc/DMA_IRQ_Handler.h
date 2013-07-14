@@ -12,7 +12,7 @@ void Xmit_CW(void);
 void Xmit_PSK(void);
 
 extern int16_t DSP_Flag;
-float rgain;
+extern float rgain;
 float R_lgain;
 float R_xgain;
 float T_lgain;

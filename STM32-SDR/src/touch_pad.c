@@ -41,12 +41,12 @@ void Old_HandleTouchEvent(void)
 
 
 
-	//Update PSK NCO Frequency
-	if ((Y_Point > 176) && (X_Point > 39) && (X_Point < 280)) {
-		NCO_Frequency = (double) ((float) ((X_Point - 40) + 8) * 15.625);
-		Plot_Integer((int) NCO_Frequency, 150, 150);
-		SetRXFrequency(NCO_Frequency);
-	}
+//	//Update PSK NCO Frequency
+//	if ((Y_Point > 176) && (X_Point > 39) && (X_Point < 280)) {
+//		NCO_Frequency = (double) ((float) ((X_Point - 40) + 8) * 15.625);
+//		Plot_Integer((int) NCO_Frequency, 150, 150);
+//		SetRXFrequency(NCO_Frequency);
+//	}
 
 	//Update Frequency Step
 	if ((X_Point > 234) && (Y_Point < 20)) {
@@ -69,61 +69,66 @@ void Old_HandleTouchEvent(void)
 		redrawFrequencyOnScreen();
 	}
 
-	if ((X_Point > 320) && (Y_Point < 48)) {  //Store Default Freq & IQ
-		Store_Defaults();  //Both Encoder 1 & 2 Defaults Stored, see Encoder_2.c
-	}
-
-	if ((X_Point > 320) && (Y_Point > 48) && (Y_Point < 96)) {  //USB Selection
-		rgain = -0.5;
-		LCD_StringLine(0, 220, "LSB");
-	}
-
-	if ((X_Point > 320) && (Y_Point > 96) && (Y_Point < 144)) {  //LSB Selection
-		rgain = 0.5;
-		LCD_StringLine(0, 220, "USB");
-	}
-
-	if ((X_Point > 320) && (Y_Point > 192)) {  //TX Selection
-
-		switch (Mode) {
-		case MODE_SSB:
-			Xmit_SSB_Sequence();
-			break;
-		case MODE_CW:
-			Xmit_CW_Sequence();
-			break;
-		case MODE_PSK:
-			Xmit_PSK_Sequence();
-			break;
-		}  // End of switch
-
-		LCD_StringLine(296, 220, "TX");
-	}
-
-	// RX Selection
-	if ((X_Point > 320) && (Y_Point > 144) && (Y_Point < 192)) {
-		Receive_Sequence();
-		//Tx_Flag=0;
-		LCD_StringLine(296, 220, "RX");
-	}
-
-	// SSB Mode Selection
-	if ((X_Point > 88) && (X_Point < 128) && (Y_Point < 20) && (Tx_Flag == 0)) {
-		Mode = MODE_SSB;
-		Set_Mode_Display();
-	}
-
-	// CW Mode Selection
-	if ((X_Point > 144) && (X_Point < 176) && (Y_Point < 20) && (Tx_Flag == 0)) {
-		Mode = MODE_CW;
-		Set_Mode_Display();
-	}
-
-	// PSK Mode Selection
-	if ((X_Point > 188) && (X_Point < 228) && (Y_Point < 20) && (Tx_Flag == 0)) {
-		Mode = MODE_PSK;
-		Set_Mode_Display();
-	}
+//	/*
+//	 * Hidden Buttons Down Right Side:
+//	 * <Moved to screen_Main.c>
+//	 */
+//  #define HIDDEN_BUTTON_X  320
+//	if ((X_Point > HIDDEN_BUTTON_X) && (Y_Point < 48)) {  //Store Default Freq & IQ
+//		Store_Defaults();  //Both Encoder 1 & 2 Defaults Stored, see Encoder_2.c
+//	}
+//
+//	if ((X_Point > HIDDEN_BUTTON_X) && (Y_Point > 48) && (Y_Point < 96)) {  //USB Selection
+//		rgain = -0.5;
+//		LCD_StringLine(0, 220, "LSB");
+//	}
+//
+//	if ((X_Point > HIDDEN_BUTTON_X) && (Y_Point > 96) && (Y_Point < 144)) {  //LSB Selection
+//		rgain = 0.5;
+//		LCD_StringLine(0, 220, "USB");
+//	}
+//
+//	if ((X_Point > HIDDEN_BUTTON_X) && (Y_Point > 192)) {  //TX Selection
+//
+//		switch (Mode) {
+//		case MODE_SSB:
+//			Xmit_SSB_Sequence();
+//			break;
+//		case MODE_CW:
+//			Xmit_CW_Sequence();
+//			break;
+//		case MODE_PSK:
+//			Xmit_PSK_Sequence();
+//			break;
+//		}  // End of switch
+//
+//		LCD_StringLine(296, 220, "TX");
+//	}
+//
+//	// RX Selection
+//	if ((X_Point > HIDDEN_BUTTON_X) && (Y_Point > 144) && (Y_Point < 192)) {
+//		Receive_Sequence();
+//		//Tx_Flag=0;
+//		LCD_StringLine(296, 220, "RX");
+//	}
+//
+//	// SSB Mode Selection
+//	if ((X_Point > 88) && (X_Point < 128) && (Y_Point < 20) && (Tx_Flag == 0)) {
+//		Mode = MODE_SSB;
+//		Set_Mode_Display();
+//	}
+//
+//	// CW Mode Selection
+//	if ((X_Point > 144) && (X_Point < 176) && (Y_Point < 20) && (Tx_Flag == 0)) {
+//		Mode = MODE_CW;
+//		Set_Mode_Display();
+//	}
+//
+//	// PSK Mode Selection
+//	if ((X_Point > 188) && (X_Point < 228) && (Y_Point < 20) && (Tx_Flag == 0)) {
+//		Mode = MODE_PSK;
+//		Set_Mode_Display();
+//	}
 
 }
 

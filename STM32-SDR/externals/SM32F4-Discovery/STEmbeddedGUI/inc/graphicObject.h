@@ -157,7 +157,7 @@ GL_PageControls_TypeDef* NewCustomWidget (
 		uint16_t (*pGetWidth)(void),
 		uint16_t (*pGetHeight)(void),
 		void (*pEventHandler)(void),
-		void (*pDrawHandler)(void)
+		void (*pDrawHandler)(_Bool force)
 		);
 
 /* Graphic Page handler *******************************************************/ 
@@ -197,6 +197,7 @@ uint8_t CompareJoyCoordinates(uint16_t u16_XMax, uint16_t u16_XMin,
                               uint16_t u16_YMax, uint16_t u16_YMin);
                               
 void ProcessInputData(void);
+void UpdateScreenWithChanges(void);
 
 /* Delay handler **************************************************************/
 void TimeOutCalculate(void);      

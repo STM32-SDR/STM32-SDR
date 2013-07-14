@@ -19,7 +19,7 @@
 
 // Tap same location repeatedly to quit.
 #define SAME_LOCATION_THRESHOLD  (15)
-#define MAX_SAME_LOCATION_COUNT  (3)
+#define MAX_SAME_LOCATION_COUNT  (2)		// For 3 the same, first one auto-counts.
 static int s_sameLocationCounter = 0;
 
 // Used in this file to refer to the correct screen (helps to keep code copy-paste friendly.
@@ -36,7 +36,7 @@ uint16_t s_lastTouchY = 0;
 static uint16_t showTouches_GetWidth(void);
 static uint16_t showTouches_GetHeight(void);
 static void showTouches_Click(void);
-static void showTouches_Draw(void);
+static void showTouches_Draw(_Bool force);
 
 
 /**
@@ -88,11 +88,15 @@ static void showTouches_Click(void)
 	s_lastTouchY = y;
 
 	// Draw it
-	showTouches_Draw();
+	showTouches_Draw(1);
 }
 
-static void showTouches_Draw(void)
+static void showTouches_Draw(_Bool force)
 {
+	if (!force) {
+		return;
+	}
+
 	// Clear screen
 	GL_Clear(LCD_COLOR_YELLOW);
 
