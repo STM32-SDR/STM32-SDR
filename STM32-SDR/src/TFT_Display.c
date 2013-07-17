@@ -59,7 +59,7 @@ void PutPixel(int16_t x, int16_t y)
 
 
 //February
-void LCD_StringLine(uint16_t PosX, uint16_t PosY, char *str)
+void LCD_StringLine(uint16_t PosX, uint16_t PosY, const char *str)
 {
 	// The +12 is for the font height
 	// (This function designed for providing the Y coord as distance from bottom of screen, relative to bottom of text.
@@ -321,51 +321,4 @@ void Plot_Integer(int16_t number, uint8_t x, uint8_t y)
 	LCD_StringLine(x, y, (char*) &buffer[0]);
 }
 
-
-#define BUFF_SIZE   11
-#define DECIMAL_IDX 6
-void writeNumberToBuffer(uint32_t number, char buffer[])
-{
-	int index = BUFF_SIZE - 2; // -2 = 0 indexed & room for \0.
-	while (number > 0) {
-		buffer[index--] = number % 10 + '0';
-		number /= 10;
-
-		if (index == DECIMAL_IDX)
-			buffer[index--] = '.';
-	}
-}
-
-// Return the number of characters to highlight in the frequency display
-// based on how the frequency number will change as the dial spins.
-int numCharChangingByDial(int changeRate) {
-	int colourChangeIdx = BUFF_SIZE - 2; // -2 = 0 indexed & room for \0.
-	int fUnitCopy = changeRate;
-	while (fUnitCopy > 1) {
-		fUnitCopy /= 10;
-		colourChangeIdx--;
-	}
-	if (colourChangeIdx > DECIMAL_IDX) {
-		colourChangeIdx++;
-	}
-	return colourChangeIdx;
-}
-
-void Plot_Freq(uint32_t number, uint8_t x, uint8_t y, uint32_t changeRate)
-{
-	char buffer[BUFF_SIZE] = "         0";
-	writeNumberToBuffer(number, buffer);
-
-	// Display the whole number (in black):
-	LCD_SetTextColor(LCD_COLOR_BLACK);
-	LCD_StringLine(x, y, buffer);
-
-	// Now display the part of the number changing
-	buffer[numCharChangingByDial(changeRate)] = 0;
-	LCD_SetTextColor(LCD_COLOR_BLUE);
-	LCD_StringLine(x, y, buffer);
-
-	// Reset color to black for next text write.
-	LCD_SetTextColor(LCD_COLOR_BLACK);
-}
 

@@ -13,6 +13,7 @@
 #include "Init_I2C.h"  //Referenced for Delay(n);
 #include "PSKMod.h"
 #include "DMA_IRQ_Handler.h"
+#include "options.h"
 
 void Receive_Sequence(void)
 {
@@ -22,8 +23,8 @@ void Receive_Sequence(void)
 	GPIO_WriteBit(GPIOD, GPIO_Pin_3, Bit_SET);	//Make PTT_Out High, Remember FET Inversion
 	Disconnect_PGA();
 	Connect_IQ_Inputs();
-	Set_DAC_DVC(IQData[0]);  //RxAudio
-	Set_PGA_Gain(IQData[1]);  //RxRF
+	Set_DAC_DVC(Options_GetValue(OPTION_RX_AUDIO));
+	Set_PGA_Gain(Options_GetValue(OPTION_RX_RF));
 	Set_ADC_DVC(0);  //was -20 using Milt's AGC scheme
 	Set_HP_Gain(6);
 }
@@ -37,7 +38,7 @@ void Xmit_SSB_Sequence(void)
 	Set_DAC_DVC(0);
 	Set_ADC_DVC(0);
 	Connect_Microphone_Input();
-	Set_PGA_Gain(IQData[2]);  //(SSB_Level)
+	Set_PGA_Gain(Options_GetValue(OPTION_SSB_LEVEL));
 	GPIO_WriteBit(GPIOD, GPIO_Pin_3, Bit_RESET);  //Make PTT_Out Low,Remember FET Inversion
 	Delay(1000);
 	Set_LO_Gain(24);
@@ -50,11 +51,11 @@ void Xmit_CW_Sequence(void)
 	Mute_LO();
 	Tx_Flag = 1;
 	Disconnect_PGA();
-	Set_DAC_DVC(IQData[3]);  //(CW_Level)
+	Set_DAC_DVC(Options_GetValue(OPTION_CW_LEVEL));
 	GPIO_WriteBit(GPIOD, GPIO_Pin_3, Bit_RESET);  //Make PTT_Out Low,Remember FET Inversion
 	Delay(1000);
 	Set_LO_Gain(20);
-	Set_HP_Gain(IQData[5]);  //ST_Level
+	Set_HP_Gain(Options_GetValue(OPTION_ST_LEVEL));
 }
 
 void Xmit_PSK_Sequence(void)
@@ -63,11 +64,11 @@ void Xmit_PSK_Sequence(void)
 	Mute_LO();
 	Tx_Flag = 1;
 	Disconnect_PGA();
-	Set_DAC_DVC(IQData[4]);  //(PSK_Level)
+	Set_DAC_DVC(Options_GetValue(OPTION_PSK_LEVEL));
 	GPIO_WriteBit(GPIOD, GPIO_Pin_3, Bit_RESET);  //Make PTT_Out Low,Remember FET Inversion
 	Delay(1000);
 	Set_LO_Gain(20);
-	Set_HP_Gain(IQData[5]);  //ST_Level
+	Set_HP_Gain(Options_GetValue(OPTION_ST_LEVEL));
 }
 
 void Init_PTT_IO(void)

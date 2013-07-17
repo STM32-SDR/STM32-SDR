@@ -19,10 +19,10 @@ static CalibrationPoint s_touchedReadings[TS_NUM_CALIBRATION_POINTS];
 /**
  * Call-back prototypes
  */
-static uint16_t calibration_GetWidth(void);
-static uint16_t calibration_GetHeight(void);
-static void calibration_Click(void);
-static void calibration_Draw(_Bool force);
+static uint16_t calibration_GetWidth(GL_PageControls_TypeDef* pThis);
+static uint16_t calibration_GetHeight(GL_PageControls_TypeDef* pThis);
+static void calibration_Click(GL_PageControls_TypeDef* pThis);
+static void calibration_Draw(GL_PageControls_TypeDef* pThis, _Bool force);
 
 
 /**
@@ -32,7 +32,7 @@ void ScreenCalibrate_Create(void)
 {
 	Create_PageObj(s_pThisScreen);
 
-	GL_PageControls_TypeDef* calibrationWidget = NewCustomWidget(1, calibration_GetWidth, calibration_GetHeight, calibration_Click, calibration_Draw);
+	GL_PageControls_TypeDef* calibrationWidget = NewCustomWidget(1, calibration_GetWidth, calibration_GetHeight, calibration_Click, calibration_Draw, 0);
 	AddPageControlObj(0, 0, calibrationWidget, s_pThisScreen);
 }
 
@@ -41,16 +41,16 @@ void ScreenCalibrate_Create(void)
  * UI Callbacks
  */
 // Return max u-int because we want the touchscreen code to find *any* point inside this widget.
-static uint16_t calibration_GetWidth(void)
+static uint16_t calibration_GetWidth(GL_PageControls_TypeDef* pThis)
 {
 	return UINT16_MAX;
 }
-static uint16_t calibration_GetHeight(void)
+static uint16_t calibration_GetHeight(GL_PageControls_TypeDef* pThis)
 {
 	return UINT16_MAX;
 }
 
-static void calibration_Click(void)
+static void calibration_Click(GL_PageControls_TypeDef* pThis)
 {
 	// Done?
 	if (currentTouchPoint >= TS_NUM_CALIBRATION_POINTS) {
@@ -83,10 +83,10 @@ static void calibration_Click(void)
 		return;
 	}
 
-	calibration_Draw(1);
+	calibration_Draw(pThis, 1);
 }
 
-static void calibration_Draw(_Bool force)
+static void calibration_Draw(GL_PageControls_TypeDef* pThis, _Bool force)
 {
 	if (!force) {
 		return;

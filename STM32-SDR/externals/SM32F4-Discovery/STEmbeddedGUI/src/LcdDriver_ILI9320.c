@@ -722,6 +722,7 @@ void LCD_DrawBMP16Bit(int x, int y, int height, int width, const uint16_t* pBitm
 	LCD_ResetDisplayWindow();
 }
 
+
 // Draw a 1-bit bitmap (monochrome) to the screen.
 // Assume each row of bits starts on a new word (i.e., pad last word per row with 0 bits)
 void LCD_DrawBMP1Bit(int x, int y, int height, int width, const uint16_t* pBitmap, _Bool revBitOrder)
@@ -838,6 +839,19 @@ void LCD_DrawRect(uint16_t Xpos, uint16_t Ypos, uint8_t Height, uint16_t Width)
 	LCD_DrawLine(Xpos + Width - 1, Ypos, Height, LCD_WriteRAMDir_Down);
 }
 
+void LCD_DrawFilledRect(int x, int y, int height, int width)
+{
+	int numPixels = width * height;
+
+	LCD_SetDisplayWindow(x, y, height, width);
+	LCD_WriteRAM_PrepareDir(LCD_WriteRAMDir_Right);
+
+	// Push pixels to the screen
+	for (int wordNum = 0; wordNum < numPixels; wordNum++) {
+		LCD_WriteRAM(LCD_textColor);
+	}
+	LCD_ResetDisplayWindow();
+}
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////

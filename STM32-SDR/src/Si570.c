@@ -15,7 +15,6 @@ unsigned const char N1_VALUE_char[2] = { 2, 1 };
 unsigned long RFREQ_INT, RFREQ_FRAC;
 float HS_DIV, N1;
 double RFREQ, Old_RFREQ, FXTAL;
-long FOUT;  //, delta_freq;
 double F0;
 
 
@@ -23,10 +22,8 @@ double F0;
 void Si570_StartUp(void)
 {
 	F0 = 56320000.0;
-	FOUT = 14070000 * 4;
-	FOUT = 14058000 * 4;
 	Compute_FXTAL();
-	Output_Frequency(FOUT);
+	Output_Frequency(14058000 * 4);
 }
 
 void Output_Frequency(long Freq_Out)

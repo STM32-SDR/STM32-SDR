@@ -388,10 +388,11 @@ struct GL_CustomObj
 {
   uint16_t          ID;
   GL_bool           Control_Visible;
-  uint16_t          (*GetWidth)(void);
-  uint16_t          (*GetHeight)(void);
-  void              (*EventHandler)(void);
-  void              (*DrawHandler)(_Bool force);
+  uint16_t          (*GetWidth)(GL_PageControls_TypeDef* obj);
+  uint16_t          (*GetHeight)(GL_PageControls_TypeDef* obj);
+  void              (*EventHandler)(GL_PageControls_TypeDef* obj);
+  void              (*DrawHandler)(GL_PageControls_TypeDef* obj, _Bool force);
+  void              *pInstanceData;
 };
 
 /** 

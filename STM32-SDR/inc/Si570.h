@@ -32,8 +32,8 @@ unsigned const char HS_DIV_VALUE_char[6];
 unsigned long RFREQ_INT, RFREQ_FRAC;
 float HS_DIV, N1;
 double RFREQ, Old_RFREQ, FXTAL;
-long FOUT;  //, delta_freq;
-double F0;
+extern long FOUT;  //, delta_freq;
+extern double F0;
 unsigned char SI570_Chk;
 //===================================================================
 

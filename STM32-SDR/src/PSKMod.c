@@ -178,7 +178,6 @@ _Bool PSK_addCharToTx(char newChar)
 
 _Bool PSK_isQueueFull(void)
 {
-
 	//int nextHead = (m_pHead + 1) % PSK_TX_BUFFER_SIZE;
 	return 38 == m_pTail;//if  38 == m_pTail then return 1 else return 0
 }

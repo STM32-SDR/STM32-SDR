@@ -97,6 +97,8 @@ void LCD_SetBackColor(__IO uint16_t Color);
 void LCD_Clear(uint16_t Color);
 void LCD_DrawLine(uint16_t Xpos, uint16_t Ypos, uint16_t Length, uint8_t Direction);
 void LCD_DrawRect(uint16_t Xpos, uint16_t Ypos, uint8_t Height, uint16_t Width);
+void LCD_DrawFilledRect(int x, int y, int height, int width);
+
 //void LCD_DrawSquare(uint16_t Xpos, uint16_t Ypos, uint16_t a);
 //void LCD_DrawCircle(uint16_t Xpos, uint16_t Ypos, uint16_t Radius);
 //

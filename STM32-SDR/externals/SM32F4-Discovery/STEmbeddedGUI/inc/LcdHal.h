@@ -136,6 +136,7 @@ void GL_Clear(uint16_t Color);
 void GL_SetDisplayWindow(uint16_t Xpos, uint16_t Ypos, uint16_t Height, uint16_t Width);
 void GL_DrawLine(uint16_t Xpos, uint16_t Ypos, uint16_t Length, uint8_t Direction);
 void GL_LCD_DrawRect(uint8_t Xpos, uint16_t Ypos, uint8_t Height, uint16_t Width);
+void GL_LCD_DrawFilledRect(uint8_t Xpos, uint16_t Ypos, uint8_t Height, uint16_t Width);
 void GL_LCD_DrawCircle(uint8_t Xpos, uint16_t Ypos, uint16_t Radius);
 //void GL_DrawBMP(uint8_t* ptrBitmap);
 void GL_BackLightSwitch(uint8_t u8_State);

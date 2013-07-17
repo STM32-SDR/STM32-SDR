@@ -896,10 +896,11 @@ GL_PageControls_TypeDef* NewGraphChart(uint16_t ID, const char* labelX, const ch
  */
 GL_PageControls_TypeDef* NewCustomWidget (
 		uint16_t ID,
-		uint16_t (*pGetWidth)(void),
-		uint16_t (*pGetHeight)(void),
-		void (*pEventHandler)(void),
-		void (*pDrawHandler)(_Bool force)
+		uint16_t (*pGetWidth)(GL_PageControls_TypeDef* pThis),
+		uint16_t (*pGetHeight)(GL_PageControls_TypeDef* pThis),
+		void (*pEventHandler)(GL_PageControls_TypeDef* pThis),
+		void (*pDrawHandler)(GL_PageControls_TypeDef* pThis, _Bool force),
+		void *pInstanceData
 		)
 {
 	GL_PageControls_TypeDef *pPageControlObj = NULL;
@@ -914,6 +915,7 @@ GL_PageControls_TypeDef* NewCustomWidget (
 		pControlObj->GetHeight = pGetHeight;
 		pControlObj->EventHandler = pEventHandler;
 		pControlObj->DrawHandler = pDrawHandler;
+		pControlObj->pInstanceData = pInstanceData;
 
 		pPageControlObj = (GL_PageControls_TypeDef*) malloc(sizeof(GL_PageControls_TypeDef));
 		if (pPageControlObj) {
@@ -941,7 +943,7 @@ static GL_ErrStatus SetCustomVisible(GL_PageControls_TypeDef* pTmp, GL_Coordinat
 	}
 	pThis->Control_Visible = GL_TRUE;
 	if (pTmp->objType == GL_CUSTOM) {
-		pThis->DrawHandler(1);
+		pThis->DrawHandler(pTmp, 1);
 	}
 
 	return GL_OK;
@@ -1113,9 +1115,9 @@ GL_ErrStatus AddPageControlObj(uint16_t PosX, uint16_t PosY, GL_PageControls_Typ
 		objPTR->SetObjVisible = SetCustomVisible;
 		objPTR->ID = pTmp->ID;
 		objCoordinates.MinX = PosX;
-		objCoordinates.MaxX = PosX + pTmp->GetWidth()-1;
+		objCoordinates.MaxX = PosX + pTmp->GetWidth(objPTR)-1;
 		objCoordinates.MinY = PosY;
-		objCoordinates.MaxY = PosY + pTmp->GetHeight()-1;
+		objCoordinates.MaxY = PosY + pTmp->GetHeight(objPTR)-1;
 		break;
 	}
 
@@ -3583,16 +3585,9 @@ void ProcessInputData(void)
 					for (uint16_t controlIdx = 0; controlIdx < pPage->ControlCount; controlIdx++) {
 						GL_PageControls_TypeDef *pControl = pPage->PageControls[controlIdx];
 
-						GL_Coordinate_TypeDef controlRegion = pControl->objCoordinates;
-						// TODO: remove when touch known to work with new code.
-//						GL_ObjDimensions_TypeDef tmpSize = GetObjSize(pControl);
-//						if (CompareCoordinates(tmpCoord.MaxX, tmpCoord.MaxX - tmpSize.Length + 1, tmpCoord.MaxY,
-//								tmpCoord.MaxY - tmpSize.Height)) {
-						if (isTouchInsideRegion(touchX, touchY, controlRegion)) {
-
+						if (isTouchInsideRegion(touchX, touchY, pControl->objCoordinates)) {
 							CallPreEvents(pControl);
 							CallEvent(pControl);
-
 							break;
 						}
 					}
@@ -3605,7 +3600,7 @@ void ProcessInputData(void)
 			}
 		}
 		TS_ClearTouchEvent();
-		// TODO: Why delay after servicing touch event? Debounce?
+		// TODO: Make the touch-screen debounce smarter than delaying the processing.
 		GL_Delay(15);
 	}
 }
@@ -3703,7 +3698,7 @@ static void CallEvent(GL_PageControls_TypeDef* pControl)
 
 	case GL_CUSTOM:
 		pTmp = (GL_Custom_TypeDef*) (pControl->objPTR);
-		((GL_Custom_TypeDef*) pTmp)->EventHandler();
+		((GL_Custom_TypeDef*) pTmp)->EventHandler(pControl);
 		break;
 
 	default:
@@ -3722,7 +3717,7 @@ static void CallRedrawPageControlOpportunity(GL_PageControls_TypeDef* pControl)
 	switch (pControl->objType) {
 	case GL_CUSTOM:
 		pTmp = (GL_Custom_TypeDef*) (pControl->objPTR);
-		((GL_Custom_TypeDef*) pTmp)->DrawHandler(0);
+		((GL_Custom_TypeDef*) pTmp)->DrawHandler(pControl, 0);
 		break;
 
 	default:

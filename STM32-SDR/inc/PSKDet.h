@@ -47,7 +47,7 @@
 
 #include	"arm_math.h"
 
-unsigned char LCD_buffer[40];
+extern unsigned char LCD_buffer[40];
 
 //Stuff Imported From NUE_PSK_Header.h
 typedef struct

@@ -33,10 +33,10 @@ uint16_t s_lastTouchY = 0;
 /**
  * Call-back prototypes
  */
-static uint16_t showTouches_GetWidth(void);
-static uint16_t showTouches_GetHeight(void);
-static void showTouches_Click(void);
-static void showTouches_Draw(_Bool force);
+static uint16_t showTouches_GetWidth(GL_PageControls_TypeDef* pThis);
+static uint16_t showTouches_GetHeight(GL_PageControls_TypeDef* pThis);
+static void showTouches_Click(GL_PageControls_TypeDef* pThis);
+static void showTouches_Draw(GL_PageControls_TypeDef* pThis, _Bool force);
 
 
 /**
@@ -46,7 +46,7 @@ void ScreenCalibrationTest_Create(void)
 {
 	Create_PageObj(s_pThisScreen);
 
-	GL_PageControls_TypeDef* displayWidget = NewCustomWidget(1, showTouches_GetWidth, showTouches_GetHeight, showTouches_Click, showTouches_Draw);
+	GL_PageControls_TypeDef* displayWidget = NewCustomWidget(1, showTouches_GetWidth, showTouches_GetHeight, showTouches_Click, showTouches_Draw, 0);
 	AddPageControlObj(0, 0, displayWidget, s_pThisScreen);
 }
 
@@ -55,16 +55,16 @@ void ScreenCalibrationTest_Create(void)
  * UI Callbacks
  */
 // Return max u-int because we want the touchscreen code to find *any* point inside this widget.
-static uint16_t showTouches_GetWidth(void)
+static uint16_t showTouches_GetWidth(GL_PageControls_TypeDef* pThis)
 {
 	return UINT16_MAX;
 }
-static uint16_t showTouches_GetHeight(void)
+static uint16_t showTouches_GetHeight(GL_PageControls_TypeDef* pThis)
 {
 	return UINT16_MAX;
 }
 
-static void showTouches_Click(void)
+static void showTouches_Click(GL_PageControls_TypeDef* pThis)
 {
 	// Get calibrated touched location
 	uint16_t x, y;
@@ -75,6 +75,8 @@ static void showTouches_Click(void)
 	if ((abs(s_lastTouchX - x) < SAME_LOCATION_THRESHOLD)
 		&& (abs(s_lastTouchY - y) < SAME_LOCATION_THRESHOLD)) {
 		s_sameLocationCounter++;
+	} else {
+		s_sameLocationCounter = 0;
 	}
 	if (s_sameLocationCounter >= MAX_SAME_LOCATION_COUNT) {
 		s_sameLocationCounter = 0;
@@ -88,10 +90,10 @@ static void showTouches_Click(void)
 	s_lastTouchY = y;
 
 	// Draw it
-	showTouches_Draw(1);
+	showTouches_Draw(pThis, 1);
 }
 
-static void showTouches_Draw(_Bool force)
+static void showTouches_Draw(GL_PageControls_TypeDef* pThis, _Bool force)
 {
 	if (!force) {
 		return;

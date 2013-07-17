@@ -15,7 +15,4 @@ uint32_t Write_Long_EEProm(uint16_t EEProm_Addr, uint32_t value);
 uint32_t Read_Long_EEProm(uint16_t EEProm_Addr);
 
 void Store_SI570_Data(void);
-void Read_SI570_Data(void);
-
-void Store_IQ_Data(void);
-void Read_IQ_Data(void);
+//void Read_SI570_Data(void);

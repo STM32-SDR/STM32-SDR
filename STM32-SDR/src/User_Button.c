@@ -96,15 +96,8 @@ void EXTI0_IRQHandler(void)
 		else
 			PB_State--;
 
-		//if (PB_State ==1)
-		//LCD_StringLine(150,0,"PB_State On");
-		//else
-		//LCD_StringLine(150,0,"PB_State Off");
-
 		EXTI_ClearITPendingBit(EXTI_Line0 );
-
 	}
-
 }
 
 //===============================================================================
@@ -116,6 +109,7 @@ void EXTI0_IRQHandler(void)
 static uint32_t s_delayEventsTriggered = 0;
 
 // Called from main.
+// TODO: Remove delayed processing here once all functionality present on UI's.
 void DelayEvent_ProcessDelayedEvents(void)
 {
 	// Handle the marked event.

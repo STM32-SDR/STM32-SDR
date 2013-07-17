@@ -81,30 +81,17 @@ uint32_t Read_Long_EEProm(uint16_t EEProm_Addr)
 	return result;
 }
 
-void Store_SI570_Data(void)
-{
-	int i;
-	for (i = 0; i < 16; i++)
-		Write_Long_EEProm(100 + i * 4, Freq_Set[i]);
-}
+//void Store_SI570_Data(void)
+//{
+//	int i;
+//	for (i = 0; i < 16; i++)
+//		Write_Long_EEProm(100 + i * 4, Freq_Set[i]);
+//}
 
-void Read_SI570_Data(void)
-{
-	int i;
-	for (i = 0; i < 16; i++)
-		Freq_Set[i] = Read_Long_EEProm(100 + i * 4);
-}
-
-void Store_IQ_Data(void)
-{
-	int i;
-	for (i = 0; i < 16; i++)
-		Write_Int_EEProm(200 + i * 2, IQData[i]);
-}
-
-void Read_IQ_Data(void)
-{
-	int i;
-	for (i = 0; i < 16; i++)
-		IQData[i] = Read_Int_EEProm(200 + i * 2);
-}
+//void Read_SI570_Data(void)
+//{
+//	int i;
+//	for (i = 0; i < 16; i++)
+//		Freq_Set[i] = Read_Long_EEProm(100 + i * 4);
+//}
+//

@@ -27,6 +27,9 @@
 #include	"TSHal.h"
 
 #include	"screen_all.h"
+#include	"options.h"
+#include	"FrequencyManager.h"
+
 
 const uint32_t CODEC_FREQUENCY = 8000;
 
@@ -68,19 +71,17 @@ int main(void)
 		 * Selector Switches
 		 */
 		// Process selector switch 1 (has it moved?)
-		check_SS1();
-		if (read_SS1 != old_SS1_position) {
+		if (Encoder1_GetPosition() != old_SS1_position) {
 			process_SS1();
-			old_SS1_position = read_SS1;
+			old_SS1_position = Encoder1_GetPosition();
 		}
 		if (SI570_Chk != 3)
 			process_encoder1();
 
 		// Process selector switch 2 (has it moved?)
 		check_SS2();
-		if (read_SS2 != old_SS2_position) {
-			display_SS2();
-			old_SS2_position = read_SS2;
+		if (Options_GetSelectedOption() != old_SS2_position) {
+			old_SS2_position = Options_GetSelectedOption();
 		}
 		process_encoder2();
 
@@ -98,7 +99,6 @@ int main(void)
 		/*
 		 * Touch Events
 		 */
-		Old_HandleTouchEvent();
 		ProcessInputData();
 
 		/*
@@ -138,9 +138,6 @@ static void initializeHardware(void)
 	User_Button_Config();
 	main_delay(SETUP_DELAY);
 
-	//BT_Flag_Config();
-	//main_delay(SETUP_DELAY);
-
 	ResetModem(BPSK_MODE);
 	main_delay(SETUP_DELAY);
 
@@ -160,8 +157,8 @@ static void initializeHardware(void)
 	Encoder1_GPIO_Config();
 	main_delay(SETUP_DELAY);
 
-	check_SS1();
-	old_SS1_position = read_SS1;
+	FrequencyManager_Initialize();
+	old_SS1_position = Encoder1_GetPosition();
 	main_delay(SETUP_DELAY);
 
 	init_encoder1();
@@ -171,10 +168,13 @@ static void initializeHardware(void)
 	main_delay(SETUP_DELAY);
 
 	check_SS2();
-	old_SS2_position = read_SS2;
+	old_SS2_position = Options_GetSelectedOption();
 	main_delay(SETUP_DELAY);
 
 	init_encoder2();
+	main_delay(SETUP_DELAY);
+
+	Options_Initialize();
 	main_delay(SETUP_DELAY);
 
 	Init_PTT_IO();

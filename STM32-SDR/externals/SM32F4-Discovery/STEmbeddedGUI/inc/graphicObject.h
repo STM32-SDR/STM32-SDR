@@ -154,10 +154,11 @@ GL_ErrStatus SetComboOptionLabel(GL_Page_TypeDef* pPage, uint16_t ID, const char
 /* Custom Widget **************************************************************/
 GL_PageControls_TypeDef* NewCustomWidget (
 		uint16_t ID,
-		uint16_t (*pGetWidth)(void),
-		uint16_t (*pGetHeight)(void),
-		void (*pEventHandler)(void),
-		void (*pDrawHandler)(_Bool force)
+		uint16_t (*pGetWidth)(GL_PageControls_TypeDef* pThis),
+		uint16_t (*pGetHeight)(GL_PageControls_TypeDef* pThis),
+		void (*pEventHandler)(GL_PageControls_TypeDef* pThis),
+		void (*pDrawHandler)(GL_PageControls_TypeDef* pThis, _Bool force),
+		void *pInstanceData
 		);
 
 /* Graphic Page handler *******************************************************/ 
@@ -190,12 +191,6 @@ GL_ErrStatus RefreshPageControl( GL_Page_TypeDef* pPage, uint16_t ID);
 void NullFunc(void);
 
 /* Input handler **************************************************************/
-uint8_t CompareCoordinates(uint16_t u16_XMax, uint16_t u16_XMin,
-                           uint16_t u16_YMax, uint16_t u16_YMin);
-                           
-uint8_t CompareJoyCoordinates(uint16_t u16_XMax, uint16_t u16_XMin,
-                              uint16_t u16_YMax, uint16_t u16_YMin);
-                              
 void ProcessInputData(void);
 void UpdateScreenWithChanges(void);
 

@@ -167,6 +167,10 @@ void GL_LCD_DrawRect(uint8_t Xpos, uint16_t Ypos, uint8_t Height, uint16_t Width
 {
 	LCD_DrawRect(Xpos, Ypos, Height, Width);
 }
+void GL_LCD_DrawFilledRect(uint8_t Xpos, uint16_t Ypos, uint8_t Height, uint16_t Width)
+{
+	LCD_DrawFilledRect(Xpos, Ypos, Height, Width);
+}
 
 /**
  * @brief  Displays a circle.
