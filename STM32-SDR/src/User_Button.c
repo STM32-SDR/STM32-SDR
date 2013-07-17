@@ -119,9 +119,9 @@ void DelayEvent_ProcessDelayedEvents(void)
 	if (s_delayEventsTriggered & DelayEvent_DisplayStoreFreq) {
 		LCD_StringLine(234, 40, "Store Freq");
 	}
-	if (s_delayEventsTriggered & DelayEvent_DisplayPSKXMitBuffer) {
-		LCD_StringLine(0, 90, (char*) &XmitBuffer[0]);
-	}
+//	if (s_delayEventsTriggered & DelayEvent_DisplayPSKXMitBuffer) {
+//		LCD_StringLine(0, 90, (char*) &XmitBuffer[0]);
+//	}
 
 	// Clear all the marked events.
 	s_delayEventsTriggered = 0;

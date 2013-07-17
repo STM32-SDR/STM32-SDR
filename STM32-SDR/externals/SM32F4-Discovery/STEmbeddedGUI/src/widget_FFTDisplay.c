@@ -194,7 +194,6 @@ static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 	if (oldSelectedFreq != NCO_Frequency) {
 		oldSelectedFreq = NCO_Frequency;
 
-
 		int textY = y + FFT_HEIGHT + TEXT_OFFSET_BELOW_FFT;
 		int numberX = x + FFT_WIDTH - MAX_FREQ_DIGITS * CHARACTER_WIDTH;
 		int labelX = numberX - CHARACTER_WIDTH * 8;	// 7=# letters in label w/ a space
@@ -210,9 +209,4 @@ static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 		intToCommaString((int)NCO_Frequency, number, MAX_FREQ_DIGITS + 1);
 		GL_PrintString(numberX, textY, number, 0);
 	}
-
-	// Display PSK Text
-	GL_SetTextColor(LCD_COLOR_RED);
-	GL_SetBackColor(LCD_COLOR_GREEN);
-	LCD_StringLine(x + 0, y + 130, (char*) &LCD_buffer[0]);
 }

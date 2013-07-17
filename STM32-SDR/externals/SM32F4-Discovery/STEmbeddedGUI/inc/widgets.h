@@ -39,6 +39,8 @@ GL_PageControls_TypeDef* Widget_NewBigButton(
 );
 
 
+GL_PageControls_TypeDef* Widget_NewPSKTextDisplay(void);
+
 // Big Buttons:
 GL_PageControls_TypeDef* Widget_NewBigButtonMode(void);
 GL_PageControls_TypeDef* Widget_NewBigButtonFrequency(void);

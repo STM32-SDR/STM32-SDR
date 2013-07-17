@@ -167,7 +167,7 @@ _Bool PSK_addCharToTx(char newChar)
 	// Queue the character
 	XmitBuffer[m_pTail++] = newChar;
 	//m_pHead %= PSK_TX_BUFFER_SIZE;
-	LCD_StringLine(0, 90, (char*) &XmitBuffer[0]);
+//	LCD_StringLine(0, 90, (char*) &XmitBuffer[0]);
 
 	// Success
 	return 1;

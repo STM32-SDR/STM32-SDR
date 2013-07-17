@@ -892,6 +892,7 @@ GL_PageControls_TypeDef* NewGraphChart(uint16_t ID, const char* labelX, const ch
  * @param  pGetHeight: Function pointer to function which gets widget's height.
  * @param  pEventHandler: Function pointer to function which handles click events.
  * @param  pDrawHandler: Function pointer to function which draws the widget
+ * @param  pInstanceData: Pointer to any data to be stored for this object.
  * @retval GL_PageControls_TypeDef* - The created Object pointer
  */
 GL_PageControls_TypeDef* NewCustomWidget (

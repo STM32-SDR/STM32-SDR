@@ -40,6 +40,9 @@ void ScreenMain_Create(void)
 	// Mode display text
 	GL_PageControls_TypeDef* lblRxTx = NewLabel(ID_RxTx_LABEL, "Rx",  GL_HORIZONTAL, GL_FONTOPTION_8x16, LCD_COLOR_BLUE);
 
+	// PSK:
+	GL_PageControls_TypeDef* ctrlPskText = Widget_NewPSKTextDisplay();
+
 	// Mode Buttons
 	GL_PageControls_TypeDef* btnMode_SSB = NewButton(5, "SSB", modeSSB_Click);
 	GL_PageControls_TypeDef* btnMode_CW  = NewButton(6, " CW", modeCW_Click);
@@ -68,18 +71,19 @@ void ScreenMain_Create(void)
 
 	// FFT
 	Widget_AddToPage_NewFFTDisplay(80, 0, s_pThisScreen);
+	AddPageControlObj(0,  80, ctrlPskText, s_pThisScreen);
 
 	// Buttons
 	AddPageControlObj(100,  LCD_HEIGHT - 35, btnMode_SSB, s_pThisScreen);
 	AddPageControlObj(140,  LCD_HEIGHT - 35, btnMode_CW, s_pThisScreen);
 	AddPageControlObj(180,  LCD_HEIGHT - 35, btnMode_PSK, s_pThisScreen);
 
-	AddPageControlObj(0,   150, btnCalibrate, s_pThisScreen);
-	AddPageControlObj(65,  150, btnDefaults, s_pThisScreen);
-	AddPageControlObj(145, 150, btnLSB, s_pThisScreen);
-	AddPageControlObj(180, 150, btnUSB, s_pThisScreen);
-	AddPageControlObj(225, 150, btnRx, s_pThisScreen);
-	AddPageControlObj(270, 150, btnTx, s_pThisScreen);
+	AddPageControlObj(0,   160, btnCalibrate, s_pThisScreen);
+	AddPageControlObj(65,  160, btnDefaults, s_pThisScreen);
+	AddPageControlObj(145, 160, btnLSB, s_pThisScreen);
+	AddPageControlObj(180, 160, btnUSB, s_pThisScreen);
+	AddPageControlObj(225, 160, btnRx, s_pThisScreen);
+	AddPageControlObj(270, 160, btnTx, s_pThisScreen);
 
 	AddPageControlObj(0, 0, btnMode, s_pThisScreen);
 
