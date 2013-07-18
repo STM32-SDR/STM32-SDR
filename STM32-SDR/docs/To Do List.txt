@@ -2,19 +2,20 @@
 
 
 Brian's To Do List
-- --DONE-- Basic component for Options (existing interface)
-- --DONE-- Basic component for frequencies (existing interface)
-- Basic component for PSK display (existing interface)
+- Code:
+	- Remove User_Button?
+	- Remove touch_pad.h/.c?
+	- Move GUI code?
+
+- UI Look:
+	- Larger frequency display
+	- Regenerate buttons to have black background.
 - Handle pressing-in knobs: Save current? Reset to default? Change how much is selected (right knob)?
-* Black background
-- Change options button to use BigButton template.
 
 - Create GUI screen for existing components.
 	- Mode button; upper left
 	- Options menu: Have daily params on first screen, calibration on second layer screen
-	- Make a change mode button.
 - Change Makefile to allow easier compilation of multiple directories
-- Store calibration constants in EEPROM; validate on read.
 - Re-engineer I2C access into: high level access {EEPROM, ..., ...}, low level {I2C commands}
 - Check-in coding standard
 - Hardware calibration and self-test feature/screen

@@ -144,6 +144,6 @@ static void displayFrequency(uint32_t number, uint8_t x, uint8_t y, uint32_t cha
 
 	// Now display the part of the number changing
 	buffer[numCharChangingByDial(changeRate)] = 0;
-	LCD_SetTextColor(LCD_COLOR_BLUE);
+	LCD_SetTextColor(LCD_COLOR_YELLOW);
 	GL_PrintString(x, y, buffer, 0);
 }

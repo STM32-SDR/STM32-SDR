@@ -11,7 +11,14 @@
 // Colours:
 
 // Offsets for text:
-#define TEXT_LINE_HEIGHT    (16)
+#define FONT_TITLE GL_FONTOPTION_8x16
+#define FONT_DATA  GL_FONTOPTION_8x16
+#define TEXT_LINE_HEIGHT    (17)
+
+#define TITLE_COLOUR     LCD_COLOR_YELLOW
+#define TITLE_BACKGROUND LCD_COLOR_BLACK
+#define DATA_COLOUR      LCD_COLOR_BLACK
+#define DATA_BACKGROUND  LCD_COLOR_DGRAY
 
 #define OFFSETX_TITLE    0
 #define OFFSETX_ONAIR    0
@@ -87,36 +94,30 @@ static void drawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 	// Display title:
 	if (redrawTitle) {
 		// Title
-		GL_SetFont(GL_FONTOPTION_8x12Bold);
-		GL_SetTextColor(LCD_COLOR_YELLOW);
-		GL_SetBackColor(LCD_COLOR_BLACK);
+		GL_SetFont(FONT_TITLE);
+		GL_SetTextColor(TITLE_COLOUR);
+		GL_SetBackColor(TITLE_BACKGROUND);
 		GL_PrintString(x + OFFSETX_TITLE, y + OFFSETY_TITLE, "Rx/Tx/Keyboard PSK Data:", 0);
 	}
 
 	// Display the on-air buffer
 	// (Was previously displayed in main())
+	GL_SetFont(FONT_DATA);
+	GL_SetTextColor(DATA_COLOUR);
+	GL_SetBackColor(DATA_BACKGROUND);
 	if (redrawOnAirBuffer) {
-		GL_SetFont(GL_FONTOPTION_8x12Bold);
-		GL_SetTextColor(LCD_COLOR_BLACK);
-		GL_SetBackColor(LCD_COLOR_GREEN);
 		GL_PrintString(x + OFFSETX_ONAIR, y + OFFSETY_ONAIR, (char*) LCD_buffer, 0);
 		lastOnAirHash = curOnAirHash;
 	}
 
 	// Display the Queue
 	if (redrawTxBuffer) {
-		GL_SetFont(GL_FONTOPTION_8x12Bold);
-		GL_SetTextColor(LCD_COLOR_BLACK);
-		GL_SetBackColor(LCD_COLOR_YELLOW);
 		GL_PrintString(x + OFFSETX_TX, y + OFFSETY_TX, XmitBuffer, 0);
 		lastTxHash = curTxHash;
 	}
 
 	// Display the keyboard buffer
 	if (redrawKeyboardBuffer) {
-		GL_SetFont(GL_FONTOPTION_8x12Bold);
-		GL_SetTextColor(LCD_COLOR_BLACK);
-		GL_SetBackColor(LCD_COLOR_RED);
 		GL_PrintString(x + OFFSETX_KEYBOARD, y + OFFSETY_KEYBOARD, (char*) kybd_string, 0);
 		lastKeyboardHash = curKeyboardHash;
 	}

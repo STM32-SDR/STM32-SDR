@@ -23,7 +23,6 @@ typedef enum {
 	// Values must be unique single bits (1, 2, 4, 8, ...)
 	DelayEvent_DisplayStoreIQ = 0x01,
 	DelayEvent_DisplayStoreFreq = 0x02,
-	DelayEvent_DisplayPSKXMitBuffer = 0x04,
 } DelayEvent_Event;
 
 // Handle (and clear) the triggered events.

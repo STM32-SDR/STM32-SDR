@@ -9,7 +9,7 @@
 #include	"PSKMod.h"
 
 
-#define KBD_BUFF_LEN 40
+#define KBD_BUFF_LEN 41 // 40 characters on the screen, +1 for null.
 
 volatile char kybd_string[KBD_BUFF_LEN]; // this will hold the keyboard string
 void kybd_addCharacter(char Char);
@@ -36,42 +36,27 @@ void kybd_addCharacter(char Char)
 		kybd_string[KBD_BUFF_LEN - 3] = Char;
 	}
 
-	// Displayed in widget_PSKText.c
-//	LCD_StringLine(0, 110, (char*) &kybd_string[0]);
-
 	// Add character for PSK transmission:
 	PSK_addCharToTx(Char);
 }
 
 void kybd_dispFunctionKey(uint8_t data)
 {
-
-//	Plot_Integer((int16_t) data, 0, 60);
-
-	switch(data) {
-
-	case 0: if(PSK_isQueueEmpty()) String2Buffer(" CQ CQ CQ de W5BAA W5BAA ");
-	break;
-
-	case 1: if(PSK_isQueueEmpty()) String2Buffer("  de W5BAA ");
-	break;
-
-	case 2: if(PSK_isQueueEmpty()) String2Buffer(" tnx for  call, handle is Charley ");
-	break;
-
-	case 3: if(PSK_isQueueEmpty()) String2Buffer("  QTH is Marble Falls,  near Austin ");
-	break;
-
-	case 4: if(PSK_isQueueEmpty()) String2Buffer("  Rig is homebrew PSK xcvr @ 2 watts");
-	break;
-
-	case 5: if(PSK_isQueueEmpty()) String2Buffer(" BTU ");
-	break;
-
-	case 6: if(PSK_isQueueEmpty()) String2Buffer("  de W5BAA k");
-	break;
+	// Ensure queue is empty before adding data:
+	if(!PSK_isQueueEmpty()) {
+		return;
 	}
 
+	// Place data from macro into the buffer:
+	switch(data) {
+	case 0: String2Buffer(" CQ CQ CQ de W5BAA W5BAA "); break;
+	case 1: String2Buffer("  de W5BAA "); break;
+	case 2: String2Buffer(" tnx for  call, handle is Charley "); break;
+	case 3: String2Buffer("  QTH is Marble Falls,  near Austin "); break;
+	case 4: String2Buffer("  Rig is homebrew PSK xcvr @ 2 watts"); break;
+	case 5: String2Buffer(" BTU "); break;
+	case 6: String2Buffer("  de W5BAA k"); break;
+	}
 }
 
 void String2Buffer(char *str) {
@@ -79,9 +64,7 @@ void String2Buffer(char *str) {
 	do {
 		TempChar = *str++;
 		kybd_addCharacter(TempChar);
-
 	} while (*str != 0);
-
  }
 
 

@@ -64,7 +64,11 @@ int main(void)
 	 * Startup the GUI
 	 */
 	Screen_CreateAllScreens();
-	Screen_ShowScreen(&g_screenCalibrate);
+	if (!TS_IsCalibrated()) {
+		Screen_ShowScreen(&g_screenCalibrate);
+	} else {
+		Screen_ShowScreen(&g_screenMain);
+	}
 
 	while (1) {
 		/*
@@ -117,13 +121,13 @@ static void initializeHardware(void)
 	LCD_Init();
 	main_delay(SETUP_DELAY);
 
-	TS_Initialize();
-	main_delay(SETUP_DELAY);
-
 	I2C_GPIO_Init();
 	main_delay(SETUP_DELAY);
 
 	I2C_Cntrl_Init();
+	main_delay(SETUP_DELAY);
+
+	TS_Initialize();
 	main_delay(SETUP_DELAY);
 
 	Codec_AudioInterface_Init(CODEC_FREQUENCY);

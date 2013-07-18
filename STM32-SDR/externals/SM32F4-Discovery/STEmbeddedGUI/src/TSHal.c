@@ -1,6 +1,7 @@
 #include "TSHal.h"
 #include "TSDriver_ADS7843.h"
 #include <assert.h>
+#include "eeprom.h"
 
 // Calibration points:
 #define TOUCHPOINT_TOP           (LCD_HEIGHT / 5)
@@ -34,14 +35,17 @@ static void TS_CalculateCalibration(CalibrationPoint touchedPoints[TS_NUM_CALIBR
 static uint16_t getDisplayCoordinateY(uint16_t x_touch, uint16_t y_touch);
 static uint16_t getDisplayCoordinateX(uint16_t x_touch, uint16_t y_touch);
 
-
-
 /*
  * Initialization
  */
 void TS_Initialize(void)
 {
 	TSDriver_Initialize();
+
+	// Load from EEPROM if valid:
+	if (TS_HaveValidEEPROMData()) {
+		TS_ReadCalibrationFromEEPROM();
+	}
 }
 
 
@@ -96,6 +100,7 @@ void  TS_SetCalibrationData(CalibrationPoint touchedPoints[TS_NUM_CALIBRATION_PO
 {
 	s_isCalibrated = 1;
 	TS_CalculateCalibration(touchedPoints);
+	TS_WriteCalibrationToEEPROM();
 }
 
 
@@ -235,4 +240,56 @@ static uint16_t getDisplayCoordinateY(uint16_t x_touch, uint16_t y_touch)
 		Yd = LCD_HEIGHT - 1;
 	}
 	return Yd;
+}
+
+
+/* ********************************************************
+ *
+ *               EEPROM Functions
+ *
+ * ********************************************************/
+// options start at 200; choose something quite a bit higher.
+#define EEPROM_OFFSET 1000
+#define EEPROM_SENTINEL_LOC (EEPROM_OFFSET - 2) // 2 byte sentinel
+#define EEPROM_SENTINEL_VAL 11413
+
+_Bool TS_HaveValidEEPROMData(void)
+{
+	int16_t sentinel = Read_Int_EEProm(EEPROM_SENTINEL_LOC);
+	return (sentinel == EEPROM_SENTINEL_VAL);
+}
+void TS_ReadCalibrationFromEEPROM(void)
+{
+	uint16_t addr = EEPROM_OFFSET;
+	A2 = Read_Long_EEProm(addr);
+	addr += sizeof(A2);
+	B2 = Read_Long_EEProm(addr);
+	addr += sizeof(A2);
+	C2 = Read_Long_EEProm(addr);
+	addr += sizeof(A2);
+	D2 = Read_Long_EEProm(addr);
+	addr += sizeof(A2);
+	E2 = Read_Long_EEProm(addr);
+	addr += sizeof(A2);
+	F2 = Read_Long_EEProm(addr);
+
+	s_isCalibrated = 1;
+}
+void TS_WriteCalibrationToEEPROM(void)
+{
+	uint16_t addr = EEPROM_OFFSET;
+	Write_Long_EEProm(addr, A2);
+	addr += sizeof(A2);
+	Write_Long_EEProm(addr, B2);
+	addr += sizeof(A2);
+	Write_Long_EEProm(addr, C2);
+	addr += sizeof(A2);
+	Write_Long_EEProm(addr, D2);
+	addr += sizeof(A2);
+	Write_Long_EEProm(addr, E2);
+	addr += sizeof(A2);
+	Write_Long_EEProm(addr, F2);
+
+	// Add Sentinel
+	Write_Int_EEProm(EEPROM_SENTINEL_LOC, EEPROM_SENTINEL_VAL);
 }

@@ -37,9 +37,6 @@ void ScreenMain_Create(void)
 	/*
 	 * Create the UI widgets
 	 */
-	// Mode display text
-	GL_PageControls_TypeDef* lblRxTx = NewLabel(ID_RxTx_LABEL, "Rx",  GL_HORIZONTAL, GL_FONTOPTION_8x16, LCD_COLOR_BLUE);
-
 	// PSK:
 	GL_PageControls_TypeDef* ctrlPskText = Widget_NewPSKTextDisplay();
 
@@ -59,6 +56,7 @@ void ScreenMain_Create(void)
 
 
 	GL_PageControls_TypeDef* btnMode = Widget_NewBigButtonMode();
+	GL_PageControls_TypeDef* btnOptions = Widget_NewBigButtonOptions();
 	GL_PageControls_TypeDef* btnFreq = Widget_NewBigButtonFrequency();
 
 
@@ -66,9 +64,6 @@ void ScreenMain_Create(void)
 	/*
 	 * Place the widgets onto the screen
 	 */
-	// Mode labels
-	AddPageControlObj(0,    50, lblRxTx, s_pThisScreen);
-
 	// FFT
 	Widget_AddToPage_NewFFTDisplay(80, 0, s_pThisScreen);
 	AddPageControlObj(0,  80, ctrlPskText, s_pThisScreen);
@@ -89,7 +84,7 @@ void ScreenMain_Create(void)
 
 
 	// Options
-	Widget_AddToPage_NewOptionsDisplay(0, LCD_HEIGHT - 42, s_pThisScreen);
+	AddPageControlObj(0, LCD_HEIGHT - 42, btnOptions, s_pThisScreen);
 	AddPageControlObj(
 			LCD_WIDTH - ((GL_Custom_TypeDef*)(btnFreq->objPTR))->GetWidth(btnFreq),
 			LCD_HEIGHT - ((GL_Custom_TypeDef*)(btnFreq->objPTR))->GetHeight(btnFreq),
@@ -128,14 +123,10 @@ static void tx_Click(void)
 		Xmit_PSK_Sequence();
 		break;
 	}  // End of switch
-
-	Set_Label(s_pThisScreen, ID_RxTx_LABEL, "TX");
 }
 static void rx_Click(void)
 {
 	Receive_Sequence();
-	//Tx_Flag=0;
-	Set_Label(s_pThisScreen, ID_RxTx_LABEL, "RX");
 }
 
 #include "DMA_IRQ_Handler.h"

@@ -42,3 +42,10 @@ _Bool TS_IsCalibrated(void);
 void  TS_GetUncalibratedTouchEvent(uint16_t *pX, uint16_t *pY);
 void  TS_GetCalibrationTarget(int pointNumber, uint16_t *pXTarg, uint16_t *pYTarg);
 void  TS_SetCalibrationData(CalibrationPoint touchedPoints[TS_NUM_CALIBRATION_POINTS]);
+
+/*
+ * EEPROM Functions
+ */
+_Bool TS_HaveValidEEPROMData(void);
+void TS_ReadCalibrationFromEEPROM(void);
+void TS_WriteCalibrationToEEPROM(void);

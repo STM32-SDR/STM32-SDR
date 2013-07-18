@@ -1,3 +1,5 @@
+#ifndef _WIDGETS_H_
+#define _WIDGETS_H_
 /*
  * Interface to creating widgets
  */
@@ -9,7 +11,6 @@
 // Display the FFT onscreen and allow user to click to select a frequency.
 void Widget_AddToPage_NewFFTDisplay(uint16_t x, uint16_t y, GL_Page_TypeDef *pPage);
 
-void Widget_AddToPage_NewOptionsDisplay(uint16_t x, uint16_t y, GL_Page_TypeDef *pPage);
 
 
 /*
@@ -44,7 +45,9 @@ GL_PageControls_TypeDef* Widget_NewPSKTextDisplay(void);
 // Big Buttons:
 GL_PageControls_TypeDef* Widget_NewBigButtonMode(void);
 GL_PageControls_TypeDef* Widget_NewBigButtonFrequency(void);
+GL_PageControls_TypeDef* Widget_NewBigButtonOptions(void);
 
 // Write a signed integer to a right-justified string.
 void intToCommaString(int16_t number, char *pDest, int numChar);
 
+#endif
