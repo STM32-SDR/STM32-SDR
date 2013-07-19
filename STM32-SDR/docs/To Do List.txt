@@ -1,33 +1,38 @@
-
-
-
 Brian's To Do List
-- EEPROM not written after every change
-	- Put on Options screen, and left-push-button (give LCD feedback? How?)
-	
-- Create GUI screen for existing components.
-	- Options menu: Have daily params on first screen, calibration on second layer screen?
-		- Move "reset to defaults" to a sub-screen (vs main screen).
-		- Remove code for left 16-position selcetor switch (leave commented out because others may want it back).
-
-- Frequency band selection screen 
-	- w/ reset to defaults for each band
-	- Remove code for right 16-position selector switch
-	- Move last two "frequency" bands to the options.
+- Mode selection:
+	- Change to be CW [CW, LSB], CWR [CW, USB], PSK [PSK, USB], LSB [SSB, LSB], USB [SSB, USB]
+	- Display on main screen shows only the mode (side band implicit in the mode)
+	- Mode selection screen shows buttons for only the modes, not side bands.
+	- Mode selection screen automatically finishes when selecting a mode (no done button)
 
 - Code:
 	- Change Makefile to allow easier compilation of multiple directories
+	- Remove the code for the 16-position encoder.
 	- Move GUI code?
 	- Remove User_Button?
 	- Remove touch_pad.h/.c?
+	- Remove TFT_Display.h/c.?
+	
+- USB debubing
+	- Indictation that USB keyboard attached
+	- USB working with new board
 
+- Frequency band selection screen 
+	- Remove code for right 16-position selector switch
+	- Move last two "frequency" bands to the options.
+	- w/ reset to defaults for each band
 
-
-- Indictation that USB keyboard attached
+- Allow operation without SI570
+	- I2C to EEPROM should still work & device run at full speed after detecting no SI570.
+	- Display error messages on screen.
 
 - UI Look:
 	- Larger frequency display
 	- Regenerate buttons to have black background.
+	- For each option, store a "dirty" bit which indicates it's not yet written to EEPROM after a change.
+	  Make the UI display dirty values differently than "clean" (different colour?)
+	- Display feedback when user pressed a "save to EEPROM" button or the like.
+	- Pressing left/right button displays message that stays on screen; Change functionality or display method.
 
 - Handle pressing-in knobs: Save current? Reset to default? Change how much is selected (right knob)?
 - Screen to edit the PSK macros.

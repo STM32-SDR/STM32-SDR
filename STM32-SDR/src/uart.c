@@ -134,7 +134,8 @@ void USART2_IRQHandler(void)
 	// check if the USART1 receive interrupt flag was set
 	if (USART_GetITStatus(USART2, USART_IT_RXNE )) {
 		// the character from the USART2 data register is saved in t
-		char rxChar = USART2 ->DR;
+		// TODO: do something with rxChar (commented out to remove warning)
+//		char rxChar = USART2 ->DR;
 	}
 }
 

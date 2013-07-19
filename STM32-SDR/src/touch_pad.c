@@ -32,6 +32,7 @@ static void DelayUS(vu32 cnt)
 	}
 }
 
+// TODO: Move to better loctaion.
 void EXTI9_5_IRQHandler(void)
 {
 	//Handle Touch Screen Interrupts
@@ -42,7 +43,6 @@ void EXTI9_5_IRQHandler(void)
 
 	//Handle Encoder #2 PB interrupt
 	if (EXTI_GetITStatus(EXTI_Line7) != RESET) {
-		// TODO: When should we write to EEPROM? When Option change made, or only on push knob?
 		// LCD code is not thread safe, so trigger a delayed event to display the "Store IQ" message.
 		DelayEvent_TriggerEvent(DelayEvent_DisplayStoreIQ);
 

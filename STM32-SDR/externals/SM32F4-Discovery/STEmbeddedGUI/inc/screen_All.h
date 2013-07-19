@@ -48,6 +48,7 @@ extern GL_Page_TypeDef g_screenMain;
 extern GL_Page_TypeDef g_screenCalibrate;
 extern GL_Page_TypeDef g_screenCalibrationTest;
 extern GL_Page_TypeDef g_screenMode;
+extern GL_Page_TypeDef g_screenOptions;
 
 
 // Screen creation routines (in screen_XYZ.c)
@@ -56,6 +57,7 @@ void ScreenMain_Create(void);
 void ScreenCalibrate_Create(void);
 void ScreenCalibrationTest_Create(void);
 void ScreenMode_Create(void);
+void ScreenOptions_Create(void);
 
 
 // Screen access functions:

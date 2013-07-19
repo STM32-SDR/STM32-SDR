@@ -155,7 +155,6 @@ static void initializeHardware(void)
 	main_delay(SETUP_DELAY);
 
 	displaySplashScreen();
-	LCD_Clear(0x0000);
 
 	main_delay(SETUP_DELAY);
 	Encoder1_GPIO_Config();
@@ -227,7 +226,7 @@ static void displaySplashScreen(void)
 	GL_PrintString(200, 140, "STM32 SDR V2.6", 0);
 	GL_PrintString(200, 160, __DATE__, 0);
 	GL_PrintString(200, 180, __TIME__, 0);
-	main_delay(20000000);
+	main_delay(10000000);
 }
 
 static void main_delay(uint32_t numLoops)

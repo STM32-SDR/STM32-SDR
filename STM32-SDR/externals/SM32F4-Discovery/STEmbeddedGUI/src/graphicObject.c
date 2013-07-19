@@ -434,7 +434,7 @@ GL_PageControls_TypeDef* NewLabel(uint16_t ID, const char* label, GL_Direction d
  * @param  pEventHandler: pointer to function associated to its touch event
  * @retval GL_PageControls_TypeDef* - The created Object pointer
  */
-GL_PageControls_TypeDef* NewButton(uint16_t ID, const char* label, void (*pEventHandler)(void))
+GL_PageControls_TypeDef* NewButton(uint16_t ID, const char* label, void (*pEventHandler)(GL_PageControls_TypeDef* pThis))
 {
 	GL_PageControls_TypeDef *pPageControlObj = NULL;
 	GL_Button_TypeDef *pControlObj = NULL;
@@ -3655,7 +3655,7 @@ static void CallEvent(GL_PageControls_TypeDef* pControl)
 	switch (pControl->objType) {
 	case GL_BUTTON:
 		pTmp = (GL_Button_TypeDef*) (pControl->objPTR);
-		((GL_Button_TypeDef*) pTmp)->EventHandler();
+		((GL_Button_TypeDef*) pTmp)->EventHandler(pControl);
 		break;
 	case GL_CHECKBOX:
 		pTmp = (GL_Checkbox_TypeDef*) (pControl->objPTR);

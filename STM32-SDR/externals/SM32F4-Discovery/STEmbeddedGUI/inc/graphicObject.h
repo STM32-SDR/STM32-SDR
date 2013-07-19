@@ -93,7 +93,7 @@ extern __IO uint8_t calibration_done;     /*!< touchscreen calibration status */
 /*----- High layer function -----*/
                                     
 GL_PageControls_TypeDef* NewButton (uint16_t ID, const char* label,
-                                    void (*pEventHandler)(void));
+                                    void (*pEventHandler)(GL_PageControls_TypeDef* pThis));
                                     
 GL_PageControls_TypeDef* NewCheckbox (uint16_t ID, const char* label,
                                        void (*pEventHandler)(void));

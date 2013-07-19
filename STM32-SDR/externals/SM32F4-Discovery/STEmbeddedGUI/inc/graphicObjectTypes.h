@@ -191,7 +191,7 @@ struct GL_ButtonObj
   char           label[MAX_BUTTON_LABEL_LENGTH];
   GL_bool           isObjectTouched;
   GL_bool           Control_Visible;
-  void              (*EventHandler)(void);
+  void              (*EventHandler)(GL_PageControls_TypeDef* pThis);
 };
 
 /* Forward declaration for circular typedefs */

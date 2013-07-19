@@ -2,6 +2,7 @@
  * Options control widget
  */
 #include "widgets.h"
+#include "screen_All.h"
 #include <assert.h>
 #include "options.h"
 
@@ -46,7 +47,7 @@ GL_PageControls_TypeDef* Widget_NewBigButtonOptions()
  */
 static void insideEventHandler(GL_PageControls_TypeDef* pThis, int relX, int relY)
 {
-
+	Screen_ShowScreen(&g_screenOptions);
 }
 static void insideDrawHandler(GL_PageControls_TypeDef* pThis, _Bool force, int relX, int relY)
 {

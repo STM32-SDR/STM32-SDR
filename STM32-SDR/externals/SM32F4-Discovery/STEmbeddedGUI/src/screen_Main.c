@@ -12,10 +12,9 @@ static GL_Page_TypeDef *s_pThisScreen = &g_screenMain;
  * Call-back prototypes
  */
 
-static void defaults_Click(void);
-static void tx_Click(void);
-static void rx_Click(void);
-static void calibrate_Click(void);
+static void tx_Click(GL_PageControls_TypeDef* pThis);
+static void rx_Click(GL_PageControls_TypeDef* pThis);
+static void calibrate_Click(GL_PageControls_TypeDef* pThis);
 
 
 //static void updateModeLabel(void);
@@ -36,7 +35,6 @@ void ScreenMain_Create(void)
 	GL_PageControls_TypeDef* ctrlPskText = Widget_NewPSKTextDisplay();
 
 	GL_PageControls_TypeDef* btnCalibrate = NewButton(13, "Cal. TS", calibrate_Click);
-	GL_PageControls_TypeDef* btnDefaults = NewButton(8, "Defaults", defaults_Click);
 
 	GL_PageControls_TypeDef* btnRx  = NewButton(10, " Rx ", rx_Click);
 	GL_PageControls_TypeDef* btnTx  = NewButton(9,  " Tx ", tx_Click);
@@ -55,14 +53,13 @@ void ScreenMain_Create(void)
 	AddPageControlObj(0,  80, ctrlPskText, s_pThisScreen);
 
 	AddPageControlObj(0,   160, btnCalibrate, s_pThisScreen);
-	AddPageControlObj(65,  160, btnDefaults, s_pThisScreen);
 	AddPageControlObj(225, 160, btnRx, s_pThisScreen);
 	AddPageControlObj(270, 160, btnTx, s_pThisScreen);
 
 	AddPageControlObj(0, 0, btnMode, s_pThisScreen);
 
 
-	// Options
+	// Bottom row of buttons
 	AddPageControlObj(0, LCD_HEIGHT - 42, btnOptions, s_pThisScreen);
 	AddPageControlObj(
 			LCD_WIDTH - ((GL_Custom_TypeDef*)(btnFreq->objPTR))->GetWidth(btnFreq),
@@ -74,12 +71,8 @@ void ScreenMain_Create(void)
 /**
  * Button callbacks
  */
-static void defaults_Click(void) {
-	Options_WriteToEEPROM();
-}
-
 #include "ChangeOver.h"
-static void tx_Click(void)
+static void tx_Click(GL_PageControls_TypeDef* pThis)
 {
 	switch (Mode) {
 	case MODE_SSB:
@@ -93,12 +86,12 @@ static void tx_Click(void)
 		break;
 	}  // End of switch
 }
-static void rx_Click(void)
+static void rx_Click(GL_PageControls_TypeDef* pThis)
 {
 	Receive_Sequence();
 }
 
-static void calibrate_Click(void) {
+static void calibrate_Click(GL_PageControls_TypeDef* pThis) {
 	Screen_ShowScreen(&g_screenCalibrate);
 }
 

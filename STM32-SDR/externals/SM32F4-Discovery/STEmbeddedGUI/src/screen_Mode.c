@@ -11,12 +11,12 @@ static GL_Page_TypeDef *s_pThisScreen = &g_screenMode;
 /**
  * Call-back prototypes
  */
-static void modeSSB_Click(void);
-static void modeCW_Click(void);
-static void modePSK_Click(void);
-static void lsb_Click(void);
-static void usb_Click(void);
-static void done_Click(void);
+static void modeSSB_Click(GL_PageControls_TypeDef* pThis);
+static void modeCW_Click(GL_PageControls_TypeDef* pThis);
+static void modePSK_Click(GL_PageControls_TypeDef* pThis);
+static void lsb_Click(GL_PageControls_TypeDef* pThis);
+static void usb_Click(GL_PageControls_TypeDef* pThis);
+static void done_Click(GL_PageControls_TypeDef* pThis);
 
 #define ID_CUR_MODE     104
 #define ID_CUR_SIDEBAND 105
@@ -97,13 +97,13 @@ static _Bool updateCurMode(GL_PageControls_TypeDef* pThis, _Bool forceRedisplay)
 	}
 	return 0;
 }
-static void modeSSB_Click(void) {
+static void modeSSB_Click(GL_PageControls_TypeDef* pThis) {
 	Mode = MODE_SSB;
 }
-static void modeCW_Click(void) {
+static void modeCW_Click(GL_PageControls_TypeDef* pThis) {
 	Mode = MODE_CW;
 }
-static void modePSK_Click(void) {
+static void modePSK_Click(GL_PageControls_TypeDef* pThis) {
 	Mode = MODE_PSK;
 }
 
@@ -126,14 +126,14 @@ static _Bool updateCurSideBand(GL_PageControls_TypeDef* pThis, _Bool forceRedisp
 	return 0;
 }
 #include "DMA_IRQ_Handler.h"
-static void lsb_Click(void) {
+static void lsb_Click(GL_PageControls_TypeDef* pThis) {
 	rgain = -0.5;
 }
-static void usb_Click(void) {
+static void usb_Click(GL_PageControls_TypeDef* pThis) {
 	rgain = 0.5;
 }
 
-static void done_Click(void) {
+static void done_Click(GL_PageControls_TypeDef* pThis) {
 	Screen_ShowScreen(&g_screenMain);
 }
 

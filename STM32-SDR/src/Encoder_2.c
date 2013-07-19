@@ -134,23 +134,10 @@ void process_encoder2(void)
 	}
 }
 
+// TODO: Remove function.
 void check_SS2(void)
 {
 	//Read PC1,2,3,4 as four bit word
 	int16_t read_SS2 = ~GPIO_ReadInputData(GPIOC ) >> 1 & 0x000F;
-	Options_SetSelectedOption(read_SS2);
+//	Options_SetSelectedOption(read_SS2);
 }
-
-void Store_Defaults(void)
-{
-//	LCD_StringLine(234, 40, " Default  ");
-	FrequencyManager_ResetBandsToDefault();
-	FrequencyManager_WriteBandsToEeprom();
-	process_SS1();
-
-//	LCD_StringLine(0, 40, " Default  ");
-	Options_ResetToDefaults();
-	Options_WriteToEEPROM();
-	check_SS2();
-}
-

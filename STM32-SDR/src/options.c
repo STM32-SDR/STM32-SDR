@@ -110,11 +110,12 @@ static OptionStruct s_optionsData[] = {
 		/*Rate*/ 1,
 		/*Data*/ 0,
 	},
-	{"Future 1 ", 0, 0, 1, 1, 0},
-	{"Future 2 ", 0, 0, 1, 1, 0},
-	{"Future 3 ", 0, 0, 1, 1, 0},
-	{"Future 4 ", 0, 0, 1, 1, 0},
-	{"Future 5 ", 0, 0, 1, 1, 0},
+	// TODO: Remove these when everyone agrees on removing option's 16-position selector switch.
+//	{"Future 1 ", 0, 0, 1, 1, 0},
+//	{"Future 2 ", 0, 0, 1, 1, 0},
+//	{"Future 3 ", 0, 0, 1, 1, 0},
+//	{"Future 4 ", 0, 0, 1, 1, 0},
+//	{"Future 5 ", 0, 0, 1, 1, 0},
 };
 
 // Initialization
@@ -154,7 +155,6 @@ void Options_SetValue(int optionIdx, int16_t newValue)
 {
 	assert(optionIdx >= 0 && optionIdx < NUM_OPTIONS);
 	s_optionsData[optionIdx].CurrentValue = newValue;
-	Write_Int_EEProm(EEPROM_OFFSET + optionIdx * 2, newValue);
 
 	/*
 	 * Process each option individually as needed.
