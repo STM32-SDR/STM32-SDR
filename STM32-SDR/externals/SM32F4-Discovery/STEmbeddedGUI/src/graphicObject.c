@@ -395,7 +395,7 @@ static void GL_SetStringFieldValue(char* dBuf, const char* sBuf, uint32_t MaxLen
  * @retval pPageControlObj - The pointer to the graphic object
  */
 GL_PageControls_TypeDef* NewLabel(uint16_t ID, const char* label, GL_Direction direction,
-		__IO uint8_t FontSize, __IO uint16_t Colour)
+		GL_FontOption FontSize, __IO uint16_t Colour)
 {
 	GL_Label_TypeDef *pControlObj = NULL;
 	GL_PageControls_TypeDef * pPageControlObj = NULL;
@@ -2008,7 +2008,7 @@ static GL_ErrStatus SetRadioButtonVisible(GL_PageControls_TypeDef* pTmp, GL_Coor
 	label_length = p_strlen(pThis->label);
 	for (; n <= label_length; n++) {
 		GL_DisplayAdjStringLine((uint8_t) (objCoordinates.MaxY) - (RADIO_BUTTON_RADIUS - 2) * 2,
-		        (uint16_t) (objCoordinates.MaxX) - (RBUTTON_OPT_SIZE + 2) - n * GL_GetFontLetterWidth(), (uint8_t*) ' ', GL_FALSE);
+		        (uint16_t) (objCoordinates.MaxX) - (RBUTTON_OPT_SIZE + 2) - n * GL_GetFontLetterWidth(GL_GetFont()), (uint8_t*) ' ', GL_FALSE);
 	}
 	GL_SetTextColor(GL_Black);
 	GL_DisplayAdjStringLine((uint8_t) (objCoordinates.MaxY) - (RADIO_BUTTON_RADIUS - 2) * 2,
@@ -2066,7 +2066,7 @@ static GL_ErrStatus SetComboBoxVisible(GL_PageControls_TypeDef* pTmp, GL_Coordin
 		}
 
 		GL_DrawFilledRectangle((uint16_t) (objCoordinates.MinX - COMBOBOX_SIZE),
-		        (uint16_t) (objCoordinates.MinX - (COMBOBOX_SIZE + (MAX_COMBO_LABEL_LENGTH - 2) * GL_GetFontLetterWidth())),
+		        (uint16_t) (objCoordinates.MinX - (COMBOBOX_SIZE + (MAX_COMBO_LABEL_LENGTH - 2) * GL_GetFontLetterWidth(GL_GetFont()))),
 		        (uint8_t) (objCoordinates.MaxY), (uint8_t) (objCoordinates.MinY + 1), GL_White);
 		GL_SetFont(GL_FONT_SMALL);
 		GL_SetTextColor(GL_Blue);
@@ -2087,7 +2087,7 @@ static GL_ErrStatus SetComboBoxVisible(GL_PageControls_TypeDef* pTmp, GL_Coordin
 		}
 
 		GL_DrawFilledRectangle((uint16_t) (objCoordinates.MinX),
-		        (uint16_t) (objCoordinates.MinX - ((MAX_COMBO_LABEL_LENGTH - 2) * GL_GetFontLetterWidth())),
+		        (uint16_t) (objCoordinates.MinX - ((MAX_COMBO_LABEL_LENGTH - 2) * GL_GetFontLetterWidth(GL_GetFont()))),
 		        (uint8_t) (objCoordinates.MaxY), (uint8_t) (objCoordinates.MinY + 1), LCD_COLOR_WHITE);
 		GL_SetFont(GL_FONT_SMALL);
 		GL_SetTextColor(GL_Blue);
@@ -2173,7 +2173,7 @@ static GL_ErrStatus SetCheckboxVisible(GL_PageControls_TypeDef* pTmp, GL_Coordin
 
 	for (n = 0; n < label_length; n++) {
 		GL_DisplayAdjStringLine((uint8_t) (objCoordinates.MaxY) - 15,
-		        (uint16_t) (objCoordinates.MaxX) - (CHECKBOX_SIZE + 1) - n * GL_GetFontLetterWidth(), (uint8_t*) ' ', GL_FALSE);
+		        (uint16_t) (objCoordinates.MaxX) - (CHECKBOX_SIZE + 1) - n * GL_GetFontLetterWidth(GL_GetFont()), (uint8_t*) ' ', GL_FALSE);
 	}
 	GL_SetTextColor(GL_Black);
 	GL_DisplayAdjStringLine((uint8_t) (objCoordinates.MaxY) - 15,
@@ -2388,32 +2388,32 @@ static GL_ErrStatus SetSlidebarVisible(GL_PageControls_TypeDef* pTmp, GL_Coordin
 		if (pThis->Direction == GL_HORIZONTAL) {
 			for (; counter < label_length - 1; counter++) {
 				GL_DisplayAdjStringLine(maxY + 2,
-				        maxX - ((btn_length - label_length * GL_GetFontLetterWidth()) / 2) - 3 - counter * GL_GetFontLetterWidth(),
+				        maxX - ((btn_length - label_length * GL_GetFontLetterWidth(GL_GetFont())) / 2) - 3 - counter * GL_GetFontLetterWidth(GL_GetFont()),
 				        (uint8_t*) " ", GL_FALSE);
 			}
-			GL_DisplayAdjStringLine(maxY + 2, maxX - ((btn_length - label_length * GL_GetFontLetterWidth()) / 2) - 3,
+			GL_DisplayAdjStringLine(maxY + 2, maxX - ((btn_length - label_length * GL_GetFontLetterWidth(GL_GetFont())) / 2) - 3,
 			        (uint8_t*) pThis->label, GL_TRUE);
 		}
 		else if (pThis->Direction == GL_LEFT_VERTICAL) {
 //      LCD_Change_Direction(_270_degree);
 			for (; counter < label_length - 1; counter++) {
 				GL_PrintString(LCD_WIDTH - minY + 2,
-				        maxX - ((btn_length - label_length * GL_GetFontLetterWidth()) / 2) + GL_GetFontLetterWidth() / 2 - counter * GL_GetFontLetterWidth(),
+				        maxX - ((btn_length - label_length * GL_GetFontLetterWidth(GL_GetFont())) / 2) + GL_GetFontLetterWidth(GL_GetFont()) / 2 - counter * GL_GetFontLetterWidth(GL_GetFont()),
 				        " ", GL_TRUE);
 			}
 			GL_PrintString(LCD_WIDTH - minY + 2,
-			        maxX - ((btn_length - label_length * GL_GetFontLetterWidth()) / 2) + GL_GetFontLetterWidth() / 2, pThis->label, GL_TRUE);
+			        maxX - ((btn_length - label_length * GL_GetFontLetterWidth(GL_GetFont())) / 2) + GL_GetFontLetterWidth(GL_GetFont()) / 2, pThis->label, GL_TRUE);
 //      LCD_Change_Direction(_0_degree);
 		}
 		else if (pThis->Direction == GL_RIGHT_VERTICAL) {
 //      LCD_Change_Direction(_90_degree);
 			for (; counter < label_length - 1; counter++) {
 				GL_PrintString(maxY + 2,
-				        maxX - ((btn_length - label_length * GL_GetFontLetterWidth()) / 2) - (counter + 1) * GL_GetFontLetterWidth(),
+				        maxX - ((btn_length - label_length * GL_GetFontLetterWidth(GL_GetFont())) / 2) - (counter + 1) * GL_GetFontLetterWidth(GL_GetFont()),
 				        " ", GL_TRUE);
 			}
 			GL_PrintString(maxY + 2,
-			        maxX - ((btn_length - label_length * GL_GetFontLetterWidth()) / 2) - (counter + 1) * GL_GetFontLetterWidth(),
+			        maxX - ((btn_length - label_length * GL_GetFontLetterWidth(GL_GetFont())) / 2) - (counter + 1) * GL_GetFontLetterWidth(GL_GetFont()),
 			        pThis->label, GL_TRUE);
 //      LCD_Change_Direction(_0_degree);
 		}
@@ -2474,8 +2474,8 @@ static GL_ErrStatus SetHistogramVisible(GL_PageControls_TypeDef* pTmp, GL_Coordi
 		GL_SetTextColor(GL_Black);
 		GL_DrawLine(offset_x, (uint16_t) (offset_y - y_step * index), 4, GL_Horizontal);
 		if (index == 9) {
-			GL_DisplayAdjStringLine((uint16_t) (offset_y - y_step * index - 2 - GL_GetFontLetterWidth() * 2),
-			        offset_x + GL_GetFontLetterWidth() * 5, (uint8_t*) pThis->label_Y, GL_TRUE);
+			GL_DisplayAdjStringLine((uint16_t) (offset_y - y_step * index - 2 - GL_GetFontLetterWidth(GL_GetFont()) * 2),
+			        offset_x + GL_GetFontLetterWidth(GL_GetFont()) * 5, (uint8_t*) pThis->label_Y, GL_TRUE);
 
 			sprintf((char*) value, "%4.1f", max_value);
 
@@ -2485,7 +2485,7 @@ static GL_ErrStatus SetHistogramVisible(GL_PageControls_TypeDef* pTmp, GL_Coordi
 			}
 			else {
 				GL_DisplayAdjStringLine((uint16_t) (offset_y - y_step * index - 5),
-				        offset_x + GL_GetFontLetterWidth() + HIST_MARGIN_LENGTH * 2, (uint8_t*) value, GL_TRUE);
+				        offset_x + GL_GetFontLetterWidth(GL_GetFont()) + HIST_MARGIN_LENGTH * 2, (uint8_t*) value, GL_TRUE);
 			}
 		}
 	}
@@ -2515,7 +2515,7 @@ static GL_ErrStatus SetHistogramVisible(GL_PageControls_TypeDef* pTmp, GL_Coordi
 			}
 		}
 		if (index == pThis->n_points - 1) {
-			GL_DisplayAdjStringLine((uint16_t) (base_y + 3 + GL_GetFontLetterWidth() * 2), max_x + GL_GetFontLetterWidth() * 3,
+			GL_DisplayAdjStringLine((uint16_t) (base_y + 3 + GL_GetFontLetterWidth(GL_GetFont()) * 2), max_x + GL_GetFontLetterWidth(GL_GetFont()) * 3,
 			        (uint8_t*) (pThis->label_X), GL_TRUE);
 		}
 	}
@@ -2544,7 +2544,7 @@ static GL_ErrStatus SetGraphChartVisible(GL_PageControls_TypeDef* pTmp, GL_Coord
 	pThis->Control_Visible = GL_TRUE;
 
 	max_value = 0;
-	max_x = LCD_WIDTH - GRAPH_MARGIN_LENGTH * 5 / 2 - GL_GetFontLetterWidth();
+	max_x = LCD_WIDTH - GRAPH_MARGIN_LENGTH * 5 / 2 - GL_GetFontLetterWidth(GL_GetFont());
 	base_y = LCD_HEIGHT - GRAPH_MARGIN_LENGTH * 7 / 2;
 
 	offset_x = max_x + 4;
@@ -2595,8 +2595,8 @@ static GL_ErrStatus SetGraphChartVisible(GL_PageControls_TypeDef* pTmp, GL_Coord
 		/* Print the Y axis Label */
 		if (index == 10) {
 			GL_SetTextColor(GL_Black);
-			GL_DisplayAdjStringLine((uint16_t) (offset_y - y_step * index - 2 - GL_GetFontLetterWidth() * 2),
-			        (uint16_t) (offset_x + GL_GetFontLetterWidth() * 9 / 2), (uint8_t*) (pThis->label_Y), GL_TRUE);
+			GL_DisplayAdjStringLine((uint16_t) (offset_y - y_step * index - 2 - GL_GetFontLetterWidth(GL_GetFont()) * 2),
+			        (uint16_t) (offset_x + GL_GetFontLetterWidth(GL_GetFont()) * 9 / 2), (uint8_t*) (pThis->label_Y), GL_TRUE);
 
 			sprintf((char*) value, "%4.1f", max_value);
 
@@ -2606,7 +2606,7 @@ static GL_ErrStatus SetGraphChartVisible(GL_PageControls_TypeDef* pTmp, GL_Coord
 			}
 			else {
 				GL_DisplayAdjStringLine((uint16_t) (offset_y - y_step * index - 5),
-				        (uint16_t) (offset_x + GL_GetFontLetterWidth() + GRAPH_MARGIN_LENGTH * 2), (uint8_t*) value, GL_TRUE);
+				        (uint16_t) (offset_x + GL_GetFontLetterWidth(GL_GetFont()) + GRAPH_MARGIN_LENGTH * 2), (uint8_t*) value, GL_TRUE);
 			}
 		}
 	}
@@ -2670,7 +2670,7 @@ static GL_ErrStatus SetGraphChartVisible(GL_PageControls_TypeDef* pTmp, GL_Coord
 		/* Print the X axis Label */
 		if (index == pThis->n_points - 1) {
 			GL_SetTextColor(GL_Black);
-			GL_DisplayAdjStringLine((uint16_t) (base_y + 3 + GL_GetFontLetterWidth() * 2), (uint16_t) (max_x + GL_GetFontLetterWidth() * 3),
+			GL_DisplayAdjStringLine((uint16_t) (base_y + 3 + GL_GetFontLetterWidth(GL_GetFont()) * 2), (uint16_t) (max_x + GL_GetFontLetterWidth(GL_GetFont()) * 3),
 			        (uint8_t*) (pThis->label_X), GL_TRUE);
 		}
 	}

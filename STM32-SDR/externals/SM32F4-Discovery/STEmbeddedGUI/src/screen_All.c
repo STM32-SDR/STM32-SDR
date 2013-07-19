@@ -10,6 +10,7 @@ static GL_Page_TypeDef *s_pCurrentScreen = 0;
 GL_Page_TypeDef g_screenMain;
 GL_Page_TypeDef g_screenCalibrate;
 GL_Page_TypeDef g_screenCalibrationTest;
+GL_Page_TypeDef g_screenMode;
 
 
 /**
@@ -22,6 +23,8 @@ void Screen_CreateAllScreens(void)
 	ScreenMain_Create();
 	ScreenCalibrate_Create();
 	ScreenCalibrationTest_Create();
+	ScreenMode_Create();
+
 }
 
 void Screen_ShowScreen(GL_Page_TypeDef *pNewScreen)

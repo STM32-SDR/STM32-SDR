@@ -2,20 +2,36 @@
 
 
 Brian's To Do List
+- EEPROM not written after every change
+	- Put on Options screen, and left-push-button (give LCD feedback? How?)
+	
+- Create GUI screen for existing components.
+	- Options menu: Have daily params on first screen, calibration on second layer screen?
+		- Move "reset to defaults" to a sub-screen (vs main screen).
+		- Remove code for left 16-position selcetor switch (leave commented out because others may want it back).
+
+- Frequency band selection screen 
+	- w/ reset to defaults for each band
+	- Remove code for right 16-position selector switch
+	- Move last two "frequency" bands to the options.
+
 - Code:
+	- Change Makefile to allow easier compilation of multiple directories
+	- Move GUI code?
 	- Remove User_Button?
 	- Remove touch_pad.h/.c?
-	- Move GUI code?
+
+
+
+- Indictation that USB keyboard attached
 
 - UI Look:
 	- Larger frequency display
 	- Regenerate buttons to have black background.
-- Handle pressing-in knobs: Save current? Reset to default? Change how much is selected (right knob)?
 
-- Create GUI screen for existing components.
-	- Mode button; upper left
-	- Options menu: Have daily params on first screen, calibration on second layer screen
-- Change Makefile to allow easier compilation of multiple directories
+- Handle pressing-in knobs: Save current? Reset to default? Change how much is selected (right knob)?
+- Screen to edit the PSK macros.
 - Re-engineer I2C access into: high level access {EEPROM, ..., ...}, low level {I2C commands}
 - Check-in coding standard
 - Hardware calibration and self-test feature/screen
+- Associtade a mode (PSK, CW, SSB; SSB, USB) with each frequency band.

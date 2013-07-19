@@ -157,8 +157,9 @@ void GL_DisplayAdjStringLine(uint16_t Line, uint16_t Column, uint8_t *ptr, _Bool
 
 // NEW FUNCTIONS (by Brian)
 void GL_SetFont(GL_FontOption uFont);
-uint16_t GL_GetFontLetterWidth(void);
-uint16_t GL_GetFontLetterHeight(void);
+GL_FontOption GL_GetFont(void);
+uint16_t GL_GetFontLetterWidth(GL_FontOption font);
+uint16_t GL_GetFontLetterHeight(GL_FontOption font);
 void GL_PrintString(uint16_t x, uint16_t y, const char *str, _Bool isTransparent);
 void GL_PrintChar(uint16_t x, uint16_t y, char c, _Bool isTransparent);
 

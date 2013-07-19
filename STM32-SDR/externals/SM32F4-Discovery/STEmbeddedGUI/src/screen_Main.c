@@ -12,14 +12,9 @@ static GL_Page_TypeDef *s_pThisScreen = &g_screenMain;
  * Call-back prototypes
  */
 
-static void modeSSB_Click(void);
-static void modeCW_Click(void);
-static void modePSK_Click(void);
 static void defaults_Click(void);
 static void tx_Click(void);
 static void rx_Click(void);
-static void lsb_Click(void);
-static void usb_Click(void);
 static void calibrate_Click(void);
 
 
@@ -40,20 +35,11 @@ void ScreenMain_Create(void)
 	// PSK:
 	GL_PageControls_TypeDef* ctrlPskText = Widget_NewPSKTextDisplay();
 
-	// Mode Buttons
-	GL_PageControls_TypeDef* btnMode_SSB = NewButton(5, "SSB", modeSSB_Click);
-	GL_PageControls_TypeDef* btnMode_CW  = NewButton(6, " CW", modeCW_Click);
-	GL_PageControls_TypeDef* btnMode_PSK = NewButton(7, "PSK", modePSK_Click);
-
-	// Mode buttons
 	GL_PageControls_TypeDef* btnCalibrate = NewButton(13, "Cal. TS", calibrate_Click);
 	GL_PageControls_TypeDef* btnDefaults = NewButton(8, "Defaults", defaults_Click);
 
-	GL_PageControls_TypeDef* btnLSB = NewButton(11, "LSB", lsb_Click);
-	GL_PageControls_TypeDef* btnUSB = NewButton(12, "USB", usb_Click);
 	GL_PageControls_TypeDef* btnRx  = NewButton(10, " Rx ", rx_Click);
 	GL_PageControls_TypeDef* btnTx  = NewButton(9,  " Tx ", tx_Click);
-
 
 	GL_PageControls_TypeDef* btnMode = Widget_NewBigButtonMode();
 	GL_PageControls_TypeDef* btnOptions = Widget_NewBigButtonOptions();
@@ -68,15 +54,8 @@ void ScreenMain_Create(void)
 	Widget_AddToPage_NewFFTDisplay(80, 0, s_pThisScreen);
 	AddPageControlObj(0,  80, ctrlPskText, s_pThisScreen);
 
-	// Buttons
-	AddPageControlObj(100,  LCD_HEIGHT - 35, btnMode_SSB, s_pThisScreen);
-	AddPageControlObj(140,  LCD_HEIGHT - 35, btnMode_CW, s_pThisScreen);
-	AddPageControlObj(180,  LCD_HEIGHT - 35, btnMode_PSK, s_pThisScreen);
-
 	AddPageControlObj(0,   160, btnCalibrate, s_pThisScreen);
 	AddPageControlObj(65,  160, btnDefaults, s_pThisScreen);
-	AddPageControlObj(145, 160, btnLSB, s_pThisScreen);
-	AddPageControlObj(180, 160, btnUSB, s_pThisScreen);
 	AddPageControlObj(225, 160, btnRx, s_pThisScreen);
 	AddPageControlObj(270, 160, btnTx, s_pThisScreen);
 
@@ -95,16 +74,6 @@ void ScreenMain_Create(void)
 /**
  * Button callbacks
  */
-static void modeSSB_Click(void) {
-	Mode = MODE_SSB;
-}
-static void modeCW_Click(void) {
-	Mode = MODE_CW;
-}
-static void modePSK_Click(void) {
-	Mode = MODE_PSK;
-}
-
 static void defaults_Click(void) {
 	Options_WriteToEEPROM();
 }
@@ -128,15 +97,6 @@ static void rx_Click(void)
 {
 	Receive_Sequence();
 }
-
-#include "DMA_IRQ_Handler.h"
-static void lsb_Click(void) {
-	rgain = -0.5;
-}
-static void usb_Click(void) {
-	rgain = 0.5;
-}
-
 
 static void calibrate_Click(void) {
 	Screen_ShowScreen(&g_screenCalibrate);

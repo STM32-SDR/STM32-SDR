@@ -47,6 +47,26 @@ GL_PageControls_TypeDef* Widget_NewBigButtonMode(void);
 GL_PageControls_TypeDef* Widget_NewBigButtonFrequency(void);
 GL_PageControls_TypeDef* Widget_NewBigButtonOptions(void);
 
+
+/**
+ * Create a new label
+ * @param strText: Text for display.
+ * @param textColor: Color of text on screen.
+ * @param backColor: Color of background on screen.
+ * @param font: Font to use (must be a GL_FontOption)
+ * @param pUpdateHandler: Callback function executed each time the label is able to redraw.
+ *        Its forceRedisplay parameter is true (1) when entire screen is being redrawn.
+ *        Function should return true if the label has been changed and must be redrawn.
+ */
+GL_PageControls_TypeDef* Widget_NewLabel(
+		const char* strText,
+		uint16_t textColor, uint16_t backColor, _Bool isTransparent,
+		GL_FontOption font,
+		_Bool (*pUpdateHandler)(GL_PageControls_TypeDef* pThis, _Bool forceRedisplay)
+	);
+void Widget_ChangeLabelText(GL_PageControls_TypeDef *pThis, const char* strText);
+
+
 // Write a signed integer to a right-justified string.
 void intToCommaString(int16_t number, char *pDest, int numChar);
 

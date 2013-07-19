@@ -50,8 +50,7 @@ GL_PageControls_TypeDef* Widget_NewBigButtonMode(void)
  */
 static void insideEventHandler(GL_PageControls_TypeDef* pThis, int relX, int relY)
 {
-	// TODO: Change mode button to display mode-select screen (when created)
-	Screen_ShowScreen(&g_screenCalibrationTest);
+	Screen_ShowScreen(&g_screenMode);
 }
 static void insideDrawHandler(GL_PageControls_TypeDef* pThis, _Bool force, int relX, int relY)
 {

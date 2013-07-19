@@ -306,28 +306,40 @@ void GL_LCD_CtrlLinesWrite(GPIO_TypeDef* GPIOx, uint16_t CtrlPins, GL_SignalActi
 // ***********************************************************************************
 
 static gl_sFONT *g_pCurrentFont = &GL_Font8x16;
+static GL_FontOption g_CurrentFontEnum = GL_FONTOPTION_8x16;
 
-
-void GL_SetFont(GL_FontOption newFont)
+gl_sFONT *getFontStructFromEnum(GL_FontOption font)
 {
-	switch (newFont) {
-	case GL_FONTOPTION_16x24:     g_pCurrentFont = &GL_Font16x24;	break;
-	case GL_FONTOPTION_12x12:     g_pCurrentFont = &GL_Font12x12;	break;
-	case GL_FONTOPTION_8x16:      g_pCurrentFont = &GL_Font8x16;	break;
-	case GL_FONTOPTION_8x12:      g_pCurrentFont = &GL_Font8x12;	break;
-	case GL_FONTOPTION_8x12Bold:  g_pCurrentFont = &GL_Font8x12_bold;	break;
-	case GL_FONTOPTION_8x8:       g_pCurrentFont = &GL_Font8x8;	break;
+	switch (font) {
+	case GL_FONTOPTION_16x24:     return &GL_Font16x24;
+	case GL_FONTOPTION_12x12:     return &GL_Font12x12;
+	case GL_FONTOPTION_8x16:      return &GL_Font8x16;
+	case GL_FONTOPTION_8x12:      return &GL_Font8x12;
+	case GL_FONTOPTION_8x12Bold:  return &GL_Font8x12_bold;
+	case GL_FONTOPTION_8x8:       return &GL_Font8x8;
 	default:
 		assert(0);
 	}
+	return 0;
 }
-uint16_t GL_GetFontLetterWidth(void)
+
+void GL_SetFont(GL_FontOption newFont)
 {
-	return g_pCurrentFont->Width;
+	g_pCurrentFont = getFontStructFromEnum(newFont);
+	g_CurrentFontEnum = newFont;
 }
-uint16_t GL_GetFontLetterHeight(void)
+GL_FontOption GL_GetFont(void)
 {
-	return g_pCurrentFont->Height;
+	return g_CurrentFontEnum;
+}
+
+uint16_t GL_GetFontLetterWidth(GL_FontOption font)
+{
+	return getFontStructFromEnum(font)->Width;
+}
+uint16_t GL_GetFontLetterHeight(GL_FontOption font)
+{
+	return getFontStructFromEnum(font)->Height;
 }
 
 void GL_PrintString(uint16_t x, uint16_t y, const char *str, _Bool isTransparent)
