@@ -63,7 +63,7 @@ void LCD_StringLine(uint16_t PosX, uint16_t PosY, const char *str)
 {
 	// The +12 is for the font height
 	// (This function designed for providing the Y coord as distance from bottom of screen, relative to bottom of text.
-	GL_PrintString(PosX, LCD_HEIGHT - PosY - GL_GetFontLetterHeight(), str, 0);
+	GL_PrintString(PosX, LCD_HEIGHT - PosY - GL_GetFontLetterHeight(GL_GetFont()), str, 0);
 }
 
 
