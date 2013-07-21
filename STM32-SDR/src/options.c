@@ -171,24 +171,23 @@ void Options_SetValue(int optionIdx, int16_t newValue)
 		break;
 
 	case OPTION_SSB_LEVEL:
-		if ((Tx_Flag == 1) && (Mode == MODE_SSB))
+		if ((Tx_Flag == 1) && (Mode_GetCurrentMode() == MODE_SSB))
 			Set_PGA_Gain(newValue);
 		break;
 
 	case OPTION_CW_LEVEL:
-		if ((Tx_Flag == 1) && (Mode == MODE_CW))
+		if ((Tx_Flag == 1) && (Mode_GetCurrentMode() == MODE_CW))
 			Set_DAC_DVC(newValue);
 		break;
 
 	case OPTION_PSK_LEVEL:
-		if ((Tx_Flag == 1) && (Mode == MODE_PSK))
+		if ((Tx_Flag == 1) && (Mode_GetCurrentMode() == MODE_PSK))
 			Set_DAC_DVC(newValue);
 		break;
 
 	case OPTION_ST_LEVEL:  //Side Tone Level
-		if ((Tx_Flag == 1) && (Mode == MODE_CW))
+		if ((Tx_Flag == 1) && (Mode_GetCurrentMode() == MODE_CW))
 			Set_HP_Gain(newValue);
-		//if ((Tx_Flag==1)&& (Mode==MODE_CW)) Set_LO_Gain(newValue); //Set ST_Level
 		break;
 
 	case OPTION_RX_AMP:

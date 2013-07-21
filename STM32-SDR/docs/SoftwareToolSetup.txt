@@ -64,24 +64,52 @@ Eclipse:
 	
 Project Setup
 -------------------------------------------------------------
-1.  Right-click empty area in Project Explorer
+0. Start Eclipse, close any welcome screens.
+1.  Right-click empty area in Project Explorer (left-hand panel)
   --> Import 
   --> Git --> Projects from Git, click Next
+      (If Git does not show up, you may need to update to a newer Eclipse).
   --> URI, click Next
   --> Paste URI from GitHub.com for project:
       https://github.com/ve7pke/STM32-SDR.git
       Enter GitHub.com's user name and password.
       Optional: "Store in Secure Store" so you don't have to retype password later.
       Click Next
+      * If it fails, double check your github.com user name and password.
+        The repository is currently closed source (private), so you must be 
+        authenticated to download or commit. Contact Dave Miller if you need
+        to have your github.com account added to the project.
   --> For Branch Selection, choose "master" and click Next.
   --> Local Destination:
       Choose a folder on your computer where the files will be located.
         Suggestion: C:\GitRepositories\STM32-SDR
         (but anything will work)
       Initial branch: Master
-      Remote name: origin
+      No need to clone sub-modules
+      Configuration Remote name: origin
       Click Next
-  --> ...
+  --> on "Select a wizard to use for importing projects"
+      - Select "Import existing prjects"
+      - Select project in list "Worknig Directory - ....."
+      - Click Next
+  --> on Import Projects
+      - Should have a check-box in the STM32-STR project
+      - Click Finish to import project into work space.
+      
+2. Configure workspace to show git tools:
+  --> Window --> Customize Perspective
+  --> Command Groups Availability tab, check "Git" in left column.
+  --> Click OK
+  
+  --> Window --> Show View --> Other
+  --> Expand Git and select both:
+       * Git Repositories
+       * Git Staging
+  --> Expand Team and select as well (hold control to keep selecting):
+       * History
+
+3. You should have the project. Go to Project --> Build All.
+
 
 
 GDB Debugging:

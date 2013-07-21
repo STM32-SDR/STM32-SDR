@@ -183,7 +183,7 @@ static void initializeHardware(void)
 	Init_PTT_IO();
 	main_delay(SETUP_DELAY);
 
-	Init_Mode();
+	Mode_Init();
 	main_delay(SETUP_DELAY);
 
 	Init_CW_GPIO();

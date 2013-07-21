@@ -1,30 +1,17 @@
-Brian's To Do List
-- Mode selection:
-	- Change to be CW [CW, LSB], CWR [CW, USB], PSK [PSK, USB], LSB [SSB, LSB], USB [SSB, USB]
-	- Display on main screen shows only the mode (side band implicit in the mode)
-	- Mode selection screen shows buttons for only the modes, not side bands.
-	- Mode selection screen automatically finishes when selecting a mode (no done button)
+Feature Request List
+- This file contains feature requests from various sources.
 
-- Code:
-	- Change Makefile to allow easier compilation of multiple directories
-	- Remove the code for the 16-position encoder.
-	- Move GUI code?
-	- Remove User_Button?
-	- Remove touch_pad.h/.c?
-	- Remove TFT_Display.h/c.?
-	
-- USB debubing
-	- Indictation that USB keyboard attached
-	- USB working with new board
 
-- Frequency band selection screen 
-	- Remove code for right 16-position selector switch
-	- Move last two "frequency" bands to the options.
-	- w/ reset to defaults for each band
+*****************************
+General (unassigned) Features
+*****************************
 
 - Allow operation without SI570
 	- I2C to EEPROM should still work & device run at full speed after detecting no SI570.
-	- Display error messages on screen.
+	- Display error messages on screen when SI570 not found.
+	- May need to redesign I2C communication into basic I2C functions and then modules for
+	  SI570, EEPROM, and any other I2C devices. This way a module can detect device is not
+	  found and then fail-fast vs waiting for extensive timeouts.
 
 - UI Look:
 	- Larger frequency display
@@ -34,9 +21,57 @@ Brian's To Do List
 	- Display feedback when user pressed a "save to EEPROM" button or the like.
 	- Pressing left/right button displays message that stays on screen; Change functionality or display method.
 
-- Handle pressing-in knobs: Save current? Reset to default? Change how much is selected (right knob)?
+- PSK Mode [Milt's wish list; see screen mockup emailed Jul 20]
+	- 4 lines of text displayed for PSK mode.
+	- S Meter
+	- Mode and Frequency displays
+	- Record Button (to capture transmit and received text to a flash drive)
+	- Tuning rate
+	- Option button to change configuration.
+	- In place of the spectral display--optional waterfall
+	- Change mode either through the OPT button, or with a selector switch.
+	
+- SSB Mode [Milt's wishlist]
+	- Display filter parameters, or graphical pass-band display.
+	- Status of notch filter, noise blander, noise reduction display. 
+	
+- Handle pressing-in knobs: Save current? Reset to default? Change frequency step size (right knob)?
 - Screen to edit the PSK macros.
-- Re-engineer I2C access into: high level access {EEPROM, ..., ...}, low level {I2C commands}
-- Check-in coding standard
 - Hardware calibration and self-test feature/screen
 - Associtade a mode (PSK, CW, SSB; SSB, USB) with each frequency band.
+- Allow fine tuning the selected frequency (red line in FFT) without having to precisely touch FFT (ex: the right-encoder knob.
+
+
+*********************************
+Features Brian Hopes to Implement
+*********************************
+- Code:
+	- Change Makefile to allow easier compilation of multiple directories
+	- Move GUI code and organize to modules
+	  Possible layout:
+		\externals: folder for code we use largely intact from other sources (such as most of the USB code). Contain sub folders for modules, and each module has an inc\ and src\ folder. (We already have this).
+	
+		\code: folder for all our code; all code to be in sub-module folders.
+		\code\main\: Folder for general code not part of another module. Have a inc\ and src\ folder for .h and .c files respectively.
+		\code\gui\: Folder for GUI widgets [mode button, options button, custom label,...], and screens. Have inc\ and src\ sub folders.
+		\code\guiDrivers\: Folder for the GUI low level code which should not need to change much. Includes touch-screen driver, core GUI code, LCD drawing routines.
+	- Remove the code for the 16-position encoders.
+	- Remove User_Button
+	- Remove touch_pad.h/.c
+	- Remove TFT_Display.h/c.
+	
+- Debug USB
+	- Indictation on LCD that USB keyboard attached
+	- Get USB working with new board
+
+- Frequency band selection screen 
+	- Remove code for right 16-position selector switch
+	- Move last two "frequency" bands to the options.
+	- Add reset to defaults button which resets all bands to default.
+
+- Check-in coding standard
+
+- Support different main screens for different modes.
+	- Many screens (options, mode, ...) transition back to the main screen by explicitly naming it.
+	  If we have different main screens for PSK, CW, SSB, ... then a better way to transition back 
+	  to the screen is required.

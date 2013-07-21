@@ -53,7 +53,7 @@ void DMA1_Stream0_IRQHandler(void)
 		Rcvr_DSP();
 	}
 	else {
-		switch (Mode) {
+		switch (Mode_GetCurrentMode()) {
 		case MODE_SSB:
 			Xmit_SSB();
 			break;

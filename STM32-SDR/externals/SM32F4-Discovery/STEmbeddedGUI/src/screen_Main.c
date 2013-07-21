@@ -74,7 +74,7 @@ void ScreenMain_Create(void)
 #include "ChangeOver.h"
 static void tx_Click(GL_PageControls_TypeDef* pThis)
 {
-	switch (Mode) {
+	switch (Mode_GetCurrentMode()) {
 	case MODE_SSB:
 		Xmit_SSB_Sequence();
 		break;
