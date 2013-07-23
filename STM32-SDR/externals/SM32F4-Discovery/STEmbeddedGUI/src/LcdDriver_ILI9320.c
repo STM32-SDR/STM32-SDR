@@ -471,26 +471,8 @@ void LCD_WriteReg(uint8_t selectedReg, uint16_t regValue)
 	threadSafeCheck++;
 	assert(threadSafeCheck == 1);
 
-	// TODO: Charley: Is it OK to read from LCD_REG? Should it be correct?
-#if DEBUG_REGMISMATCH == 1
-	LCD_REG = selectedReg;
-
-	if (LCD_REG != selectedReg) {
-		LCDRegMismatch_BadReg = LCD_REG;
-		LCDRegMismatchCount_A1++;
-		if (LCD_REG != selectedReg) {
-			LCDRegMismatchCount_A2++;
-			if (LCD_REG != selectedReg) {
-				LCDRegMismatchCount_A3++;
-				LCD_REG = selectedReg;
-				if (LCD_REG != selectedReg) {
-					LCDRegMismatchCount_A4++;
-				}
-			}
-		}
-	}
-#else
 	// Loop until the value is set correctly
+	// Note: This is a bit of a hack! But it works...
 	uint8_t count = 0;
 	do {
 		LCD_REG = selectedReg;
@@ -499,8 +481,6 @@ void LCD_WriteReg(uint8_t selectedReg, uint16_t regValue)
 			break;
 		}
 	} while (LCD_REG != selectedReg);
-#endif
-
 
 	LCD_RAM = regValue;
 

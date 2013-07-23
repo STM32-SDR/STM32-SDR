@@ -5,8 +5,8 @@
  *      Author: CharleyK
  */
 
-#include	"ChangeOver.h"
-#include	"Encoder_2.h"
+#include "ChangeOver.h"
+#include "Encoder_2.h"
 #include "stm32f4xx_gpio.h"
 #include "stm32f4xx_rcc.h"
 #include "Codec_Gains.h"
@@ -46,7 +46,6 @@ void Xmit_SSB_Sequence(void)
 
 void Xmit_CW_Sequence(void)
 {
-	CW_Gain = 0.0;  //For Testing
 	Mute_HP();
 	Mute_LO();
 	Tx_Flag = 1;

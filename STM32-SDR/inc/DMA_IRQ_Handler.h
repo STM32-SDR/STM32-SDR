@@ -13,14 +13,12 @@ void Xmit_PSK(void);
 
 extern int16_t DSP_Flag;
 extern float rgain;
-float R_lgain;
-float R_xgain;
-float T_lgain;
-float T_xgain;
-float phase_adjust;
-float CW_Gain;
+extern float R_lgain;
+extern float R_xgain;
+extern float T_lgain;
+extern float T_xgain;
+extern float phase_adjust;
 
-int16_t Tx_Flag;
+extern int16_t Tx_Flag;
 
 double x_NCOphzinc;
-uint8_t Key_Down;

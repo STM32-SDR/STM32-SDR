@@ -21,6 +21,7 @@ typedef struct
 	int16_t CurrentValue;
 } OptionStruct;
 
+// Order must match OptionNumber in options.h
 static OptionStruct s_optionsData[] = {
 	{
 		/*Name*/ "Rx Audio ",
@@ -110,12 +111,6 @@ static OptionStruct s_optionsData[] = {
 		/*Rate*/ 1,
 		/*Data*/ 0,
 	},
-	// TODO: Remove these when everyone agrees on removing option's 16-position selector switch.
-//	{"Future 1 ", 0, 0, 1, 1, 0},
-//	{"Future 2 ", 0, 0, 1, 1, 0},
-//	{"Future 3 ", 0, 0, 1, 1, 0},
-//	{"Future 4 ", 0, 0, 1, 1, 0},
-//	{"Future 5 ", 0, 0, 1, 1, 0},
 };
 
 // Initialization

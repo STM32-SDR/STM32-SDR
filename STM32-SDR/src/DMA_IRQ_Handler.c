@@ -22,18 +22,20 @@ uint32_t DMA_TX_Memory;
 int16_t DSP_Flag = 0;
 int16_t Tx_Flag;
 int16_t i;
-uint8_t Key_Down;
+
 
 float rgain;
 float R_lgain;
 float R_xgain;
+float T_lgain;
+float T_xgain;
 float phase_adjust;
 
 const float Amp0 = 32766;
 static float temp;
 static float temp_old;
 float key;
-float CW_Gain;
+
 const float A = 0.000125 / .005; // sample interval divided by keying time constant
 const float B = 1.0 - 0.000125 / .005;
 
@@ -42,6 +44,8 @@ float PSK_Gain;
 
 void DMA1_Stream0_IRQHandler(void)
 {
+	uint8_t Key_Down;
+
 	//Check to see which set of buffers are currently in use
 	DMA_RX_Memory = DMA_GetCurrentMemoryTarget(DMA1_Stream0 );
 	DMA_TX_Memory = DMA_GetCurrentMemoryTarget(DMA1_Stream5 );
@@ -149,7 +153,8 @@ void Xmit_SSB(void)
 			phase_adjust = (float) Rx1BufferDMA[2 * i] * T_xgain;
 			FIR_Q_In[i] = (q15_t) (((float) Rx1BufferDMA[2 * i] + phase_adjust) * rgain); //feed same audio in for SSB
 		}
-		for (i = 0; i < BUFFERSIZE / 4; i++) {  //changed for 512 sampling using balanced input data
+		// Changed for 512 sampling using balanced input data
+		for (i = 0; i < BUFFERSIZE / 4; i++) {
 			FFT_Input[i * 2] = FIR_I_In[i];
 			FFT_Input[i * 2 + 1] = FIR_Q_In[i];
 		}
@@ -158,23 +163,23 @@ void Xmit_SSB(void)
 		Process_FIR_Q();
 		Process_FFT();
 
-		for (i = 0; i < BUFFERSIZE / 2; i++)				//Output FIR filter results to codec
-		        {
+		//Output FIR filter results to codec
+		for (i = 0; i < BUFFERSIZE / 2; i++) {
 			Tx1BufferDMA[2 * i] = (int16_t) FIR_I_Out[i];
 			Tx1BufferDMA[2 * i + 1] = (int16_t) FIR_Q_Out[i];
 		}
-
 	}		//End of Buffer 1 Processing
 
-	else  //Transfer I/Q data and fill FFT buffer on inactive buffer
-	{
+	//Transfer I/Q data and fill FFT buffer on inactive buffer
+	else {
 		for (i = 0; i < BUFFERSIZE / 2; i++) {
 			FIR_I_In[i] = (q15_t) ((float) Rx0BufferDMA[2 * i] * T_lgain);
 			phase_adjust = (float) Rx0BufferDMA[2 * i] * T_xgain;
 			FIR_Q_In[i] = (q15_t) (((float) Rx0BufferDMA[2 * i] + phase_adjust) * rgain); //feed same audio in for SSB
 		}
 
-		for (i = 0; i < BUFFERSIZE / 4; i++) {  //changed for 512 sampling using balanced input data
+		//changed for 512 sampling using balanced input data
+		for (i = 0; i < BUFFERSIZE / 4; i++) {
 			FFT_Input[i * 2] = FIR_I_In[i];
 			FFT_Input[i * 2 + 1] = FIR_Q_In[i];
 		}
@@ -183,8 +188,8 @@ void Xmit_SSB(void)
 		Process_FIR_Q();
 		Process_FFT();
 
-		for (i = 0; i < BUFFERSIZE / 2; i++)  //Output FIR filter results to codec
-		        {
+		//Output FIR filter results to codec
+		for (i = 0; i < BUFFERSIZE / 2; i++) {
 			Tx0BufferDMA[2 * i] = (int16_t) FIR_I_Out[i];
 			Tx0BufferDMA[2 * i + 1] = (int16_t) FIR_Q_Out[i];
 		}
@@ -197,6 +202,7 @@ void Xmit_CW(void)
 {
 	static q15_t NCO_I;
 	static long NCO_phz;
+	float CW_Gain;
 
 	x_NCOphzinc = (PI2 * (double) NCO_Frequency / (double) Sample_Frequency);
 

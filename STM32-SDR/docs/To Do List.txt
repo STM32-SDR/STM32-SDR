@@ -41,10 +41,16 @@ General (unassigned) Features
 - Associtade a mode (PSK, CW, SSB; SSB, USB) with each frequency band.
 - Allow fine tuning the selected frequency (red line in FFT) without having to precisely touch FFT (ex: the right-encoder knob.
 
+- Keyborad input:
+	- Make input-key handling specific to which screen is active; plug into to event handler?
+	- Allow a pseudo-focus capability on a screen.
+	- Have edit-box widget for screen.
+
 
 *********************************
 Features Brian Hopes to Implement
 *********************************
+- FFT redraw offset on force redraw screen
 - Code:
 	- Change Makefile to allow easier compilation of multiple directories
 	- Move GUI code and organize to modules
@@ -63,11 +69,17 @@ Features Brian Hopes to Implement
 - Debug USB
 	- Indictation on LCD that USB keyboard attached
 	- Get USB working with new board
-
+	- "On the new board the OTG_FS_OverCurrent signal was moved from PD5 to PB8"
+	  Pin shared on discovery board as fault output of U6; may need to turn overcurrent off in software.
+	  See July 22nd email form Charley for thoughts.
+	
 - Frequency band selection screen 
 	- Remove code for right 16-position selector switch
 	- Move last two "frequency" bands to the options.
 	- Add reset to defaults button which resets all bands to default.
+	- Change step size by holding in button.
+
+- Remove 16-position encoder code completely.
 
 - Check-in coding standard
 

@@ -191,7 +191,7 @@ static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 
 	// Update the frequency offset displayed (text):
 	static double oldSelectedFreq = -1;
-	if (oldSelectedFreq != NCO_Frequency) {
+	if (force || oldSelectedFreq != NCO_Frequency) {
 		oldSelectedFreq = NCO_Frequency;
 
 		int textY = y + FFT_HEIGHT + TEXT_OFFSET_BELOW_FFT;

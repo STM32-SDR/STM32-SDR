@@ -4,6 +4,7 @@
 #include "ModeSelect.h"
 #include <assert.h>
 #include "DMA_IRQ_Handler.h"
+#include "ChangeOver.h"
 
 typedef struct
 {
@@ -68,6 +69,10 @@ void Mode_Init(void)
 }
 void Mode_SetCurrentMode(UserModeType newMode)
 {
+	// Change to receive whenever we switch mode
+	Receive_Sequence();
+
+	// Store the change in mode
 	assert(newMode >= 0 && newMode < USERMODE_NUM_MODES);
 	s_pCurrentMode = &s_modeData[newMode];
 
