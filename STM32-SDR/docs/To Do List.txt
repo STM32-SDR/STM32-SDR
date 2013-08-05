@@ -45,14 +45,16 @@ General (unassigned) Features
 	- Make input-key handling specific to which screen is active; plug into to event handler?
 	- Allow a pseudo-focus capability on a screen.
 	- Have edit-box widget for screen.
+	
+- PSK Bugs:
+	- Have to change frequency on start before it receives anything. (via Dave, July 30 2013)
+	- Able to overflow the buffer by pressing F#-key macro multiple times.
 
 
 *********************************
 Features Brian Hopes to Implement
 *********************************
-- FFT redraw offset on force redraw screen
 - Code:
-	- Change Makefile to allow easier compilation of multiple directories
 	- Move GUI code and organize to modules
 	  Possible layout:
 		\externals: folder for code we use largely intact from other sources (such as most of the USB code). Contain sub folders for modules, and each module has an inc\ and src\ folder. (We already have this).
