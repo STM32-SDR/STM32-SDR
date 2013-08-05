@@ -43,19 +43,20 @@ void kybd_addCharacter(char Char)
 void kybd_dispFunctionKey(uint8_t data)
 {
 	// Ensure queue is empty before adding data:
-	if(!PSK_isQueueEmpty()) {
+/*	if(!PSK_isQueueEmpty()) {
 		return;
 	}
-
+*/
+//another Fix per Charley
 	// Place data from macro into the buffer:
 	switch(data) {
-	case 0: String2Buffer(" CQ CQ CQ de W5BAA W5BAA "); break;
-	case 1: String2Buffer("  de W5BAA "); break;
-	case 2: String2Buffer(" tnx for  call, handle is Charley "); break;
-	case 3: String2Buffer("  QTH is Marble Falls,  near Austin "); break;
-	case 4: String2Buffer("  Rig is homebrew PSK xcvr @ 2 watts"); break;
+	case 0: String2Buffer(" CQ CQ CQ de VE7PKE "); break;
+	case 1: String2Buffer("  de VE7PKE "); break;
+	case 2: String2Buffer(" tnx for  call, handle is Dave "); break;
+	case 3: String2Buffer("  QTH is Surrey, BC "); break;
+	case 4: String2Buffer("  Rig is homebrew PSK xcvr @ 500 milliwats"); break;
 	case 5: String2Buffer(" BTU "); break;
-	case 6: String2Buffer("  de W5BAA k"); break;
+	case 6: String2Buffer("  de VE7PKE   k"); break;
 	}
 }
 

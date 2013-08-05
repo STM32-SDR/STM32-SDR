@@ -209,4 +209,5 @@ static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 		intToCommaString((int)NCO_Frequency, number, MAX_FREQ_DIGITS + 1);
 		GL_PrintString(numberX, textY, number, 0);
 	}
+	DSP_Flag = 0;   // added per Charley
 }

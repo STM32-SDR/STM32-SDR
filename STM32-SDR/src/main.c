@@ -109,7 +109,7 @@ int main(void)
 		 * Redraw the screen (as needed)
 		 */
 		UpdateScreenWithChanges();
-		DSP_Flag = 0;
+		// DSP_Flag = 0; // moved to widget_FFT_Display
 
 	}
 }

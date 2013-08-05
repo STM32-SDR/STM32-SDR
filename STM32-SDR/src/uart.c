@@ -135,7 +135,7 @@ void USART2_IRQHandler(void)
 	if (USART_GetITStatus(USART2, USART_IT_RXNE )) {
 		// the character from the USART2 data register is saved in t
 		// TODO: do something with rxChar (commented out to remove warning)
-//		char rxChar = USART2 ->DR;
+		char rxChar = USART2 ->DR; // uncommented to fix hang Charley was having
 	}
 }
 
