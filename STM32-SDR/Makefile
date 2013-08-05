@@ -64,30 +64,46 @@ UDEFS =
 # Define ASM defines here
 UADEFS =
  
-# List C source files here
 # Note: Use \ (or \\ if being processed by a tool) for paths because
 #       Linux tools handle either, but Windows tools (some) only handle \.
-LIBSDIR      = .\externals\SM32F4-Discovery
-CORELIBDIR   = $(LIBSDIR)\CMSIS-Includes
-DEVDIR       = $(LIBSDIR)\STM32F4xx-Includes
-STMSPDDIR    = $(LIBSDIR)\STM32F4xx-StdPeriph-Includes
-USBINCDIR    = $(LIBSDIR)\USB\inc
-GUIINCDIR    = $(LIBSDIR)\STEmbeddedGUI\inc
 LINKER       = .\linker
 
-# Build all .c files in the src/ folder.
+
+# Find all .c & .h files
 # wildcard needs unix forward-slashes, but build tools need wisdows backslashes, 
 # so give wildcard what it likes, and then convert the results using subst function.
-SRC_TMP = $(wildcard ./src/*.c) $(wildcard ./externals/SM32F4-Discovery/USB/src/*.c) $(wildcard ./externals/SM32F4-Discovery/STEmbeddedGUI/src/*.c)
-SRC = $(subst /,\,$(SRC_TMP))
+#
+# Make does not offer a recursive wildcard function, so here's one:
+# Posted by "LightStruk" to StackOverflow: http://stackoverflow.com/questions/4036191/sources-from-subdirectories-in-makefile
+rwildcard=$(wildcard $1$2) $(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2))
+#
+# Recursively find all .c files and their folders 
+SRC_TMP := $(call rwildcard,./,*.c)
+SRC := $(subst /,\,$(SRC_TMP))
+# ..find folders (sort to remove duplicates)
+C_DIRS := $(sort $(dir $(SRC)))
+# ..(strip any trailing \ at end of each path)
+C_DIRS := $(C_DIRS:\=)     
+# 
+# Recursively find all .h files and their folders 
+HEADERS_TMP := $(call rwildcard,./,*.h)
+HEADERS := $(subst /,\,$(HEADERS_TMP))
+# ..find folders (sort to remove duplicates)
+H_DIRS := $(sort $(dir $(HEADERS)))
+# ..(strip any trailing \ at end of each path)
+H_DIRS := $(H_DIRS:\=)     
+
+
+
+
 
 # List ASM source files here
 ASRC = .\startup\startup_stm32f4xx.s
  
-# List all user directories here
-UINCDIR = $(DEVDIR) $(CORELIBDIR) $(STMSPDDIR)  $(USBINCDIR) $(GUIINCDIR) .\inc     
+# List all user include directories here  
+UINCDIR := $(H_DIRS)     
      
-# List the user directory to look for the libraries here
+# List the user directory to look for the pre-compiled libraries here
 ULIBDIR = .\externals\libs
  
 # List all user libraries here
@@ -100,14 +116,15 @@ ULIBS = -lstm32f4xx_peripherals -lstm32f4xx_math -lm
 #   DMA_Cmd(DMA1_Stream0, ENABLE); and DMA_Cmd(DMA1_Stream5, ENABLE); with -O0 causes the IRQ to be triggered
 #   continually; without these delays, the IRQ is never triggered.
 OPT = -Os
-#OPT = -O0	
 
 # Folder for build intermediates:
 OBJDIR = obj
 
-# Required directories:
-# TODO: Fix directory creation/comilation to make it more generic.
-DIRS = $(OBJDIR) $(OBJDIR)\src $(OBJDIR)\externals $(OBJDIR)\externals\SM32F4-Discovery $(OBJDIR)\externals\SM32F4-Discovery\USB $(OBJDIR)\externals\SM32F4-Discovery\USB\src $(OBJDIR)\externals\SM32F4-Discovery\STEmbeddedGUI $(OBJDIR)\externals\SM32F4-Discovery\STEmbeddedGUI\src $(OBJDIR)\startup .dep
+# Required directories to create:
+# - Add the OBJDIR prefix to put the .o files in separate output directory.
+DIRS_TMP := $(foreach srcDir,$(C_DIRS),$(OBJDIR)\$(srcDir))  $(OBJDIR)\startup .dep
+DIRS := $(subst \.\,\,$(DIRS_TMP))
+  
 
 #
 # End of user defines
@@ -203,15 +220,18 @@ clean:
 # Used for debugging the makefile variables.
 dump:
 	@echo Dumping out some build variables:
+	@echo -------------------------
 	@echo SRC:  $(SRC)
-	@echo 
+	@echo -------------------------
 	@echo ASRC: $(ASRC)
-	@echo
+	@echo -------------------------
 	@echo OBJS: $(OBJS)
-	@echo
+	@echo -------------------------
+	@echo DIRS: $(DIRS)
+	@echo UINCDIR: $(UINCDIR)	
+	@echo -------------------------
 	@echo Your GCC version:
 	$(CC) --version
-	@echo
 	@echo Your make version:
 	make --version
  
