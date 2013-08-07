@@ -50,31 +50,14 @@ General (unassigned) Features
 	- Have to change frequency on start before it receives anything. (via Dave, July 30 2013)
 	- Able to overflow the buffer by pressing F#-key macro multiple times.
 
+- USB Bugs:
+	- Seems to work better when board powered down for 1 minute, plug in USB keyboard and then boot.
+	- Seems not to support USB hot-swapping.
+
 
 *********************************
 Features Brian Hopes to Implement
 *********************************
-- Code:
-	- Move GUI code and organize to modules
-	  Possible layout:
-		\externals: folder for code we use largely intact from other sources (such as most of the USB code). Contain sub folders for modules, and each module has an inc\ and src\ folder. (We already have this).
-	
-		\code: folder for all our code; all code to be in sub-module folders.
-		\code\main\: Folder for general code not part of another module. Have a inc\ and src\ folder for .h and .c files respectively.
-		\code\gui\: Folder for GUI widgets [mode button, options button, custom label,...], and screens. Have inc\ and src\ sub folders.
-		\code\guiDrivers\: Folder for the GUI low level code which should not need to change much. Includes touch-screen driver, core GUI code, LCD drawing routines.
-	- Remove the code for the 16-position encoders.
-	- Remove User_Button
-	- Remove touch_pad.h/.c
-	- Remove TFT_Display.h/c.
-	
-- Debug USB
-	- Indictation on LCD that USB keyboard attached
-	- Get USB working with new board
-	- "On the new board the OTG_FS_OverCurrent signal was moved from PD5 to PB8"
-	  Pin shared on discovery board as fault output of U6; may need to turn overcurrent off in software.
-	  See July 22nd email form Charley for thoughts.
-	
 - Frequency band selection screen 
 	- Remove code for right 16-position selector switch
 	- Move last two "frequency" bands to the options.
@@ -89,3 +72,17 @@ Features Brian Hopes to Implement
 	- Many screens (options, mode, ...) transition back to the main screen by explicitly naming it.
 	  If we have different main screens for PSK, CW, SSB, ... then a better way to transition back 
 	  to the screen is required.
+	  
+- Investigate software licences and licence of all code
+	- PSK already GPL based?
+	- USB & GUI from STM?
+	- Startup Image?
+		  
+- Debug USB
+	- Indictation on LCD that USB keyboard attached
+	- "On the new board the OTG_FS_OverCurrent signal was moved from PD5 to PB8"
+	  Pin shared on discovery board as fault output of U6; may need to turn overcurrent off in software.
+	  See July 22nd email form Charley for thoughts.
+	
+- Other:
+	- Remove all LCD_StringLine() calls and delete function.

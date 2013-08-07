@@ -98,16 +98,16 @@ H_DIRS := $(H_DIRS:\=)
 
 
 # List ASM source files here
-ASRC = .\startup\startup_stm32f4xx.s
+ASRC := .\startup\startup_stm32f4xx.s
  
 # List all user include directories here  
 UINCDIR := $(H_DIRS)     
      
 # List the user directory to look for the pre-compiled libraries here
-ULIBDIR = .\externals\libs
+ULIBDIR := .\externals\libs
  
 # List all user libraries here
-ULIBS = -lstm32f4xx_peripherals -lstm32f4xx_math -lm
+ULIBS := -lstm32f4xx_peripherals -lstm32f4xx_math -lm
  
 # Define optimisation level here 
 # (-O0 useful for debugging because variables not optimized out; however, seems to interfere with DMA ISR)
@@ -118,7 +118,7 @@ ULIBS = -lstm32f4xx_peripherals -lstm32f4xx_math -lm
 OPT = -Os
 
 # Folder for build intermediates:
-OBJDIR = obj
+OBJDIR := obj
 
 # Required directories to create:
 # - Add the OBJDIR prefix to put the .o files in separate output directory.
@@ -140,8 +140,8 @@ LDSCRIPT = ./linker/stm32f407vg.ld
 FULL_PRJ = $(PROJECT)_rom
 endif
  
-INCDIR  = $(patsubst %,-I%,$(DINCDIR) $(UINCDIR))
-LIBDIR  = $(patsubst %,-L%,$(DLIBDIR) $(ULIBDIR))
+INCDIR  := $(patsubst %,-I%,$(DINCDIR) $(UINCDIR))
+LIBDIR  := $(patsubst %,-L%,$(DLIBDIR) $(ULIBDIR))
  
 ifeq ($(RUN_FROM_FLASH), 0)
 DEFS    = $(DDEFS) $(UDEFS) -DRUN_FROM_FLASH=0 -DVECT_TAB_SRAM
@@ -193,6 +193,9 @@ $(OBJDIR)\\%.o: %.s
 	$(BIN)  $< $@
 	
 unixclean:
+	# CAUTION: NOT UPDATED!
+	# If building on a Linux box, or using different version of make, you may need
+	# to make this match the "clean" target.
 	rm -f $(OBJS)
 	rm -f $(OBJS:.o=.lst)
 	rm -f $(FULL_PRJ).elf
@@ -205,16 +208,14 @@ unixclean:
 	mkdir .dep
 	
 clean:
-	del $(OBJS)
-	del $(OBJS:.o=.lst)
-	del $(FULL_PRJ).elf
-	del $(FULL_PRJ).map
-	del $(FULL_PRJ).hex
-	del $(FULL_PRJ).bin
-	del $(SRC:.c=.c.bak)
-	del $(ASRC:.s=.s.bak)
-	rmdir .dep /S /Q
-	mkdir .dep
+	-rmdir $(OBJDIR) /S /Q   
+	-del $(FULL_PRJ).elf
+	-del $(FULL_PRJ).map
+	-del $(FULL_PRJ).hex
+	-del $(FULL_PRJ).bin
+	-del $(SRC:.c=.c.bak)
+	-del $(ASRC:.s=.s.bak)
+	-rmdir .dep /S /Q
 
 
 # Used for debugging the makefile variables.
