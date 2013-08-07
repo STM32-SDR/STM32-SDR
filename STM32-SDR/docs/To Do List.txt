@@ -54,18 +54,12 @@ General (unassigned) Features
 	- Seems to work better when board powered down for 1 minute, plug in USB keyboard and then boot.
 	- Seems not to support USB hot-swapping.
 
+- Other:
+	- Makefile dependencies are not working: changing a .h file does not recompile the .c files.
 
 *********************************
 Features Brian Hopes to Implement
 *********************************
-- Frequency band selection screen 
-	- Remove code for right 16-position selector switch
-	- Move last two "frequency" bands to the options.
-	- Add reset to defaults button which resets all bands to default.
-	- Change step size by holding in button.
-
-- Remove 16-position encoder code completely.
-
 - Check-in coding standard
 
 - Support different main screens for different modes.

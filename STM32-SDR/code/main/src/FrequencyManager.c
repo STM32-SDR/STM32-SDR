@@ -28,10 +28,6 @@ static BandsStruct s_bandsData[] = {
 	{ " 12 M PSK ",  24920000},
 	{ " 10 M PSK ",  28120000},
 	{ "  6 M PSK ",  50250000},
-
-	// TODO: Should SI570 configurations be options vs frequency settings?
-	{ " SI570 F0 ",  56320000},
-	{ "SI570 Mult",  4},
 };
 static BandPreset s_selectedBand = FREQBAND_20M_PSK;
 
@@ -43,7 +39,7 @@ static uint32_t s_stepSize = 100;
 #define FREQUENCY_MIN 2000000
 #define FREQUENCY_MAX 500000000
 
-uint8_t F_Mult;
+static uint8_t s_frequencyMultiplier = 2;
 
 void FrequencyManager_Initialize(void)
 {
@@ -59,31 +55,11 @@ void FrequencyManager_Initialize(void)
 		FrequencyManager_ReadBandsFromEeprom();
 	}
 
-
-
-
 	FrequencyManager_SetSelectedBand(FREQBAND_20M_PSK);
-
-	// Initialize the F0 for the radio:
-	F0 = (double) s_bandsData[FREQBAND_SSI570_F0].CurrentFrequency;
-
-	// Initialize the multiplier to the radio:
-//	static uint32_t satoheuntaoehu = 0;
-//	satoheuntaoehu = s_bandsData[FREQBAND_SI570_MULT].CurrentFrequency;
-	assert(s_bandsData[FREQBAND_SI570_MULT].CurrentFrequency == 2 ||
-			s_bandsData[FREQBAND_SI570_MULT].CurrentFrequency == 4);
-	F_Mult = s_bandsData[FREQBAND_SI570_MULT].CurrentFrequency;
-
-	// Radio stuff:
-	Check_SI570();
-
-
-
 }
 
 void FrequencyManager_ResetBandsToDefault(void)
 {
-	// TODO: Also write to EEPROM when storing resetting bands?
 	for (int i = 0; i < FREQBAND_NUMBER_OF_BANDS; i++) {
 		s_bandsData[i].CurrentFrequency = s_bandsData[i].Setpoint;
 	}
@@ -98,17 +74,21 @@ void FrequencyManager_SetSelectedBand(BandPreset newBand)
 	s_selectedBand = newBand;
 	FrequencyManager_SetCurrentFrequency(s_bandsData[newBand].CurrentFrequency);
 }
-BandPreset FrequencyManager_GetSelecteBand(void)
+BandPreset FrequencyManager_GetSelectedBand(void)
 {
 	return s_selectedBand;
 }
-const char* FrequencyManager_GetSelectedBandName(void)
+
+
+const char* FrequencyManager_GetBandName(BandPreset band)
 {
-	return s_bandsData[s_selectedBand].Name;
+	assert(band >= 0 && band < FREQBAND_NUMBER_OF_BANDS);
+	return s_bandsData[band].Name;
 }
-uint32_t FrequencyManager_GetSelectedBandValue(void)
+uint32_t FrequencyManager_GetBandValue(BandPreset band)
 {
-	return s_bandsData[s_selectedBand].Setpoint;
+	assert(band >= 0 && band < FREQBAND_NUMBER_OF_BANDS);
+	return s_bandsData[band].Setpoint;
 }
 
 /*
@@ -116,61 +96,26 @@ uint32_t FrequencyManager_GetSelectedBandValue(void)
  */
 void FrequencyManager_SetCurrentFrequency(uint32_t newFrequency)
 {
-
-	// Apply change to hardware:
-	switch (s_selectedBand) {
-	case FREQBAND_SSI570_F0:
-	{
-		// Toggle between 56.32Mhz and 10Mhz
-		uint32_t curVal = s_bandsData[FREQBAND_SSI570_F0].CurrentFrequency;
-		if (newFrequency != curVal) {
-			if (F0 == 56320000.0) {
-				F0 = 10000000.0;
-			}
-			else {
-				F0 = 56320000.0;
-			}
-		}
-		if (SI570_Chk != 3) {
-			Compute_FXTAL();
-		}
-		newFrequency = F0;
-		break;
+	// Change the radio frequency:
+	if ((newFrequency < FREQUENCY_MIN) || (newFrequency > FREQUENCY_MAX)) {
+		return;
 	}
 
-	case FREQBAND_SI570_MULT:
-	{
-		// Toggle between 2 and 4:
-		uint32_t curVal = s_bandsData[FREQBAND_SI570_MULT].CurrentFrequency;
-		if (newFrequency != curVal) {
-			if (curVal == 4) {
-				newFrequency = 2;
-			} else {
-				newFrequency = 4;
-			}
-		}
-		F_Mult = newFrequency;
-		break;
+	if (SI570_Chk != 3) {
+		Output_Frequency(newFrequency * s_frequencyMultiplier);
 	}
 
-	default:
-		// All "normal" frequencies change the radio frequency:
-		if ((newFrequency < FREQUENCY_MIN) || (newFrequency > FREQUENCY_MAX)) {
-			return;
-		}
-
-		if (SI570_Chk != 3) {
-			Output_Frequency(newFrequency * F_Mult);
-		}
-		break;
-	}
-
-	// If we made it through the above, store the value.
+	// If we made it through the above, record the value.
 	s_bandsData[s_selectedBand].CurrentFrequency = newFrequency;
 }
 uint32_t FrequencyManager_GetCurrentFrequency(void)
 {
 	return s_bandsData[s_selectedBand].CurrentFrequency;
+}
+
+void FrequencyManager_SetFreqMultiplier(int16_t newFreqMult)
+{
+	s_frequencyMultiplier = newFreqMult;
 }
 
 /*
@@ -207,7 +152,6 @@ uint32_t FrequencyManager_GetFrequencyStepSize(void)
 /*
  * EEPROM Routines
  */
-
 #define EEPROM_FREQBAND_OFFSET 100
 void FrequencyManager_WriteBandsToEeprom(void)
 {
@@ -215,7 +159,6 @@ void FrequencyManager_WriteBandsToEeprom(void)
 		Write_Long_EEProm(EEPROM_FREQBAND_OFFSET + i * 4, s_bandsData[i].CurrentFrequency);
 	}
 }
-
 void FrequencyManager_ReadBandsFromEeprom(void)
 {
 	for (int i = 0; i < FREQBAND_NUMBER_OF_BANDS; i++) {

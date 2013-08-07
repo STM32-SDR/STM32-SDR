@@ -7,8 +7,6 @@
 #include 	"stm32f4xx_i2c.h"
 #include 	"Init_I2C.h"
 #include 	"eeprom.h"
-#include 	"Encoder_1.h"
-#include 	"Encoder_2.h"
 
 //Routine to write a integer value to the eeprom starting at eeprom address EEProm_Addr
 int16_t Write_Int_EEProm(uint16_t EEProm_Addr, int16_t value)
@@ -80,18 +78,3 @@ uint32_t Read_Long_EEProm(uint16_t EEProm_Addr)
 
 	return result;
 }
-
-//void Store_SI570_Data(void)
-//{
-//	int i;
-//	for (i = 0; i < 16; i++)
-//		Write_Long_EEProm(100 + i * 4, Freq_Set[i]);
-//}
-
-//void Read_SI570_Data(void)
-//{
-//	int i;
-//	for (i = 0; i < 16; i++)
-//		Freq_Set[i] = Read_Long_EEProm(100 + i * 4);
-//}
-//

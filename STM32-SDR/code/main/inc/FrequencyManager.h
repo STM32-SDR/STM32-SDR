@@ -1,8 +1,8 @@
-
+// Control the selected frequency, its value, and how it changes.
+#ifndef _FREQUENCYMANAGER_H_
+#define _FREQUENCYMANAGER_H_
 
 #include <stdint.h>
-
-
 
 typedef enum {
 	FREQBAND_20M_PSK = 0,
@@ -19,8 +19,6 @@ typedef enum {
 	FREQBAND_12M_PSK,
 	FREQBAND_10M_PSK,
 	FREQBAND_6M_PSK,
-	FREQBAND_SSI570_F0,
-	FREQBAND_SI570_MULT,
 
 	// Count of number of bands
 	// Automatically updated when more bands added above.
@@ -31,15 +29,18 @@ typedef enum {
 void FrequencyManager_Initialize(void);
 void FrequencyManager_ResetBandsToDefault(void);
 
-// Work with preset bands:
+// Manage current selection
 void FrequencyManager_SetSelectedBand(BandPreset newBand);
-BandPreset FrequencyManager_GetSelecteBand(void);
-const char* FrequencyManager_GetSelectedBandName(void);
-uint32_t FrequencyManager_GetSelectedBandValue(void);
+BandPreset FrequencyManager_GetSelectedBand(void);
+
+// Work with preset bands:
+const char* FrequencyManager_GetBandName(BandPreset band);
+uint32_t FrequencyManager_GetBandValue(BandPreset band);
 
 // Get/Set curent frequency to radio (in Hz)
 void FrequencyManager_SetCurrentFrequency(uint32_t newFrequency);
 uint32_t FrequencyManager_GetCurrentFrequency(void);
+void FrequencyManager_SetFreqMultiplier(int16_t newFreqMult);
 
 // Stepping the frequency (for example, using the adjustment knob)
 void FrequencyManager_StepFrequencyUp(void);
@@ -51,3 +52,5 @@ uint32_t FrequencyManager_GetFrequencyStepSize(void);
 // EEPROM Routines:
 void FrequencyManager_WriteBandsToEeprom(void);
 void FrequencyManager_ReadBandsFromEeprom(void);
+
+#endif

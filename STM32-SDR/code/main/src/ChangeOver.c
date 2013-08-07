@@ -6,7 +6,6 @@
  */
 
 #include "ChangeOver.h"
-#include "Encoder_2.h"
 #include "stm32f4xx_gpio.h"
 #include "stm32f4xx_rcc.h"
 #include "Codec_Gains.h"
@@ -72,7 +71,6 @@ void Xmit_PSK_Sequence(void)
 
 void Init_PTT_IO(void)
 {
-
 	GPIO_InitTypeDef GPIO_InitStruct;
 
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);

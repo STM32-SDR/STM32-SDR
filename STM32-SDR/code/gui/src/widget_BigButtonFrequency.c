@@ -43,9 +43,9 @@ GL_PageControls_TypeDef* Widget_NewBigButtonFrequency(void)
 /*
  * Private interface
  */
-// TODO: Idea for control: make tap bring up band selection; make press-in and turn knob change adjustment amount.
 static void insideEventHandler(GL_PageControls_TypeDef* pThis, int relX, int relY)
 {
+#if 0
 	_Bool touchLeftHalf = relX < INSIDE_WIDTH / 2;
 	if (touchLeftHalf) {
 		FrequencyManager_IncreaseFreqStepSize();
@@ -53,6 +53,9 @@ static void insideEventHandler(GL_PageControls_TypeDef* pThis, int relX, int rel
 	else {
 		FrequencyManager_DecreaseFreqStepSize();
 	}
+#else
+	Screen_ShowScreen(&g_screenFrequencies);
+#endif
 }
 
 static void insideDrawHandler(GL_PageControls_TypeDef* pThis, _Bool force, int relX, int relY)
@@ -62,7 +65,7 @@ static void insideDrawHandler(GL_PageControls_TypeDef* pThis, _Bool force, int r
 	static uint32_t previousFreq = -1;
 	static uint32_t previousStep = -1;
 
-	BandPreset curBand = FrequencyManager_GetSelecteBand();
+	BandPreset curBand = FrequencyManager_GetSelectedBand();
 	uint32_t curFreq = FrequencyManager_GetCurrentFrequency();
 	uint32_t curStep = FrequencyManager_GetFrequencyStepSize();
 
@@ -79,7 +82,7 @@ static void insideDrawHandler(GL_PageControls_TypeDef* pThis, _Bool force, int r
 		int writeX = relX + OFFSETX_TEXT;
 		int writeY = relY + OFFSETY_BAND;
 
-		GL_PrintString(writeX, writeY, FrequencyManager_GetSelectedBandName(), 0);
+		GL_PrintString(writeX, writeY, FrequencyManager_GetBandName(FrequencyManager_GetSelectedBand()), 0);
 		previousBand = curBand;
 	}
 

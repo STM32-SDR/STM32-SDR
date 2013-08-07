@@ -89,6 +89,17 @@ void EXTI0_IRQHandler(void)
 
 //===============================================================================
 
+static void DelayUS(vu32 cnt)
+{
+	uint32_t i;
+	for (i = 0; i < cnt; i++) {
+		uint8_t us = 12;
+		while (us--) {
+			;
+		}
+	}
+}
+
 
 /*
  * Delayed Event Handling
@@ -102,9 +113,17 @@ void DelayEvent_ProcessDelayedEvents(void)
 	// Handle the marked event.
 	if (s_delayEventsTriggered & DelayEvent_DisplayStoreIQ) {
 		LCD_StringLine(0, 40, "Store   IQ");
+
+		DelayUS(10);
+		Options_WriteToEEPROM();
+		DelayUS(10);
 	}
 	if (s_delayEventsTriggered & DelayEvent_DisplayStoreFreq) {
 		LCD_StringLine(234, 40, "Store Freq");
+
+		DelayUS(10);
+		FrequencyManager_WriteBandsToEeprom();
+		DelayUS(10);
 	}
 
 	// Clear all the marked events.
@@ -125,17 +144,6 @@ void DelayEvent_TriggerEvent(DelayEvent_Event event)
 /* ****************************************************************
  *   ISR
  * ****************************************************************/
-static void DelayUS(vu32 cnt)
-{
-	uint32_t i;
-	for (i = 0; i < cnt; i++) {
-		uint8_t us = 12;
-		while (us--) {
-			;
-		}
-	}
-}
-
 void EXTI9_5_IRQHandler(void)
 {
 	//Handle Touch Screen Interrupts
@@ -148,21 +156,17 @@ void EXTI9_5_IRQHandler(void)
 	if (EXTI_GetITStatus(EXTI_Line7) != RESET) {
 		// LCD code is not thread safe, so trigger a delayed event to display the "Store IQ" message.
 		DelayEvent_TriggerEvent(DelayEvent_DisplayStoreIQ);
-
-		DelayUS(10);
-		Options_WriteToEEPROM();
-		DelayUS(10);
 		EXTI_ClearITPendingBit(EXTI_Line7 );
 	}
 
 	//Handle Encoder #1 PB interrupt
 	if (EXTI_GetITStatus(EXTI_Line8) != RESET) {
-		// LCD code is not thread safe, so trigger a delayed event to display the "Store Freq" message.
-		DelayEvent_TriggerEvent(DelayEvent_DisplayStoreFreq);
-
-		DelayUS(10);
-		FrequencyManager_WriteBandsToEeprom();
-		DelayUS(10);
 		EXTI_ClearITPendingBit(EXTI_Line8 );
+
+		// No event triggered here; (previously stored frequencies to flash).
+		/*
+			// LCD code is not thread safe, so trigger a delayed event to display the "Store Freq" message.
+			DelayEvent_TriggerEvent(DelayEvent_DisplayStoreFreq);
+		*/
 	}
 }

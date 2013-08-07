@@ -4,10 +4,15 @@
 #include "ModeSelect.h"
 #include "DMA_IRQ_Handler.h"
 #include "eeprom.h"
+#include "Si570.h"
+#include "FrequencyManager.h"
+
 
 #define EEPROM_OFFSET 200
 #define EEPROM_SENTINEL_LOC 50
-#define EEPROM_SENTINEL_VAL 5678
+#define EEPROM_SENTINEL_VAL 5679
+
+#define SI570_F0_SCALE 10000
 
 static OptionNumber s_currentOptionNumber = OPTION_RX_AUDIO;
 
@@ -111,6 +116,22 @@ static OptionStruct s_optionsData[] = {
 		/*Rate*/ 1,
 		/*Data*/ 0,
 	},
+	{
+		/*Name*/ "SI570 F0 ", // Scaled at /10000
+		/*Init*/ (56320000 / SI570_F0_SCALE),
+		/*Min */ (10000000 / SI570_F0_SCALE),
+		/*Max */ (56320000 / SI570_F0_SCALE),
+		/*Rate*/ ((56320000-10000000) / SI570_F0_SCALE),
+		/*Data*/ 0,
+	},
+	{
+		/*Name*/ "SI570Mult",
+		/*Init*/ 4,
+		/*Min */ 2,
+		/*Max */ 4,
+		/*Rate*/ 2,
+		/*Data*/ 0,
+	},
 };
 
 // Initialization
@@ -127,6 +148,18 @@ void Options_Initialize(void)
 		Options_ResetToDefaults();
 		Options_WriteToEEPROM();
 	}
+
+	// Initialize the F0 for the radio:
+	F0 = (double) s_optionsData[OPTION_SI570_F0].CurrentValue * SI570_F0_SCALE;
+
+	// Initialize the multiplier to the radio:
+	assert(s_optionsData[OPTION_SI570_MULT].CurrentValue == 2 ||
+			s_optionsData[OPTION_SI570_MULT].CurrentValue == 4);
+	FrequencyManager_SetFreqMultiplier(s_optionsData[OPTION_SI570_MULT].CurrentValue);
+
+	// Radio initialization:
+	Check_SI570();
+
 }
 void Options_ResetToDefaults(void)
 {
@@ -208,7 +241,23 @@ void Options_SetValue(int optionIdx, int16_t newValue)
 			Turn_On_Bias();
 		}
 		break;
+
+	case OPTION_SI570_F0:
+		F0 = (double) newValue * SI570_F0_SCALE;
+		if (SI570_Chk != 3) {
+			Compute_FXTAL();
+		}
+		break;
+
+	case OPTION_SI570_MULT:
+		FrequencyManager_SetFreqMultiplier(newValue);
+		break;
+
+	default:
+		// Handle any programming errors where we forget to update this switch statement.
+		assert(0);
 	}
+
 }
 uint16_t Options_GetMinimum(int optionIdx)
 {

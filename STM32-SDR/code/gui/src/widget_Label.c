@@ -22,6 +22,7 @@ typedef struct {
 	// forceRedraw set to true (1) indicates full page draw; false means just an update.
 	// Returns true if a redraw is required.
 	_Bool (*pUpdateHandler)(GL_PageControls_TypeDef* pThis, _Bool forceRedisplay);
+	_Bool isRedrawRequired;	// Redraw text when changed.
 } LabelData;
 
 
@@ -75,6 +76,7 @@ GL_PageControls_TypeDef* Widget_NewLabel(
 	pInstanceData->isTransparent = isTransparent;
 	pInstanceData->font = font;
 	pInstanceData->pUpdateHandler = pUpdateHandler;
+	pInstanceData->isRedrawRequired = 0;
 
 	return pControl;
 }
@@ -87,6 +89,14 @@ void Widget_ChangeLabelText(GL_PageControls_TypeDef *pThis, const char* strText)
 	// Note: Buffer is 1 bigger than WIDGET_LABEL_TEXT_MAXLENGTH
 	strncpy(pInstData->strText, strText, WIDGET_LABEL_TEXT_MAXLENGTH);
 	pInstData->strText[WIDGET_LABEL_TEXT_MAXLENGTH] = 0;
+	pInstData->isRedrawRequired = 1;
+}
+
+void Widget_ChangeLabelColour(GL_PageControls_TypeDef *pThis, uint16_t newTextColour)
+{
+	LabelData *pInstData = getInstDataFromPageCtrl(pThis);
+	pInstData->textColor = newTextColour;
+	pInstData->isRedrawRequired = 1;
 }
 
 
@@ -112,8 +122,11 @@ static void drawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 {
 	LabelData *pInstData = getInstDataFromPageCtrl(pThis);
 
-	// Allow code to update itself
-	_Bool change = 0;
+	// Check if a call to Widget_ChangeLabelText() has happened:
+	_Bool change = pInstData->isRedrawRequired;
+	pInstData->isRedrawRequired = 0;
+
+	// Allow code to update itself (via an update handler, if any).
 	if (pInstData->pUpdateHandler != 0) {
 		change = pInstData->pUpdateHandler(pThis, force);
 	}

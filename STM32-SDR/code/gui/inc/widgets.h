@@ -63,6 +63,8 @@ GL_PageControls_TypeDef* Widget_NewLabel(
 		_Bool (*pUpdateHandler)(GL_PageControls_TypeDef* pThis, _Bool forceRedisplay)
 	);
 void Widget_ChangeLabelText(GL_PageControls_TypeDef *pThis, const char* strText);
+void Widget_ChangeLabelColour(GL_PageControls_TypeDef *pThis, uint16_t newTextColour);
+
 
 GL_PageControls_TypeDef* Widget_NewPSKTextDisplay(void);
 

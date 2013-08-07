@@ -5,8 +5,7 @@
 #include	"DMA_IRQ_Handler.h"
 #include	"DMA_Test_Pins.h"
 #include	"DSP_Processing.h"
-#include	"Encoder_1.h"
-#include	"Encoder_2.h"
+#include	"Encoders.h"
 #include	"Init_Codec.h"
 #include	"Init_DMA.h"
 #include 	"Init_I2C.h"
@@ -32,9 +31,6 @@
 
 const uint32_t CODEC_FREQUENCY = 8000;
 
-int16_t old_SS1_position;
-int16_t old_SS2_position;
-
 // USB structures (Must be 4-byte aligned if DMA active)
 __ALIGN_BEGIN USB_OTG_CORE_HANDLE USB_OTG_Core_dev __ALIGN_END;
 __ALIGN_BEGIN USBH_HOST USB_Host __ALIGN_END;
@@ -50,9 +46,6 @@ static void main_delay(uint32_t numLoops);
 /*
  * FUNCTIONS
  */
-
-
-
 int main(void)
 {
 	initializeHardware();
@@ -69,22 +62,9 @@ int main(void)
 
 	while (1) {
 		/*
-		 * Selector Switches
+		 * Check if encoder-knobs have changed:
 		 */
-		// Process selector switch 1 (has it moved?)
-		if (Encoder1_GetPosition() != old_SS1_position) {
-			process_SS1();
-			old_SS1_position = Encoder1_GetPosition();
-		}
-		if (SI570_Chk != 3)
-			process_encoder1();
-
-		// Process selector switch 2 (has it moved?)
-		check_SS2();
-		if (Options_GetSelectedOption() != old_SS2_position) {
-			old_SS2_position = Options_GetSelectedOption();
-		}
-		process_encoder2();
+		Encoders_CalculateAndProcessChanges();
 
 		/*
 		 * USB
@@ -154,24 +134,10 @@ static void initializeHardware(void)
 	displaySplashScreen();
 
 	main_delay(SETUP_DELAY);
-	Encoder1_GPIO_Config();
+	Encoders_Init();
 	main_delay(SETUP_DELAY);
 
 	FrequencyManager_Initialize();
-	old_SS1_position = Encoder1_GetPosition();
-	main_delay(SETUP_DELAY);
-
-	init_encoder1();
-	main_delay(SETUP_DELAY);
-
-	Encoder2_GPIO_Config();
-	main_delay(SETUP_DELAY);
-
-	check_SS2();
-	old_SS2_position = Options_GetSelectedOption();
-	main_delay(SETUP_DELAY);
-
-	init_encoder2();
 	main_delay(SETUP_DELAY);
 
 	Options_Initialize();
