@@ -111,6 +111,9 @@ static void freqButton_Click(GL_PageControls_TypeDef* pThis)
 	assert(userMode >= 0 && userMode <= FREQBAND_NUMBER_OF_BANDS);
 
 	FrequencyManager_SetSelectedBand(userMode);
+
+	// Reset message to clear any saved/defaults message.
+	displayNormalFeedback();
 }
 
 static void store_Click(GL_PageControls_TypeDef* pThis)

@@ -56,6 +56,7 @@ General (unassigned) Features
 
 - Other:
 	- Makefile dependencies are not working: changing a .h file does not recompile the .c files.
+	- Clicking sound when switching screens or saving values to EEPROM.
 
 *********************************
 Features Brian Hopes to Implement

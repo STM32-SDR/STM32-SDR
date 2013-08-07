@@ -98,6 +98,9 @@ static void optionButton_Click(GL_PageControls_TypeDef* pThis)
 	uint16_t id = pThis->ID - ID_OPTION_START;
 	assert(id >= 0 && id <= NUM_OPTIONS);
 	Options_SetSelectedOption(id);
+
+	// Reset message to clear any saved/defaults message.
+	displayNormalFeedback();
 }
 
 static void store_Click(GL_PageControls_TypeDef* pThis)
