@@ -19,6 +19,7 @@ typedef enum {
 	FREQBAND_12M_PSK,
 	FREQBAND_10M_PSK,
 	FREQBAND_6M_PSK,
+	FREQBAND_SI570_F0,
 
 	// Count of number of bands
 	// Automatically updated when more bands added above.

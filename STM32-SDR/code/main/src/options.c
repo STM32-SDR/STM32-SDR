@@ -10,9 +10,7 @@
 
 #define EEPROM_OFFSET 200
 #define EEPROM_SENTINEL_LOC 50
-#define EEPROM_SENTINEL_VAL 5679
-
-#define SI570_F0_SCALE 10000
+#define EEPROM_SENTINEL_VAL 5680
 
 static OptionNumber s_currentOptionNumber = OPTION_RX_AUDIO;
 
@@ -117,14 +115,6 @@ static OptionStruct s_optionsData[] = {
 		/*Data*/ 0,
 	},
 	{
-		/*Name*/ "SI570 F0 ", // Scaled at /10000
-		/*Init*/ (56320000 / SI570_F0_SCALE),
-		/*Min */ (10000000 / SI570_F0_SCALE),
-		/*Max */ (56320000 / SI570_F0_SCALE),
-		/*Rate*/ ((56320000-10000000) / SI570_F0_SCALE),
-		/*Data*/ 0,
-	},
-	{
 		/*Name*/ "SI570Mult",
 		/*Init*/ 4,
 		/*Min */ 2,
@@ -148,9 +138,6 @@ void Options_Initialize(void)
 		Options_ResetToDefaults();
 		Options_WriteToEEPROM();
 	}
-
-	// Initialize the F0 for the radio:
-	F0 = (double) s_optionsData[OPTION_SI570_F0].CurrentValue * SI570_F0_SCALE;
 
 	// Initialize the multiplier to the radio:
 	assert(s_optionsData[OPTION_SI570_MULT].CurrentValue == 2 ||
@@ -239,13 +226,6 @@ void Options_SetValue(int optionIdx, int16_t newValue)
 			Turn_Off_Bias();
 		} else {
 			Turn_On_Bias();
-		}
-		break;
-
-	case OPTION_SI570_F0:
-		F0 = (double) newValue * SI570_F0_SCALE;
-		if (SI570_Chk != 3) {
-			Compute_FXTAL();
 		}
 		break;
 

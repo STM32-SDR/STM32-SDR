@@ -28,16 +28,18 @@ static BandsStruct s_bandsData[] = {
 	{ " 12 M PSK ",  24920000},
 	{ " 10 M PSK ",  28120000},
 	{ "  6 M PSK ",  50250000},
+	{ " SI570 F0 ",  56320000}, 	// SI570 startup frequency
 };
 static BandPreset s_selectedBand = FREQBAND_20M_PSK;
+
 
 // Stepping
 #define MAX_STEP_SIZE 100000
 #define MIN_STEP_SIZE 1
 static uint32_t s_stepSize = 100;
 
-#define FREQUENCY_MIN 2000000
-#define FREQUENCY_MAX 500000000
+#define FREQUENCY_MIN   2000000 //   2 MHz
+#define FREQUENCY_MAX 500000000 // 500 MHz
 
 static uint8_t s_frequencyMultiplier = 2;
 
@@ -46,7 +48,7 @@ void FrequencyManager_Initialize(void)
 
 	uint32_t EEProm_Value1 = Read_Long_EEProm(0); //Read the 0 address to see if SI570 data has been stored
 
-	if (EEProm_Value1 != 1234) {
+	if (EEProm_Value1 != 1235) {
 		FrequencyManager_ResetBandsToDefault();
 		FrequencyManager_WriteBandsToEeprom();
 		Write_Long_EEProm(0, 1234);
@@ -54,6 +56,9 @@ void FrequencyManager_Initialize(void)
 	else {
 		FrequencyManager_ReadBandsFromEeprom();
 	}
+
+	// Initialize the F0 for the radio:
+	F0 = (double) s_bandsData[FREQBAND_SI570_F0].CurrentFrequency;
 
 	FrequencyManager_SetSelectedBand(FREQBAND_20M_PSK);
 }
@@ -101,8 +106,19 @@ void FrequencyManager_SetCurrentFrequency(uint32_t newFrequency)
 		return;
 	}
 
-	if (SI570_Chk != 3) {
-		Output_Frequency(newFrequency * s_frequencyMultiplier);
+	// Handle a normal frequency or an option:
+	// Set the startup frequency (F0)
+	if (s_selectedBand == FREQBAND_SI570_F0) {
+		F0 = (double) newFrequency;
+		if (SI570_Chk != 3) {
+			Compute_FXTAL();
+		}
+	}
+	// Normal frequency: Set it.
+	else {
+		if (SI570_Chk != 3) {
+			Output_Frequency(newFrequency * s_frequencyMultiplier);
+		}
 	}
 
 	// If we made it through the above, record the value.

@@ -21,7 +21,8 @@ General (unassigned) Features
 	- Display feedback when user pressed a "save to EEPROM" button or the like.
 	- Pressing left/right button displays message that stays on screen; Change functionality or display method.
 
-- PSK Mode [Milt's wish list; see screen mockup emailed Jul 20]
+- PSK Mode 
+	[Milt's wish list; see screen mockup emailed Jul 20]
 	- 4 lines of text displayed for PSK mode.
 	- S Meter
 	- Mode and Frequency displays
@@ -30,6 +31,11 @@ General (unassigned) Features
 	- Option button to change configuration.
 	- In place of the spectral display--optional waterfall
 	- Change mode either through the OPT button, or with a selector switch.
+	[Aug 9]
+	- White background colour for PSK text
+	- Write received text into a four line, word-wrapping display on screen.
+	- When 4 lines full, "scroll" up discarding content of top line and continue display on bottom line.
+	- Able to delete characters received form USB keyboard (but not yet transmitted)
 	
 - SSB Mode [Milt's wishlist]
 	- Display filter parameters, or graphical pass-band display.
@@ -57,6 +63,8 @@ General (unassigned) Features
 - Other:
 	- Makefile dependencies are not working: changing a .h file does not recompile the .c files.
 	- Clicking sound when switching screens or saving values to EEPROM.
+	- Add time-base to the code to support time-outs, and tracking real-world time.
+	- Create textbox widget
 
 *********************************
 Features Brian Hopes to Implement
@@ -81,3 +89,4 @@ Features Brian Hopes to Implement
 	
 - Other:
 	- Remove all LCD_StringLine() calls and delete function.
+	- Remove code in graphicObject.c
