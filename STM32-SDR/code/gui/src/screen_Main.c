@@ -14,7 +14,7 @@ static GL_Page_TypeDef *s_pThisScreen = &g_screenMain;
 
 static void tx_Click(GL_PageControls_TypeDef* pThis);
 static void rx_Click(GL_PageControls_TypeDef* pThis);
-static void calibrate_Click(GL_PageControls_TypeDef* pThis);
+//static void calibrate_Click(GL_PageControls_TypeDef* pThis);
 
 
 //static void updateModeLabel(void);
@@ -34,7 +34,7 @@ void ScreenMain_Create(void)
 	// PSK:
 	GL_PageControls_TypeDef* ctrlPskText = Widget_NewPSKTextDisplay();
 
-	GL_PageControls_TypeDef* btnCalibrate = NewButton(13, "Cal. TS", calibrate_Click);
+	//GL_PageControls_TypeDef* btnCalibrate = NewButton(13, "Cal. TS", calibrate_Click);
 
 	GL_PageControls_TypeDef* btnRx  = NewButton(10, " Rx ", rx_Click);
 	GL_PageControls_TypeDef* btnTx  = NewButton(9,  " Tx ", tx_Click);
@@ -51,9 +51,11 @@ void ScreenMain_Create(void)
 	Widget_AddToPage_NewFFTDisplay(80, 0, s_pThisScreen);
 	AddPageControlObj(0,  80, ctrlPskText, s_pThisScreen);
 
-	AddPageControlObj(0,   160, btnCalibrate, s_pThisScreen);
-	AddPageControlObj(225, 160, btnRx, s_pThisScreen);
-	AddPageControlObj(270, 160, btnTx, s_pThisScreen);
+	//AddPageControlObj(0,   160, btnCalibrate, s_pThisScreen);
+	//AddPageControlObj(225, 160, btnRx, s_pThisScreen);
+	//AddPageControlObj(270, 160, btnTx, s_pThisScreen);
+	AddPageControlObj(120, LCD_HEIGHT - 42, btnRx, s_pThisScreen);
+	AddPageControlObj(165, LCD_HEIGHT - 42, btnTx, s_pThisScreen);
 
 	AddPageControlObj(0, 0, btnMode, s_pThisScreen);
 
@@ -89,7 +91,7 @@ static void rx_Click(GL_PageControls_TypeDef* pThis)
 	Receive_Sequence();
 }
 
-static void calibrate_Click(GL_PageControls_TypeDef* pThis) {
-	Screen_ShowScreen(&g_screenCalibrate);
-}
+//static void calibrate_Click(GL_PageControls_TypeDef* pThis) {
+//	Screen_ShowScreen(&g_screenCalibrate);
+//}
 

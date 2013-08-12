@@ -48,13 +48,13 @@ void kybd_dispFunctionKey(uint8_t data)
 //another Fix per Charley
 	// Place data from macro into the buffer:
 	switch(data) {
-	case 0: String2Buffer(" CQ CQ CQ de VE7PKE "); break;
-	case 1: String2Buffer("  de VE7PKE "); break;
-	case 2: String2Buffer(" tnx for  call, handle is Dave "); break;
-	case 3: String2Buffer("  QTH is Surrey, BC "); break;
+	case 0: String2Buffer(" CQ CQ CQ de NO5K "); break;
+	case 1: String2Buffer("  de NO5K "); break;
+	case 2: String2Buffer(" tnx for  call, handle is Ben "); break;
+	case 3: String2Buffer("  QTH is Austin, Tx "); break;
 	case 4: String2Buffer("  Rig is homebrew PSK xcvr @ 500 milliwats"); break;
 	case 5: String2Buffer(" BTU "); break;
-	case 6: String2Buffer("  de VE7PKE   k"); break;
+	case 6: String2Buffer("  de NO5K   k"); break;
 	}
 }
 

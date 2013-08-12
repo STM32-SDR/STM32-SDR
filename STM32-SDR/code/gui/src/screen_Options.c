@@ -17,6 +17,7 @@ static void optionButton_Click(GL_PageControls_TypeDef* pThis);
 static void store_Click(GL_PageControls_TypeDef* pThis);
 static void done_Click(GL_PageControls_TypeDef* pThis);
 static void defaults_Click(GL_PageControls_TypeDef* pThis);
+static void calibrate_Click(GL_PageControls_TypeDef* pThis);
 
 #define ID_OPTION_START      100
 #define FIRST_BUTTON_Y       40
@@ -46,6 +47,7 @@ void ScreenOptions_Create(void)
 	GL_PageControls_TypeDef* btnDefaults = NewButton(0, "Defaults", defaults_Click);
 	GL_PageControls_TypeDef* btnDone = NewButton(0, "  Done  ", done_Click);
 
+	GL_PageControls_TypeDef* btnCalibrate = NewButton(13, "Cal. TS", calibrate_Click);
 
 	/*
 	 * Place the widgets onto the screen
@@ -70,6 +72,8 @@ void ScreenOptions_Create(void)
 	AddPageControlObj(90 , LCD_HEIGHT - 30, btnStore, s_pThisScreen);
 	AddPageControlObj(165, LCD_HEIGHT - 30, btnDefaults, s_pThisScreen);
 	AddPageControlObj(LCD_WIDTH - 75, LCD_HEIGHT - 30, btnDone, s_pThisScreen);
+	AddPageControlObj(220,   160, btnCalibrate, s_pThisScreen);
+
 }
 
 
@@ -120,6 +124,10 @@ static void done_Click(GL_PageControls_TypeDef* pThis) {
 	displayNormalFeedback();
 
 	Screen_ShowScreen(&g_screenMain);
+}
+
+static void calibrate_Click(GL_PageControls_TypeDef* pThis) {
+	Screen_ShowScreen(&g_screenCalibrate);
 }
 
 

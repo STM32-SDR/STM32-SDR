@@ -21,6 +21,10 @@ static uint16_t WidgetFFT_GetHeight(GL_PageControls_TypeDef* pThis);
 static void WidgetFFT_EventHandler(GL_PageControls_TypeDef* pThis);
 static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force);
 
+int 	NCO_Point;
+void	Acquire ( void );
+uint8_t FFT_Display[256];
+
 #define ID_FFTSelFreqNum_LABEL 50105
 
 /*
@@ -97,17 +101,61 @@ void intToCommaString(int16_t number, char *pDest, int numChar)
 	assert(index >= -1);
 }
 
+//static void WidgetFFT_EventHandler(GL_PageControls_TypeDef* pThis)
+//{
+//	// Get the coordinates:
+//	uint16_t X_Point, Y_Point;
+//	TS_GetTouchEventCoords(&X_Point, &Y_Point);
+
+//	//Update PSK NCO Frequency
+//	int fftLeftEdge = pThis->objCoordinates.MinX;
+//	NCO_Frequency = (double) ((float) ((X_Point - fftLeftEdge) + 8) * 15.625);
+//	SetRXFrequency(NCO_Frequency);
+//}
+
 static void WidgetFFT_EventHandler(GL_PageControls_TypeDef* pThis)
 {
 	// Get the coordinates:
 	uint16_t X_Point, Y_Point;
+	//int NCO_Point;
 	TS_GetTouchEventCoords(&X_Point, &Y_Point);
 
 	//Update PSK NCO Frequency
 	int fftLeftEdge = pThis->objCoordinates.MinX;
+	NCO_Point = ((int)X_Point - fftLeftEdge) +8;
+
 	NCO_Frequency = (double) ((float) ((X_Point - fftLeftEdge) + 8) * 15.625);
-	SetRXFrequency(NCO_Frequency);
+	Acquire();
+
+	//SetRXFrequency(NCO_Frequency);
 }
+
+void	Acquire ( void ){
+	//extern double NCO_Frequency;
+	extern int count;
+	extern int char_count;
+	//extern unsigned int FFT_Display[];
+	long i, S1, S2, W;
+	double delta;
+
+				/* this is where I  add a correction to the NCO frequency
+					based on the nearby spectral peaks */
+				S1 = 0;
+				S2 = 0;
+				delta = 0.;
+				for (i=-2; i<3; i++){
+					W = (long)FFT_Display[NCO_Point + i];
+					S1 += W*i;
+					S2 += W;
+				}
+				if (S2 != 0) delta = (double) S1/((double)S2);
+
+				NCO_Frequency +=  (double)((float)delta * 15.625);
+
+				SetRXFrequency (NCO_Frequency );
+				count = 0;
+				char_count = 0;
+				}
 
 
 static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
@@ -131,7 +179,7 @@ static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 	 *   effective time-based smoothing (as in, display does not change
 	 *   as abruptly as it would when using new data samples each time).
 	 */
-	uint8_t FFT_Display[256];
+	//uint8_t FFT_Display[256];
 	static uint8_t FFT_Output[128];   // static because use last rounds data now.
 
 	// TODO: Where are all these FFT constants from?

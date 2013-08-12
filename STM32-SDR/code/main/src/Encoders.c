@@ -37,7 +37,7 @@ static EncoderStruct_t s_encoderStruct2 = {0, 0, 0, GPIOB, 4};
 // Prototypes
 static void configureGPIOEncoder1(void);
 static void configureGPIOEncoder2(void);
-static void configureEncoderInterrupt(void);
+//static void configureEncoderInterrupt(void);
 static void init_encoder1(void);
 static void init_encoder2(void);
 static int8_t calculateEncoderChange(EncoderStruct_t *pEncoder);
@@ -52,7 +52,7 @@ void Encoders_Init(void)
 {
 	configureGPIOEncoder1();
 	configureGPIOEncoder2();
-	configureEncoderInterrupt();
+	//configureEncoderInterrupt();
 
 	init_encoder1();
 	init_encoder2();
@@ -130,17 +130,17 @@ static void configureGPIOEncoder2(void)
 	EXTI_InitStructure.EXTI_LineCmd = ENABLE;
 	EXTI_Init(&EXTI_InitStructure);
 }
-static void configureEncoderInterrupt(void)
-{
-	NVIC_InitTypeDef NVIC_InitStructure;
+//static void configureEncoderInterrupt(void)
+//{
+//	NVIC_InitTypeDef NVIC_InitStructure;
 
-	/* Enable and set EXTI Line9-5 Interrupt to the lowest priority */
-	NVIC_InitStructure.NVIC_IRQChannel = EXTI9_5_IRQn;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x01;
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x01;
-	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-	NVIC_Init(&NVIC_InitStructure);
-}
+//	/* Enable and set EXTI Line9-5 Interrupt to the lowest priority */
+//	NVIC_InitStructure.NVIC_IRQChannel = EXTI9_5_IRQn;
+//	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x01;
+//	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x01;
+//	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+//	NVIC_Init(&NVIC_InitStructure);
+//}
 
 void init_encoder1(void)
 {

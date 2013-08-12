@@ -3,6 +3,7 @@
 #include <assert.h>
 #include "eeprom.h"
 
+
 // Calibration points:
 #define TOUCHPOINT_TOP           (LCD_HEIGHT / 5)
 #define TOUCHPOINT_BOTTOM        (4 * (LCD_HEIGHT / 5))

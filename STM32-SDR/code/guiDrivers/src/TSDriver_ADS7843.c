@@ -5,8 +5,13 @@
 
 #include "TSDriver_ADS7843.h"
 #include "stm32f4xx.h"
-
-
+//example error correction
+#include "stm32f4xx_gpio.h"
+#include "stm32f4xx_rcc.h"
+#include "stm32f4xx_exti.h"
+#include "misc.h"
+#include "stm32f4xx_spi.h"
+#include	"stm32f4xx_syscfg.h"
 /* Private define ------------------------------------------------------------*/
 /* AD channel selection command and register */
 #define	CHX 	0x90 	/* channel Y+ selection command */

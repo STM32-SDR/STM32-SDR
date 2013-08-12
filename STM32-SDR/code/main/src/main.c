@@ -26,7 +26,7 @@
 #include	"screen_all.h"
 #include	"options.h"
 #include	"FrequencyManager.h"
-#include	"smile_image.h"
+#include	"sdr_image.h"
 
 
 const uint32_t CODEC_FREQUENCY = 8000;
@@ -132,15 +132,15 @@ static void initializeHardware(void)
 	main_delay(SETUP_DELAY);
 
 	displaySplashScreen();
-
 	main_delay(SETUP_DELAY);
+
+	Options_Initialize();
+	main_delay(SETUP_DELAY);
+
 	Encoders_Init();
 	main_delay(SETUP_DELAY);
 
 	FrequencyManager_Initialize();
-	main_delay(SETUP_DELAY);
-
-	Options_Initialize();
 	main_delay(SETUP_DELAY);
 
 	Init_PTT_IO();
@@ -178,7 +178,7 @@ static void displaySplashScreen(void)
 	GL_SetTextColor(LCD_COLOR_BLACK);
 	GL_SetBackColor(LCD_COLOR_WHITE);
 
-	GL_PrintString(200, 140, "STM32 SDR V2.6", 0);
+	GL_PrintString(200, 140, "STM32 SDR V1.0", 0);
 	GL_PrintString(200, 160, __DATE__, 0);
 	GL_PrintString(200, 180, __TIME__, 0);
 	main_delay(10000000);

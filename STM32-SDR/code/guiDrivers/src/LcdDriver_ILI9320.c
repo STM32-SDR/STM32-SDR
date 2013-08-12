@@ -4,8 +4,15 @@
 #include <stdlib.h>
 #include "stm32_eval.h"
 #include "LcdDriver_ILI9320.h"
-#include "smile_image.h"
-
+#include "sdr_image.h"
+//example error correction
+#include "stm32f4xx_gpio.h"
+#include "stm32f4xx_rcc.h"
+#include "stm32f4xx_exti.h"
+#include "misc.h"
+#include "stm32f4xx_tim.h"
+#include "stm32f4xx_syscfg.h"
+#include "stm32f4xx_fsmc.h"
 
 // *********************************************************************************
 // Register Settings for LCD
