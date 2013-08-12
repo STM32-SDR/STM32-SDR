@@ -29,6 +29,8 @@
 #include	"sdr_image.h"
 
 
+#define VERSION_STRING "1.001"
+
 const uint32_t CODEC_FREQUENCY = 8000;
 
 // USB structures (Must be 4-byte aligned if DMA active)
@@ -173,14 +175,15 @@ static void initializeHardware(void)
 
 static void displaySplashScreen(void)
 {
+	const int TEXT_LEFT = 180;
 	LCD_DrawBMP16Bit(0,0, gimp_image.height, gimp_image.width, (uint16_t*) gimp_image.pixel_data, 0);
 
 	GL_SetTextColor(LCD_COLOR_BLACK);
 	GL_SetBackColor(LCD_COLOR_WHITE);
 
-	GL_PrintString(200, 140, "STM32 SDR V1.0", 0);
-	GL_PrintString(200, 160, __DATE__, 0);
-	GL_PrintString(200, 180, __TIME__, 0);
+	GL_PrintString(TEXT_LEFT, 140, "STM32 SDR V" VERSION_STRING, 0);
+	GL_PrintString(TEXT_LEFT, 160, __DATE__, 0);
+	GL_PrintString(TEXT_LEFT, 180, __TIME__, 0);
 	main_delay(10000000);
 }
 
