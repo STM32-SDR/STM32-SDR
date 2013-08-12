@@ -41,17 +41,22 @@ static uint32_t s_stepSize = 100;
 #define FREQUENCY_MIN   2000000 //   2 MHz
 #define FREQUENCY_MAX 500000000 // 500 MHz
 
+#define EEPROM_FREQBAND_OFFSET 100
+#define EEPROM_SENTINEL_LOC 0
+#define EEPROM_SENTINEL_VAL 1235
+
+
 static uint8_t s_frequencyMultiplier = 2;
 
 void FrequencyManager_Initialize(void)
 {
 
-	uint32_t EEProm_Value1 = Read_Long_EEProm(0); //Read the 0 address to see if SI570 data has been stored
+	uint32_t EEProm_Value1 = Read_Long_EEProm(EEPROM_SENTINEL_LOC); //Read the 0 address to see if SI570 data has been stored
 
-	if (EEProm_Value1 != 1235) {
+	if (EEProm_Value1 != EEPROM_SENTINEL_VAL) {
 		FrequencyManager_ResetBandsToDefault();
 		FrequencyManager_WriteBandsToEeprom();
-		Write_Long_EEProm(0, 1234);
+		Write_Long_EEProm(EEPROM_SENTINEL_LOC, EEPROM_SENTINEL_VAL);
 	}
 	else {
 		FrequencyManager_ReadBandsFromEeprom();
@@ -168,7 +173,6 @@ uint32_t FrequencyManager_GetFrequencyStepSize(void)
 /*
  * EEPROM Routines
  */
-#define EEPROM_FREQBAND_OFFSET 100
 void FrequencyManager_WriteBandsToEeprom(void)
 {
 	for (int i = 0; i < FREQBAND_NUMBER_OF_BANDS; i++) {

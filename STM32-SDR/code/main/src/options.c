@@ -7,7 +7,6 @@
 #include "Si570.h"
 #include "FrequencyManager.h"
 
-
 #define EEPROM_OFFSET 200
 #define EEPROM_SENTINEL_LOC 50
 #define EEPROM_SENTINEL_VAL 5680

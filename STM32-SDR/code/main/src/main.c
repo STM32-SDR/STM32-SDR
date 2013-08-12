@@ -29,7 +29,7 @@
 #include	"sdr_image.h"
 
 
-#define VERSION_STRING "1.002"
+#define VERSION_STRING "1.003"
 
 const uint32_t CODEC_FREQUENCY = 8000;
 
