@@ -1,10 +1,7 @@
 // Includes ------------------------------------------------------------------
-#include	"arm_math.h"
+
 #include	"ChangeOver.h"
 #include	"CW_Mod.h"
-#include	"DMA_IRQ_Handler.h"
-#include	"DMA_Test_Pins.h"
-#include	"DSP_Processing.h"
 #include	"Encoders.h"
 #include	"Init_Codec.h"
 #include	"Init_DMA.h"
@@ -18,15 +15,14 @@
 #include 	"usb_conf.h"
 #include	"usbh_hid_core.h"
 #include	"usbh_usr.h"
-
 #include 	"LcdDriver_ILI9320.h"
 #include	"LcdHal.h"
 #include	"TSHal.h"
-
 #include	"screen_all.h"
 #include	"options.h"
 #include	"FrequencyManager.h"
 #include	"sdr_image.h"
+
 
 
 #define VERSION_STRING "1.003"
@@ -115,12 +111,6 @@ static void initializeHardware(void)
 	Audio_DMA_Init();
 	main_delay(SETUP_DELAY);
 
-	TEST_GPIO_Init();
-	main_delay(SETUP_DELAY);
-
-	User_Button_Config();
-	main_delay(SETUP_DELAY);
-
 	ResetModem(BPSK_MODE);
 	main_delay(SETUP_DELAY);
 
@@ -181,9 +171,15 @@ static void displaySplashScreen(void)
 	GL_SetTextColor(LCD_COLOR_BLACK);
 	GL_SetBackColor(LCD_COLOR_WHITE);
 
+<<<<<<< HEAD
 	GL_PrintString(TEXT_LEFT, 140, "STM32 SDR V" VERSION_STRING, 0);
 	GL_PrintString(TEXT_LEFT, 160, __DATE__, 0);
 	GL_PrintString(TEXT_LEFT, 180, __TIME__, 0);
+=======
+	GL_PrintString(180, 140, "STM32 SDR V1.004", 0);
+	GL_PrintString(180, 160, __DATE__, 0);
+	GL_PrintString(180, 180, __TIME__, 0);
+>>>>>>> branch 'master' of https://github.com/ve7pke/STM32-SDR.git
 	main_delay(10000000);
 }
 

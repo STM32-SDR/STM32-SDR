@@ -13,19 +13,14 @@ void Process_FIR_Q(void);
 void Process_FFT(void);
 void Sideband_Demod(void);
 
-//q15_t FFT_Magnitude[BUFFERSIZE/8];  //1024 sampling
 extern q15_t FFT_Magnitude[BUFFERSIZE / 4];  //512 sampling
 
 q15_t FIR_I_In[BUFFERSIZE / 2];
 q15_t FIR_Q_In[BUFFERSIZE / 2];
-
 q15_t FIR_I_Out[BUFFERSIZE / 2];
 q15_t FIR_Q_Out[BUFFERSIZE / 2];
-
 q15_t USB_Out[BUFFERSIZE / 2];
 q15_t LSB_Out[BUFFERSIZE / 2];
-
-//q15_t   FFT_Input[BUFFERSIZE/4];  //1024 sampling
 q15_t FFT_Input[BUFFERSIZE / 2];  //512sampling
 
 //chh PSK Filters Arrays

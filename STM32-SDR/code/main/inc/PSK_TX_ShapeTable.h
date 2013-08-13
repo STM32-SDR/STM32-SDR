@@ -8,7 +8,7 @@
 #ifndef PSK_TX_SHAPETABLE_H_
 #define PSK_TX_SHAPETABLE_H_
 
-#endif /* PSK_TX_SHAPETABLE_H_ */
+
 /*======================================================================
 
  PSK_TX_ShapeTable.h
@@ -245,3 +245,5 @@ const float PSKShapeTbl[2049] = { /* PSKShapeTbl_Z */
 	0x170,			//* 	1,7,0	TBL_P,	TBL_MP,	PHZ_0 		: PHZ_270	*/
 	0x330}			//* 	3,3,0	TBL_ZP, TBL_ZP,	PHZ_0 		: PHZ_OFF 	*/
   };
+
+#endif /* PSK_TX_SHAPETABLE_H_ */

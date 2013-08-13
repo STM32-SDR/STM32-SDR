@@ -6,18 +6,16 @@
  */
 
 // Min/Max gain constants
+
+
+#ifndef CODEC_GAINS_H_
+#define CODEC_GAINS_H_
 #define PGA_GAIN_MIN 0
 #define PGA_GAIN_MAX 95
 #define DAC_GAIN_MIN -127
 #define DAC_GAIN_MAX 48
 #define ADC_GAIN_MIN -24
 #define ADC_GAIN_MAX 40
-
-#ifndef CODEC_GAINS_H_
-#define CODEC_GAINS_H_
-
-#endif /* CODEC_GAINS_H_ */
-
 void Set_HP_Gain(int HP_gain);
 
 void Set_LO_Gain(int LO_gain);
@@ -33,6 +31,9 @@ void Turn_On_Bias(void);
 void Turn_Off_Bias(void);
 
 void Disconnect_PGA(void);
+#endif /* CODEC_GAINS_H_ */
+
+
 
 void Mute_HP(void);
 

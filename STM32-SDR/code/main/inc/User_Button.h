@@ -9,9 +9,7 @@
 #define USER_BUTTON_H_
 #include	"arm_math.h"
 
-void User_Button_Config(void);
-void BT_Flag_Config(void);
-_Bool IsBTConnected(void);
+
 
 /*
  * Interface to queue general events (small ones) for after ISR processing

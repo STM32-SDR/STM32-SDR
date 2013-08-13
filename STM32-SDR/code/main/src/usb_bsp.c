@@ -21,7 +21,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "usb_bsp.h"
-#include "stm32f4_discovery.h"
+
 
 /** @addtogroup STM32F4-Discovery_Audio_Player_Recorder
  * @{
@@ -70,7 +70,7 @@ static void USB_OTG_BSP_TimeInit(void);
 void BSP_Init(void)
 {
 	/* Configure PA0 pin: User Key pin */
-	STM_EVAL_PBInit(BUTTON_USER, BUTTON_MODE_GPIO);
+	//STM_EVAL_PBInit(BUTTON_USER, BUTTON_MODE_GPIO);
 }
 
 /**

@@ -18,12 +18,6 @@ double F0;
 
 
 /*======================================================================*/
-void Si570_StartUp(void)
-{
-	F0 = 56320000.0;
-	Compute_FXTAL();
-	Output_Frequency(14058000 * 4);
-}
 
 void Output_Frequency(long Freq_Out)
 {
