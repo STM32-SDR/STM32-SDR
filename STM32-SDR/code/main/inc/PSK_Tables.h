@@ -9,9 +9,6 @@
 #define PSK_TABLES_H_
 
 
-
-#endif /* PSK_TABLES_H_ */
-
 /* Modified by Milt Cram, W8NUE--June 2006  */
 
 /* ////////////////////////////////////////////////////////////////// */
@@ -318,6 +315,6 @@ const unsigned int VARICODE_TABLE[256] = {
 		0xB5B0	/* ASCII = 255	101101011011                  */
 };
 
-
+#endif /* PSK_TABLES_H_ */
 
 

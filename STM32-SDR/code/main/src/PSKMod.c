@@ -7,7 +7,6 @@
 #include 	"PSKDet.h"
 #include 	"PSKMod.h"
 #include 	"PSK_TX_ShapeTable.h"
-#include	"User_Button.h"
 
 #define TXTOG_CODE 1
 

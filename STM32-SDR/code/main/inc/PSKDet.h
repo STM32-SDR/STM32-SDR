@@ -5,8 +5,8 @@
  *      Author: CharleyK
  */
 
-#ifndef PSK_DET_H_
-#define PSK_DET_H_
+//#ifndef PSK_DET_H_
+//#define PSK_DET_H_
 /*
  * PSKDet.h
  *
@@ -17,7 +17,7 @@
 #ifndef PSKDET_H_
 #define PSKDET_H_
 
-#endif /* PSKDET_H_ */
+//#endif /* PSKDET_H_ */
 
 /* Modified by Milt Cram, W8NUE--June 2006  */
 

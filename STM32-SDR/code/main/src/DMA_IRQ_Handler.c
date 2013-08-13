@@ -6,9 +6,7 @@
  */
 
 #include	"Init_DMA.h"
-#include	"DMA_Test_Pins.h"
 #include	"arm_math.h"
-#include	"stm32f4xx_gpio.h"
 #include 	"stm32f4xx_dma.h"
 #include 	"DSP_Processing.h"
 #include 	"DMA_IRQ_Handler.h"
@@ -50,9 +48,6 @@ void DMA1_Stream0_IRQHandler(void)
 	DMA_RX_Memory = DMA_GetCurrentMemoryTarget(DMA1_Stream0 );
 	DMA_TX_Memory = DMA_GetCurrentMemoryTarget(DMA1_Stream5 );
 
-	//Turn on pin PD12 to indicate the start of IRQ processing
-	GPIO_WriteBit(DMA_GPIO, DMA_IRQ, Bit_SET);
-
 	if (Tx_Flag == 0) {
 		Rcvr_DSP();
 	}
@@ -77,8 +72,7 @@ void DMA1_Stream0_IRQHandler(void)
 		}  //End of Mode Switch
 	}
 
-	//Turn off pin  PD12 to indicate end of IRQ processing
-	GPIO_WriteBit(DMA_GPIO, DMA_IRQ, Bit_RESET);
+
 
 	DSP_Flag = 1;
 

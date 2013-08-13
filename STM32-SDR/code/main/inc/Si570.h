@@ -21,7 +21,6 @@ void Pack_Si570_registers(unsigned char reg[]);
 void Unpack_Si570_registers(unsigned char reg[]);
 void Compute_FXTAL(void);
 void Output_Frequency(long Freq_Out);
-void Si570_StartUp(void);
 char Large_RFREQ_Change(void);
 void Check_SI570(void);
 

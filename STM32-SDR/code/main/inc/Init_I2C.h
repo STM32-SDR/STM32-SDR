@@ -7,8 +7,6 @@
 
 #include	"arm_math.h"
 
-//void Delay( __IO uint32_t nCount);
-
 void Delay(uint32_t nCount);
 
 #define I2C_SPEED                        400000

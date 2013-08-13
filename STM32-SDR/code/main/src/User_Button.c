@@ -29,65 +29,7 @@
 
 EXTI_InitTypeDef EXTI_InitStructure;
 
-//===============================================================================
 
-void User_Button_Config(void)
-{
-	GPIO_InitTypeDef GPIO_InitStructure;
-
-	/* Enable GPIOA clock */
-	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
-	/* Enable SYSCFG clock */
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
-
-	/* Configure PA0 pin as input floating */
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
-	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;
-	GPIO_Init(GPIOA, &GPIO_InitStructure);
-}
-
-void BT_Flag_Config(void)
-{
-	GPIO_InitTypeDef GPIO_InitStructure;
-
-	/* Enable GPIOB clock */
-	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
-	/* Enable SYSCFG clock */
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
-
-	/* Configure PB10 & 11 pin as input floating */
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
-	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_10 | GPIO_Pin_11;
-	GPIO_Init(GPIOB, &GPIO_InitStructure);
-}
-
-
-_Bool IsBTConnected(void)
-{
-	return GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_10);
-}
-
-//===============================================================================
-
-void EXTI0_IRQHandler(void)
-{
-	static uint8_t PB_State = 0;
-	if (EXTI_GetITStatus(EXTI_Line0 ) != RESET) {
-
-		if (PB_State == 0)
-			PB_State++;
-		else
-			PB_State--;
-
-		// Do something with the PB_State?
-
-		EXTI_ClearITPendingBit(EXTI_Line0 );
-	}
-}
-
-//===============================================================================
 
 static void DelayUS(vu32 cnt)
 {

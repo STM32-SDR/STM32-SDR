@@ -52,15 +52,13 @@ void Encoders_Init(void)
 {
 	configureGPIOEncoder1();
 	configureGPIOEncoder2();
-	//configureEncoderInterrupt();
-
 	init_encoder1();
 	init_encoder2();
 }
 
 static void configureGPIOEncoder1(void)
 {
-	EXTI_InitTypeDef EXTI_InitStructure;
+	//EXTI_InitTypeDef EXTI_InitStructure;
 	GPIO_InitTypeDef GPIO_InitStructure;
 
 	/* Enable GPIOC clock */
@@ -82,22 +80,10 @@ static void configureGPIOEncoder1(void)
 			| GPIO_Pin_6 );
 	GPIO_Init(GPIOE, &GPIO_InitStructure);
 
-	/* Enable SYSCFG clock */
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
-	/* Connect EXTI Line8 to PA8 pin */
-	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOC, EXTI_PinSource8 );
-
-	/* Configure EXTI Line8 */
-	EXTI_InitStructure.EXTI_Line = EXTI_Line8;
-	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
-	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Falling;
-	EXTI_InitStructure.EXTI_LineCmd = ENABLE;
-	EXTI_Init(&EXTI_InitStructure);
 
 }
 static void configureGPIOEncoder2(void)
 {
-	EXTI_InitTypeDef EXTI_InitStructure;
 	GPIO_InitTypeDef GPIO_InitStructure;
 
 	/* Enable GPIOC clock */
@@ -118,17 +104,7 @@ static void configureGPIOEncoder2(void)
 	GPIO_InitStructure.GPIO_Pin = (GPIO_Pin_4 | GPIO_Pin_5 | GPIO_Pin_7 );
 	GPIO_Init(GPIOB, &GPIO_InitStructure);
 
-	/* Enable SYSCFG clock */
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
-	/* Connect EXTI Line 7 to PA7 pin */
-	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOB, EXTI_PinSource7 );
 
-	/* Configure EXTI Line7 */
-	EXTI_InitStructure.EXTI_Line = EXTI_Line7;
-	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
-	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Falling;
-	EXTI_InitStructure.EXTI_LineCmd = ENABLE;
-	EXTI_Init(&EXTI_InitStructure);
 }
 //static void configureEncoderInterrupt(void)
 //{
