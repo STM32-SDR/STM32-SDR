@@ -24,6 +24,7 @@
 #include	"sdr_image.h"
 
 
+
 const uint32_t CODEC_FREQUENCY = 8000;
 
 // USB structures (Must be 4-byte aligned if DMA active)
