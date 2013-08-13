@@ -25,7 +25,7 @@
 
 
 
-#define VERSION_STRING "1.003"
+#define VERSION_STRING "1.005"
 
 const uint32_t CODEC_FREQUENCY = 8000;
 
@@ -129,10 +129,10 @@ static void initializeHardware(void)
 	Options_Initialize();
 	main_delay(SETUP_DELAY);
 
-	Encoders_Init();
+	FrequencyManager_Initialize();
 	main_delay(SETUP_DELAY);
 
-	FrequencyManager_Initialize();
+	Encoders_Init();
 	main_delay(SETUP_DELAY);
 
 	Init_PTT_IO();
@@ -171,15 +171,9 @@ static void displaySplashScreen(void)
 	GL_SetTextColor(LCD_COLOR_BLACK);
 	GL_SetBackColor(LCD_COLOR_WHITE);
 
-<<<<<<< HEAD
 	GL_PrintString(TEXT_LEFT, 140, "STM32 SDR V" VERSION_STRING, 0);
 	GL_PrintString(TEXT_LEFT, 160, __DATE__, 0);
 	GL_PrintString(TEXT_LEFT, 180, __TIME__, 0);
-=======
-	GL_PrintString(180, 140, "STM32 SDR V1.004", 0);
-	GL_PrintString(180, 160, __DATE__, 0);
-	GL_PrintString(180, 180, __TIME__, 0);
->>>>>>> branch 'master' of https://github.com/ve7pke/STM32-SDR.git
 	main_delay(10000000);
 }
 
