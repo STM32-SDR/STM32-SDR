@@ -4,7 +4,6 @@
 #include "Si570.h"
 
 
-
 // Band Values:
 typedef struct
 {
@@ -47,7 +46,7 @@ static uint32_t s_stepSize = 100;
 #define EEPROM_SENTINEL_VAL 1235
 
 
-static uint8_t s_frequencyMultiplier = 2;
+static uint8_t s_frequencyMultiplier = 4;
 
 void FrequencyManager_Initialize(void)
 {
@@ -67,6 +66,7 @@ void FrequencyManager_Initialize(void)
 	F0 = (double) s_bandsData[FREQBAND_SI570_F0].CurrentFrequency;
 
 	FrequencyManager_SetSelectedBand(FREQBAND_20M_PSK);
+
 }
 
 void FrequencyManager_ResetBandsToDefault(void)

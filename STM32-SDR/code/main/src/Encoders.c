@@ -54,6 +54,8 @@ void Encoders_Init(void)
 	configureGPIOEncoder2();
 	init_encoder1();
 	init_encoder2();
+	FrequencyManager_StepFrequencyDown();
+	FrequencyManager_StepFrequencyUp();
 }
 
 static void configureGPIOEncoder1(void)
@@ -103,20 +105,9 @@ static void configureGPIOEncoder2(void)
 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
 	GPIO_InitStructure.GPIO_Pin = (GPIO_Pin_4 | GPIO_Pin_5 | GPIO_Pin_7 );
 	GPIO_Init(GPIOB, &GPIO_InitStructure);
-
-
 }
-//static void configureEncoderInterrupt(void)
-//{
-//	NVIC_InitTypeDef NVIC_InitStructure;
 
-//	/* Enable and set EXTI Line9-5 Interrupt to the lowest priority */
-//	NVIC_InitStructure.NVIC_IRQChannel = EXTI9_5_IRQn;
-//	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x01;
-//	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x01;
-//	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-//	NVIC_Init(&NVIC_InitStructure);
-//}
+
 
 void init_encoder1(void)
 {
@@ -128,6 +119,7 @@ void init_encoder1(void)
 		Compute_FXTAL();
 	}
 }
+
 void init_encoder2(void)
 {
 	Receive_Sequence();

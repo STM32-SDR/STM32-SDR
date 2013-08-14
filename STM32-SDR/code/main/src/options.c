@@ -143,9 +143,6 @@ void Options_Initialize(void)
 			s_optionsData[OPTION_SI570_MULT].CurrentValue == 4);
 	FrequencyManager_SetFreqMultiplier(s_optionsData[OPTION_SI570_MULT].CurrentValue);
 
-	// Radio initialization:
-	Check_SI570();
-
 }
 void Options_ResetToDefaults(void)
 {

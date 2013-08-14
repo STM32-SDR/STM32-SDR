@@ -11,7 +11,6 @@
 #include	"ModeSelect.h"
 #include	"SI570.h"
 #include	"uart.h"
-#include	"User_Button.h"
 #include 	"usb_conf.h"
 #include	"usbh_hid_core.h"
 #include	"usbh_usr.h"
@@ -25,7 +24,7 @@
 
 
 
-#define VERSION_STRING "1.005"
+#define VERSION_STRING "1.006"
 
 const uint32_t CODEC_FREQUENCY = 8000;
 
@@ -70,21 +69,14 @@ int main(void)
 		// Process any pending USB events
 		USBH_Process(&USB_OTG_Core_dev, &USB_Host);
 
-		/*
-		 * Handle general deferred events from the ISR.
-		 */
-		DelayEvent_ProcessDelayedEvents();
-
-		/*
-		 * Touch Events
-		 */
+		 //* Touch Events
+		 //*/
 		ProcessInputData();
 
 		/*
 		 * Redraw the screen (as needed)
 		 */
 		UpdateScreenWithChanges();
-		// DSP_Flag = 0; // moved to widget_FFT_Display
 
 	}
 }

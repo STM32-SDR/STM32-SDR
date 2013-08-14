@@ -11,7 +11,7 @@
 #include "arm_math.h"
 #include "DSP_Processing.h"
 #include  "uart.h"
-#include  "User_Button.h"  //BT Flag reference
+
 
 /* define some constants  */
 #define PHZ_180_BMIN	(0.0)			/* 0         */
