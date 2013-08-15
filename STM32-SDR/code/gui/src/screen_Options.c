@@ -123,7 +123,7 @@ static void done_Click(GL_PageControls_TypeDef* pThis) {
 	// Change text back to normal for next time.
 	displayNormalFeedback();
 
-	Screen_ShowScreen(&g_screenMain);
+	Screen_ShowMainScreen();
 }
 
 static void calibrate_Click(GL_PageControls_TypeDef* pThis) {

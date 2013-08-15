@@ -54,7 +54,7 @@ int main(void)
 	if (!TS_IsCalibrated()) {
 		Screen_ShowScreen(&g_screenCalibrate);
 	} else {
-		Screen_ShowScreen(&g_screenMain);
+		Screen_ShowMainScreen();
 	}
 
 	while (1) {

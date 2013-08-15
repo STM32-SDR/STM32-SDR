@@ -131,5 +131,5 @@ static void defaults_Click(GL_PageControls_TypeDef* pThis)
 static void done_Click(GL_PageControls_TypeDef* pThis) {
 	// Reset to defaults in preparation for next display.
 	displayNormalFeedback();
-	Screen_ShowScreen(&g_screenMain);
+	Screen_ShowMainScreen();
 }

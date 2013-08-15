@@ -81,7 +81,7 @@ static void showTouches_Click(GL_PageControls_TypeDef* pThis)
 	if (s_sameLocationCounter >= MAX_SAME_LOCATION_COUNT) {
 		s_sameLocationCounter = 0;
 		s_haveTouch = 0;
-		Screen_ShowScreen(&g_screenMain);
+		Screen_ShowMainScreen();
 		return;
 	}
 

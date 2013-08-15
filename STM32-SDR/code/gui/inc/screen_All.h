@@ -44,7 +44,9 @@
 
 // Screen global variables (defined in screen_all.c) for switching screens
 // ## Add new screens here:
-extern GL_Page_TypeDef g_screenMain;
+extern GL_Page_TypeDef g_screenMainPSK;
+extern GL_Page_TypeDef g_screenMainCW;
+extern GL_Page_TypeDef g_screenMainSSB;
 extern GL_Page_TypeDef g_screenCalibrate;
 extern GL_Page_TypeDef g_screenCalibrationTest;
 extern GL_Page_TypeDef g_screenMode;
@@ -54,7 +56,9 @@ extern GL_Page_TypeDef g_screenFrequencies;
 
 // Screen creation routines (in screen_XYZ.c)
 // ## Add creation routines for all screens here
-void ScreenMain_Create(void);
+void ScreenMainPSK_Create(void);
+void ScreenMainCW_Create(void);
+void ScreenMainSSB_Create(void);
 void ScreenCalibrate_Create(void);
 void ScreenCalibrationTest_Create(void);
 void ScreenMode_Create(void);
@@ -65,6 +69,7 @@ void ScreenFrequencies_Create(void);
 // Screen access functions:
 void Screen_CreateAllScreens(void);
 void Screen_ShowScreen(GL_Page_TypeDef *pNewScreen);
+void Screen_ShowMainScreen(void);
 
 
 #endif

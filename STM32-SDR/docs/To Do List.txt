@@ -71,11 +71,6 @@ Features Brian Hopes to Implement
 *********************************
 - Check-in coding standard
 
-- Support different main screens for different modes.
-	- Many screens (options, mode, ...) transition back to the main screen by explicitly naming it.
-	  If we have different main screens for PSK, CW, SSB, ... then a better way to transition back 
-	  to the screen is required.
-	  
 - Investigate software licences and licence of all code
 	- PSK already GPL based?
 	- USB & GUI from STM?

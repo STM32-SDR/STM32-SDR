@@ -1,5 +1,6 @@
 // General code to allow screen management for the UI
 #include "screen_All.h"
+#include "ModeSelect.h"
 #include "LcdHal.h"
 #include <assert.h>
 
@@ -12,7 +13,9 @@ static GL_Page_TypeDef *s_pCurrentScreen = 0;
 
 // Global variable for each screen
 // ## Add new global for each new screen.
-GL_Page_TypeDef g_screenMain;
+GL_Page_TypeDef g_screenMainPSK;
+GL_Page_TypeDef g_screenMainCW;
+GL_Page_TypeDef g_screenMainSSB;
 GL_Page_TypeDef g_screenCalibrate;
 GL_Page_TypeDef g_screenCalibrationTest;
 GL_Page_TypeDef g_screenMode;
@@ -25,7 +28,9 @@ void Screen_CreateAllScreens(void)
 {
 	// Create (populate/allocate/...) each screen.
 	// ## Add new screens to this list.
-	ScreenMain_Create();
+	ScreenMainPSK_Create();
+	ScreenMainCW_Create();
+	ScreenMainSSB_Create();
 	ScreenCalibrate_Create();
 	ScreenCalibrationTest_Create();
 	ScreenMode_Create();
@@ -37,6 +42,12 @@ void Screen_CreateAllScreens(void)
 void Screen_ShowScreen(GL_Page_TypeDef *pNewScreen)
 {
 	assert(pNewScreen != 0);
+
+	// Break out if already on this screen.
+	if (pNewScreen == s_pCurrentScreen) {
+		return;
+	}
+
 	if (s_pCurrentScreen != 0) {
 		s_pCurrentScreen->ShowPage(s_pCurrentScreen, GL_FALSE);
 	}
@@ -51,4 +62,20 @@ void Screen_ShowScreen(GL_Page_TypeDef *pNewScreen)
 	s_pCurrentScreen = pNewScreen;
 }
 
-
+// Transition to the correct main screen, based on the mode.
+void Screen_ShowMainScreen(void)
+{
+	switch(Mode_GetCurrentMode()) {
+	case MODE_PSK:
+		Screen_ShowScreen(&g_screenMainPSK);
+		break;
+	case MODE_CW:
+		Screen_ShowScreen(&g_screenMainCW);
+		break;
+	case MODE_SSB:
+		Screen_ShowScreen(&g_screenMainSSB);
+		break;
+	default:
+		assert(0);
+	}
+}

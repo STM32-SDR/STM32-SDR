@@ -59,6 +59,6 @@ static void modeButton_Click(GL_PageControls_TypeDef* pThis)
 	assert(userMode >= 0 && userMode <= USERMODE_NUM_MODES);
 
 	Mode_SetCurrentMode(userMode);
-	Screen_ShowScreen(&g_screenMain);
+	Screen_ShowMainScreen();
 }
 
