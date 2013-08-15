@@ -24,7 +24,7 @@
 
 
 
-#define VERSION_STRING "1.006"
+#define VERSION_STRING "1.007"
 
 const uint32_t CODEC_FREQUENCY = 8000;
 
