@@ -21,10 +21,10 @@
 #include	"options.h"
 #include	"FrequencyManager.h"
 #include	"sdr_image.h"
+#include	"ScrollingTextBox.h"
 
 
-
-#define VERSION_STRING "1.007"
+#define VERSION_STRING "1.008"
 
 const uint32_t CODEC_FREQUENCY = 8000;
 
@@ -56,6 +56,7 @@ int main(void)
 	} else {
 		Screen_ShowMainScreen();
 	}
+	InitTextDisplay();
 
 	while (1) {
 		/*

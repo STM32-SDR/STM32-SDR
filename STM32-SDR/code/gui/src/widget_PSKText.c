@@ -2,6 +2,7 @@
  * PSK Text display widget
  */
 #include "widgets.h"
+#include "ScrollingTextBox.h"
 #include <assert.h>
 
 #include "PSKDet.h"
@@ -18,7 +19,7 @@
 #define TITLE_COLOUR     LCD_COLOR_YELLOW
 #define TITLE_BACKGROUND LCD_COLOR_BLACK
 #define DATA_COLOUR      LCD_COLOR_BLACK
-#define DATA_BACKGROUND  LCD_COLOR_DGRAY
+#define DATA_BACKGROUND  LCD_COLOR_WHITE
 
 #define OFFSETX_TITLE    0
 #define OFFSETX_ONAIR    0
@@ -30,7 +31,8 @@
 #define OFFSETY_KEYBOARD (3 * TEXT_LINE_HEIGHT)
 
 #define TOTAL_WIDTH    (LCD_WIDTH)
-#define TOTAL_HEIGHT   (4*TEXT_LINE_HEIGHT)
+#define TOTAL_HEIGHT   (5*TEXT_LINE_HEIGHT)
+
 
 // Prototypes:
 static uint16_t getWidth(GL_PageControls_TypeDef* obj);
@@ -77,14 +79,16 @@ static void drawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 	static uint32_t lastOnAirHash = 0;
 	static uint32_t lastTxHash = 0;
 	static uint32_t lastKeyboardHash = 0;
+	extern unsigned char NewChar;
 
-	uint32_t curOnAirHash = calculateStringHash((char*) LCD_buffer);
+//	uint32_t curOnAirHash = calculateStringHash((char*) LCD_buffer);
 	uint32_t curTxHash = calculateStringHash(XmitBuffer);
 	uint32_t curKeyboardHash = calculateStringHash((char*) kybd_string);
 
 	// Redraw only when needed:
 	_Bool redrawTitle = force;
-	_Bool redrawOnAirBuffer = force || lastOnAirHash != curOnAirHash;
+	_Bool redrawOnAirBuffer = force || NewChar != 0;
+//	_Bool redrawOnAirBuffer = force || lastOnAirHash != curOnAirHash;
 	_Bool redrawTxBuffer = force || lastTxHash != curTxHash;
 	_Bool redrawKeyboardBuffer = force || lastKeyboardHash != curKeyboardHash;
 
@@ -98,6 +102,7 @@ static void drawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 		GL_SetTextColor(TITLE_COLOUR);
 		GL_SetBackColor(TITLE_BACKGROUND);
 		GL_PrintString(x + OFFSETX_TITLE, y + OFFSETY_TITLE, "Rx/Tx/Keyboard PSK Data:", 0);
+
 	}
 
 	// Display the on-air buffer
@@ -106,20 +111,22 @@ static void drawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 	GL_SetTextColor(DATA_COLOUR);
 	GL_SetBackColor(DATA_BACKGROUND);
 	if (redrawOnAirBuffer) {
-		GL_PrintString(x + OFFSETX_ONAIR, y + OFFSETY_ONAIR, (char*) LCD_buffer, 0);
-		lastOnAirHash = curOnAirHash;
+		DisplayText (NewChar);
+		NewChar = 0;
+//		GL_PrintString(x + OFFSETX_ONAIR, y + OFFSETY_ONAIR, (char*) LCD_buffer, 0);
+//		lastOnAirHash = curOnAirHash;
 	}
 
 	// Display the Queue
 	if (redrawTxBuffer) {
-		GL_PrintString(x + OFFSETX_TX, y + OFFSETY_TX, XmitBuffer, 0);
-		lastTxHash = curTxHash;
+//		GL_PrintString(x + OFFSETX_TX, y + OFFSETY_TX, XmitBuffer, 0);
+//		lastTxHash = curTxHash;
 	}
 
 	// Display the keyboard buffer
 	if (redrawKeyboardBuffer) {
-		GL_PrintString(x + OFFSETX_KEYBOARD, y + OFFSETY_KEYBOARD, (char*) kybd_string, 0);
-		lastKeyboardHash = curKeyboardHash;
+//		GL_PrintString(x + OFFSETX_KEYBOARD, y + OFFSETY_KEYBOARD, (char*) kybd_string, 0);
+//		lastKeyboardHash = curKeyboardHash;
 	}
 }
 
@@ -137,7 +144,6 @@ static uint32_t calculateStringHash(char* str)
 
 	return hash;
 }
-
 
 
 
