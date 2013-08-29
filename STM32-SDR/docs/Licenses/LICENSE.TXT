@@ -1,0 +1,46 @@
+STM32-SDR License Agreement
+
+The STM32-SDR project has contributions from a number of authors. The source 
+code in this project, where not otherwise stated, is licensed under GNU GPL V2.
+See docs\Licenses\LICENSE_GPLv2.txt for legal text of the license. Some code 
+in the project originated in the STM32F4 Discovery FW package distributed by 
+STMicroelectronics. The license file for this code is included in the file 
+"MCD-ST Liberty SW License Agreement 20Jul2011 v0.1.pdf".
+
+
+Initial project contributions (~2013) by:
+- Charley Hill (W5BAA)
+- John Fisher (K5JHF)
+- Milt Cram (W8NUE)
+- Kees Talen (K5BCQ)
+- Brian Fraser
+- Dave Miller (VE7PKE)
+
+ 
+ 
+ 
+Licensing information in each file:
+- Add the text below to each new file added to the project.
+- Don't add to files which already attributed to another source,
+  such as ST's code in the external\ folder, PSK, or XPrintf code.
+
+/*
+ * <Description of file, especially for .h files. For example: "Low level graphics routines to support UI">
+ *
+ * STM32-SDR: A software defined HAM radio embedded system.
+ * Copyright (C) 2013, STM32-SDR Group
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details. 
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */

@@ -65,17 +65,16 @@ General (unassigned) Features
 	- Clicking sound when switching screens or saving values to EEPROM.
 	- Add time-base to the code to support time-outs, and tracking real-world time.
 	- Create textbox widget
+	- Beep through headphone jack: touchscreen feedback, notification of crash (assert), 
+	  help track progress at startup for debugging (play a jingle?)
+	- Serial port support
+	- Display LCD driver chip ID at startup.
 
 *********************************
 Features Brian Hopes to Implement
 *********************************
 - Check-in coding standard
 
-- Investigate software licences and licence of all code
-	- PSK already GPL based?
-	- USB & GUI from STM?
-	- Startup Image?
-		  
 - Debug USB
 	- Indictation on LCD that USB keyboard attached
 	- "On the new board the OTG_FS_OverCurrent signal was moved from PD5 to PB8"
@@ -85,3 +84,4 @@ Features Brian Hopes to Implement
 - Other:
 	- Remove all LCD_StringLine() calls and delete function.
 	- Remove code in graphicObject.c
+	- Compile out asserts
