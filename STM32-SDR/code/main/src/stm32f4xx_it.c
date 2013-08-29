@@ -29,7 +29,7 @@
 #include "usbh_core.h"
 #include "stm32f4xx_conf.h"
 #include "stm32fxxx_it.h"
-
+#include <assert.h>
 
 /** @addtogroup STM32F4_Discovery_Peripheral_Examples
  * @{
@@ -67,8 +67,9 @@ void NMI_Handler(void)
 void HardFault_Handler(void)
 {
 	/* Go to infinite loop when Hard Fault exception occurs */
-	while (1) {
-	}
+	//while (1) {
+	//}
+	assert(0);
 }
 
 /**

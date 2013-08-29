@@ -45,7 +45,6 @@ static uint32_t s_stepSize = 100;
 #define EEPROM_SENTINEL_LOC 0
 #define EEPROM_SENTINEL_VAL 1235
 
-
 static uint8_t s_frequencyMultiplier = 4;
 
 void FrequencyManager_Initialize(void)

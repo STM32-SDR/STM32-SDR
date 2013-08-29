@@ -8,6 +8,7 @@
 #include "PSKDet.h"
 #include "PSKMod.h"
 #include "Keyboard_Input.h"
+#include "Text_Enter.h"
 
 // Colours:
 
@@ -79,32 +80,55 @@ static void drawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 	static uint32_t lastOnAirHash = 0;
 	static uint32_t lastTxHash = 0;
 	static uint32_t lastKeyboardHash = 0;
+	static uint32_t lastCallHash = 0;
+	static uint32_t lastNameHash = 0;
 	extern unsigned char NewChar;
 
 //	uint32_t curOnAirHash = calculateStringHash((char*) LCD_buffer);
 	uint32_t curTxHash = calculateStringHash(XmitBuffer);
 	uint32_t curKeyboardHash = calculateStringHash((char*) kybd_string);
+	uint32_t curCallHash = calculateStringHash(Get_Contact(0));
+	uint32_t curNameHash = calculateStringHash(Get_Contact(1));
 
 	// Redraw only when needed:
-	_Bool redrawTitle = force;
+	//_Bool redrawTitle = force;
 	_Bool redrawOnAirBuffer = force || NewChar != 0;
 //	_Bool redrawOnAirBuffer = force || lastOnAirHash != curOnAirHash;
 	_Bool redrawTxBuffer = force || lastTxHash != curTxHash;
 	_Bool redrawKeyboardBuffer = force || lastKeyboardHash != curKeyboardHash;
+	_Bool redrawCallBuffer = force || lastCallHash != curCallHash;
+	_Bool redrawNameBuffer = force || lastNameHash != curNameHash;
 
 	int x = pThis->objCoordinates.MinX;
 	int y = pThis->objCoordinates.MinY;
 
 	// Display title:
-	if (redrawTitle) {
-		// Title
-		GL_SetFont(FONT_TITLE);
-		GL_SetTextColor(TITLE_COLOUR);
-		GL_SetBackColor(TITLE_BACKGROUND);
-		GL_PrintString(x + OFFSETX_TITLE, y + OFFSETY_TITLE, "Rx/Tx/Keyboard PSK Data:", 0);
+	//if (redrawTitle) {
+	//	// Title
+	//	GL_SetFont(FONT_TITLE);
+	//	GL_SetTextColor(TITLE_COLOUR);
+	//	GL_SetBackColor(TITLE_BACKGROUND);
+	//	GL_PrintString(x + OFFSETX_TITLE, y + OFFSETY_TITLE, "Rx/Tx/Keyboard PSK Data:", 0);
+//
+	//}
 
+	// Display Call
+	if (redrawCallBuffer){
+	GL_SetFont(GL_FONTOPTION_8x16);
+	GL_SetBackColor(LCD_COLOR_BLACK);
+	GL_SetTextColor(LCD_COLOR_WHITE);
+	GL_PrintString(25, 170,Get_Contact(0), 0);
+	lastCallHash = curCallHash;
 	}
 
+	//Display Name
+	if (redrawNameBuffer) {
+	GL_SetFont(GL_FONTOPTION_8x16);
+	GL_SetBackColor(LCD_COLOR_BLACK);
+	GL_SetTextColor(LCD_COLOR_WHITE);
+	GL_PrintString(175, 170,Get_Contact(1), 0);
+	lastNameHash = curNameHash;
+	}
 	// Display the on-air buffer
 	// (Was previously displayed in main())
 	GL_SetFont(FONT_DATA);
@@ -119,14 +143,14 @@ static void drawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 
 	// Display the Queue
 	if (redrawTxBuffer) {
-//		GL_PrintString(x + OFFSETX_TX, y + OFFSETY_TX, XmitBuffer, 0);
-//		lastTxHash = curTxHash;
+		GL_PrintString(x + OFFSETX_TX, y + OFFSETY_TX, XmitBuffer, 0);
+		lastTxHash = curTxHash;
 	}
 
 	// Display the keyboard buffer
 	if (redrawKeyboardBuffer) {
-//		GL_PrintString(x + OFFSETX_KEYBOARD, y + OFFSETY_KEYBOARD, (char*) kybd_string, 0);
-//		lastKeyboardHash = curKeyboardHash;
+		GL_PrintString(x + OFFSETX_KEYBOARD, y + OFFSETY_KEYBOARD, (char*) kybd_string, 0);
+		lastKeyboardHash = curKeyboardHash;
 	}
 }
 

@@ -124,7 +124,7 @@ static void drawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 
 	// Check if a call to Widget_ChangeLabelText() has happened:
 	_Bool change = pInstData->isRedrawRequired;
-	pInstData->isRedrawRequired = 0;
+	//pInstData->isRedrawRequired = 0;
 
 	// Allow code to update itself (via an update handler, if any).
 	if (pInstData->pUpdateHandler != 0) {
@@ -142,6 +142,7 @@ static void drawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 
 		GL_PrintString(x, y, pInstData->strText, pInstData->isTransparent);
 	}
+	pInstData->isRedrawRequired = 0;
 }
 
 

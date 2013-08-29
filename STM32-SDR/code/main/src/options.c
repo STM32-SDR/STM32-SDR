@@ -8,6 +8,7 @@
 #include "FrequencyManager.h"
 
 #define EEPROM_OFFSET 200
+
 #define EEPROM_SENTINEL_LOC 50
 #define EEPROM_SENTINEL_VAL 5680
 
@@ -130,10 +131,11 @@ void Options_Initialize(void)
 	rgain = 0.5;					//temp location, move to sequencer
 	Tx_Flag = 0;
 
-	// Load from EEPROM if valid:
+	 //Load from EEPROM if valid:
 	if (Options_HaveValidEEPROMData()) {
 		Options_ReadFromEEPROM();
-	} else {
+	}
+	else {
 		Options_ResetToDefaults();
 		Options_WriteToEEPROM();
 	}

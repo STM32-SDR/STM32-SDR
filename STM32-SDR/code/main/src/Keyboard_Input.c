@@ -5,14 +5,41 @@
  *      Author: CharleyK
  */
 #include	"PSKMod.h"
-
+#include "widgets.h"
+#include "Text_Enter.h"
 
 #define KBD_BUFF_LEN 41 // 40 characters on the screen, +1 for null.
 
+int kybd_mode = 0;
+char Call[]    = "   Call   " ;
+char Name[]    = " Name     ";
+
+int i;
+
+void set_kybd_mode( int data)
+	{
+	 kybd_mode = data;
+	}
+
 volatile char kybd_string[KBD_BUFF_LEN]; // this will hold the keyboard string
+volatile char macro_string[KBD_BUFF_LEN];
+
 void kybd_addCharacter(char Char);
-void String2Buffer(char *str);
 void kybd_dispFunctionKey(uint8_t data);
+void kybd_char_switch (char newChar);
+void compose_F6(void);
+void Text2Buffer(char *str, uint8_t count);
+void String2Buffer(char *str);
+
+void kybd_char_switch(char data)
+{
+	switch(kybd_mode) {
+	case 0: kybd_addCharacter(data); break;
+	case 1: kybd_edit_contact(data,0); break;
+	case 2: kybd_edit_contact(data,1); break;
+	case 3: kybd_edit_text(data); break;
+	}
+}
 
 void kybd_addCharacter(char Char)
 {
@@ -26,7 +53,7 @@ void kybd_addCharacter(char Char)
 		cnt++;
 	}
 	else {
-		// Already full, shift characters in buffer left one spat and
+		// Already full, shift characters in buffer left one space and
 		// append new character to end.
 		for (int i = 1; i < KBD_BUFF_LEN - 2; i++)
 			kybd_string[i - 1] = kybd_string[i];
@@ -38,25 +65,25 @@ void kybd_addCharacter(char Char)
 	PSK_addCharToTx(Char);
 }
 
+
 void kybd_dispFunctionKey(uint8_t data)
 {
-	// Ensure queue is empty before adding data:
-/*	if(!PSK_isQueueEmpty()) {
-		return;
-	}
-*/
-//another Fix per Charley
-	// Place data from macro into the buffer:
+
 	switch(data) {
-	case 0: String2Buffer(" CQ CQ CQ de NO5K "); break;
-	case 1: String2Buffer("  de NO5K "); break;
-	case 2: String2Buffer(" tnx for  call, handle is Ben "); break;
-	case 3: String2Buffer("  QTH is Austin, Tx "); break;
-	case 4: String2Buffer("  Rig is homebrew PSK xcvr @ 500 milliwats"); break;
-	case 5: String2Buffer(" BTU "); break;
-	case 6: String2Buffer("  de NO5K   k"); break;
+	case 0: compose_F1(); break;
+	case 1: compose_F2(); break;
+	case 2: compose_F3(); break;
+	case 3: compose_F4(); break;
+	case 4: compose_F5(); break;
+	case 5: compose_F6(); break;
+	case 6: compose_F7(); break;
+	case 7: compose_F8(); break;
+	case 8: compose_F9(); break;
+	case 9: compose_F10(); break;
 	}
 }
+
+
 
 void String2Buffer(char *str) {
 	char TempChar;
@@ -67,6 +94,14 @@ void String2Buffer(char *str) {
  }
 
 
+void Text2Buffer(char *str, uint8_t count) {
+	char TempChar;
+	do {
+		TempChar = *str++;
+		kybd_addCharacter(TempChar);
+		count--;
+	} while (count != 0);
 
+ }
 
 

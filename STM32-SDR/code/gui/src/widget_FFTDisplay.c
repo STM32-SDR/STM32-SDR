@@ -143,7 +143,8 @@ void	Acquire ( void ){
 				S1 = 0;
 				S2 = 0;
 				delta = 0.;
-				for (i=-2; i<3; i++){
+				//for (i=-2; i<3; i++){
+				for (i=-4; i<5; i++){
 					W = (long)FFT_Display[NCO_Point + i];
 					S1 += W*i;
 					S2 += W;
@@ -192,7 +193,8 @@ static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 			FFT_Output[j] = 64;
 		FFT_Display[2 * j] = FFT_Output[j];
 		// Note that calculation uses values from last pass through.
-		FFT_Display[2 * j + 1] = (FFT_Output[j] + FFT_Output[j + 1]) / 2;
+		FFT_Display[2 * j + 1] = 0;
+		//FFT_Display[2 * j + 1] = (FFT_Output[j] + FFT_Output[j + 1]) / 2;
 	}
 
 
