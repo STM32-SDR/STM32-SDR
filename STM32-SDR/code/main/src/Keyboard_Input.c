@@ -26,7 +26,7 @@ volatile char macro_string[KBD_BUFF_LEN];
 
 void kybd_addCharacter(char Char);
 void kybd_dispFunctionKey(uint8_t data);
-void kybd_char_switch (char newChar);
+void kybd_char_switch (char data);
 void compose_F6(void);
 void Text2Buffer(char *str, uint8_t count);
 void String2Buffer(char *str);
