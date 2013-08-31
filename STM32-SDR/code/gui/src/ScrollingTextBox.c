@@ -1,10 +1,11 @@
 #include "widgets.h"
 #include <assert.h>
 #include "ScrollingTextBox.h"
+#include "DMA_IRQ_Handler.h"
+#include "LcdDriver_ILI9320.h"
 
 #define FIRSTROW		1
-//#define LASTROW			4
-#define LASTROW			2
+#define LASTROW			4
 #define FIRSTCOL		1
 #define LASTCOL			39
 #define NUMROWS			(LASTROW - FIRSTROW + 1)
@@ -25,6 +26,8 @@ static int row;
 static int charnum;
 static int ptr;
 
+int16_t Tx_Flag;
+
 int dx = 8;
 int dy = 17;
 
@@ -32,6 +35,13 @@ void DisplayText ( char ch)
 {
 	int x;
 	int y;
+
+	//Set Text Color
+
+	if(Tx_Flag== 1)
+	GL_SetTextColor(LCD_COLOR_RED);
+	else
+	GL_SetTextColor(LCD_COLOR_BLACK);
 
 	// handle backspace
 	if (ch==8){

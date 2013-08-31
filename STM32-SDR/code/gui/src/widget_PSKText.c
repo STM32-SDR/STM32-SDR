@@ -84,6 +84,7 @@ static void drawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 	static uint32_t lastNameHash = 0;
 	extern unsigned char NewChar;
 
+
 //	uint32_t curOnAirHash = calculateStringHash((char*) LCD_buffer);
 	uint32_t curTxHash = calculateStringHash(XmitBuffer);
 	uint32_t curKeyboardHash = calculateStringHash((char*) kybd_string);
@@ -143,14 +144,14 @@ static void drawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 
 	// Display the Queue
 	if (redrawTxBuffer) {
-		GL_PrintString(x + OFFSETX_TX, y + OFFSETY_TX, XmitBuffer, 0);
-		lastTxHash = curTxHash;
+		//GL_PrintString(x + OFFSETX_TX, y + OFFSETY_TX, XmitBuffer, 0);
+		//lastTxHash = curTxHash;
 	}
 
 	// Display the keyboard buffer
 	if (redrawKeyboardBuffer) {
-		GL_PrintString(x + OFFSETX_KEYBOARD, y + OFFSETY_KEYBOARD, (char*) kybd_string, 0);
-		lastKeyboardHash = curKeyboardHash;
+		//GL_PrintString(x + OFFSETX_KEYBOARD, y + OFFSETY_KEYBOARD, (char*) kybd_string, 0);
+		//lastKeyboardHash = curKeyboardHash;
 	}
 }
 
