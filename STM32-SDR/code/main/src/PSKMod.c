@@ -34,7 +34,8 @@
 #define SYM_P180 2		/*Plus 180 deg */
 #define SYM_OFF 4		/*No output */
 #define SYM_ON 5		/*constant output */
-#define PSK_TX_BUFFER_SIZE 41	// 40 characters on screen + space for null
+//#define PSK_TX_BUFFER_SIZE 41	// 40 characters on screen + space for null
+#define PSK_TX_BUFFER_SIZE 161
 
 float S1, S2;
 extern const unsigned int VARICODE_TABLE[256];
@@ -42,7 +43,7 @@ extern const unsigned int VARICODE_TABLE[256];
 int m_Ramp  = 0;
 int m_pTail = 0;
 char XmitBuffer[PSK_TX_BUFFER_SIZE];
-
+extern unsigned char NewChar;
 
 
 void Update_PSK(void)
@@ -98,7 +99,7 @@ char GetNextBPSKSymbol(void)
 		}
 		else {
 			ch = GetTxChar(); /*get next character to xmit */
-
+			if (ch > 31 && ch<123)  NewChar = (unsigned char)ch;
 			switch( ch ) {
 
 				case TXTOG_CODE:
@@ -161,7 +162,7 @@ char GetTxChar(void)
 
 // Queue a new character for transmission.
 // Returns 1 if succeeded, 0 if failed (buffer full)
-_Bool PSK_addCharToTx(char newChar)
+_Bool PSK_addCharToTx(char newTxChar)
 {
 	// Queue full?
 	if (PSK_isQueueFull()) {
@@ -169,14 +170,11 @@ _Bool PSK_addCharToTx(char newChar)
 	}
 
 	// Queue the character
-	XmitBuffer[m_pTail++] = newChar;
+	XmitBuffer[m_pTail++] = newTxChar;
 
 	// Success
 	return 1;
 }
-
-
-
 
 _Bool PSK_isQueueFull(void)
 {

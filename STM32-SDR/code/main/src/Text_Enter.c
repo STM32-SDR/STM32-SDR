@@ -304,23 +304,24 @@ void compose_F3(void){  //Xmit QTH
 
 void compose_F4(void){   //Station Info
 	if(s_TextData[Text_Pwr].count != 0)
-	{String2Buffer("My rig is an STM32_SDR interfaced with a ");
+	{String2Buffer("My rig is an STM32-SDR interfaced with a ");
 	Text2Buffer(s_TextData[Text_Pwr].Text, s_TextData[Text_Pwr].count);
 	String2Buffer(" ");
 	}
 	if(s_TextData[Text_Ant].count != 0)
 	{
-	String2Buffer("My antenna is  ");
+	String2Buffer("My antenna is a ");
 	}
 	Text2Buffer(s_TextData[Text_Ant].Text, s_TextData[Text_Ant].count);
 	String2Buffer(" ");
 }
 void compose_F5(void){
 	if(s_ContactData[1].count != 0)
-	String2Buffer("Well  ");
+	String2Buffer("Well, ");
 	Text2Buffer(s_ContactData[1].Text,s_ContactData[1].count);
 	String2Buffer("TNX for the PSK31 QSO");
 	String2Buffer(" ");
+	String2Buffer("Vy 73's, ");
 	if(s_ContactData[0].count != 0)
 	Text2Buffer(s_ContactData[0].Text,s_ContactData[0].count);
 	String2Buffer(" de ");

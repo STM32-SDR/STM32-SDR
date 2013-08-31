@@ -46,7 +46,7 @@
 #include	"ScrollingTextBox.h"
 #include	"Text_Enter.h"
 
-#define VERSION_STRING "1.009"
+#define VERSION_STRING "1.010"
 
 const uint32_t CODEC_FREQUENCY = 8000;
 

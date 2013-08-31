@@ -54,7 +54,7 @@ void Update_PSK(void);
 void InitPSKModulator(void);
 
 // Support for transmitting characters and the Tx buffer
-_Bool PSK_addCharToTx(char newChar);
+_Bool PSK_addCharToTx(char newTxChar);
 _Bool PSK_isQueueFull(void);
 _Bool PSK_isQueueEmpty(void);
 
