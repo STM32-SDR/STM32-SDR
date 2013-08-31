@@ -65,7 +65,8 @@ static ModeStruct* s_pCurrentMode = &s_modeData[USERMODE_USB];
 
 void Mode_Init(void)
 {
-	Mode_SetCurrentMode(USERMODE_USB);
+	//Mode_SetCurrentMode(USERMODE_USB);
+	Mode_SetCurrentMode(USERMODE_DIGU);
 }
 void Mode_SetCurrentMode(UserModeType newMode)
 {

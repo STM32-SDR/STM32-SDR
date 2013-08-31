@@ -21,7 +21,7 @@ GL_Page_TypeDef g_screenCalibrationTest;
 GL_Page_TypeDef g_screenMode;
 GL_Page_TypeDef g_screenOptions;
 GL_Page_TypeDef g_screenFrequencies;
-
+GL_Page_TypeDef g_screenEditText;
 
 // Create all screens
 void Screen_CreateAllScreens(void)
@@ -36,6 +36,7 @@ void Screen_CreateAllScreens(void)
 	ScreenMode_Create();
 	ScreenOptions_Create();
 	ScreenFrequencies_Create();
+	ScreenEditText_Create();
 }
 
 // Change to a new screen.

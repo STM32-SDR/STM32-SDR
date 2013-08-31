@@ -319,8 +319,11 @@ void USR_KEYBRD_ProcessData(uint8_t data1,uint8_t data2 )
 	USB_debugEvent(__LINE__);
 
 	// Skip control characters like enter, bell, escape..
-	if (data1 >= ' ' && data2 < 112) {
-		kybd_addCharacter(data1);
+	//if ((data1 >= ' ' && data2 < 112)||(data1 == 10)||(data1==8)) {
+	//if (data1 >= ' ' && data2 < 112) {
+	if (data2 < 112) {
+		//kybd_addCharacter(data1);
+		kybd_char_switch(data1);
 	}
 
 	// Check the Function Keys F1 thru F10

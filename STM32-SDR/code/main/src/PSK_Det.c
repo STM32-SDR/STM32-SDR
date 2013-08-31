@@ -48,7 +48,8 @@
 #define NLP_K (100.0)		/*narrow phase derived afc constans  */
 #define FNLP_K (30.0)
 
-unsigned char LCD_buffer[40];
+//unsigned char LCD_buffer[80];
+unsigned char NewChar;
 int count;
 int char_count;
 double m_PSKPeriodUpdate;
@@ -60,12 +61,12 @@ double m_SymbolRate;
 
 void ResetModem(int mode)
 {
-	int i;
+//	int i;
 
-	for (i = 0; i < 40; i++) {
-		LCD_buffer[i] = ' ';
-	}
-	LCD_buffer[39] = '\0';
+//	for (i = 0; i < 40; i++) {
+//		LCD_buffer[i] = ' ';
+//	}
+//	LCD_buffer[39] = '\0';
 
 	count = 0;
 	char_count = 0;
@@ -600,7 +601,7 @@ void DecodeSymb(struct Complex newsamp)
 	unsigned char ch = 0;
 
 	int bit;
-	static int i;
+	//static int i;
 
 	int GotChar = FALSE;
 
@@ -662,7 +663,8 @@ void DecodeSymb(struct Complex newsamp)
 	}
 
 	if (GotChar && (ch != 0) && m_SQOpen) {
-		if (char_count < 38) {
+		NewChar = ch;
+/*		if (char_count < 38) {
 			LCD_buffer[char_count] = ch;
 			char_count++;
 		}
@@ -675,7 +677,7 @@ void DecodeSymb(struct Complex newsamp)
 			//if (IsBTConnected())
 			//uart_putc(ch);  // turn off char by char transmission
 		}
-		GotChar = FALSE;
+*/		GotChar = FALSE;
 	}
 
 }
