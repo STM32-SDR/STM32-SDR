@@ -296,9 +296,20 @@ void compose_F2(void){    // Call a station by call and name
 }
 
 void compose_F3(void){  //Xmit QTH
+	String2Buffer("Thanks for the call ");
+	if(s_ContactData[1].count != 0)	Text2Buffer(s_ContactData[1].Text, s_ContactData[1].count);
+	if(s_TextData[Text_Name].count != 0)
+	{
+		String2Buffer(" ");
+	String2Buffer("My Name is ");
+	Text2Buffer(s_TextData[Text_Name].Text, s_TextData[Text_Name].count);
+	}
+	String2Buffer(" ");
 	if(s_TextData[Text_QTH].count != 0)
+	{
 	String2Buffer("My QTH is ");
 	Text2Buffer(s_TextData[Text_QTH].Text, s_TextData[Text_QTH].count);
+	}
 	String2Buffer(" ");
 }
 
