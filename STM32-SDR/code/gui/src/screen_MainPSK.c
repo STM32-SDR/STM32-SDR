@@ -77,9 +77,10 @@ void ScreenMainPSK_Create(void)
 	AddPageControlObj(120, LCD_HEIGHT - 42, btnRx, s_pThisScreen);
 	AddPageControlObj(165, LCD_HEIGHT - 42, btnTx, s_pThisScreen);
 	AddPageControlObj(150,   165, btnN, s_pThisScreen);
+	//AddPageControlObj(126,   165, btnN, s_pThisScreen);
 	AddPageControlObj(0, 165, btnC, s_pThisScreen);
 	AddPageControlObj(280, 165, btnT, s_pThisScreen);
-
+	//AddPageControlObj(240, 165, btnT, s_pThisScreen);
 }
 
 

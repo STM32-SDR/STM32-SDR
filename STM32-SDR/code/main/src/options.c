@@ -181,7 +181,8 @@ const char* Options_GetName(int optionIdx)
 	assert(optionIdx >= 0 && optionIdx < NUM_OPTIONS);
 	return s_optionsData[optionIdx].Name;
 }
-uint16_t Options_GetValue(int optionIdx)
+//uint16_t Options_GetValue(int optionIdx)
+int16_t Options_GetValue(int optionIdx)
 {
 	assert(optionIdx >= 0 && optionIdx < NUM_OPTIONS);
 	return s_optionsData[optionIdx].CurrentValue;

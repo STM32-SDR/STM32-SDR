@@ -49,7 +49,8 @@ void Options_ResetToDefaults(void);
 
 // Work with option data
 const char* Options_GetName(int optionIdx);
-uint16_t Options_GetValue(int optionIdx);
+//uint16_t Options_GetValue(int optionIdx);
+int16_t Options_GetValue(int optionIdx);
 void     Options_SetValue(int optionIdx, int16_t newValue);
 uint16_t Options_GetMinimum(int optionIdx);
 uint16_t Options_GetMaximum(int optionIdx);
