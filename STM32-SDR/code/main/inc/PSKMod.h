@@ -32,7 +32,7 @@
 // Exported for display in the ISR.
 extern char XmitBuffer[];
 
-
+void ClearXmitBuffer(void);
 char GetTxChar(void);
 
 /* PSK31  generator variables */

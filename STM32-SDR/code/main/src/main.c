@@ -46,7 +46,7 @@
 #include	"ScrollingTextBox.h"
 #include	"Text_Enter.h"
 
-#define VERSION_STRING "1.012"
+#define VERSION_STRING "1.013"
 
 const uint32_t CODEC_FREQUENCY = 8000;
 
@@ -139,9 +139,6 @@ static void initializeHardware(void)
 	uart_init();
 	main_delay(SETUP_DELAY);
 
-	displaySplashScreen();
-	main_delay(SETUP_DELAY);
-
 	Options_Initialize();
 	main_delay(SETUP_DELAY);
 
@@ -151,9 +148,14 @@ static void initializeHardware(void)
 	Encoders_Init();
 	main_delay(SETUP_DELAY);
 
+	Text_Initialize();
+	main_delay(SETUP_DELAY);
+
+	displaySplashScreen();
+	main_delay(SETUP_DELAY);
+
 	//Load stored macro data
 	displayLoadStationData();
-	Text_Initialize();
 	main_delay(SETUP_DELAY);
 
 	Init_PTT_IO();

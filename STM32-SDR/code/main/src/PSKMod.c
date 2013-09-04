@@ -45,6 +45,8 @@ int m_pTail = 0;
 char XmitBuffer[PSK_TX_BUFFER_SIZE];
 extern unsigned char NewChar;
 
+void ClearXmitBuffer(void);
+
 
 void Update_PSK(void)
 {
@@ -72,18 +74,25 @@ void Update_PSK(void)
 void InitPSKModulator(void)
 {
 	m_Ramp = 0;
-	m_pTail = 0;
+	//m_pTail = 0;
 
 	//Clear Xmit Buffer
-	for (int i = 0; i < PSK_TX_BUFFER_SIZE-2; i++) {
-		XmitBuffer[i] = ' ';
-	}
-	XmitBuffer[PSK_TX_BUFFER_SIZE-1] = '\0';
-
+	ClearXmitBuffer();
 	m_AddEndingZero = TRUE;
 	m_SymbolRate = SYMBOL_RATE31;
 
 	m_TxShiftReg = 0;
+}
+
+
+void ClearXmitBuffer(void)
+
+{
+	m_pTail = 0;
+	for (int i = 0; i < PSK_TX_BUFFER_SIZE-2; i++) {
+		XmitBuffer[i] = ' ';
+	}
+	XmitBuffer[PSK_TX_BUFFER_SIZE-1] = '\0';
 }
 
 char GetNextBPSKSymbol(void)

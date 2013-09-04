@@ -26,6 +26,8 @@
 #include "Text_Enter.h"
 #include "Keyboard_Input.h"
 #include <assert.h>
+#include <PSKMod.h>
+
 
 // Used in this file to refer to the correct screen (helps to keep code copy-paste friendly.
 static GL_Page_TypeDef *s_pThisScreen = &g_screenMainPSK;
@@ -38,6 +40,7 @@ static void rx_Click(GL_PageControls_TypeDef* pThis);
 static void N_Click(GL_PageControls_TypeDef* pThis);
 static void C_Click(GL_PageControls_TypeDef* pThis);
 static void T_Click(GL_PageControls_TypeDef* pThis);
+static void Clear_Click(GL_PageControls_TypeDef* pThis);
 /**
  * Create the screen
  */
@@ -73,14 +76,17 @@ void ScreenMainPSK_Create(void)
 	GL_PageControls_TypeDef* btnN  = NewButton(13,  "N ", N_Click);
 	GL_PageControls_TypeDef* btnC  = NewButton(14,  "C ", C_Click);
 	GL_PageControls_TypeDef* btnT  = NewButton(15,  "T ", T_Click);
+	GL_PageControls_TypeDef* btnClear  = NewButton(16,  "* ", Clear_Click);
+
 
 	AddPageControlObj(120, LCD_HEIGHT - 42, btnRx, s_pThisScreen);
 	AddPageControlObj(165, LCD_HEIGHT - 42, btnTx, s_pThisScreen);
-	AddPageControlObj(150,   165, btnN, s_pThisScreen);
-	//AddPageControlObj(126,   165, btnN, s_pThisScreen);
+	//AddPageControlObj(150,   165, btnN, s_pThisScreen);
+	AddPageControlObj(126,   165, btnN, s_pThisScreen);
 	AddPageControlObj(0, 165, btnC, s_pThisScreen);
-	AddPageControlObj(280, 165, btnT, s_pThisScreen);
-	//AddPageControlObj(240, 165, btnT, s_pThisScreen);
+	//AddPageControlObj(280, 165, btnT, s_pThisScreen);
+	AddPageControlObj(240, 165, btnT, s_pThisScreen);
+	AddPageControlObj(280, 165, btnClear, s_pThisScreen);
 }
 
 
@@ -115,5 +121,11 @@ static void C_Click(GL_PageControls_TypeDef* pThis)
 static void T_Click(GL_PageControls_TypeDef* pThis)
 {
 	Screen_ShowScreen(&g_screenEditText);
+
+}
+
+static void Clear_Click(GL_PageControls_TypeDef* pThis)
+{
+	ClearXmitBuffer();
 
 }

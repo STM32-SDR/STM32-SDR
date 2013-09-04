@@ -52,6 +52,7 @@ int16_t Tx_Flag;
 int dx = 8;
 int dy = 17;
 
+
 void DisplayText ( char ch)
 {
 	int x;
@@ -128,9 +129,27 @@ void DisplayText ( char ch)
 	col = FIRSTCOL;
 }
 
+
 void InitTextDisplay (void){
 	row = FIRSTROW;
 	col = FIRSTCOL;
 	ptr = NUMCOLS;
 	charnum = 0;
+}
+
+void ClearTextDisplay(void) {
+	int x;
+	int y;
+	GL_SetBackColor(LCD_COLOR_BLACK);
+	for (row = FIRSTROW; row < LASTROW+1; row++)
+	{
+		y = OFFSETY_ONAIR + (row-1)*dy;
+
+		for (col = FIRSTCOL; col <= LASTCOL; col++) {
+			x = OFFSETX_ONAIR + (col-1)*dx;
+			GL_PrintChar(x,y,BLANK,0);
+		}
+	}
+	GL_SetBackColor(LCD_COLOR_WHITE);
+	InitTextDisplay ();
 }

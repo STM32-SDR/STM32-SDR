@@ -27,6 +27,7 @@
 #include "PSKMod.h"
 #include "DMA_IRQ_Handler.h"
 #include "options.h"
+#include "ScrollingTextBox.h"
 
 void Receive_Sequence(void)
 {
@@ -40,6 +41,7 @@ void Receive_Sequence(void)
 	Set_PGA_Gain(Options_GetValue(OPTION_RX_RF));
 	Set_ADC_DVC(0);  //was -20 using Milt's AGC scheme
 	Set_HP_Gain(6);
+	ClearTextDisplay();
 }
 
 void Xmit_SSB_Sequence(void)
@@ -55,6 +57,7 @@ void Xmit_SSB_Sequence(void)
 	GPIO_WriteBit(GPIOD, GPIO_Pin_3, Bit_RESET);  //Make PTT_Out Low,Remember FET Inversion
 	Delay(1000);
 	Set_LO_Gain(24);
+	Set_LO_Gain(Options_GetValue(OPTION_ST_LEVEL));
 }
 
 void Xmit_CW_Sequence(void)

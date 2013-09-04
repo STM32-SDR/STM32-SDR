@@ -101,7 +101,7 @@ uint8_t count;
 	},
 
 	{
-		/*Item*/ "PWR ",
+		/*Item*/ "RIG ",
 		/*Text*/ " ",
 		/*count*/ 5
 	},
