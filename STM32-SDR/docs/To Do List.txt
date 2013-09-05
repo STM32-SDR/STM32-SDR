@@ -29,7 +29,7 @@ General (unassigned) Features
 	- Record Button (to capture transmit and received text to a flash drive)
 	- Tuning rate
 	- Option button to change configuration.
-	- In place of the spectral display--optional waterfall
+	- In place of the spectral display--optional waterfall. 2nd request for Waterfall VE7DID
 	- Change mode either through the OPT button, or with a selector switch.
 	[Aug 9]
 	- White background colour for PSK text
@@ -47,7 +47,7 @@ General (unassigned) Features
 - Associtade a mode (PSK, CW, SSB; SSB, USB) with each frequency band.
 - Allow fine tuning the selected frequency (red line in FFT) without having to precisely touch FFT (ex: the right-encoder knob.
 
-- Keyborad input:
+- Keyboard input:
 	- Make input-key handling specific to which screen is active; plug into to event handler?
 	- Allow a pseudo-focus capability on a screen.
 	- Have edit-box widget for screen.
