@@ -32,7 +32,8 @@
 #define EEPROM_OFFSET 200
 
 #define EEPROM_SENTINEL_LOC 50
-#define EEPROM_SENTINEL_VAL 5680
+//#define EEPROM_SENTINEL_VAL 5680
+#define EEPROM_SENTINEL_VAL 3333
 
 static OptionNumber s_currentOptionNumber = OPTION_RX_AUDIO;
 
@@ -65,7 +66,7 @@ static OptionStruct s_optionsData[] = {
 		/*Data*/ 0,
 	},
 	{
-		/*Name*/ "SSB Level",
+		/*Name*/ "Mic Gain ",
 		/*Init*/ 20,
 		/*Min */ 0,
 		/*Max */ 80,
@@ -73,21 +74,14 @@ static OptionStruct s_optionsData[] = {
 		/*Data*/ 0,
 	},
 	{
-		/*Name*/ "CW Level ",
-		/*Init*/ 0,
-		/*Min */ -127,
+		/*Name*/ "Tx Level ",
+		/*Init*/ 29,
+		/*Min */ 0,
 		/*Max */ 29,
 		/*Rate*/ 1,
 		/*Data*/ 0,
 	},
-	{
-		/*Name*/ "PSK Level",
-		/*Init*/ 0,
-		/*Min */ -127,
-		/*Max */ 29,
-		/*Rate*/ 1,
-		/*Data*/ 0,
-	},
+
 	{
 		/*Name*/ "ST Level ",
 		/*Init*/ 0,
@@ -206,23 +200,20 @@ void Options_SetValue(int optionIdx, int16_t newValue)
 			Set_PGA_Gain(newValue);
 		break;
 
-	case OPTION_SSB_LEVEL:
+	case OPTION_Mic_Gain:
 		if ((Tx_Flag == 1) && (Mode_GetCurrentMode() == MODE_SSB))
 			Set_PGA_Gain(newValue);
 		break;
 
-	case OPTION_CW_LEVEL:
-		if ((Tx_Flag == 1) && (Mode_GetCurrentMode() == MODE_CW))
-			Set_DAC_DVC(newValue);
-		break;
-
-	case OPTION_PSK_LEVEL:
-		if ((Tx_Flag == 1) && (Mode_GetCurrentMode() == MODE_PSK))
-			Set_DAC_DVC(newValue);
+	case OPTION_Tx_LEVEL:
+		//if ((Tx_Flag == 1) && (Mode_GetCurrentMode() == MODE_CW))
+		if (Tx_Flag == 1)
+			Set_LO_Gain(newValue);
 		break;
 
 	case OPTION_ST_LEVEL:  //Side Tone Level
-		if ((Tx_Flag == 1) && (Mode_GetCurrentMode() == MODE_CW))
+		//if ((Tx_Flag == 1) && (Mode_GetCurrentMode() == MODE_CW))
+		if (Tx_Flag == 1)
 			Set_HP_Gain(newValue);
 		break;
 
