@@ -74,7 +74,7 @@ void Encoders_Init(void)
 	configureGPIOEncoder1();
 	configureGPIOEncoder2();
 	init_encoder1();
-	init_encoder2();
+	init_encoder2();  //this may be requied to introduce a delay for start up
 	FrequencyManager_StepFrequencyDown();
 	FrequencyManager_StepFrequencyUp();
 }

@@ -27,7 +27,7 @@
 #include "Keyboard_Input.h"
 #include <assert.h>
 #include <PSKMod.h>
-
+#include <ScrollingTextBox.h>
 
 // Used in this file to refer to the correct screen (helps to keep code copy-paste friendly.
 static GL_Page_TypeDef *s_pThisScreen = &g_screenMainPSK;
@@ -102,6 +102,7 @@ static void tx_Click(GL_PageControls_TypeDef* pThis)
 static void rx_Click(GL_PageControls_TypeDef* pThis)
 {
 	Receive_Sequence();
+	ClearTextDisplay();
 }
 
 static void N_Click(GL_PageControls_TypeDef* pThis)

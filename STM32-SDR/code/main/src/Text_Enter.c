@@ -328,7 +328,7 @@ void compose_F4(void){   //Station Info
 }
 void compose_F5(void){
 	if(s_ContactData[1].count != 0)
-	String2Buffer("Well, ");
+	String2Buffer(" Well, ");
 	Text2Buffer(s_ContactData[1].Text,s_ContactData[1].count);
 	String2Buffer("TNX for the PSK31 QSO");
 	String2Buffer(" ");

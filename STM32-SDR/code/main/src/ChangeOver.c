@@ -41,7 +41,6 @@ void Receive_Sequence(void)
 	Set_PGA_Gain(Options_GetValue(OPTION_RX_RF));
 	Set_ADC_DVC(0);  //was -20 using Milt's AGC scheme
 	Set_HP_Gain(6);
-	ClearTextDisplay();
 }
 
 void Xmit_SSB_Sequence(void)
@@ -50,14 +49,15 @@ void Xmit_SSB_Sequence(void)
 	Mute_LO();
 	Tx_Flag = 1;
 	Disconnect_PGA();
-	Set_DAC_DVC(0);
+	Set_DAC_DVC(-10);
+	//Set_DAC_DVC(Options_GetValue(OPTION_CW_LEVEL));
 	Set_ADC_DVC(0);
 	Connect_Microphone_Input();
-	Set_PGA_Gain(Options_GetValue(OPTION_SSB_LEVEL));
+	Set_PGA_Gain(Options_GetValue(OPTION_Mic_Gain));
 	GPIO_WriteBit(GPIOD, GPIO_Pin_3, Bit_RESET);  //Make PTT_Out Low,Remember FET Inversion
 	Delay(1000);
-	Set_LO_Gain(24);
-	Set_LO_Gain(Options_GetValue(OPTION_ST_LEVEL));
+	//Set_LO_Gain(24);
+	Set_LO_Gain(Options_GetValue(OPTION_Tx_LEVEL));
 }
 
 void Xmit_CW_Sequence(void)
@@ -66,10 +66,11 @@ void Xmit_CW_Sequence(void)
 	Mute_LO();
 	Tx_Flag = 1;
 	Disconnect_PGA();
-	Set_DAC_DVC(Options_GetValue(OPTION_CW_LEVEL));
+	Set_DAC_DVC(-60);
 	GPIO_WriteBit(GPIOD, GPIO_Pin_3, Bit_RESET);  //Make PTT_Out Low,Remember FET Inversion
 	Delay(1000);
-	Set_LO_Gain(20);
+	//Set_LO_Gain(20);
+	Set_LO_Gain(Options_GetValue(OPTION_Tx_LEVEL));
 	Set_HP_Gain(Options_GetValue(OPTION_ST_LEVEL));
 }
 
@@ -79,10 +80,11 @@ void Xmit_PSK_Sequence(void)
 	Mute_LO();
 	Tx_Flag = 1;
 	Disconnect_PGA();
-	Set_DAC_DVC(Options_GetValue(OPTION_PSK_LEVEL));
+	Set_DAC_DVC(-10);
 	GPIO_WriteBit(GPIOD, GPIO_Pin_3, Bit_RESET);  //Make PTT_Out Low,Remember FET Inversion
 	Delay(1000);
-	Set_LO_Gain(20);
+	//Set_LO_Gain(20);
+	Set_LO_Gain(Options_GetValue(OPTION_Tx_LEVEL));
 	Set_HP_Gain(Options_GetValue(OPTION_ST_LEVEL));
 }
 
