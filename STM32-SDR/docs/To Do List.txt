@@ -85,4 +85,3 @@ Features Brian Hopes to Implement
 	- Remove all LCD_StringLine() calls and delete function.
 	- Remove code in graphicObject.c
 	- Compile out asserts
-	
