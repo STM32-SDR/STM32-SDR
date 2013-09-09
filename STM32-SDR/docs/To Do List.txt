@@ -86,6 +86,9 @@ Features Brian Hopes to Implement
 	- Remove code in graphicObject.c
 	- Compile out asserts
 	
-	
-	
+***************	
+Tony would like
+***************
+	- 4m amateur band included in defaults
+	- he also notices there is lots of duplicated code in 'cases' of SS1 settings - feels it could be shrunk a bit
 	
