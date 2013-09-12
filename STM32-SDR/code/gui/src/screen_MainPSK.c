@@ -28,11 +28,8 @@
 #include <assert.h>
 #include <PSKMod.h>
 #include <ScrollingTextBox.h>
-<<<<<<< HEAD
 #include "KeyboardStatus.h"
-=======
 
->>>>>>> refs/remotes/origin/origin/master
 // Used in this file to refer to the correct screen (helps to keep code copy-paste friendly.
 static GL_Page_TypeDef *s_pThisScreen = &g_screenMainPSK;
 static GL_PageControls_TypeDef* pKeyboardLabel;
