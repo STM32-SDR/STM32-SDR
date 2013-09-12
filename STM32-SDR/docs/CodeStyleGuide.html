@@ -1,0 +1,316 @@
+<!DOCTYPE html 
+    PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+
+<head><title>Coding Standard for STM32-SDR</title>
+<!--<link    rel="stylesheet" href="look.css" type="text/css" />-->
+    <style TYPE="text/css">
+    <!--
+        pre.code{
+			background: #ffffE6;
+			font-family: monospace;
+			color: black;
+			margin: 0;
+			margin-top: 0px;
+			margin-bottom: 5px;
+			margin-left: 25px;
+			margin-right: 100px;
+			padding: 2px 10px;
+        }
+        
+        p {
+			padding: 0;
+			border: 0;
+			margin: 0;
+			margin-bottom: 0px;
+			margin-top: 10px;
+        }
+		
+		span.k{
+			color: blue;
+		}
+		
+		span.c{
+			color: darkgreen;
+		}
+    -->
+    </style> 
+</head>
+<body>
+<h1>Coding Standard for STM32-SDR</h1>
+<p>The following is the suggested coding style for new code being added to the STM32-SDR project.</p>
+<p>It is always best to write simple, clear code that is easy to understand, debug and maintain.</p>
+
+
+<h2>Use Meaningful Names</h2>
+<p>All identifiers must have meaningful, human-readable, English names. Avoid cryptic abbreviations such as "dspl()", "cntStd()", or "stdRegYYYYMMDD". Instead use:</p>
+
+<pre class="code"><span class="k">void</span> display();
+<span class="k">int</span> countStudents();
+<span class="k">char</span> dateStudentRegistered[30];</pre>
+
+<p>Exception 1: loop variables may be i, j or k:</p>
+<pre class="code"><span class="k">for</span> (<span class="k">int</span> i = 0; i < 10; i++) {
+    ...
+}</pre>
+<p>Exception 2: variables with very limited scope (&lt;20 lines) may be shortened if the purpose of the variable is clear. </p>
+<pre class="code"><span class="k">void</span> swapMoney(<span class="k">float</span> *pMoney1, <span class="k">float</span> *pMoney2) 
+{
+    <span class="k">float</span> tmp = *pMoney1;
+    *pMoney1 = *pMoney2;
+    *pMoney2 = tmp;
+}</pre>
+
+
+
+<h2>Naming Conventions</h2>
+<p>Constants must be all upper case, with multiple words separated by '_':</p>
+<pre class="code"><span class="k">const int</span> DAYS_PER_WEEK = 7;</pre>
+
+<p>"Public" functions exported from a module in a .h file should start with the module name, such as: </p>
+<pre class="code"><span class="k">double</span> LCD_ClearScreen();
+<span class="k">_Bool</span> Keyboard_IsKeyboardConnected();</pre>
+
+<p>"Private" functions which are local to a module (not in the .h file) should be made <span class="k">static</span> (to prevent other code from calling them and to avoid linking errors). These functions should start with a lower case letter, and use camelCase. Functions should be named in terms of an action:</p>
+<pre class="code"><span class="k">double</span> calculateTax();
+<span class="k">_Bool</span> verifyInput();</pre>
+
+<p>Global constants are acceptable, and should be placed in the most restrictive scope possible. For example, if it is used in only one .c file, then define the constant inside that file. If a constant is needed in multiple files, place it in a .h file (and make it <span class="k">static</span>).</p>
+
+<p>Global variables must be avoided as much as possible. When <em>absolutely</em> required, their names should be prefixed with g_:</p>
+<pre class="code"><span class="k">int</span> g_bad;
+<span class="k">double</span> g_doNotUseGlobals;</pre>
+
+<p>Module variables should be placed in a .c file and not exported to other modules (don't put them in the .h file!). Make these module variables static and their names should be prefixed with s_:</p>
+<pre class="code"><span class="k">int</span> s_isKeyboardConnected;
+<span class="k">double</span> s_countErrors;</pre>
+
+<p>Boolean (<span class="k">_Bool</span>) variables should be named so that they make sense in an if statement:</p>
+<pre class="code"><span class="k">if</span> (isOpen) {
+    ...
+}
+<span class="k">while</span> (!isEndOfFile && hasMoreData()) {
+    ...
+}
+</pre>
+
+<p>Pointers should be prefixed with 'p' in order to remind the programmer that it is a pointer.</p>
+<pre class="code"><span class="k">int</span> *pNumStudents;</pre>
+
+<p>Constants must be all upper case, with words separated by '_':</p>
+<pre class="code"><span class="k">const int</span> MONTHS_PER_YEAR = 12 
+<span class="k">#define</span> MONTHS_PER_YEAR 12</pre>
+
+<p>Use named constants instead of literal numbers (magic numbers). It is often acceptable to use 0 and 1; however, it must be clear what they mean:</p>
+<pre class="code"><span class="c">// OK:</span>
+<span class="k">int</span> i = 0;
+i = i + 1;
+
+<span class="c">// Bad: What are 0 and 1 for?!?</span>
+someFunction(x, 0, 1);
+
+<span class="c">// Terrible code:</span>
+int a = 215;
+int b = a * 5 % 502;
+</pre>
+
+
+
+
+<h2>Indentation and Braces {...}</h2>
+<p>There's <strong>always</strong> time for <strong>perfect indentation</strong>.</p>
+<p>Tab size is 4; indentation size is 4. Do not replace tabs with spaces. Use tabs at the start of a line to indent code to the current level of indentation. Use spaces to indent code beyond the current level of indentation. This format should make the code readable in all editors, but you will have to configure your editor to maintain this formatting.</p>
+<pre class="code"><span class="k">if</span> (j < 10) {
+&rarr;   counter = getStudentCount(lowIndex,
+&rarr;   &middot;&middot;&middot;&middot;&middot;&middot;&middot;&middot;&middot;&middot;&middot;&middot;&middot;&middot;&middot;&middot;&middot;&middot;&middot;&middot;&middot;&middot;&middot;&middot;&middot;&middot;highIndex);
+&rarr;   <span class="k">if</span> (x == 0) {
+&rarr;   &rarr;   <span class="k">if</span> (y != 0) {
+&rarr;   &rarr;   &rarr;   x = y;&middot;&middot;&middot;&middot;&middot;&middot;&middot;&middot;&middot;&middot;<span class="c">// Insightful comment here</span>
+&rarr;   &rarr;   }
+&rarr;   }
+}</pre>
+
+<p>Braces follow the <a href="http://cm.bell-labs.com/cm/cs/cbook/">K&amp;R</a> style. Opening brace is at the end of the enclosing statement; closing brace is on its own line, lined up with the start of the opening enclosing statement. Statements inside the block are indented one tab.</p>
+<pre class="code"><span class="k">for</span> (<span class="k">int</span> i = 0; i < 10; i++) {
+&rarr;   ...
+}
+
+<span class="k">while</span> (i > 0) {
+&rarr;   ...
+}
+
+<span class="k">do</span> {
+&rarr;   ...
+} <span class="k">while</span> (x > 1);
+
+<span class="k">if</span> (y > 500) {
+&rarr;   ...
+} <span class="k">else if</span> (y == 0) {
+&rarr;   ...
+} <span class="k">else</span> {
+&rarr;   ...
+}</pre>
+    
+<p>Exception 1 (as per K&amp;R): Functions have their opening braces on their own line:</p>
+<pre class="code"><span class="k">void</span> foo()
+{
+&rarr;   ...
+}</pre>
+
+<p>"Heretic people all over the world have claimed that this inconsistency is ...  well ...  inconsistent, but all right-thinking people know that (a) K&R are _right_ and (b) K&R are right.", <a href="http://www.kernel.org/doc/Documentation/CodingStyle">Linux kernel coding style</a>.</p>
+    
+<p>Exception 2: <em>If</em> statements with multi-line conditions have the starting brace aligned on the left to make it easier to spot the block in the <em>if</em> statement.</p>
+<pre class="code"><span class="k">if</span> (someBigBooleanExpression
+&middot;&middot;&middot;&middot;&& !someOtherExpression)
+{
+&rarr;   ...
+}</pre>
+    
+<p>All <em>if</em> statements and loops should include braces around their statements, even if there is only one statement in the body:</p>
+<pre class="code"><span class="k">if</span> (a < 1) {
+    a = 1;
+} <span class="k">else</span> {
+    a *= 2;
+}
+<span class="k">while</span> (count > 0) {
+    count--;
+}</pre>
+
+
+<h2>Statements and Spacing</h2>
+
+<p>Declare each variable in its own definition, rather than together ("int i, j"). This is because pointer declarations can be confusing: </br> "int* p1, p2;" makes a pointer and an int.</p>
+<pre class="code"><span class="k">int</span> *p1;
+<span class="k">int</span> p2;</pre>
+<p></p>
+    
+<p>Each statement should be on its own line:</p>
+<pre class="code"><span class="c">// Good:</span>
+i = j + k;
+l = m * 2;
+
+<span class="c">// Bad (what are you hiding?):</span>
+<span class="k">if</span> (i == j) l = m * 2;
+    printf("Can ya read this?\n");</pre>
+
+<p>All binary (2 argument) operators (arithmetic, bitwise and assignment) and ternary conditionals (?:) must be surrounded by one space. Commas must have one space after them and none before. Unary operators (!, *, &, - (ex: -1), + (ex: +1), ++, --) have no additional space on either side of the operator.</p>
+<pre class="code">i = 2 + (j * 2) + -1 + k++;
+<span class="k">if</span> (i == 0 || j < 0 || !k) {
+    arr[i] = i;
+}</pre>
+    
+<p>Add extra brackets in complex expressions, even if operator precedence will do what you want. The extra brackets increase readability and reduce errors.</p>
+<pre class="code"><span class="k">if</span> ((!isReady && isBooting)
+    || (x > 10)
+    || (y == 0 && z < (x + 1)))
+{
+    ...
+}</pre>
+<p>However, it is often better to simplify complex expressions by breaking them into multiple sub-expressions that are easier to understand and maintain: </p>	
+<pre class="code">
+<span class="k">_Bool</span> isFinishedBooting = (isReady || !isBooting);
+<span class="k">_Bool</span> hasTimedOut = (x > 10);
+<span class="k">_Bool</span> isOldFirmware = (y == 0 && z < (x + 1));
+<span class="k">if</span> (!isFinishedBooting
+    || hasTimedOut
+    || isOldFirmware) 
+{
+    ...	
+}</pre>
+	
+   
+<h2>Comments</h2>
+<p>Comments which are on one line should use the // style. Comments which are or a couple lines may use either the //, or /* ... */ style. Comments which are many lines long should use /* ... */.</p>
+
+<p>Each file must have a descriptive comment describing the general purpose of the module, and the standard GPL licence (or the license the code is released under). Recommended format is shown below:</p>
+<pre class="code"><span class="c">/*
+ * Code for SSB operations screen
+ *
+ * STM32-SDR: A software defined HAM radio embedded system.
+ * Copyright (C) 2013, STM32-SDR Group
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */ </span>
+ ...
+</pre>
+    
+<p>Each function listed in a .h file may have a comment describing what it does. However, the name of the function, combined with an understanding of the module, should be enough to tell the user what it does.</p>
+    
+<p>Comments should almost always be the line before what they describe, and be placed at the same level of indentation as the code. Only very short comments should appear inline with the code:</p>
+<pre class="code"><span class="c">// Display final confirmation message box.</span>
+callSomeFunction(
+        0,              <span class="c">// Parent.</span>
+        "My App",       <span class="c">// Title</span>
+        "test");        <span class="c">// Message</span></pre>
+    
+	
+    
+
+<h2>Files</h2>
+<p>Header files have the extension .h; source files have the extension .c. Treat file names as being case sensitive: if the file is named Car.h, use #include "Car.h", not #include "car.h".</p>
+
+<p>All header files must use include guards of the form:</p>
+<pre class="code"><span class="k">#ifndef</span> FILENAME_H
+<span class="k">#define</span> FILENAME_H
+...
+<span class="k">#endif</span></pre>
+    
+<p>Header files must be self-contained. For example, if it uses uint8_t, then "#include &ltstdint.h&gt" in the .h file. The client code must be able to include the .h file without having to first include other .h files.</p>
+
+<p>Place all #include directives at the top of the file, instead of distributing them throughout your code.</p>
+
+<p>Function prototypes must include full parameter names instead of (the valid, but poor style) "void printResult(int, char*);". The parameter names in the prototype must match the function definition (for style, not for compiler).</p>
+<pre class="code"><span class="k">void</span> printResult(int numStudents, float avgShoeSize);</pre>
+
+<p>Order your files so that the most general function is at the top, and the sub-routines are below it. For example, your main file should have main() at the top, and then the functions which it calls below it. This will require prototypes, but allows the reader to read your code top-down.</p>
+
+
+<h2>Other</h2>
+<p>Either post-increment or pre-increment may be used on its own:</p>
+<pre class="code">i++;
+++j;</pre>
+
+<p>Avoid using goto. If possible, design your loops to not require the use of "break" or "continue".</p>
+
+<p>All switch statements should include a "default" label. If the "default" case seems impossible, place an "assert(false);" in it. Comment any intentional fall-through's in switch statements:</p>
+<pre class="code"><span class="k">switch</span>(buttonChoice) {
+<span class="k">case</span> YES:
+    <span class="c">// Fall through</span>
+<span class="k">case</span> OK:
+    printf("It's all good.\n");
+    <span class="k">break</span>;
+<span class="k">case</span> CANCEL:
+    printf("It's over!\n");
+    <span class="k">break</span>;
+<span class="k">default</span>:
+    assert(<span class="k">false</span>);
+}</pre>
+
+<p>Use plenty of assertions. Any time you can use an assertion to check that some condition is true which "must" be true, you can catch a bug early in development. It is especially useful to verify function pre-conditions for input arguments or the object's state. </p>
+
+<p>Never let an assert have a side effect such as "assert(i++ > 1);". This may do what you expect during debugging, but when you build a release version, the asserts get compiled out (they are macros). Therefore, the i++ won't happen in the release build.</p>
+
+<p>When changing the code, change the version number #define named VERSION_STRING in code/main/src/main.c.</p>
+
+
+
+
+<h2>References:</h2>
+<ol>
+<li><a href="http://cm.bell-labs.com/cm/cs/cbook/">Kernighan and Ritchie's</a> "The C Programming Language", 1988.</li>
+<li><a href="http://www.kernel.org/doc/Documentation/CodingStyle">Linux kernel coding style</a>.</li>
+</ol>
+
+<?php include 'foot.html' ?>
