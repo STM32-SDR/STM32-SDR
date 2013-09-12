@@ -28,10 +28,10 @@
 #include <assert.h>
 #include <PSKMod.h>
 #include <ScrollingTextBox.h>
-
+#include "KeyboardStatus.h"
 // Used in this file to refer to the correct screen (helps to keep code copy-paste friendly.
 static GL_Page_TypeDef *s_pThisScreen = &g_screenMainPSK;
-
+static GL_PageControls_TypeDef* pKeyboardLabel;
 /**
  * Call-back prototypes
  */
@@ -41,6 +41,23 @@ static void N_Click(GL_PageControls_TypeDef* pThis);
 static void C_Click(GL_PageControls_TypeDef* pThis);
 static void T_Click(GL_PageControls_TypeDef* pThis);
 static void Clear_Click(GL_PageControls_TypeDef* pThis);
+
+static _Bool KeyboardStatusUpdateHandler(GL_PageControls_TypeDef* pThis, _Bool forceRedisplay)
+{
+      // For CW, put this in code\gui\src\screen_MainCW.c
+      if (KeyboardStatus_IsKeyboardWorking()) {
+    	  Widget_ChangeLabelText(pKeyboardLabel, "Kbd attached");
+      } else if(KeyboardStatus_IsUSBDeviceAttached()) {
+    	  Widget_ChangeLabelText(pKeyboardLabel, "USB attached");
+      } else {
+    	  Widget_ChangeLabelText(pKeyboardLabel, "   No Kbd   ");
+      }
+
+      // No need to indicate update required because changing the
+      // label text forces an update (redraw).
+      return 0;
+}
+
 /**
  * Create the screen
  */
@@ -70,6 +87,11 @@ void ScreenMainPSK_Create(void)
 			LCD_WIDTH - ((GL_Custom_TypeDef*)(btnFreq->objPTR))->GetWidth(btnFreq),
 			LCD_HEIGHT - ((GL_Custom_TypeDef*)(btnFreq->objPTR))->GetHeight(btnFreq),
 			btnFreq, s_pThisScreen);
+	// Keyboard status
+
+		pKeyboardLabel = Widget_NewLabel("Your keyboard...", LCD_COLOR_YELLOW, LCD_COLOR_BLACK, 0, GL_FONTOPTION_8x8,KeyboardStatusUpdateHandler);
+
+		AddPageControlObj(115,  228, pKeyboardLabel, s_pThisScreen);
 	// .. Rx & Tx buttons (Remove when code can automatically switch)
 	GL_PageControls_TypeDef* btnRx  = NewButton(10, " Rx ", rx_Click);
 	GL_PageControls_TypeDef* btnTx  = NewButton(9,  " Tx ", tx_Click);

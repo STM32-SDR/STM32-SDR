@@ -80,6 +80,7 @@ void USBH_USR_Init(void)
 void USBH_USR_DeviceAttached(void)
 {
 	USB_debugEvent(__LINE__);
+	KeyboardStatus_SetDeviceAttached();
 }
 
 /**
@@ -101,6 +102,7 @@ void USBH_USR_UnrecoveredError(void)
 void USBH_USR_DeviceDisconnected(void)
 {
 	USB_debugEvent(__LINE__);
+	KeyboardStatus_SetDeviceDesconnected();
 }
 
 /**
@@ -242,6 +244,7 @@ void USBH_USR_SerialNum_String(void *SerialNumString)
 void USBH_USR_EnumerationDone(void)
 {
 	USB_debugEvent(__LINE__);
+
 }
 
 /**
@@ -306,6 +309,8 @@ void USBH_USR_OverCurrentDetected(void)
 void USR_KEYBRD_Init(void)
 {
 	USB_debugEvent(__LINE__);
+	KeyboardStatus_SetKeyboardWorking();
+
 }
 
 /**

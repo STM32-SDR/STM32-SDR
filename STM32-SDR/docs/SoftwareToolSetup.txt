@@ -19,7 +19,7 @@ GCC Compiler for ARM:
 	Test:
 		* Open a command prompt
 		* Type: 
-			arm-none-eabi-gcc --version
+			arm-none-eabi-gcc -v
 		  Should show long dump of configuration and build version.
 	
 GnuWin (for Make): 
