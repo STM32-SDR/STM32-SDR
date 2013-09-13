@@ -29,6 +29,7 @@
 #include "usbh_usr.h"
 #include "usbh_hid_keybd.h"
 #include "Keyboard_Input.h"
+#include "KeyboardStatus.h"
 
 USBH_Usr_cb_TypeDef USR_Callbacks = {
 		USBH_USR_Init,

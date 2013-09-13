@@ -34,10 +34,10 @@
 #define USE_ACCURATE_TIME
 #define TIM_MSEC_DELAY                     0x01
 #define TIM_USEC_DELAY                     0x02
-#define HOST_OVRCURR_PORT                  GPIOD
-#define HOST_OVRCURR_LINE                  GPIO_Pin_5
-#define HOST_OVRCURR_PORT_SOURCE           GPIO_PortSourceGPIOD
-#define HOST_OVRCURR_PIN_SOURCE            GPIO_PinSourceD
+#define HOST_OVRCURR_PORT                  GPIOB  // was D
+#define HOST_OVRCURR_LINE                  GPIO_Pin_8 //GPIO_Pin_5
+#define HOST_OVRCURR_PORT_SOURCE           GPIO_PortSourceGPIOB  // GPIO_PortSourceGPIOD
+#define HOST_OVRCURR_PIN_SOURCE            GPIO_PinSourceB //GPIO_PinSourceD
 #define HOST_OVRCURR_PORT_RCC              RCC_APB2Periph_GPIOD
 #define HOST_OVRCURR_EXTI_LINE             EXTI_Line5
 #define HOST_OVRCURR_IRQn                  EXTI9_5_IRQn 
