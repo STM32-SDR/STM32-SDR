@@ -84,7 +84,6 @@ Features Brian Hopes to Implement
 	- Remove code in graphicObject.c
 	- Compile out asserts
 	
-- Investigate Transparency anomoly	
 ***************	
 Tony would like
 ***************
