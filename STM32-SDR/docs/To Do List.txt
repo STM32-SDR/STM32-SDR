@@ -70,11 +70,7 @@ General (unassigned) Features
 	- Serial port support
 	- Display LCD driver chip ID at startup.
 
-- Debug USB
-	- Indictation on LCD that USB keyboard attached
-	- "On the new board the OTG_FS_OverCurrent signal was moved from PD5 to PB8"
-	  Pin shared on discovery board as fault output of U6; may need to turn overcurrent off in software.
-	  See July 22nd email form Charley for thoughts.
+- Remove Offset and vertical slider from SSB screen as the dont have any afffect in SSB
 	
 *********************************
 Features Brian Hopes to Implement
