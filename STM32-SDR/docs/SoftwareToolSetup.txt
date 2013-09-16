@@ -188,3 +188,4 @@ https://docs.google.com/folder/d/0B4F_gjXVrHZVRXkydE0xVFBRRkc1WUpEcXdwQ2I1dw/edi
 Eclipse's plugin that gives us Git support (named EGit) has a pretty good manual:
 http://wiki.eclipse.org/EGit/User_Guide
 Google Docs - Items from this e-mail
+
