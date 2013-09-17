@@ -85,6 +85,7 @@ void DisplayText ( char ch)
 		}
 	}
 	else {
+		if ((ch<0x20) | (ch>0x7E)) ch=0x20;
 		x = OFFSETX_ONAIR + (col-1)*dx;
 		y = OFFSETY_ONAIR + (row-1)*dy;
 		GL_PrintChar (x,y,ch,0);

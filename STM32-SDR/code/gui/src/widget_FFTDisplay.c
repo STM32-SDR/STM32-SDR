@@ -211,8 +211,8 @@ static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 			FFT_Output[j] = 64;
 		FFT_Display[2 * j] = FFT_Output[j];
 		// Note that calculation uses values from last pass through.
-		FFT_Display[2 * j + 1] = 0;
-		//FFT_Display[2 * j + 1] = (FFT_Output[j] + FFT_Output[j + 1]) / 2;
+		//FFT_Display[2 * j + 1] = 0;
+		FFT_Display[2 * j + 1] = (FFT_Output[j] + FFT_Output[j + 1]) / 2;
 	}
 
 
