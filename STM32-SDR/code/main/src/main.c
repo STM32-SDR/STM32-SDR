@@ -218,4 +218,3 @@ static void main_delay(uint32_t numLoops)
 		j++;
 	}
 }
-
