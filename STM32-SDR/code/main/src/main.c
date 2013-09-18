@@ -46,7 +46,7 @@
 #include	"ScrollingTextBox.h"
 #include	"Text_Enter.h"
 
-#define VERSION_STRING "1.016"
+#define VERSION_STRING "1.018"
 
 const uint32_t CODEC_FREQUENCY = 8000;
 
@@ -121,6 +121,7 @@ static void initializeHardware(void)
 	TS_Initialize();
 	main_delay(SETUP_DELAY);
 
+
 	Codec_AudioInterface_Init(CODEC_FREQUENCY);
 	main_delay(SETUP_DELAY);
 
@@ -128,6 +129,9 @@ static void initializeHardware(void)
 	main_delay(SETUP_DELAY);
 
 	ResetModem(BPSK_MODE);
+	main_delay(SETUP_DELAY);
+
+	displaySplashScreen();
 	main_delay(SETUP_DELAY);
 
 	SetRXFrequency(1000);
@@ -151,8 +155,7 @@ static void initializeHardware(void)
 	Text_Initialize();
 	main_delay(SETUP_DELAY);
 
-	displaySplashScreen();
-	main_delay(SETUP_DELAY);
+
 
 	//Load stored macro data
 	displayLoadStationData();
@@ -200,12 +203,11 @@ static void displaySplashScreen(void)
 	main_delay(10000000);
 }
 static void displayLoadStationData(void)
-	{
+{
 	GL_SetTextColor(LCD_COLOR_RED);
 	GL_SetBackColor(LCD_COLOR_WHITE);
 	GL_PrintString(0, 200, "Loading Station Info", 0);
-
-	}
+}
 
 
 static void main_delay(uint32_t numLoops)
