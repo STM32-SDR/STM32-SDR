@@ -73,6 +73,7 @@ void ScreenMainSSB_Create(void)
 			LCD_WIDTH - ((GL_Custom_TypeDef*)(btnFreq->objPTR))->GetWidth(btnFreq),
 			LCD_HEIGHT - ((GL_Custom_TypeDef*)(btnFreq->objPTR))->GetHeight(btnFreq),
 			btnFreq, s_pThisScreen);
+
 	// .. Rx & Tx buttons (Remove when code can automatically switch)
 	GL_PageControls_TypeDef* btnRx  = NewButton(10, " Rx ", rx_Click);
 	GL_PageControls_TypeDef* btnTx  = NewButton(9,  " Tx ", tx_Click);

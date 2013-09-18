@@ -25,9 +25,9 @@
 #include "options.h"
 #include <assert.h>
 
+
 // Used in this file to refer to the correct screen (helps to keep code copy-paste friendly.
 static GL_Page_TypeDef *s_pThisScreen = &g_screenMainCW;
-
 /**
  * Call-back prototypes
  */
@@ -62,6 +62,7 @@ void ScreenMainCW_Create(void)
 			LCD_WIDTH - ((GL_Custom_TypeDef*)(btnFreq->objPTR))->GetWidth(btnFreq),
 			LCD_HEIGHT - ((GL_Custom_TypeDef*)(btnFreq->objPTR))->GetHeight(btnFreq),
 			btnFreq, s_pThisScreen);
+
 	// .. Rx & Tx buttons (Remove when code can automatically switch)
 	GL_PageControls_TypeDef* btnRx  = NewButton(10, " Rx ", rx_Click);
 	GL_PageControls_TypeDef* btnTx  = NewButton(9,  " Tx ", tx_Click);

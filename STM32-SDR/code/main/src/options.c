@@ -28,13 +28,14 @@
 #include "eeprom.h"
 #include "Si570.h"
 #include "FrequencyManager.h"
+#include "AGC_Processing.h"
 
 #define EEPROM_OFFSET 200
 
 #define EEPROM_SENTINEL_LOC 50
 //#define EEPROM_SENTINEL_VAL 5680
-#define EEPROM_SENTINEL_VAL 3333
-
+//#define EEPROM_SENTINEL_VAL 3333
+#define EEPROM_SENTINEL_VAL 2222
 static OptionNumber s_currentOptionNumber = OPTION_RX_AUDIO;
 
 typedef struct
@@ -131,6 +132,15 @@ static OptionStruct s_optionsData[] = {
 		/*Data*/ 0,
 	},
 	{
+		/*Name*/ "AGC Thrsh",
+		/*Init*/ 200,
+		/*Min */ 100,
+		/*Max */ 400,
+		/*Rate*/ 10,
+		/*Data*/ 0,
+	},
+
+	{
 		/*Name*/ "SI570Mult",
 		/*Init*/ 4,
 		/*Min */ 2,
@@ -197,12 +207,14 @@ void Options_SetValue(int optionIdx, int16_t newValue)
 
 	case OPTION_RX_RF:
 		if (Tx_Flag == 0)
-			Set_PGA_Gain(newValue);
+			//Set_PGA_Gain(newValue);
+			Init_AGC();
 		break;
 
 	case OPTION_Mic_Gain:
 		if ((Tx_Flag == 1) && (Mode_GetCurrentMode() == MODE_SSB))
 			Set_PGA_Gain(newValue);
+			//PGAGAIN0 = newValue;
 		break;
 
 	case OPTION_Tx_LEVEL:
@@ -239,6 +251,12 @@ void Options_SetValue(int optionIdx, int16_t newValue)
 		} else {
 			Turn_On_Bias();
 		}
+		break;
+
+	case OPTION_AGC_THRSH:
+		if (Tx_Flag == 0)
+			//Set_PGA_Gain(newValue);
+			Init_AGC();
 		break;
 
 	case OPTION_SI570_MULT:

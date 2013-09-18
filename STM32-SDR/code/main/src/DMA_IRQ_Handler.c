@@ -28,13 +28,16 @@
 #include	"CW_Mod.h"
 #include    "stm32f4xx_gpio.h"
 #include 	"PSKMod.h"
+#include 	"AGC_Processing.h"
+#include 	"DMA_Test_Pins.h"
+#include	"stm32f4xx_gpio.h"
 
 uint32_t DMA_RX_Memory;
 uint32_t DMA_TX_Memory;
 int16_t DSP_Flag = 0;
+int16_t AGC_Flag = 0;
 int16_t Tx_Flag;
 int16_t i;
-
 
 float rgain;
 float R_lgain;
@@ -86,16 +89,17 @@ void DMA1_Stream0_IRQHandler(void)
 		}  //End of Mode Switch
 	}
 
-
-
 	DSP_Flag = 1;
+	AGC_Flag = 1;
 
 	//Clear the DMA buffer full interrupt flag
 	DMA_ClearITPendingBit(DMA1_Stream0, DMA_IT_TCIF0 );
+
 }
 
 void Rcvr_DSP(void)
 {
+	GPIO_WriteBit(Test_GPIO, Test_0, Bit_SET);
 	if (DMA_RX_Memory == 0) //Transfer I/Q data and fill FFT buffer on inactive buffer
 	        {
 		for (i = 0; i < BUFFERSIZE / 2; i++) {
@@ -112,7 +116,9 @@ void Rcvr_DSP(void)
 		Process_FIR_Q();
 		Sideband_Demod(); //PSK buffer is filled in this procedure with USB data stream
 		ProcPSKDet();
+		GPIO_WriteBit(Test_GPIO, Test_2, Bit_SET);
 		Process_FFT();
+		GPIO_WriteBit(Test_GPIO, Test_2, Bit_RESET);
 
 		for (i = 0; i < BUFFERSIZE / 2; i++) {
 			Tx1BufferDMA[2 * i] = (int16_t) USB_Out[i];
@@ -140,7 +146,9 @@ void Rcvr_DSP(void)
 		Process_FIR_Q();
 		Sideband_Demod(); //PSK Buffer is filled in this procedure
 		ProcPSKDet();
+		GPIO_WriteBit(Test_GPIO, Test_2, Bit_SET);
 		Process_FFT();
+		GPIO_WriteBit(Test_GPIO, Test_2, Bit_RESET);
 
 		for (i = 0; i < BUFFERSIZE / 2; i++) {
 			Tx0BufferDMA[2 * i] = (int16_t) USB_Out[i];
@@ -149,7 +157,7 @@ void Rcvr_DSP(void)
 		}
 
 	}   //End of Buffer 1 Processing
-
+	GPIO_WriteBit(Test_GPIO, Test_0, Bit_RESET);
 }  // End of Rcvr_DSP( )
 
 void Xmit_SSB(void)
@@ -170,7 +178,6 @@ void Xmit_SSB(void)
 		Process_FIR_I();
 		Process_FIR_Q();
 		Process_FFT();
-
 		//Output FIR filter results to codec
 		for (i = 0; i < BUFFERSIZE / 2; i++) {
 			Tx1BufferDMA[2 * i] = (int16_t) FIR_I_Out[i];
@@ -195,7 +202,6 @@ void Xmit_SSB(void)
 		Process_FIR_I();
 		Process_FIR_Q();
 		Process_FFT();
-
 		//Output FIR filter results to codec
 		for (i = 0; i < BUFFERSIZE / 2; i++) {
 			Tx0BufferDMA[2 * i] = (int16_t) FIR_I_Out[i];
@@ -235,7 +241,7 @@ void Xmit_CW(void)
 
 		Process_FIR_I();
 		Process_FIR_Q();
-		Process_FFT();
+		//Process_FFT();
 
 		for (i = 0; i < BUFFERSIZE / 2; i++)				//Output FIR filter results to codec
 		        {

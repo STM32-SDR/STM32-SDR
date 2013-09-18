@@ -40,13 +40,18 @@
 #include	"LcdHal.h"
 #include	"TSHal.h"
 #include	"screen_all.h"
+#include "DMA_IRQ_Handler.h"
+
 #include	"options.h"
 #include	"FrequencyManager.h"
 #include	"sdr_image.h"
 #include	"ScrollingTextBox.h"
 #include	"Text_Enter.h"
+#include 	"AGC_Processing.h"
+#include 	"DMA_Test_Pins.h"
 
-#define VERSION_STRING "1.014"
+//#define VERSION_STRING "1.014"
+#define VERSION_STRING "AGC_0"
 
 const uint32_t CODEC_FREQUENCY = 8000;
 
@@ -100,7 +105,13 @@ int main(void)
 		/*
 		 * Redraw the screen (as needed)
 		 */
+		if(DSP_Flag == 1)GPIO_WriteBit(Test_GPIO, Test_1, Bit_SET);
+
 		UpdateScreenWithChanges();
+		GPIO_WriteBit(Test_GPIO, Test_1, Bit_RESET);
+
+
+		Proc_AGC();
 
 	}
 }
@@ -158,6 +169,9 @@ static void initializeHardware(void)
 	displayLoadStationData();
 	main_delay(SETUP_DELAY);
 
+	Init_AGC ();
+	main_delay(SETUP_DELAY);
+
 	Init_PTT_IO();
 	main_delay(SETUP_DELAY);
 
@@ -183,6 +197,8 @@ static void initializeHardware(void)
 
 	Audio_DMA_Start();			//Get everything up and running before starting DMA Interrupt
 	main_delay(SETUP_DELAY);
+
+	TEST_GPIO_Init();
 
 }
 

@@ -24,11 +24,21 @@
 #include	"FIR_Coefficients.h"
 #include	"DSP_Processing.h"
 
+float   AGC_Mag;
+int 	Max_Mag;
+uint16_t FFT_Max;
+float 	FFT_Coeff = 0.2;
+extern  int NCO_Bin;
 
+float32_t FFT_Output[128];
+float32_t FFT_Filter[128];
 q15_t FFT_Input[BUFFERSIZE / 2]; //512 sampling
-q15_t FFT_Test[BUFFERSIZE / 2]; //512 sampling
 q15_t FFT_Scale[BUFFERSIZE / 2]; //512 sampling
 q15_t FFT_Magnitude[BUFFERSIZE / 4]; //512 sampling
+
+uint16_t FFT_Size = 256;  // change for 512 sampling
+uint8_t FFT_status;
+
 q15_t FIR_State_I[NUM_FIR_COEF + (BUFFERSIZE / 2) - 1];
 q15_t FIR_State_Q[NUM_FIR_COEF + (BUFFERSIZE / 2) - 1];
 q15_t FIR_I_In[BUFFERSIZE / 2];
@@ -37,10 +47,6 @@ q15_t FIR_I_Out[BUFFERSIZE / 2];
 q15_t FIR_Q_Out[BUFFERSIZE / 2];
 q15_t USB_Out[BUFFERSIZE / 2];
 q15_t LSB_Out[BUFFERSIZE / 2];
-
-uint16_t FFT_Size = BUFFERSIZE / 4;  // change for 512 sampling
-
-uint8_t FFT_status;
 
 //chh Filter Definitions imported from NUE PSK
 q15_t Filter_delay_I1[38]; //38 = 35 + 4 -1
@@ -56,7 +62,9 @@ q15_t Filter_delay_Q4[65];
 //chh stuff for filling PSK  Buffer
 
 q15_t ADC_Buffer[BUFFERSIZE / 2];  //for 1024 sampling
+
 arm_cfft_radix4_instance_q15 S_CFFT;
+
 arm_fir_instance_q15 S_FIR_I = { NUM_FIR_COEF, &FIR_State_I[0], &coeff_fir_I[0] };
 arm_fir_instance_q15 S_FIR_Q = { NUM_FIR_COEF, &FIR_State_Q[0], &coeff_fir_Q[0] };
 
@@ -92,8 +100,10 @@ void Sideband_Demod(void)
 	}
 }
 
+
 void Process_FFT(void)
 {
+
 	//Set up structure for complex FFT processing
 	FFT_status = arm_cfft_radix4_init_q15(&S_CFFT, FFT_Size, 0, 1);
 
@@ -101,10 +111,26 @@ void Process_FFT(void)
 	arm_cfft_radix4_q15(&S_CFFT, &FFT_Input[0]);
 
 	//Shift FFT data to compensate for FFT scaling
-	arm_shift_q15(&FFT_Input[0], 6, &FFT_Scale[0], BUFFERSIZE / 4 //1024 sampling
-	        );
+	arm_shift_q15(&FFT_Input[0], 6, &FFT_Scale[0], BUFFERSIZE / 4 );
 
 	//Calculate the magnitude squared of FFT results ( i.e., power level)
 	arm_cmplx_mag_squared_q15(&FFT_Scale[0], &FFT_Magnitude[0], FFT_Size);
-}
+
+	//********************************************************
+	FFT_Max = 0;
+	Max_Mag = 0;
+
+	for (int16_t j = 0; j < 128; j++) {
+		FFT_Output[j] =  (6.6 * log((float32_t) ((int)FFT_Magnitude[j] + 1)));
+		FFT_Filter[j] =  FFT_Coeff * FFT_Output[j] + (1.0-FFT_Coeff) * FFT_Filter[j];
+
+		if(j == NCO_Bin)
+		//if (j>8 && (uint16_t)FFT_Output[j] >  FFT_Max)
+		{FFT_Max = (uint16_t)FFT_Output[j];
+		Max_Mag = (int)(10.0 * log((float32_t) ((int)FFT_Magnitude[j] + 1)));
+		AGC_Mag = 10*sqrt((float32_t)FFT_Magnitude[j]);
+		}
+	}
+
+	}
 

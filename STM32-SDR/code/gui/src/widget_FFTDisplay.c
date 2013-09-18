@@ -26,6 +26,9 @@
 #include "DSP_Processing.h"
 #include "TSHal.h"
 #include "DMA_IRQ_Handler.h"
+#include "AGC_Processing.h"
+#include "math.h"
+
 
 static const int FFT_WIDTH   = 240;
 static const int FFT_HEIGHT  =  64;
@@ -40,8 +43,11 @@ static void WidgetFFT_EventHandler(GL_PageControls_TypeDef* pThis);
 static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force);
 
 int 	NCO_Point;
+int		NCO_Bin;
 void	Acquire ( void );
 uint8_t FFT_Display[256];
+int 	RSL;
+float selectedFreqX;
 
 #define ID_FFTSelFreqNum_LABEL 50105
 
@@ -78,7 +84,6 @@ static uint16_t WidgetFFT_GetHeight(GL_PageControls_TypeDef* pThis)
 {
 	return FFT_HEIGHT;
 }
-
 
 // Write a signed integer to a right-justified string.
 void intToCommaString(int16_t number, char *pDest, int numChar)
@@ -141,7 +146,6 @@ static void WidgetFFT_EventHandler(GL_PageControls_TypeDef* pThis)
 	//Update PSK NCO Frequency
 	int fftLeftEdge = pThis->objCoordinates.MinX;
 	NCO_Point = ((int)X_Point - fftLeftEdge) +8;
-
 	NCO_Frequency = (double) ((float) ((X_Point - fftLeftEdge) + 8) * 15.625);
 	Acquire();
 
@@ -152,7 +156,6 @@ void	Acquire ( void ){
 	//extern double NCO_Frequency;
 	extern int count;
 	extern int char_count;
-	//extern unsigned int FFT_Display[];
 	long i, S1, S2, W;
 	double delta;
 
@@ -184,47 +187,38 @@ static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 		return;
 	}
 
+
 	int x = pThis->objCoordinates.MinX;
 	int y = pThis->objCoordinates.MinY;
 
-	/*
-	 * Calculate the data to draw:
-	 * - Use FFT_Magnitude[0..127] which is 0 to +4kHz of frequency
-	 *   (don't use last half which is -4kHz to 0kHz)
-	 * - Scale the values up to fill a wider portion of the display.
-	 *   (by averaging with neighboring data). This helps allow the
-	 *   user to tap on frequencies to select them with better resolution.
-	 * - Average with "old" data from the previous pass to give it an
-	 *   effective time-based smoothing (as in, display does not change
-	 *   as abruptly as it would when using new data samples each time).
-	 */
-	//uint8_t FFT_Display[256];
-	static uint8_t FFT_Output[128];   // static because use last rounds data now.
-
-	// TODO: Where are all these FFT constants from?
-	for (int16_t j = 0; j < 128; j++) {
-		// Changed for getting right display with SR6.3
-		// Convert from Q15 (fractional numeric representation) into integer
-		FFT_Output[j] = (uint8_t) (6 * log((float32_t) (FFT_Magnitude[j] + 1)));
-
-		if (FFT_Output[j] > 64)
-			FFT_Output[j] = 64;
-		FFT_Display[2 * j] = FFT_Output[j];
-		// Note that calculation uses values from last pass through.
-		FFT_Display[2 * j + 1] = 0;
-		//FFT_Display[2 * j + 1] = (FFT_Output[j] + FFT_Output[j + 1]) / 2;
+		for (int16_t j = 0; j < 128; j++) {
+		if (FFT_Filter[j] > 64.0) {
+		FFT_Display[2 * j]  = 64;
+		}
+		else					{
+		FFT_Display[2 * j] = (uint8_t)FFT_Filter[j];
+		}
+		FFT_Display[2 * j + 1] = (FFT_Filter[j] + FFT_Filter[j + 1]) / 2;
 	}
 
+
+
+
+
+
+	RSL =  -115 +(int) ( 0.5 *(80.0-(float)PGAGain)+ (0.5 * (float)Max_Mag));
 
 	/*
 	 * Display the FFT
 	 * - Drop the bottom 8, and top 8 frequency-display bins to discard
 	 *   noisy sections near band edges due to filtering.
 	 */
-	float selectedFreqX = (float) (NCO_Frequency - 125) / 15.625;
+	selectedFreqX = (float) (NCO_Frequency - 125) / 15.625;
 	if (selectedFreqX < 0) {
 		selectedFreqX = 0;
 	}
+
+	NCO_Bin = (int)(0.5 * selectedFreqX)+4;
 
 	// Draw the FFT using direct memory writes (fast).
 	LCD_SetDisplayWindow(x, y, FFT_HEIGHT, FFT_WIDTH);
@@ -276,5 +270,34 @@ static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 		intToCommaString((int)NCO_Frequency, number, MAX_FREQ_DIGITS + 1);
 		GL_PrintString(numberX, textY, number, 0);
 	}
+	//Display AGC test values
+	GL_SetTextColor(LCD_COLOR_RED);
+	char test1[7];
+	intToCommaString((int)AGC_Mag, test1, 7);
+	GL_PrintString(0, 85, test1, 0);
+
+
+
+	GL_SetTextColor(LCD_COLOR_RED);
+	char test2[7];
+	intToCommaString((int)DDeltaPGA, test2, 7);
+	GL_PrintString(60, 85, test2, 0);
+
+
+	GL_SetTextColor(LCD_COLOR_RED);
+	char test3[7];
+	intToCommaString(PGAGain, test3, 7);
+	GL_PrintString(120, 85, test3, 0);
+
+	GL_SetTextColor(LCD_COLOR_RED);
+	char test4[7];
+	intToCommaString(Max_Mag, test4, 7);
+	GL_PrintString(180, 85, test4, 0);
+
+	GL_SetTextColor(LCD_COLOR_RED);
+	char test5[7];
+	intToCommaString(RSL, test5, 7);
+	GL_PrintString(240, 85, test5, 0);
 	DSP_Flag = 0;   // added per Charley
+
 }
