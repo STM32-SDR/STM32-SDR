@@ -108,7 +108,7 @@ ULIBDIR := .\externals\libs
  
 # List all user libraries here
 #ULIBS := -lstm32f4xx_peripherals -lstm32f4xx_math -lm
-ULIBS := -lstm32f4xx_peripherals -libarm_cortexM4lf_math -lm
+ULIBS := -lstm32f4xx_peripherals -larm_cortexM4l_math -lm
  
 # Define optimisation level here 
 # (-O0 useful for debugging because variables not optimized out; however, seems to interfere with DMA ISR)

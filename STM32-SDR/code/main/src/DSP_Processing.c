@@ -30,14 +30,14 @@ uint16_t FFT_Max;
 float 	FFT_Coeff = 0.2;
 extern  int NCO_Bin;
 
-float32_t FFT_Output[128];
-float32_t FFT_Filter[128];
+float32_t FFT_Output[256];
+float32_t FFT_Filter[256];
 
-q15_t FFT_Input[BUFFERSIZE / 2]; //512 sampling
-q15_t FFT_Scale[BUFFERSIZE / 2]; //512 sampling
-q15_t FFT_Magnitude[BUFFERSIZE / 4]; //512 sampling
+q15_t FFT_Input[1024];
+q15_t FFT_Scale[1024]; //512 sampling
+q15_t FFT_Magnitude[512]; //512 sampling
 
-uint16_t FFT_Size = 256;  // change for 512 sampling
+uint16_t FFT_Size = 512;  // change for 512 sampling
 uint8_t FFT_status;
 
 q15_t FIR_State_I[NUM_FIR_COEF + (BUFFERSIZE / 2) - 1];
@@ -64,7 +64,8 @@ q15_t Filter_delay_Q4[65];
 
 q15_t ADC_Buffer[BUFFERSIZE / 2];  //for 1024 sampling
 
-arm_cfft_radix4_instance_q15 S_CFFT;
+//arm_cfft_radix4_instance_q15 S_CFFT;
+arm_cfft_radix2_instance_q15 S_CFFT;
 
 arm_fir_instance_q15 S_FIR_I = { NUM_FIR_COEF, &FIR_State_I[0], &coeff_fir_I[0] };
 arm_fir_instance_q15 S_FIR_Q = { NUM_FIR_COEF, &FIR_State_Q[0], &coeff_fir_Q[0] };
@@ -106,13 +107,13 @@ void Process_FFT(void)
 {
 
 	//Set up structure for complex FFT processing
-	FFT_status = arm_cfft_radix4_init_q15(&S_CFFT, FFT_Size, 0, 1);
-
+	//FFT_status = arm_cfft_radix4_init_q15(&S_CFFT, FFT_Size, 0, 1);
+	FFT_status = arm_cfft_radix2_init_q15(&S_CFFT, FFT_Size, 0, 1);
 	//Execute complex FFT
-	arm_cfft_radix4_q15(&S_CFFT, &FFT_Input[0]);
-
+	//arm_cfft_radix4_q15(&S_CFFT, &FFT_Input[0]);
+	arm_cfft_radix2_q15(&S_CFFT, &FFT_Input[0]);
 	//Shift FFT data to compensate for FFT scaling
-	arm_shift_q15(&FFT_Input[0], 6, &FFT_Scale[0], BUFFERSIZE / 4 );
+	arm_shift_q15(&FFT_Input[0], 6, &FFT_Scale[0], 512 );
 
 	//Calculate the magnitude squared of FFT results ( i.e., power level)
 	arm_cmplx_mag_squared_q15(&FFT_Scale[0], &FFT_Magnitude[0], FFT_Size);
@@ -121,7 +122,7 @@ void Process_FFT(void)
 	FFT_Max = 0;
 	Max_Mag = 0;
 
-	for (int16_t j = 0; j < 128; j++) {
+	for (int16_t j = 0; j < 256; j++) {
 		FFT_Output[j] =  (6.6 * log((float32_t) ((int)FFT_Magnitude[j] + 1)));
 		FFT_Filter[j] =  FFT_Coeff * FFT_Output[j] + (1.0-FFT_Coeff) * FFT_Filter[j];
 

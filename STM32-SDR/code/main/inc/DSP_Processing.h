@@ -32,10 +32,10 @@ void Sideband_Demod(void);
 float   AGC_Mag;
 int 	Max_Mag;
 
-float32_t FFT_Output[128];
-float32_t FFT_Filter[128];
-q15_t FFT_Input[BUFFERSIZE / 2];  //512sampling
-q15_t FFT_Magnitude[BUFFERSIZE / 4];  //512 sampling
+float32_t FFT_Output[256];
+float32_t FFT_Filter[256];
+q15_t FFT_Input[1024];  //512sampling
+q15_t FFT_Magnitude[512];  //512 sampling
 
 q15_t FIR_I_In[BUFFERSIZE / 2];
 q15_t FIR_Q_In[BUFFERSIZE / 2];

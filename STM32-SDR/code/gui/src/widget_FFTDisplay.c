@@ -191,20 +191,15 @@ static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 	int x = pThis->objCoordinates.MinX;
 	int y = pThis->objCoordinates.MinY;
 
-		for (int16_t j = 0; j < 128; j++) {
+		for (int16_t j = 0; j < 256; j++) {
 		if (FFT_Filter[j] > 64.0) {
-		FFT_Display[2 * j]  = 64;
+		FFT_Display[j]  = 64;
 		}
 		else					{
-		FFT_Display[2 * j] = (uint8_t)FFT_Filter[j];
+		FFT_Display[j] = (uint8_t)FFT_Filter[j];
 		}
-		FFT_Display[2 * j + 1] = (FFT_Filter[j] + FFT_Filter[j + 1]) / 2;
+
 	}
-
-
-
-
-
 
 	RSL =  -115 +(int) ( 0.5 *(80.0-(float)PGAGain)+ (0.5 * (float)Max_Mag));
 
@@ -218,7 +213,7 @@ static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 		selectedFreqX = 0;
 	}
 
-	NCO_Bin = (int)(0.5 * selectedFreqX)+4;
+	NCO_Bin = (int)selectedFreqX + 8;
 
 	// Draw the FFT using direct memory writes (fast).
 	LCD_SetDisplayWindow(x, y, FFT_HEIGHT, FFT_WIDTH);

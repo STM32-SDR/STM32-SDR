@@ -51,7 +51,7 @@
 #include 	"DMA_Test_Pins.h"
 
 //#define VERSION_STRING "1.014"
-#define VERSION_STRING "AGC_0"
+#define VERSION_STRING "AGC_1"
 
 const uint32_t CODEC_FREQUENCY = 8000;
 
