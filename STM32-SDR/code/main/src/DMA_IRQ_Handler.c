@@ -107,10 +107,13 @@ void Rcvr_DSP(void)
 			phase_adjust = (float) Rx1BufferDMA[2 * i] * R_xgain;
 			FIR_Q_In[i] = (q15_t) (((float) Rx1BufferDMA[2 * i + 1] + phase_adjust) * rgain);
 		}
+
 		for (i = 0; i < BUFFERSIZE / 4; i++) {  //changed for 512 sampling using balanced input data
 			FFT_Input[i * 2] = FIR_I_In[i];
 			FFT_Input[i * 2 + 1] = FIR_Q_In[i];
 		}
+
+
 
 		Process_FIR_I();
 		Process_FIR_Q();

@@ -32,6 +32,7 @@ extern  int NCO_Bin;
 
 float32_t FFT_Output[128];
 float32_t FFT_Filter[128];
+
 q15_t FFT_Input[BUFFERSIZE / 2]; //512 sampling
 q15_t FFT_Scale[BUFFERSIZE / 2]; //512 sampling
 q15_t FFT_Magnitude[BUFFERSIZE / 4]; //512 sampling
