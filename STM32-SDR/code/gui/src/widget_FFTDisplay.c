@@ -35,7 +35,7 @@ static const int CHARACTER_WIDTH = 8;
 static const int MAX_FREQ_DIGITS = 5;
 
 static int	LED_Color = LCD_COLOR_GREEN;
-extern int16_t Tx_Flag;
+extern int 	Led;
 
 static uint16_t WidgetFFT_GetWidth(GL_PageControls_TypeDef* pThis);
 static uint16_t WidgetFFT_GetHeight(GL_PageControls_TypeDef* pThis);
@@ -182,6 +182,7 @@ void	Acquire ( void ){
 
 static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 {
+
 	// Bail if nothing to draw.
 	if (!force && !DSP_Flag) {
 		return;
@@ -275,12 +276,6 @@ static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 
 	}
 
-	//Update RX/TX "LED"
-	GL_SetTextColor(LCD_COLOR_BLACK);
-	if (Tx_Flag == 0)LED_Color = LCD_COLOR_RED;
-	else LED_Color = LCD_COLOR_GREEN;
-	GL_DrawFilledCircle(28,72,10,LED_Color);
-	GL_SetTextColor(LCD_COLOR_RED);
 
 	DSP_Flag = 0;   // added per Charley
 }

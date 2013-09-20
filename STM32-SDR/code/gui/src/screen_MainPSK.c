@@ -30,7 +30,6 @@
 #include <ScrollingTextBox.h>
 #include "KeyboardStatus.h"
 
-int LED;
 
 // Used in this file to refer to the correct screen (helps to keep code copy-paste friendly.
 static GL_Page_TypeDef *s_pThisScreen = &g_screenMainPSK;
@@ -123,13 +122,11 @@ static void tx_Click(GL_PageControls_TypeDef* pThis)
 {
 	assert(Mode_GetCurrentMode() == MODE_PSK);
 	Xmit_PSK_Sequence();
-	LED = 1;
 }
 static void rx_Click(GL_PageControls_TypeDef* pThis)
 {
 	Receive_Sequence();
 	ClearTextDisplay();
-	LED = 0;
 }
 
 static void N_Click(GL_PageControls_TypeDef* pThis)
