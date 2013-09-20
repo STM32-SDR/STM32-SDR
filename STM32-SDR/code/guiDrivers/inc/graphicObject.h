@@ -183,6 +183,8 @@ void GL_Cross(uint16_t Ypos, uint16_t Xpos);
 
 void GL_DrawButtonBMP(uint16_t maxX, uint16_t minX, uint16_t maxY,
                       uint16_t minY, uint8_t* ptrBitmap);
+
+void GL_DrawFilledCircle(uint16_t Xpos, uint8_t Ypos, uint16_t Radius, uint16_t Color);
                       
 GL_bool GetObjStatus(GL_Page_TypeDef* pThis, uint16_t ID);
 

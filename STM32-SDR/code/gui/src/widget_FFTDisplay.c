@@ -35,6 +35,7 @@ static const int CHARACTER_WIDTH = 8;
 static const int MAX_FREQ_DIGITS = 5;
 
 static int	LED_Color = LCD_COLOR_GREEN;
+extern int16_t Tx_Flag;
 
 static uint16_t WidgetFFT_GetWidth(GL_PageControls_TypeDef* pThis);
 static uint16_t WidgetFFT_GetHeight(GL_PageControls_TypeDef* pThis);
@@ -272,16 +273,14 @@ static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 		GL_SetTextColor(LCD_COLOR_WHITE);
 		GL_PrintString(labelX, textY, "Offset:", 0);
 
-		// Display location on label.
-		GL_SetTextColor(LCD_COLOR_RED);
-		char number[MAX_FREQ_DIGITS + 1];
-		intToCommaString((int)NCO_Frequency, number, MAX_FREQ_DIGITS + 1);
-		GL_PrintString(numberX, textY, number, 0);
 	}
 
 	//Update RX/TX "LED"
-	LED_Color = (Tx_Flag == 1)? LCD_COLOR_RED:LCD_COLOR_GREEN;
-	GL_DrawFilledCircle(63,25,16,LED_Color);
+	GL_SetTextColor(LCD_COLOR_BLACK);
+	if (Tx_Flag == 0)LED_Color = LCD_COLOR_RED;
+	else LED_Color = LCD_COLOR_GREEN;
+	GL_DrawFilledCircle(28,72,10,LED_Color);
+	GL_SetTextColor(LCD_COLOR_RED);
 
 	DSP_Flag = 0;   // added per Charley
 }
