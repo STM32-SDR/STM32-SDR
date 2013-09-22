@@ -29,6 +29,9 @@
 #include "AGC_Processing.h"
 #include "math.h"
 
+double NCO_0;
+double NCO_1;
+double NCO_2;
 
 static const int FFT_WIDTH   = 240;
 static const int FFT_HEIGHT  =  64;
@@ -147,6 +150,7 @@ static void WidgetFFT_EventHandler(GL_PageControls_TypeDef* pThis)
 	int fftLeftEdge = pThis->objCoordinates.MinX;
 	NCO_Point = ((int)X_Point - fftLeftEdge) +8;
 	NCO_Frequency = (double) ((float) ((X_Point - fftLeftEdge) + 8) * 15.625);
+	NCO_0 = NCO_Frequency;
 	Acquire();
 
 	//SetRXFrequency(NCO_Frequency);
@@ -166,13 +170,15 @@ void	Acquire ( void ){
 				delta = 0.;
 				//for (i=-2; i<3; i++){
 				for (i=-4; i<5; i++){
-					W = (long)FFT_Display[NCO_Point + i];
+					//W = (long)FFT_Magnitude[NCO_Point + i];
+					W = (long)FFT_Filter[NCO_Point + i];
 					S1 += W*i;
 					S2 += W;
 				}
 				if (S2 != 0) delta = (double) S1/((double)S2);
 
 				NCO_Frequency +=  (double)((float)delta * 15.625);
+				NCO_1 = NCO_Frequency;
 
 				SetRXFrequency (NCO_Frequency );
 				count = 0;
@@ -201,7 +207,7 @@ static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 
 	}
 
-	RSL =  -115 +(int) ( 0.5 *(80.0-(float)PGAGain)+ (0.5 * (float)Max_Mag));
+	RSL =  -115 +(int) ( 0.5 *(80.0-(float)PGAGain)+ (0.5 * (float)Max_RSL)); //256 FFT
 
 	/*
 	 * Display the FFT
@@ -268,25 +274,28 @@ static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 	//Display AGC test values
 	GL_SetTextColor(LCD_COLOR_RED);
 	char test1[7];
-	intToCommaString((int)AGC_Mag, test1, 7);
+	intToCommaString((int)NCO_0, test1, 7);
+	//intToCommaString((int)AGC_Mag, test1, 7);
 	GL_PrintString(0, 85, test1, 0);
 
 
 
 	GL_SetTextColor(LCD_COLOR_RED);
 	char test2[7];
-	intToCommaString((int)DDeltaPGA, test2, 7);
+	intToCommaString((int)NCO_1, test2, 7);
+	//intToCommaString((int)DDeltaPGA, test2, 7);
 	GL_PrintString(60, 85, test2, 0);
 
 
 	GL_SetTextColor(LCD_COLOR_RED);
 	char test3[7];
-	intToCommaString(PGAGain, test3, 7);
+	intToCommaString((int)NCO_2, test3, 7);
+	//intToCommaString(PGAGain, test3, 7);
 	GL_PrintString(120, 85, test3, 0);
 
 	GL_SetTextColor(LCD_COLOR_RED);
 	char test4[7];
-	intToCommaString(Max_Mag, test4, 7);
+	intToCommaString((int)AGC_Mag, test4, 7);
 	GL_PrintString(180, 85, test4, 0);
 
 	GL_SetTextColor(LCD_COLOR_RED);

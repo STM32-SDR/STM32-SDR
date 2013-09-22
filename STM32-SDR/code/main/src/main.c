@@ -40,8 +40,7 @@
 #include	"LcdHal.h"
 #include	"TSHal.h"
 #include	"screen_all.h"
-#include "DMA_IRQ_Handler.h"
-
+#include    "DMA_IRQ_Handler.h"
 #include	"options.h"
 #include	"FrequencyManager.h"
 #include	"sdr_image.h"
@@ -49,9 +48,10 @@
 #include	"Text_Enter.h"
 #include 	"AGC_Processing.h"
 #include 	"DMA_Test_Pins.h"
+#include 	"DSP_Processing.h"
 
 //#define VERSION_STRING "1.014"
-#define VERSION_STRING "AGC_1"
+#define VERSION_STRING "AGC_2"
 
 const uint32_t CODEC_FREQUENCY = 8000;
 
@@ -145,6 +145,7 @@ static void initializeHardware(void)
 	main_delay(SETUP_DELAY);
 
 	SetAFCLimit(1000);
+	//SetAFCLimit(3000);
 	main_delay(SETUP_DELAY);
 
 	uart_init();
@@ -193,6 +194,9 @@ static void initializeHardware(void)
 			&HID_cb,           // In /drv/src/usbh_hid.core.c (class callback)
 			&USR_Callbacks     // In /usbh_usr.c (user callback)
 	);
+	main_delay(SETUP_DELAY);
+
+	init_DSP();
 	main_delay(SETUP_DELAY);
 
 	Audio_DMA_Start();			//Get everything up and running before starting DMA Interrupt

@@ -133,8 +133,8 @@ static OptionStruct s_optionsData[] = {
 	},
 	{
 		/*Name*/ "AGC Thrsh",
-		/*Init*/ 200,
-		/*Min */ 100,
+		/*Init*/ 100,
+		/*Min */ 50,
 		/*Max */ 400,
 		/*Rate*/ 10,
 		/*Data*/ 0,

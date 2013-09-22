@@ -55,6 +55,8 @@ int char_count;
 double m_PSKPeriodUpdate;
 double m_SymbolRate;
 
+extern double NCO_2;
+
 /* //////////////////////////////////////////////////////////////////// */
 /* Construction/Destruction                                             */
 /* //////////////////////////////////////////////////////////////////// */
@@ -281,6 +283,7 @@ void ProcPSKDet()
 			m_AFCmax = m_NCOphzinc + m_AFClimit;
 			m_AFCmin = m_NCOphzinc - m_AFClimit;
 			NCO_Frequency = m_NCOphzinc * (double) Sample_Frequency / PI2;
+			NCO_2 = NCO_Frequency;
 			if (m_AFCmin <= 0.0)
 				m_AFCmin = 0.0;
 		}

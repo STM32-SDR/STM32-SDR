@@ -27,8 +27,11 @@
 float   AGC_Mag;
 int 	Max_Mag;
 uint16_t FFT_Max;
+int 	Max_RSL;
 float 	FFT_Coeff = 0.2;
 extern  int NCO_Bin;
+
+const float     Log_2 = 0.693147188;
 
 float32_t FFT_Output[256];
 float32_t FFT_Filter[256];
@@ -66,6 +69,11 @@ q15_t ADC_Buffer[BUFFERSIZE / 2];  //for 1024 sampling
 
 //arm_cfft_radix4_instance_q15 S_CFFT;
 arm_cfft_radix2_instance_q15 S_CFFT;
+//FFT_status = arm_cfft_radix2_init_q15(&S_CFFT, FFT_Size, 0, 1);
+void init_DSP(void) {
+	FFT_status = arm_cfft_radix2_init_q15(&S_CFFT, FFT_Size, 0, 1);
+}
+
 
 arm_fir_instance_q15 S_FIR_I = { NUM_FIR_COEF, &FIR_State_I[0], &coeff_fir_I[0] };
 arm_fir_instance_q15 S_FIR_Q = { NUM_FIR_COEF, &FIR_State_Q[0], &coeff_fir_Q[0] };
@@ -107,32 +115,44 @@ void Process_FFT(void)
 {
 
 	//Set up structure for complex FFT processing
-	//FFT_status = arm_cfft_radix4_init_q15(&S_CFFT, FFT_Size, 0, 1);
-	FFT_status = arm_cfft_radix2_init_q15(&S_CFFT, FFT_Size, 0, 1);
+	//FFT_status = arm_cfft_radix2_init_q15(&S_CFFT, FFT_Size, 0, 1);
 	//Execute complex FFT
-	//arm_cfft_radix4_q15(&S_CFFT, &FFT_Input[0]);
 	arm_cfft_radix2_q15(&S_CFFT, &FFT_Input[0]);
 	//Shift FFT data to compensate for FFT scaling
 	arm_shift_q15(&FFT_Input[0], 6, &FFT_Scale[0], 512 );
-
 	//Calculate the magnitude squared of FFT results ( i.e., power level)
 	arm_cmplx_mag_squared_q15(&FFT_Scale[0], &FFT_Magnitude[0], FFT_Size);
-
 	//********************************************************
 	FFT_Max = 0;
 	Max_Mag = 0;
+	Max_RSL =0;
 
-	for (int16_t j = 0; j < 256; j++) {
-		FFT_Output[j] =  (6.6 * log((float32_t) ((int)FFT_Magnitude[j] + 1)));
+		for (int16_t j = 8; j < 252; j++) {  //Changed for 512 FFT
+
+		if (FFT_Magnitude[j]> 0)
+			FFT_Output[j] =  (10.0 * log((float32_t)FFT_Magnitude[j]/Log_2 + 1.0));
+			else
+			FFT_Output[j] = 0;
+
 		FFT_Filter[j] =  FFT_Coeff * FFT_Output[j] + (1.0-FFT_Coeff) * FFT_Filter[j];
 
-		if(j == NCO_Bin)
-		//if (j>8 && (uint16_t)FFT_Output[j] >  FFT_Max)
-		{FFT_Max = (uint16_t)FFT_Output[j];
-		Max_Mag = (int)(10.0 * log((float32_t) ((int)FFT_Magnitude[j] + 1)));
-		AGC_Mag = 10*sqrt((float32_t)FFT_Magnitude[j]);
+		if(j== NCO_Bin) {
+			for (int k = NCO_Bin-2; k < NCO_Bin+3; k++)
+			if ((int)FFT_Filter[k]> Max_RSL) {
+			Max_RSL = 	(int)FFT_Filter[k];
+			AGC_Mag = 10*sqrt((float32_t)FFT_Magnitude[k]);
+			Max_Mag = (int)(10.0 * log((float32_t) (FFT_Magnitude[k] + 1)));
+			}
 		}
-	}
+		}
 
-	}
+		//if (j>16 && (uint16_t)FFT_Output[j] >  FFT_Max)
+		//{FFT_Max = (uint16_t)FFT_Output[j];
+		//Max_Mag = (int)(10.0 * log((float32_t) (FFT_Magnitude[j] + 1)));
+		//AGC_Mag = 10*sqrt((float32_t)FFT_Magnitude[j]);
+		//}
+		}
+
+
+
 

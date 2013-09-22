@@ -56,6 +56,8 @@ const float PGA_TC_Fast = .1; 	//Time constant for fast PGA attack
 const float AGC_TC_Slow = .5;	//Time constant for slow AGC decay
 const float AGC_TC_Fast = .1;	//Time constant for fast AGC attack
 
+
+
 const float Sig2F_TC 	= .004;	//Time constant for Sig2F filter
 //const float Sig2F_TC 	= .0004;	//Time constant for Sig2F filter
 const float Envelope_TC = .004;	//Time constant for Envelope filter
