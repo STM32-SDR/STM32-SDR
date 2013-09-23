@@ -209,7 +209,8 @@ static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 	for (int16_t j = 0; j < 128; j++) {
 		// Changed for getting right display with SR6.3
 		// Convert from Q15 (fractional numeric representation) into integer
-		FFT_Output[j] = (uint8_t) (6 * log((float32_t) (FFT_Magnitude[j] + 1)));
+		//FFT_Output[j] = (uint8_t) (6 * log((float32_t) (FFT_Magnitude[j] + 1)));
+		FFT_Output[j] = (uint8_t) (6 * log( (Smoothed_FFT_Magnitude[j] + 1)));
 
 		if (FFT_Output[j] > 64)
 			FFT_Output[j] = 64;
@@ -239,7 +240,7 @@ static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 		for (int y = 0; y < FFT_HEIGHT; y++) {
 
 			// Draw red line for selected frequency
-			if (x == (int) selectedFreqX) {
+			if (x == (int) (selectedFreqX + 0.5)) {
 				// Leave some white at the top
 				if (y <= SELFREQ_ADJ) {
 					LCD_WriteRAM(LCD_COLOR_WHITE);
@@ -265,14 +266,19 @@ static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 	if (force || oldSelectedFreq != NCO_Frequency) {
 		oldSelectedFreq = NCO_Frequency;
 
-		int textY = y + FFT_HEIGHT + TEXT_OFFSET_BELOW_FFT;
-		int numberX = x + FFT_WIDTH - MAX_FREQ_DIGITS * CHARACTER_WIDTH;
-		int labelX = numberX - CHARACTER_WIDTH * 8;	// 7=# letters in label w/ a space
+		//int textY = y + FFT_HEIGHT + TEXT_OFFSET_BELOW_FFT;
+		int textY = FFT_HEIGHT - 18;
+		//int numberX = x + FFT_WIDTH - MAX_FREQ_DIGITS * CHARACTER_WIDTH;
+		int numberX = 4 * CHARACTER_WIDTH;
+		//int labelX = numberX - CHARACTER_WIDTH * 8;	// 7=# letters in label w/ a space
+		int labelX = 1;
 
 		GL_SetFont(GL_FONTOPTION_8x16);
 		GL_SetBackColor(LCD_COLOR_BLACK);
 		GL_SetTextColor(LCD_COLOR_WHITE);
-		GL_PrintString(labelX, textY, "Offset:", 0);
+		//GL_PrintString(labelX, textY, "Offset:", 0);
+		GL_PrintString(labelX, textY, "AF", 0);
+
 
 		// Display location on label.
 		GL_SetTextColor(LCD_COLOR_RED);
