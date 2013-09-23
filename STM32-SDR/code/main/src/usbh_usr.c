@@ -30,6 +30,13 @@
 #include "usbh_hid_keybd.h"
 #include "Keyboard_Input.h"
 #include "KeyboardStatus.h"
+#include "xprintf.h"
+
+// A macro to allow tracing of all USB events.
+#define USB_DEBUG_MARKER() do { \
+	xprintf("USB Event:   %s()   at line %d.\n", __func__, __LINE__); \
+	} while (0)
+		//USB_debugEvent(__LINE__);
 
 USBH_Usr_cb_TypeDef USR_Callbacks = {
 		USBH_USR_Init,
@@ -59,6 +66,8 @@ void USB_debugEvent(int lineNumber)
 {
 	static int usbEventCounter = 0;
 	usbEventCounter++;
+
+	xprintf("USB_debugEvent #%4d from line %d.\n", usbEventCounter, lineNumber);
 }
 
 /**
@@ -69,7 +78,7 @@ void USB_debugEvent(int lineNumber)
  */
 void USBH_USR_Init(void)
 {
-	USB_debugEvent(__LINE__);
+	USB_DEBUG_MARKER();
 }
 
 /**
@@ -80,7 +89,7 @@ void USBH_USR_Init(void)
  */
 void USBH_USR_DeviceAttached(void)
 {
-	USB_debugEvent(__LINE__);
+	USB_DEBUG_MARKER();
 	KeyboardStatus_SetDeviceAttached();
 }
 
@@ -91,7 +100,7 @@ void USBH_USR_DeviceAttached(void)
  */
 void USBH_USR_UnrecoveredError(void)
 {
-	USB_debugEvent(__LINE__);
+	USB_DEBUG_MARKER();
 }
 
 /**
@@ -102,7 +111,7 @@ void USBH_USR_UnrecoveredError(void)
  */
 void USBH_USR_DeviceDisconnected(void)
 {
-	USB_debugEvent(__LINE__);
+	USB_DEBUG_MARKER();
 	KeyboardStatus_SetDeviceDesconnected();
 }
 
@@ -115,7 +124,7 @@ void USBH_USR_DeviceDisconnected(void)
 void USBH_USR_ResetDevice(void)
 {
 	/* Users can do their application actions here for the USB-Reset */
-	USB_debugEvent(__LINE__);
+	USB_DEBUG_MARKER();
 }
 
 /**
@@ -126,7 +135,7 @@ void USBH_USR_ResetDevice(void)
  */
 void USBH_USR_DeviceSpeedDetected(uint8_t DeviceSpeed)
 {
-	USB_debugEvent(__LINE__);
+	USB_DEBUG_MARKER();
 	//  if(DeviceSpeed == HPRT0_PRTSPD_HIGH_SPEED)
 	//  {
 	////   LCD_UsrLog((void *)MSG_DEV_HIGHSPEED);
@@ -153,7 +162,7 @@ void USBH_USR_DeviceSpeedDetected(uint8_t DeviceSpeed)
  */
 void USBH_USR_Device_DescAvailable(void *DeviceDesc)
 {
-	USB_debugEvent(__LINE__);
+	USB_DEBUG_MARKER();
 	//  uint8_t temp[50];
 	//  USBH_DevDesc_TypeDef *hs;
 	//  hs = DeviceDesc;
@@ -175,7 +184,7 @@ void USBH_USR_Device_DescAvailable(void *DeviceDesc)
  */
 void USBH_USR_DeviceAddressAssigned(void)
 {
-	USB_debugEvent(__LINE__);
+	USB_DEBUG_MARKER();
 }
 
 /**
@@ -187,7 +196,7 @@ void USBH_USR_DeviceAddressAssigned(void)
 void USBH_USR_Configuration_DescAvailable(USBH_CfgDesc_TypeDef * cfgDesc, USBH_InterfaceDesc_TypeDef *itfDesc,
         USBH_EpDesc_TypeDef *epDesc)
 {
-	USB_debugEvent(__LINE__);
+	USB_DEBUG_MARKER();
 	//  USBH_InterfaceDesc_TypeDef *id;
 	//
 	//  id = itfDesc;
@@ -210,7 +219,7 @@ void USBH_USR_Configuration_DescAvailable(USBH_CfgDesc_TypeDef * cfgDesc, USBH_I
  */
 void USBH_USR_Manufacturer_String(void *ManufacturerString)
 {
-	USB_debugEvent(__LINE__);
+	USB_DEBUG_MARKER();
 }
 
 /**
@@ -221,7 +230,7 @@ void USBH_USR_Manufacturer_String(void *ManufacturerString)
  */
 void USBH_USR_Product_String(void *ProductString)
 {
-	USB_debugEvent(__LINE__);
+	USB_DEBUG_MARKER();
 }
 
 /**
@@ -232,7 +241,7 @@ void USBH_USR_Product_String(void *ProductString)
  */
 void USBH_USR_SerialNum_String(void *SerialNumString)
 {
-	USB_debugEvent(__LINE__);
+	USB_DEBUG_MARKER();
 }
 
 /**
@@ -244,7 +253,7 @@ void USBH_USR_SerialNum_String(void *SerialNumString)
  */
 void USBH_USR_EnumerationDone(void)
 {
-	USB_debugEvent(__LINE__);
+	USB_DEBUG_MARKER();
 
 }
 
@@ -256,7 +265,8 @@ void USBH_USR_EnumerationDone(void)
  */
 void USBH_USR_DeviceNotSupported(void)
 {
-	USB_debugEvent(__LINE__);
+	// ** This function seems to be called often! **
+	//USB_DEBUG_MARKER();
 }
 
 /**
@@ -267,7 +277,8 @@ void USBH_USR_DeviceNotSupported(void)
  */
 USBH_USR_Status USBH_USR_UserInput(void)
 {
-	USB_debugEvent(__LINE__);
+	// ** This function seems to be called often! **
+	//USB_DEBUG_MARKER();
 
 	USBH_USR_Status usbh_usr_status;
 
@@ -296,7 +307,7 @@ USBH_USR_Status USBH_USR_UserInput(void)
  */
 void USBH_USR_OverCurrentDetected(void)
 {
-	USB_debugEvent(__LINE__);
+	USB_DEBUG_MARKER();
 	//   LCD_ErrLog ("Overcurrent detected.\n");
 
 }
@@ -309,7 +320,7 @@ void USBH_USR_OverCurrentDetected(void)
  */
 void USR_KEYBRD_Init(void)
 {
-	USB_debugEvent(__LINE__);
+	USB_DEBUG_MARKER();
 	KeyboardStatus_SetKeyboardWorking();
 
 }
@@ -322,7 +333,7 @@ void USR_KEYBRD_Init(void)
  */
 void USR_KEYBRD_ProcessData(uint8_t data1,uint8_t data2 )
 {
-	USB_debugEvent(__LINE__);
+	USB_DEBUG_MARKER();
 
 	// Skip control characters like enter, bell, escape..
 	//if ((data1 >= ' ' && data2 < 112)||(data1 == 10)||(data1==8)) {
@@ -349,7 +360,7 @@ void USR_KEYBRD_ProcessData(uint8_t data1,uint8_t data2 )
  */
 void USBH_USR_DeInit(void)
 {
-	USB_debugEvent(__LINE__);
+	USB_DEBUG_MARKER();
 }
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

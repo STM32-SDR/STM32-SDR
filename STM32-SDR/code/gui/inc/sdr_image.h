@@ -20,8 +20,8 @@
  */
 // Image data structure. Created via GIMP.
 
-#ifndef SMILE_IMAGE_H_
-#define SMILE_IMAGE_H_
+#ifndef SDR_IMAGE_H_
+#define SDR_IMAGE_H_
 
 extern const struct {
 	unsigned int 	 width;
