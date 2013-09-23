@@ -102,22 +102,25 @@ static void insideDrawHandler(GL_PageControls_TypeDef* pThis, _Bool force, int r
 	// Draw Rx/Tx
 	if (redrawRxTx) {
 		GL_SetFont(GL_FONTOPTION_8x12Bold);
-		GL_SetBackColor(BIGBUTTON_COLOR_NORMAL_BACK);
+		//GL_SetBackColor(BIGBUTTON_COLOR_NORMAL_BACK);
 
 		int writeX = relX + OFFSETX_TEXT;
 		int writeY = relY + OFFSETY_RXTX;
 
 		if (Tx_Flag == 0) {
-			GL_SetTextColor(LCD_COLOR_DGREEN);
-			GL_PrintString(writeX, writeY, " Rx  ", 0);
-			GL_SetTextColor(LCD_COLOR_GREEN);
-			GL_DrawFilledCircle(28,72,10,LCD_COLOR_GREEN);
-			GL_DrawFilledCircle(29,72,10,LCD_COLOR_GREEN);
+			GL_SetBackColor(LCD_COLOR_GREEN);
+			GL_SetTextColor(LCD_COLOR_BLACK);
+			GL_PrintString(writeX, writeY, " RX  ", 0);
+			//GL_SetTextColor(LCD_COLOR_GREEN);
+			//GL_DrawFilledCircle(28,72,10,LCD_COLOR_GREEN);
+			//GL_DrawFilledCircle(29,72,10,LCD_COLOR_GREEN);
 		} else {
-			GL_SetTextColor(LCD_COLOR_RED);
-			GL_PrintString(writeX, writeY, " Tx  ", 0);
-			GL_DrawFilledCircle(28,72,10,LCD_COLOR_RED);
-			GL_DrawFilledCircle(29,72,10,LCD_COLOR_RED);
+			GL_SetBackColor(LCD_COLOR_RED);
+			//GL_SetTextColor(LCD_COLOR_RED);
+			GL_SetTextColor(LCD_COLOR_WHITE);
+			GL_PrintString(writeX, writeY, " TX  ", 0);
+			//GL_DrawFilledCircle(28,72,10,LCD_COLOR_RED);
+			//GL_DrawFilledCircle(29,72,10,LCD_COLOR_RED);
 		}
 		previousRxTx = curRxTx;
 	}
