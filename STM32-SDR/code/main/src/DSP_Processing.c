@@ -24,6 +24,9 @@
 #include	"FIR_Coefficients.h"
 #include	"DSP_Processing.h"
 
+#define		FFT_TIME_CONST	0.25
+#define		SAMPLING_FREQ 8000.
+#define		ALPHA 1/(SAMPLING_FREQ*FFT_TIME_CONST)
 
 q15_t FFT_Input[BUFFERSIZE / 2]; //512 sampling
 q15_t FFT_Test[BUFFERSIZE / 2]; //512 sampling
@@ -37,6 +40,8 @@ q15_t FIR_I_Out[BUFFERSIZE / 2];
 q15_t FIR_Q_Out[BUFFERSIZE / 2];
 q15_t USB_Out[BUFFERSIZE / 2];
 q15_t LSB_Out[BUFFERSIZE / 2];
+
+float Smoothed_FFT_Magnitude[BUFFERSIZE / 4]; //512 sampling
 
 uint16_t FFT_Size = BUFFERSIZE / 4;  // change for 512 sampling
 
@@ -94,6 +99,9 @@ void Sideband_Demod(void)
 
 void Process_FFT(void)
 {
+	int16_t i;
+	float	delta;
+
 	//Set up structure for complex FFT processing
 	FFT_status = arm_cfft_radix4_init_q15(&S_CFFT, FFT_Size, 0, 1);
 
@@ -106,5 +114,10 @@ void Process_FFT(void)
 
 	//Calculate the magnitude squared of FFT results ( i.e., power level)
 	arm_cmplx_mag_squared_q15(&FFT_Scale[0], &FFT_Magnitude[0], FFT_Size);
+
+	for (  i = 0; i < BUFFERSIZE/4; i++){
+		delta = (float)FFT_Magnitude[i] - Smoothed_FFT_Magnitude[i];
+		Smoothed_FFT_Magnitude[i] += 512*ALPHA*delta;
+	}
 }
 

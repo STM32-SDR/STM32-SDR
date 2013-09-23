@@ -29,6 +29,7 @@ void Process_FFT(void);
 void Sideband_Demod(void);
 
 extern q15_t FFT_Magnitude[BUFFERSIZE / 4];  //512 sampling
+extern float Smoothed_FFT_Magnitude[BUFFERSIZE / 4];
 
 q15_t FIR_I_In[BUFFERSIZE / 2];
 q15_t FIR_Q_In[BUFFERSIZE / 2];
