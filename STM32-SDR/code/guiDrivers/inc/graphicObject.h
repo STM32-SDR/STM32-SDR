@@ -185,7 +185,9 @@ void GL_DrawButtonBMP(uint16_t maxX, uint16_t minX, uint16_t maxY,
                       uint16_t minY, uint8_t* ptrBitmap);
 
 void GL_DrawFilledCircle(uint16_t Xpos, uint8_t Ypos, uint16_t Radius, uint16_t Color);
-                      
+
+void GL_DrawFilledRectangle(uint16_t maxX, uint16_t minX, uint8_t maxY, uint8_t minY, uint16_t Color);
+
 GL_bool GetObjStatus(GL_Page_TypeDef* pThis, uint16_t ID);
 
 GL_ErrStatus RefreshPageControl( GL_Page_TypeDef* pPage, uint16_t ID);

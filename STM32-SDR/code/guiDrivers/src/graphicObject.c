@@ -162,7 +162,7 @@ static void GL_DrawRectangle(uint16_t maxX, uint16_t minX, uint8_t maxY, uint8_t
  * @param  Color: The filling color
  * @retval None
  */
-static void GL_DrawFilledRectangle(uint16_t maxX, uint16_t minX, uint8_t maxY, uint8_t minY, uint16_t Color)
+void GL_DrawFilledRectangle(uint16_t maxX, uint16_t minX, uint8_t maxY, uint8_t minY, uint16_t Color)
 {
 	uint32_t counter = 0;
 
