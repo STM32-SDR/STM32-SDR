@@ -21,6 +21,8 @@
 
 #include "widgets.h"
 #include <assert.h>
+#include <string.h>
+#include <stdio.h>
 
 #include "arm_math.h"
 #include "DSP_Processing.h"
@@ -33,12 +35,17 @@ double NCO_0;
 double NCO_1;
 double NCO_2;
 
+int 	Signal_Level;
+int		S;
+char	SMeter$[7];
+
 static const int FFT_WIDTH   = 240;
 static const int FFT_HEIGHT  =  64;
 static const int SELFREQ_ADJ =   4;
 static const int TEXT_OFFSET_BELOW_FFT = 4;
 static const int CHARACTER_WIDTH = 8;
 static const int MAX_FREQ_DIGITS = 5;
+static const int SMETER_HEIGHT = 12;
 
 static uint16_t WidgetFFT_GetWidth(GL_PageControls_TypeDef* pThis);
 static uint16_t WidgetFFT_GetHeight(GL_PageControls_TypeDef* pThis);
@@ -196,6 +203,7 @@ static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 
 	int x = pThis->objCoordinates.MinX;
 	int y = pThis->objCoordinates.MinY;
+	int Frequency_CursorX;
 
 		for (int16_t j = 0; j < 256; j++) {
 		if (FFT_Filter[j] > 64.0) {
@@ -215,6 +223,7 @@ static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 	 *   noisy sections near band edges due to filtering.
 	 */
 	selectedFreqX = (float) (NCO_Frequency - 125) / 15.625;
+	Frequency_CursorX = (int)selectedFreqX;
 	if (selectedFreqX < 0) {
 		selectedFreqX = 0;
 	}
@@ -230,7 +239,7 @@ static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 		for (int y = 0; y < FFT_HEIGHT; y++) {
 
 			// Draw red line for selected frequency
-			if (x == (int) selectedFreqX) {
+			if (x == (int) (selectedFreqX + 0.5)) {
 				// Leave some white at the top
 				if (y <= SELFREQ_ADJ) {
 					LCD_WriteRAM(LCD_COLOR_WHITE);
@@ -256,14 +265,18 @@ static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 	if (force || oldSelectedFreq != NCO_Frequency) {
 		oldSelectedFreq = NCO_Frequency;
 
-		int textY = y + FFT_HEIGHT + TEXT_OFFSET_BELOW_FFT;
-		int numberX = x + FFT_WIDTH - MAX_FREQ_DIGITS * CHARACTER_WIDTH;
-		int labelX = numberX - CHARACTER_WIDTH * 8;	// 7=# letters in label w/ a space
+		//int textY = y + FFT_HEIGHT + TEXT_OFFSET_BELOW_FFT;
+		int textY = FFT_HEIGHT - 18;
+		//int numberX = x + FFT_WIDTH - MAX_FREQ_DIGITS * CHARACTER_WIDTH;
+		int numberX = 4 * CHARACTER_WIDTH;
+		//int labelX = numberX - CHARACTER_WIDTH * 8;	// 7=# letters in label w/ a space
+		int labelX = 1;
 
 		GL_SetFont(GL_FONTOPTION_8x16);
 		GL_SetBackColor(LCD_COLOR_BLACK);
 		GL_SetTextColor(LCD_COLOR_WHITE);
-		GL_PrintString(labelX, textY, "Offset:", 0);
+		//GL_PrintString(labelX, textY, "Offset:", 0);
+		GL_PrintString(labelX, textY, "AF", 0);
 
 		// Display location on label.
 		GL_SetTextColor(LCD_COLOR_RED);
@@ -302,6 +315,36 @@ static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 	char test5[7];
 	intToCommaString(RSL, test5, 7);
 	GL_PrintString(240, 85, test5, 0);
+
+	//Display SMeter
+	x = 80;
+	y = 68;
+	LCD_SetDisplayWindow(x, y, SMETER_HEIGHT, FFT_WIDTH);
+	LCD_WriteRAM_PrepareDir(LCD_WriteRAMDir_Down);
+	Signal_Level = 3 * FFT_Display[Frequency_CursorX +8];
+	for (int x = 0; x < FFT_WIDTH; x++){
+		for (int y = 0; y <SMETER_HEIGHT; y++){
+			if (x <= Signal_Level){
+				LCD_WriteRAM(LCD_COLOR_GREEN);
+			}
+			else {
+				LCD_WriteRAM(LCD_COLOR_DGRAY);
+			}
+		}
+	}
+	if (Signal_Level < 120) {
+		S = Signal_Level/12;
+		sprintf(SMeter$,"S%i    ",S);
+	}
+	else {
+		S = 9;
+		int R = (Signal_Level-100)/3;
+		sprintf(SMeter$,"S%i+%i",S,R);
+	}
+	GL_SetBackColor(LCD_COLOR_BLACK);
+	GL_SetTextColor(LCD_COLOR_WHITE);
+	GL_PrintString (1,67,SMeter$,0);
+
 	DSP_Flag = 0;   // added per Charley
 
 }
