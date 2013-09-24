@@ -85,3 +85,5 @@ Tony would like
 ***************
 	- 4m amateur band included in defaults
 	
+	Wolfgang would like Support for German Keyboards
+	
