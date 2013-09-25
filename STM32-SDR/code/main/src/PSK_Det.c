@@ -42,7 +42,8 @@
 
 #define AFC_OFF 0
 #define AFC_ON 1
-#define AFC_TIMELIMIT 20	/* 2.5 seconds	*/
+#define AFC_TIMELIMIT 40	/* 2.5 seconds	*/
+//#define AFC_TIMELIMIT 20	/* 2.5 seconds	*/ chh sept
 #define AFC_FTIMELIMIT 4	/* 0.5 seconds	*/
 
 #define NLP_K (100.0)		/*narrow phase derived afc constans  */

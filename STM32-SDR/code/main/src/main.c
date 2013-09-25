@@ -144,8 +144,7 @@ static void initializeHardware(void)
 	SetRXFrequency(1000);
 	main_delay(SETUP_DELAY);
 
-	SetAFCLimit(1000);
-	//SetAFCLimit(3000);
+	SetAFCLimit(1000);  //chh sept
 	main_delay(SETUP_DELAY);
 
 	uart_init();

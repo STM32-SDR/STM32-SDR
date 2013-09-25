@@ -230,7 +230,7 @@ static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 		for (int y = 0; y < FFT_HEIGHT; y++) {
 
 			// Draw red line for selected frequency
-			if (x == (int) selectedFreqX) {
+			if (x == (int) (selectedFreqX + 0.5)) {
 				// Leave some white at the top
 				if (y <= SELFREQ_ADJ) {
 					LCD_WriteRAM(LCD_COLOR_WHITE);
