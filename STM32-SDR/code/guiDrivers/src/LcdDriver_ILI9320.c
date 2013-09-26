@@ -192,6 +192,10 @@ void LCD_Init(void)
 	LCD_WriteReg(0x0097, 0x0000);
 	LCD_WriteReg(0x0098, 0x0000);
 	LCD_WriteReg(0x0007, 0x0173);
+
+	// Check LCD Version:
+	uint16_t version = LCD_ReadReg(0x0000);
+	xprintf("LCD Driver code (expect 0x9320 for ILI9320): 0x%X\n", version);
 }
 
 

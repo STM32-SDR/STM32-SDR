@@ -47,7 +47,7 @@
 #include	"Text_Enter.h"
 #include	"xprintf.h"
 
-#define VERSION_STRING "1.022"
+#define VERSION_STRING "1.023"
 
 const uint32_t CODEC_FREQUENCY = 8000;
 
@@ -71,7 +71,6 @@ static void displayLoadStationData(void);
 int main(void)
 {
 	initializeHardware();
-	displaySerialPortWelcome();
 
 	/*
 	 * Startup the GUI
@@ -106,6 +105,11 @@ static void initializeHardware(void)
 {
 	const int SETUP_DELAY = 100;
 
+	uart_init();
+	main_delay(SETUP_DELAY);
+	displaySerialPortWelcome();
+
+
 	LCD_Init();
 	main_delay(SETUP_DELAY);
 
@@ -135,9 +139,6 @@ static void initializeHardware(void)
 	main_delay(SETUP_DELAY);
 
 	SetAFCLimit(1000);
-	main_delay(SETUP_DELAY);
-
-	uart_init();
 	main_delay(SETUP_DELAY);
 
 	Options_Initialize();
@@ -199,15 +200,16 @@ static void displaySplashScreen(void)
 	GL_PrintString(TEXT_LEFT, 180, __TIME__, 0);
 	main_delay(10000000);
 }
+
 static void displaySerialPortWelcome(void)
 {
-	// Display serial port "splash" screen too.
-	xprintf("\n\n\n");
+	xprintf("\n\n\n\n\n");
 	xprintf("STM32-SDR Version %s.\n", VERSION_STRING);
 	xprintf("Compiled on %s at %s.\n", __DATE__, __TIME__);
 	xprintf("Serial port at 115,200 baud, 8 bit, no parity, 1 stop-bit.\n");
 	xprintf("\n");
 }
+
 static void displayLoadStationData(void)
 {
 	GL_SetTextColor(LCD_COLOR_RED);
