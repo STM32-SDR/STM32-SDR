@@ -33,6 +33,7 @@
 #include "stm32f4xx_tim.h"
 #include "stm32f4xx_syscfg.h"
 #include "stm32f4xx_fsmc.h"
+#include "xprintf.h"
 
 // *********************************************************************************
 // Register Settings for LCD
@@ -96,9 +97,18 @@ static void TIM_Config(void);
 
 void __assert_func(const char *file, int line, const char *assertFunc, const char *e)
 {
+	xprintf("\n\n\n\n");
+	xprintf("******************************\n");
+	xprintf("ASSERT FAILED!\n");
+	xprintf("******************************\n");
 	volatile int bugger = 0;
-	while (1)
+	while (1) {
+		xprintf("Assert failed:\n");
+		xprintf("   File %s, Line %d\n", file, line);
+		xprintf("   Function  %s\n", assertFunc);
+		xprintf("   Condition %s\n", e);
 		bugger ++;
+	}
 }
 
 

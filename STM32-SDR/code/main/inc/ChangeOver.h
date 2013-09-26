@@ -21,15 +21,23 @@
 
 #ifndef CHANGEOVER_H_
 #define CHANGEOVER_H_
-void Receive_Sequence(void);
 
-void Xmit_SSB_Sequence(void);
+// Initialize radio at startup.
+void RxTx_Init(void);
 
-void Xmit_CW_Sequence(void);
+// Control switching between receive and transmit mode.
+void RxTx_SetReceive(void);
+void RxTx_SetTransmit(void);
 
-void Xmit_PSK_Sequence(void);
+// Query current mode (transmit or receive).
+_Bool RxTx_InRxMode(void);
+_Bool RxTx_InTxMode(void);
 
-void Init_PTT_IO(void);
+// Handle Push To Talk
+void RxTx_CheckAndHandlePTT(void);
+_Bool RxTx_IsPttPressed(void);
+
+
 #endif /* CHANGEOVER_H_ */
 
 

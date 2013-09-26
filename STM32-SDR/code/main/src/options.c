@@ -28,6 +28,7 @@
 #include "eeprom.h"
 #include "Si570.h"
 #include "FrequencyManager.h"
+#include "ChangeOver.h"
 
 #define EEPROM_OFFSET 200
 
@@ -145,7 +146,6 @@ void Options_Initialize(void)
 {
 	// TODO: Clear out this initialization from options to the correct places.
 	rgain = 0.5;					//temp location, move to sequencer
-	Tx_Flag = 0;
 
 	 //Load from EEPROM if valid:
 	if (Options_HaveValidEEPROMData()) {
@@ -191,29 +191,27 @@ void Options_SetValue(int optionIdx, int16_t newValue)
 	 */
 	switch (optionIdx) {
 	case OPTION_RX_AUDIO:
-		if (Tx_Flag == 0)
+		if (RxTx_InRxMode())
 			Set_DAC_DVC(newValue);
 		break;
 
 	case OPTION_RX_RF:
-		if (Tx_Flag == 0)
+		if (RxTx_InRxMode())
 			Set_PGA_Gain(newValue);
 		break;
 
 	case OPTION_Mic_Gain:
-		if ((Tx_Flag == 1) && (Mode_GetCurrentMode() == MODE_SSB))
+		if (RxTx_InTxMode() && (Mode_GetCurrentMode() == MODE_SSB))
 			Set_PGA_Gain(newValue);
 		break;
 
 	case OPTION_Tx_LEVEL:
-		//if ((Tx_Flag == 1) && (Mode_GetCurrentMode() == MODE_CW))
-		if (Tx_Flag == 1)
+		if (RxTx_InTxMode())
 			Set_LO_Gain(newValue);
 		break;
 
 	case OPTION_ST_LEVEL:  //Side Tone Level
-		//if ((Tx_Flag == 1) && (Mode_GetCurrentMode() == MODE_CW))
-		if (Tx_Flag == 1)
+		if (RxTx_InTxMode())
 			Set_HP_Gain(newValue);
 		break;
 

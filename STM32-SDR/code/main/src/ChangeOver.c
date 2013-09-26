@@ -28,12 +28,123 @@
 #include "DMA_IRQ_Handler.h"
 #include "options.h"
 #include "ScrollingTextBox.h"
+#include "ModeSelect.h"
+#include <assert.h>
+#include <xprintf.h>
+
+
+// Constants
+//const int DEBOUNCE_COUNT_REQUIRED = 3;	// Called from IRQ
+const int DEBOUNCE_COUNT_REQUIRED = 30;	// Called from main()
+
+// Private state variables:
+static _Bool s_isPttPressed = 0;
+static _Bool s_inTxMode = 0;
+
+// Private functions:
+static void Receive_Sequence(void);
+static void Xmit_SSB_Sequence(void);
+static void Xmit_CW_Sequence(void);
+static void Xmit_PSK_Sequence(void);
+static void Init_PTT_IO(void);
+void handlePttStateChange(void);
+
+
+/****************************************
+ * Public interface
+ ****************************************/
+// Initialize radio at startup.
+void RxTx_Init(void)
+{
+	Init_PTT_IO();
+}
+
+// Control switching between receive and transmit mode.
+void RxTx_SetReceive(void)
+{
+	Receive_Sequence();
+}
+void RxTx_SetTransmit(void)
+{
+	switch(Mode_GetCurrentMode()) {
+	case MODE_SSB:
+		Xmit_SSB_Sequence();
+		break;
+	case MODE_CW:
+		Xmit_CW_Sequence();
+		break;
+	case MODE_PSK:
+		Xmit_PSK_Sequence();
+		break;
+	default:
+		assert(0);
+	}
+}
+
+// Query current mode (transmit or receive).
+_Bool RxTx_InRxMode(void)
+{
+	return !s_inTxMode;
+}
+_Bool RxTx_InTxMode(void)
+{
+	return s_inTxMode;
+}
+
+
+// Handle Push To Talk
+void RxTx_CheckAndHandlePTT(void)
+{
+	// Debounce PTT signal changes
+	static int debounceCount = 0;
+
+	/* Note on PTT pins:
+	 * Connector "Key" has:
+	 *   Pin 1: PTT_ --> Port D, Pin 2
+	 *   Pin 5: Key1 --> Port C, Pin 9
+	 *
+	 * Pin C9 is the "normal" PTT pin, D2 allows room for future expansion
+	 * of the PTT approach and support unique input pins for dot vs dash generation.
+	 */
+	_Bool isKeyDown = GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_9) == 0;
+
+	// Are we trying to change?
+	if (isKeyDown != s_isPttPressed) {
+		// Debounce:
+		if (debounceCount < DEBOUNCE_COUNT_REQUIRED) {
+			// Count up:
+			debounceCount++;
+			xprintf("#%d\n", debounceCount);
+
+			// Debounce done?
+			if (debounceCount == DEBOUNCE_COUNT_REQUIRED) {
+				s_isPttPressed = isKeyDown;
+				debounceCount = 0;
+				xprintf("PTT Changed to %d\n", s_isPttPressed);
+				handlePttStateChange();
+			}
+		}
+	} else {
+		// Not currently trying to change:
+		debounceCount = 0;
+	}
+}
+
+_Bool RxTx_IsPttPressed(void)
+{
+	return s_isPttPressed;
+}
+
+
+/****************************************
+ * Private Functions
+ ****************************************/
 
 void Receive_Sequence(void)
 {
 	Mute_HP();
 	Mute_LO();
-	Tx_Flag = 0;
+	s_inTxMode = 0;
 	GPIO_WriteBit(GPIOD, GPIO_Pin_3, Bit_SET);	//Make PTT_Out High, Remember FET Inversion
 	Disconnect_PGA();
 	Connect_IQ_Inputs();
@@ -47,7 +158,7 @@ void Xmit_SSB_Sequence(void)
 {
 	Mute_HP();
 	Mute_LO();
-	Tx_Flag = 1;
+	s_inTxMode = 1;
 	Disconnect_PGA();
 	Set_DAC_DVC(-10);
 	//Set_DAC_DVC(Options_GetValue(OPTION_CW_LEVEL));
@@ -64,7 +175,7 @@ void Xmit_CW_Sequence(void)
 {
 	Mute_HP();
 	Mute_LO();
-	Tx_Flag = 1;
+	s_inTxMode = 1;
 	Disconnect_PGA();
 	Set_DAC_DVC(-60);
 	GPIO_WriteBit(GPIOD, GPIO_Pin_3, Bit_RESET);  //Make PTT_Out Low,Remember FET Inversion
@@ -78,7 +189,7 @@ void Xmit_PSK_Sequence(void)
 {
 	Mute_HP();
 	Mute_LO();
-	Tx_Flag = 1;
+	s_inTxMode = 1;
 	Disconnect_PGA();
 	Set_DAC_DVC(-10);
 	GPIO_WriteBit(GPIOD, GPIO_Pin_3, Bit_RESET);  //Make PTT_Out Low,Remember FET Inversion
@@ -107,4 +218,24 @@ void Init_PTT_IO(void)
 	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_3; //  Pin 3 controls the FET-Gate for PTT_Out
 	GPIO_Init(GPIOD, &GPIO_InitStruct);
 
+}
+
+// Called when Push To Talk state has changed (after debounce)
+void handlePttStateChange(void)
+{
+	switch (Mode_GetCurrentMode()) {
+	case MODE_SSB:
+		if (s_isPttPressed) {
+			RxTx_SetTransmit();
+		} else {
+			RxTx_SetReceive();
+		}
+		break;
+	case MODE_CW:
+		break;
+	case MODE_PSK:
+		break;
+	default:
+		assert(0);
+	}
 }

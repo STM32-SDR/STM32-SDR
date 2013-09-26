@@ -43,7 +43,7 @@ void ScreenMainCW_Create(void)
 
 	// Title
 	GL_PageControls_TypeDef* ctrlPskText = Widget_NewLabel("CW Screen", LCD_COLOR_YELLOW, LCD_COLOR_BLACK, 1, GL_FONTOPTION_16x24, 0);
-	AddPageControlObj(0,  80, ctrlPskText, s_pThisScreen);
+	AddPageControlObj(0,  85, ctrlPskText, s_pThisScreen);
 
 	// FFT
 	Widget_AddToPage_NewFFTDisplay(80, 0, s_pThisScreen);
@@ -77,10 +77,9 @@ void ScreenMainCW_Create(void)
 #include "ChangeOver.h"
 static void tx_Click(GL_PageControls_TypeDef* pThis)
 {
-	assert(Mode_GetCurrentMode() == MODE_CW);
-	Xmit_CW_Sequence();
+	RxTx_SetTransmit();
 }
 static void rx_Click(GL_PageControls_TypeDef* pThis)
 {
-	Receive_Sequence();
+	RxTx_SetReceive();
 }

@@ -24,6 +24,7 @@
 #include <assert.h>
 #include "ModeSelect.h"
 #include "DMA_IRQ_Handler.h"
+#include "ChangeOver.h"
 
 #define TEXT_HEIGHT_PER_CHAR 12
 #define TEXT_WIDTH_PER_CHAR  8
@@ -42,8 +43,6 @@
 // Prototypes:
 static void insideEventHandler(GL_PageControls_TypeDef* pThis, int relX, int relY);
 static void insideDrawHandler(GL_PageControls_TypeDef* pThis, _Bool force, int relX, int relY);
-
-int	Led;
 
 /*
  * Public Interface
@@ -76,8 +75,7 @@ static void insideDrawHandler(GL_PageControls_TypeDef* pThis, _Bool force, int r
 	static int16_t previousRxTx = -1;
 
 	UserModeType curUserMode = Mode_GetCurrentUserMode();
-	// TODO: Improve modular interface for tx/rx
-	int16_t curRxTx = Tx_Flag;
+	int16_t curRxTx = RxTx_InTxMode();
 
 
 	// Redraw only when needed:
@@ -102,25 +100,18 @@ static void insideDrawHandler(GL_PageControls_TypeDef* pThis, _Bool force, int r
 	// Draw Rx/Tx
 	if (redrawRxTx) {
 		GL_SetFont(GL_FONTOPTION_8x12Bold);
-		//GL_SetBackColor(BIGBUTTON_COLOR_NORMAL_BACK);
 
 		int writeX = relX + OFFSETX_TEXT;
 		int writeY = relY + OFFSETY_RXTX;
 
-		if (Tx_Flag == 0) {
+		if (RxTx_InRxMode()) {
 			GL_SetBackColor(LCD_COLOR_GREEN);
 			GL_SetTextColor(LCD_COLOR_BLACK);
 			GL_PrintString(writeX, writeY, " RX  ", 0);
-			//GL_SetTextColor(LCD_COLOR_GREEN);
-			//GL_DrawFilledCircle(28,72,10,LCD_COLOR_GREEN);
-			//GL_DrawFilledCircle(29,72,10,LCD_COLOR_GREEN);
 		} else {
 			GL_SetBackColor(LCD_COLOR_RED);
-			//GL_SetTextColor(LCD_COLOR_RED);
 			GL_SetTextColor(LCD_COLOR_WHITE);
 			GL_PrintString(writeX, writeY, " TX  ", 0);
-			//GL_DrawFilledCircle(28,72,10,LCD_COLOR_RED);
-			//GL_DrawFilledCircle(29,72,10,LCD_COLOR_RED);
 		}
 		previousRxTx = curRxTx;
 	}

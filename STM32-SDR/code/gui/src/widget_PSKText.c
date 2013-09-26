@@ -95,7 +95,7 @@ static void eventHandler(GL_PageControls_TypeDef* pThis)
 static void drawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 {
 	// Setup unlikely values to start
-	static uint32_t lastOnAirHash = 0;
+//	static uint32_t lastOnAirHash = 0;
 	static uint32_t lastTxHash = 0;
 	static uint32_t lastKeyboardHash = 0;
 	static uint32_t lastCallHash = 0;
@@ -118,8 +118,8 @@ static void drawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 	_Bool redrawCallBuffer = force || lastCallHash != curCallHash;
 	_Bool redrawNameBuffer = force || lastNameHash != curNameHash;
 
-	int x = pThis->objCoordinates.MinX;
-	int y = pThis->objCoordinates.MinY;
+//	int x = pThis->objCoordinates.MinX;
+//	int y = pThis->objCoordinates.MinY;
 
 	// Display title:
 	//if (redrawTitle) {

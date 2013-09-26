@@ -28,11 +28,11 @@
 #include	"CW_Mod.h"
 #include    "stm32f4xx_gpio.h"
 #include 	"PSKMod.h"
+#include	"ChangeOver.h"
 
 uint32_t DMA_RX_Memory;
 uint32_t DMA_TX_Memory;
 int16_t DSP_Flag = 0;
-int16_t Tx_Flag;
 int16_t i;
 
 
@@ -56,13 +56,11 @@ float PSK_Gain;
 
 void DMA1_Stream0_IRQHandler(void)
 {
-	uint8_t Key_Down;
-
 	//Check to see which set of buffers are currently in use
 	DMA_RX_Memory = DMA_GetCurrentMemoryTarget(DMA1_Stream0 );
 	DMA_TX_Memory = DMA_GetCurrentMemoryTarget(DMA1_Stream5 );
 
-	if (Tx_Flag == 0) {
+	if (RxTx_InRxMode()) {
 		Rcvr_DSP();
 	}
 	else {
@@ -72,13 +70,18 @@ void DMA1_Stream0_IRQHandler(void)
 			break;
 
 		case MODE_CW:
-			Key_Down = GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_9 );
-			if (Key_Down == 0)
+		{
+			// Handle generating CW tone when button is down.
+			uint8_t Key_Down = GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_9 );
+			if (Key_Down == 0) {
 				key = Amp0;
-			else
+			} else {
+				// Reset to no tone.
 				key = 0.0;
+			}
 			Xmit_CW();
 			break;
+		}
 
 		case MODE_PSK:
 			Xmit_PSK();
@@ -96,8 +99,8 @@ void DMA1_Stream0_IRQHandler(void)
 
 void Rcvr_DSP(void)
 {
-	if (DMA_RX_Memory == 0) //Transfer I/Q data and fill FFT buffer on inactive buffer
-	        {
+	//Transfer I/Q data and fill FFT buffer on inactive buffer
+	if (DMA_RX_Memory == 0) {
 		for (i = 0; i < BUFFERSIZE / 2; i++) {
 			FIR_I_In[i] = (q15_t) ((float) Rx1BufferDMA[2 * i] * R_lgain);
 			phase_adjust = (float) Rx1BufferDMA[2 * i] * R_xgain;
@@ -154,8 +157,8 @@ void Rcvr_DSP(void)
 
 void Xmit_SSB(void)
 {
-	if (DMA_RX_Memory == 0) //Transfer I/Q data and fill FFT buffer on inactive buffer
-	        {
+	//Transfer I/Q data and fill FFT buffer on inactive buffer
+	if (DMA_RX_Memory == 0) {
 		for (i = 0; i < BUFFERSIZE / 2; i++) {
 			FIR_I_In[i] = (q15_t) ((float) Rx1BufferDMA[2 * i] * T_lgain);
 			phase_adjust = (float) Rx1BufferDMA[2 * i] * T_xgain;
@@ -214,8 +217,8 @@ void Xmit_CW(void)
 
 	x_NCOphzinc = (PI2 * (double) NCO_Frequency / (double) Sample_Frequency);
 
-	if (DMA_RX_Memory == 0) //Transfer I/Q data and fill FFT buffer on inactive buffer
-	        {
+	//Transfer I/Q data and fill FFT buffer on inactive buffer
+	if (DMA_RX_Memory == 0) {
 		for (i = 0; i < BUFFERSIZE / 2; i++) {
 			NCO_phz += (long) (KCONV * (x_NCOphzinc));
 			NCO_I = (Sine_table[((NCO_phz >> 4) + 0x400) & 0xFFF]);
@@ -290,8 +293,8 @@ void Xmit_PSK(void)
 
 	x_NCOphzinc = (PI2 * (double) NCO_Frequency / (double) Sample_Frequency);
 
-	if (DMA_RX_Memory == 0) //Transfer I/Q data and fill FFT buffer on inactive buffer
-	        {
+	//Transfer I/Q data and fill FFT buffer on inactive buffer
+	if (DMA_RX_Memory == 0) {
 		for (i = 0; i < BUFFERSIZE / 2; i++) {
 			NCO_phz += (long) (KCONV * (x_NCOphzinc));
 			TX_Q = (Sine_table[(NCO_phz >> 4) & 0xFFF]);

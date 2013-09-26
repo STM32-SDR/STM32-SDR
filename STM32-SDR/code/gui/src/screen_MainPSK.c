@@ -120,12 +120,11 @@ void ScreenMainPSK_Create(void)
 #include "ChangeOver.h"
 static void tx_Click(GL_PageControls_TypeDef* pThis)
 {
-	assert(Mode_GetCurrentMode() == MODE_PSK);
-	Xmit_PSK_Sequence();
+	RxTx_SetTransmit();
 }
 static void rx_Click(GL_PageControls_TypeDef* pThis)
 {
-	Receive_Sequence();
+	RxTx_SetReceive();
 	ClearTextDisplay();
 }
 

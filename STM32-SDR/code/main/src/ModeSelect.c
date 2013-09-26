@@ -89,7 +89,7 @@ void Mode_Init(void)
 void Mode_SetCurrentMode(UserModeType newMode)
 {
 	// Change to receive whenever we switch mode
-	Receive_Sequence();
+	RxTx_SetReceive();
 
 	// Store the change in mode
 	assert(newMode >= 0 && newMode < USERMODE_NUM_MODES);

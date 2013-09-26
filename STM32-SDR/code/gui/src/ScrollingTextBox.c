@@ -24,6 +24,7 @@
 #include "ScrollingTextBox.h"
 #include "DMA_IRQ_Handler.h"
 #include "LcdDriver_ILI9320.h"
+#include "ChangeOver.h"
 
 #define FIRSTROW		1
 #define LASTROW			4
@@ -47,8 +48,6 @@ static int row;
 static int charnum;
 static int ptr;
 
-int16_t Tx_Flag;
-
 int dx = 8;
 int dy = 17;
 
@@ -60,10 +59,10 @@ void DisplayText ( char ch)
 
 	//Set Text Color
 
-	if(Tx_Flag== 1)
-	GL_SetTextColor(LCD_COLOR_RED);
+	if(RxTx_InTxMode())
+		GL_SetTextColor(LCD_COLOR_RED);
 	else
-	GL_SetTextColor(LCD_COLOR_BLACK);
+		GL_SetTextColor(LCD_COLOR_BLACK);
 
 	// handle backspace
 	if (ch==8){

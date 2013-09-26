@@ -143,7 +143,8 @@ void init_encoder1(void)
 
 void init_encoder2(void)
 {
-	Receive_Sequence();
+	// TODO:- Is there a need to do this here?
+	RxTx_SetReceive();
 }
 
 

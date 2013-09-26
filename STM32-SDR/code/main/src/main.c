@@ -47,7 +47,7 @@
 #include	"Text_Enter.h"
 #include	"xprintf.h"
 
-#define VERSION_STRING "1.020"
+#define VERSION_STRING "1.021"
 
 const uint32_t CODEC_FREQUENCY = 8000;
 
@@ -85,24 +85,19 @@ int main(void)
 	InitTextDisplay();
 
 	while (1) {
-		/*
-		 * Check if encoder-knobs have changed:
-		 */
+		// Check if encoder-knobs have changed:
 		Encoders_CalculateAndProcessChanges();
 
-		/*
-		 * USB
-		 */
 		// Process any pending USB events
 		USBH_Process(&USB_OTG_Core_dev, &USB_Host);
 
-		 //* Touch Events
-		 //*/
+		// Polling tasks:
+		RxTx_CheckAndHandlePTT();
+
+		 // Touch Events
 		ProcessInputData();
 
-		/*
-		 * Redraw the screen (as needed)
-		 */
+		// Redraw the screen (as needed)
 		UpdateScreenWithChanges();
 	}
 }
@@ -163,7 +158,7 @@ static void initializeHardware(void)
 	displayLoadStationData();
 	main_delay(SETUP_DELAY);
 
-	Init_PTT_IO();
+	RxTx_Init();
 	main_delay(SETUP_DELAY);
 
 	Mode_Init();
