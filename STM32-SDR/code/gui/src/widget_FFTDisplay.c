@@ -24,7 +24,7 @@
 #include "graphicObject.h"
 #include <string.h>
 #include <stdio.h>
-
+#include "ModeSelect.h"
 #include "arm_math.h"
 #include "DSP_Processing.h"
 #include "TSHal.h"
@@ -33,7 +33,6 @@
 static const int FFT_WIDTH   = 240;
 static const int FFT_HEIGHT  =  64;
 static const int SELFREQ_ADJ =   4;
-static const int TEXT_OFFSET_BELOW_FFT = 4;
 static const int CHARACTER_WIDTH = 8;
 static const int MAX_FREQ_DIGITS = 5;
 static const int SMETER_HEIGHT = 12;
@@ -43,15 +42,16 @@ static uint16_t WidgetFFT_GetHeight(GL_PageControls_TypeDef* pThis);
 static void WidgetFFT_EventHandler(GL_PageControls_TypeDef* pThis);
 static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force);
 
+static void displayFFT(_Bool force, int x, int y);
+static void displaySelectedFrequencyText(_Bool force, int x, int y);
+static void displaySMeter(_Bool force, int x, int y);
+
+
 int 	NCO_Point;
-int 	Signal_Level;
-int		S;
-char	SMeter$[7];
 void	Acquire ( void );
-void	Draw_SMeter ( void );
 uint8_t FFT_Display[256];
-uint8_t Sig_Level;
-uint16_t bin_num;
+
+
 
 #define ID_FFTSelFreqNum_LABEL 50105
 
@@ -129,23 +129,10 @@ void intToCommaString(int16_t number, char *pDest, int numChar)
 	assert(index >= -1);
 }
 
-//static void WidgetFFT_EventHandler(GL_PageControls_TypeDef* pThis)
-//{
-//	// Get the coordinates:
-//	uint16_t X_Point, Y_Point;
-//	TS_GetTouchEventCoords(&X_Point, &Y_Point);
-
-//	//Update PSK NCO Frequency
-//	int fftLeftEdge = pThis->objCoordinates.MinX;
-//	NCO_Frequency = (double) ((float) ((X_Point - fftLeftEdge) + 8) * 15.625);
-//	SetRXFrequency(NCO_Frequency);
-//}
-
 static void WidgetFFT_EventHandler(GL_PageControls_TypeDef* pThis)
 {
 	// Get the coordinates:
 	uint16_t X_Point, Y_Point;
-	//int NCO_Point;
 	TS_GetTouchEventCoords(&X_Point, &Y_Point);
 
 	//Update PSK NCO Frequency
@@ -158,46 +145,76 @@ static void WidgetFFT_EventHandler(GL_PageControls_TypeDef* pThis)
 	//SetRXFrequency(NCO_Frequency);
 }
 
-void	Acquire ( void ){
-	//extern double NCO_Frequency;
+void Acquire (void )
+{
 	extern int count;
 	extern int char_count;
-	//extern unsigned int FFT_Display[];
 	long i, S1, S2, W;
 	double delta;
 
-				/* this is where I  add a correction to the NCO frequency
+	/* this is where I  add a correction to the NCO frequency
 					based on the nearby spectral peaks */
-				S1 = 0;
-				S2 = 0;
-				delta = 0.;
-				//for (i=-2; i<3; i++){
-				for (i=-4; i<5; i++){
-					W = (long)FFT_Display[NCO_Point + i];
-					S1 += W*i;
-					S2 += W;
-				}
-				if (S2 != 0) delta = (double) S1/((double)S2);
+	S1 = 0;
+	S2 = 0;
+	delta = 0.;
+	//for (i=-2; i<3; i++){
+	for (i=-4; i<5; i++){
+		W = (long)FFT_Display[NCO_Point + i];
+		S1 += W*i;
+		S2 += W;
+	}
+	if (S2 != 0) delta = (double) S1/((double)S2);
 
-				NCO_Frequency +=  (double)((float)delta * 15.625);
+	NCO_Frequency +=  (double)((float)delta * 15.625);
 
-				SetRXFrequency (NCO_Frequency );
-				count = 0;
-				char_count = 0;
-				}
+	SetRXFrequency (NCO_Frequency );
+	count = 0;
+	char_count = 0;
+}
 
+// Return the x-offset of where the current frequency is selected.
+// Return -1 if frequency selection invalid in this mode.
+static int getSelectedFrequencyX(void)
+{
+	if (Mode_GetCurrentMode() == MODE_SSB) {
+		return -1;
+	} else {
+		float exact = (NCO_Frequency - 125) / 15.625;
+		return (int) (exact + 0.5) ;
+	}
+}
+
+
+/******************************************************
+ * Screen Drawing Functions
+ ******************************************************/
 static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 {
-
 	// Bail if nothing to draw.
 	if (!force && !DSP_Flag) {
 		return;
 	}
 
+	// Extract the FFT's screen coordinates.
 	int x = pThis->objCoordinates.MinX;
 	int y = pThis->objCoordinates.MinY;
-	int Frequency_CursorX;
 
+	// Draw the FFT
+	displayFFT(force, x, y);
+
+	// Display frequency text and S Meter if we have a selected frequency.
+	if (getSelectedFrequencyX() >= 0) {
+		displaySelectedFrequencyText(force, x, y);
+		displaySMeter(force, x, y);
+	}
+
+	// Once the FFT has been drawn, clear the DSP flag.
+	DSP_Flag = 0;
+}
+
+
+static void displayFFT(_Bool force, int x, int y)
+{
 	/*
 	 * Calculate the data to draw:
 	 * - Use FFT_Magnitude[0..127] which is 0 to +4kHz of frequency
@@ -209,7 +226,6 @@ static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 	 *   effective time-based smoothing (as in, display does not change
 	 *   as abruptly as it would when using new data samples each time).
 	 */
-	//uint8_t FFT_Display[256];
 	static uint8_t FFT_Output[128];   // static because use last rounds data now.
 
 	// TODO: Where are all these FFT constants from?
@@ -233,12 +249,6 @@ static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 	 * - Drop the bottom 8, and top 8 frequency-display bins to discard
 	 *   noisy sections near band edges due to filtering.
 	 */
-	float selectedFreqX = (float) (NCO_Frequency - 125) / 15.625;
-	Frequency_CursorX = (int)selectedFreqX;
-	if (selectedFreqX < 0) {
-		selectedFreqX = 0;
-	}
-
 	// Draw the FFT using direct memory writes (fast).
 	LCD_SetDisplayWindow(x, y, FFT_HEIGHT, FFT_WIDTH);
 	LCD_WriteRAM_PrepareDir(LCD_WriteRAMDir_Down);
@@ -248,9 +258,7 @@ static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 		for (int y = 0; y < FFT_HEIGHT; y++) {
 
 			// Draw red line for selected frequency
-			if (x == (int) (selectedFreqX + 0.5)) {
-				bin_num = x + 8;
-				Sig_Level = FFT_Output[bin_num];
+			if (x == getSelectedFrequencyX()) {
 				// Leave some white at the top
 				if (y <= SELFREQ_ADJ) {
 					LCD_WriteRAM(LCD_COLOR_WHITE);
@@ -270,7 +278,10 @@ static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 			}
 		}
 	}
+}
 
+static void displaySelectedFrequencyText(_Bool force, int x, int y)
+{
 	// Update the frequency offset displayed (text):
 	static double oldSelectedFreq = -1;
 	if (force || oldSelectedFreq != NCO_Frequency) {
@@ -281,32 +292,37 @@ static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 		//int numberX = x + FFT_WIDTH - MAX_FREQ_DIGITS * CHARACTER_WIDTH;
 		int numberX = 4 * CHARACTER_WIDTH;
 		//int labelX = numberX - CHARACTER_WIDTH * 8;	// 7=# letters in label w/ a space
-		int labelX = 1;
+		int labelX = 0;
 
+		// Display frequency select label
 		GL_SetFont(GL_FONTOPTION_8x16);
 		GL_SetBackColor(LCD_COLOR_BLACK);
 		GL_SetTextColor(LCD_COLOR_WHITE);
-		//GL_PrintString(labelX, textY, "Offset:", 0);
 		GL_PrintString(labelX, textY, "AF", 0);
 
-
-		// Display location on label.
+		// Display select frequency number
 		GL_SetTextColor(LCD_COLOR_RED);
 		char number[MAX_FREQ_DIGITS + 1];
 		intToCommaString((int)NCO_Frequency, number, MAX_FREQ_DIGITS + 1);
 		GL_PrintString(numberX, textY, number, 0);
-
-
 	}
-	//Display SMeter
+}
+
+static void displaySMeter(_Bool force, int x, int y)
+{
+	// Override where it is located.
+	// TODO: Make this relative to the X,Y of the component, not a hard coded value.
 	x = 80;
 	y = 68;
+
+	// Draw the S Meter bar
 	LCD_SetDisplayWindow(x, y, SMETER_HEIGHT, FFT_WIDTH);
 	LCD_WriteRAM_PrepareDir(LCD_WriteRAMDir_Down);
-	Signal_Level = 3*FFT_Display[Frequency_CursorX + 8];
+
+	int signalLevel = 3*FFT_Display[getSelectedFrequencyX() + 8];
 	for (int x = 0; x < FFT_WIDTH; x++){
 		for (int y = 0; y < SMETER_HEIGHT; y++){
-			if (x <= Signal_Level) {
+			if (x <= signalLevel) {
 				LCD_WriteRAM(LCD_COLOR_GREEN);
 			}
 			else {
@@ -314,18 +330,21 @@ static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 			}
 		}
 	}
-	if (Signal_Level < 120){
-		S = Signal_Level/12;
-		sprintf(SMeter$,"S%i    ",S);
+
+	// Construct output string:
+	char SMeter$[7];
+	if (signalLevel < 120) {
+		int S = signalLevel / 12;
+		sprintf(SMeter$,"S%i    ", S);
 	}
 	else {
-		S = 9;
-		int R = (Signal_Level-100)/3;
-		sprintf(SMeter$,"S%i+%i",S,R);
+		int S = 9;
+		int R = (signalLevel-100)/3;
+		sprintf(SMeter$,"S%i+%i", S, R);
 	}
+
+	// Display string
 	GL_SetBackColor(LCD_COLOR_BLACK);
 	GL_SetTextColor(LCD_COLOR_WHITE);
 	GL_PrintString (1,67,SMeter$,0);
-	DSP_Flag = 0;   // added per Charley
-
 }
