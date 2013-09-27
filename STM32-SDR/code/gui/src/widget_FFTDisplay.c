@@ -46,9 +46,9 @@ static void displayFFT(_Bool force, int x, int y);
 static void displaySelectedFrequencyText(_Bool force, int x, int y);
 static void displaySMeter(_Bool force, int x, int y);
 
+void	Acquire ( void );
 
 int 	NCO_Point;
-void	Acquire ( void );
 uint8_t FFT_Display[256];
 
 
@@ -184,6 +184,22 @@ static int getSelectedFrequencyX(void)
 	}
 }
 
+// Return the strength of the signal to display in the S Meter
+static int getSMeterLevel(void)
+{
+	if (Mode_GetCurrentMode() == MODE_SSB) {
+		int maxStrength = -1;
+		for (int x = 0; x < FFT_WIDTH; x++) {
+			if (maxStrength < FFT_Display[x + 8]) {
+				maxStrength = FFT_Display[x + 8];
+			}
+		}
+		return maxStrength;
+	} else {
+		return FFT_Display[getSelectedFrequencyX() + 8];
+	}
+}
+
 
 /******************************************************
  * Screen Drawing Functions
@@ -202,10 +218,12 @@ static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 	// Draw the FFT
 	displayFFT(force, x, y);
 
-	// Display frequency text and S Meter if we have a selected frequency.
+	// Draw the S-Meter
+	displaySMeter(force, x, y);
+
+	// Display selected frequency if in CW or PSK mode.
 	if (getSelectedFrequencyX() >= 0) {
 		displaySelectedFrequencyText(force, x, y);
-		displaySMeter(force, x, y);
 	}
 
 	// Once the FFT has been drawn, clear the DSP flag.
@@ -319,7 +337,8 @@ static void displaySMeter(_Bool force, int x, int y)
 	LCD_SetDisplayWindow(x, y, SMETER_HEIGHT, FFT_WIDTH);
 	LCD_WriteRAM_PrepareDir(LCD_WriteRAMDir_Down);
 
-	int signalLevel = 3*FFT_Display[getSelectedFrequencyX() + 8];
+//	int signalLevel = 3*FFT_Display[getSelectedFrequencyX() + 8];
+	int signalLevel = 3 * getSMeterLevel();
 	for (int x = 0; x < FFT_WIDTH; x++){
 		for (int y = 0; y < SMETER_HEIGHT; y++){
 			if (x <= signalLevel) {
@@ -344,6 +363,7 @@ static void displaySMeter(_Bool force, int x, int y)
 	}
 
 	// Display string
+	GL_SetFont(GL_FONTOPTION_8x16);
 	GL_SetBackColor(LCD_COLOR_BLACK);
 	GL_SetTextColor(LCD_COLOR_WHITE);
 	GL_PrintString (1,67,SMeter$,0);
