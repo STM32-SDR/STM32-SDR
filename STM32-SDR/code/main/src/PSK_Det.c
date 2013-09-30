@@ -596,12 +596,14 @@ int SymbSync(struct Complex sample)
 /* ////////////////////////////////////////////////////////////////////  */
 /*  Decode the new symbol sample                                         */
 /* ////////////////////////////////////////////////////////////////////  */
+
+struct Complex vect;
 void DecodeSymb(struct Complex newsamp)
 {
-	struct Complex vect;
+
 	double angle;
 	double energy;
-
+	struct Complex vect;
 	unsigned char ch = 0;
 
 	int bit;
@@ -668,20 +670,7 @@ void DecodeSymb(struct Complex newsamp)
 
 	if (GotChar && (ch != 0) && m_SQOpen) {
 		NewChar = ch;
-/*		if (char_count < 38) {
-			LCD_buffer[char_count] = ch;
-			char_count++;
-		}
-		else {
-			for (i = 1; i < 38; i++) {
-				LCD_buffer[i - 1] = LCD_buffer[i];
-			}
-
-			LCD_buffer[37] = ch;
-			//if (IsBTConnected())
-			//uart_putc(ch);  // turn off char by char transmission
-		}
-*/		GotChar = FALSE;
+		GotChar = FALSE;
 	}
 
 }

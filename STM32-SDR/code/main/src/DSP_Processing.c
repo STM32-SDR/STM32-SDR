@@ -24,14 +24,22 @@
 #include	"FIR_Coefficients.h"
 #include	"DSP_Processing.h"
 
-float   AGC_Mag;
-int 	Max_Mag;
-uint16_t FFT_Max;
-int 	Max_RSL;
+float 	Point_Mag;
+float 	Peak_Mag;
+float	Total_Mag;
+float	Avg_Mag;
+
+int 	Point_RSL;
+int 	Peak_RSL;
+int		Total_RSL;
+int		Avg_RSL;
+
+int		AGC_Scale;
+int 	number_bins;
+float 	AGC_Multiplier;
+
 float 	FFT_Coeff = 0.2;
 extern  int NCO_Bin;
-
-const float     Log_2 = 0.693147188;
 
 float32_t FFT_Output[256];
 float32_t FFT_Filter[256];
@@ -39,6 +47,8 @@ float32_t FFT_Filter[256];
 q15_t FFT_Input[1024];
 q15_t FFT_Scale[1024]; //512 sampling
 q15_t FFT_Magnitude[512]; //512 sampling
+
+int FFT_Mag_10[256];
 
 uint16_t FFT_Size = 512;  // change for 512 sampling
 uint8_t FFT_status;
@@ -63,17 +73,15 @@ q15_t Filter_delay_I4[65];
 q15_t Filter_delay_Q4[65];
 //chh Filter Definitions imported from NUE PSK
 
-//chh stuff for filling PSK  Buffer
+
 
 q15_t ADC_Buffer[BUFFERSIZE / 2];  //for 1024 sampling
 
-//arm_cfft_radix4_instance_q15 S_CFFT;
 arm_cfft_radix2_instance_q15 S_CFFT;
-//FFT_status = arm_cfft_radix2_init_q15(&S_CFFT, FFT_Size, 0, 1);
+
 void init_DSP(void) {
 	FFT_status = arm_cfft_radix2_init_q15(&S_CFFT, FFT_Size, 0, 1);
 }
-
 
 arm_fir_instance_q15 S_FIR_I = { NUM_FIR_COEF, &FIR_State_I[0], &coeff_fir_I[0] };
 arm_fir_instance_q15 S_FIR_Q = { NUM_FIR_COEF, &FIR_State_Q[0], &coeff_fir_Q[0] };
@@ -113,9 +121,6 @@ void Sideband_Demod(void)
 
 void Process_FFT(void)
 {
-
-	//Set up structure for complex FFT processing
-	//FFT_status = arm_cfft_radix2_init_q15(&S_CFFT, FFT_Size, 0, 1);
 	//Execute complex FFT
 	arm_cfft_radix2_q15(&S_CFFT, &FFT_Input[0]);
 	//Shift FFT data to compensate for FFT scaling
@@ -123,35 +128,60 @@ void Process_FFT(void)
 	//Calculate the magnitude squared of FFT results ( i.e., power level)
 	arm_cmplx_mag_squared_q15(&FFT_Scale[0], &FFT_Magnitude[0], FFT_Size);
 	//********************************************************
-	FFT_Max = 0;
-	Max_Mag = 0;
-	Max_RSL =0;
+	Point_Mag = 0;
+	Peak_Mag = 0;
+	Total_Mag =0;
+	Avg_Mag =0;
 
+	Point_RSL = 0;
+	Peak_RSL =0;
+	Total_RSL = 0;
+	Avg_RSL = 0;
+
+	number_bins =0;
+	AGC_Multiplier = (float)AGC_Scale/100.0;
+
+
+		for (int j = 0; j<256;j++) FFT_Mag_10[j] = (int) FFT_Magnitude[j] * 10; //add in 10 db gain
+		//Sift Thru the Bins
 		for (int16_t j = 8; j < 252; j++) {  //Changed for 512 FFT
-
-		if (FFT_Magnitude[j]> 0)
-			FFT_Output[j] =  (10.0 * log((float32_t)FFT_Magnitude[j]/Log_2 + 1.0));
+		//This detects bins which are saturated and ignores them
+			if (FFT_Mag_10[j]> 0)
+			FFT_Output[j] =  (10.0 * log((float32_t)FFT_Mag_10[j] + 1.0));
 			else
 			FFT_Output[j] = 0;
 
+		//First Order Filter for FFT
 		FFT_Filter[j] =  FFT_Coeff * FFT_Output[j] + (1.0-FFT_Coeff) * FFT_Filter[j];
 
+		//Find Point Values
 		if(j== NCO_Bin) {
 			for (int k = NCO_Bin-2; k < NCO_Bin+3; k++)
-			if ((int)FFT_Filter[k]> Max_RSL) {
-			Max_RSL = 	(int)FFT_Filter[k];
-			AGC_Mag = 10*sqrt((float32_t)FFT_Magnitude[k]);
-			Max_Mag = (int)(10.0 * log((float32_t) (FFT_Magnitude[k] + 1)));
+			if ((int)FFT_Filter[k]> Point_RSL) {
+			Point_RSL = 	(int)FFT_Filter[k];
+			Point_Mag = 10*sqrt((float32_t)FFT_Magnitude[k]);
 			}
 		}
+
+		//Find Peak Values
+		if (j>16 && (uint16_t)FFT_Filter[j] >  Peak_RSL)
+		{Peak_RSL = (uint16_t)FFT_Filter[j];
+		Peak_Mag = 10*sqrt((float32_t)FFT_Magnitude[j]);
 		}
 
-		//if (j>16 && (uint16_t)FFT_Output[j] >  FFT_Max)
-		//{FFT_Max = (uint16_t)FFT_Output[j];
-		//Max_Mag = (int)(10.0 * log((float32_t) (FFT_Magnitude[j] + 1)));
-		//AGC_Mag = 10*sqrt((float32_t)FFT_Magnitude[j]);
-		//}
+		//Calculate Average Values and Scale them
+		if (j>8 && j<64 && (uint16_t)FFT_Filter[j]>2 ) {
+			Total_RSL = Total_RSL + (uint16_t)FFT_Filter[j];
+			Total_Mag = Total_Mag + 10*sqrt((float32_t)FFT_Magnitude[j]);
+			number_bins++;
+			}
+		if (number_bins>0)
+		{
+			Avg_RSL = (Total_RSL*AGC_Scale)/(number_bins*100);//Scaling is done with integer values
+			Avg_Mag = Total_Mag*AGC_Multiplier/(float)number_bins;
 		}
+		}
+	}
 
 
 

@@ -29,10 +29,14 @@
 #include <PSKMod.h>
 #include <ScrollingTextBox.h>
 #include "KeyboardStatus.h"
-
+#include "AGC_Processing.h"
 // Used in this file to refer to the correct screen (helps to keep code copy-paste friendly.
 static GL_Page_TypeDef *s_pThisScreen = &g_screenMainPSK;
 static GL_PageControls_TypeDef* pKeyboardLabel;
+static GL_PageControls_TypeDef* pAGCLabel;
+static GL_PageControls_TypeDef* pPGALabel;
+static GL_PageControls_TypeDef* pRSLLabel;
+
 /**
  * Call-back prototypes
  */
@@ -59,6 +63,38 @@ static _Bool KeyboardStatusUpdateHandler(GL_PageControls_TypeDef* pThis, _Bool f
       return 0;
 }
 
+static _Bool AGCStatusUpdateHandler(GL_PageControls_TypeDef* pThis, _Bool forceRedisplay)
+{
+
+     switch(AGC_Mode){
+
+     case 0: Widget_ChangeLabelText(pAGCLabel, "Point AGC");
+     break;
+
+     case 1: Widget_ChangeLabelText(pAGCLabel, "Peak AGC ");
+     break;
+
+     case 2: Widget_ChangeLabelText(pAGCLabel, "Avg AGC  ");
+     break;
+
+     return 0;
+
+     }
+      // No need to indicate update required because changing the
+      // label text forces an update (redraw).
+     return 0;
+	}
+
+
+static _Bool PGAUpdateHandler(GL_PageControls_TypeDef* pThis, _Bool forceRedisplay){
+	 return 0;
+	}
+
+
+static _Bool RSLUpdateHandler(GL_PageControls_TypeDef* pThis, _Bool forceRedisplay){
+	return 0;
+	}
+
 /**
  * Create the screen
  */
@@ -68,8 +104,7 @@ void ScreenMainPSK_Create(void)
 
 	// PSK
 	GL_PageControls_TypeDef* ctrlPskText = Widget_NewPSKTextDisplay();
-	//AddPageControlObj(0,  80, ctrlPskText, s_pThisScreen);
-	AddPageControlObj(0,  60, ctrlPskText, s_pThisScreen);
+	AddPageControlObj(0,  85, ctrlPskText, s_pThisScreen);
 
 	// FFT
 	Widget_AddToPage_NewFFTDisplay(80, 0, s_pThisScreen);
@@ -89,10 +124,19 @@ void ScreenMainPSK_Create(void)
 			LCD_HEIGHT - ((GL_Custom_TypeDef*)(btnFreq->objPTR))->GetHeight(btnFreq),
 			btnFreq, s_pThisScreen);
 	// Keyboard status
-
 		pKeyboardLabel = Widget_NewLabel("Your keyboard...", LCD_COLOR_YELLOW, LCD_COLOR_BLACK, 0, GL_FONTOPTION_8x8,KeyboardStatusUpdateHandler);
-
 		AddPageControlObj(115,  228, pKeyboardLabel, s_pThisScreen);
+	//AGC Mode Label
+		pAGCLabel = Widget_NewLabel("AGC_Mode ", LCD_COLOR_YELLOW, LCD_COLOR_BLACK, 0, GL_FONTOPTION_8x16,AGCStatusUpdateHandler);
+		AddPageControlObj(0,  80, pAGCLabel, s_pThisScreen);
+
+	//PGA Label
+		pPGALabel = Widget_NewLabel(" Rx RF ", LCD_COLOR_YELLOW, LCD_COLOR_BLACK, 0, GL_FONTOPTION_8x16,PGAUpdateHandler);
+		AddPageControlObj(115,  80, pPGALabel, s_pThisScreen);
+	//RSL Label
+		pRSLLabel = Widget_NewLabel(" RSL ", LCD_COLOR_YELLOW, LCD_COLOR_BLACK, 0, GL_FONTOPTION_8x16,RSLUpdateHandler);
+		AddPageControlObj(235,  80, pRSLLabel, s_pThisScreen);
+
 	// .. Rx & Tx buttons (Remove when code can automatically switch)
 	GL_PageControls_TypeDef* btnRx  = NewButton(10, " Rx ", rx_Click);
 	GL_PageControls_TypeDef* btnTx  = NewButton(9,  " Tx ", tx_Click);
@@ -104,12 +148,10 @@ void ScreenMainPSK_Create(void)
 
 	AddPageControlObj(120, LCD_HEIGHT - 42, btnRx, s_pThisScreen);
 	AddPageControlObj(165, LCD_HEIGHT - 42, btnTx, s_pThisScreen);
-	//AddPageControlObj(150,   165, btnN, s_pThisScreen);
-	AddPageControlObj(126,   165, btnN, s_pThisScreen);
-	AddPageControlObj(0, 165, btnC, s_pThisScreen);
-	//AddPageControlObj(280, 165, btnT, s_pThisScreen);
-	AddPageControlObj(240, 165, btnT, s_pThisScreen);
-	AddPageControlObj(280, 165, btnClear, s_pThisScreen);
+	AddPageControlObj(126,   170, btnN, s_pThisScreen);
+	AddPageControlObj(0, 170, btnC, s_pThisScreen);
+	AddPageControlObj(240, 170, btnT, s_pThisScreen);
+	AddPageControlObj(280, 170, btnClear, s_pThisScreen);
 }
 
 
@@ -153,3 +195,5 @@ static void Clear_Click(GL_PageControls_TypeDef* pThis)
 	ClearXmitBuffer();
 
 }
+
+

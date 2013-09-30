@@ -26,8 +26,7 @@
 #include "LcdDriver_ILI9320.h"
 
 #define FIRSTROW		1
-//#define LASTROW			4
-#define LASTROW			3
+#define LASTROW			4
 #define FIRSTCOL		1
 #define LASTCOL			39
 #define NUMROWS			(LASTROW - FIRSTROW + 1)
@@ -36,8 +35,9 @@
 
 #define TEXT_LINE_HEIGHT    (17)
 #define OFFSETX_ONAIR    0
-#define OFFSETY_ONAIR    (6 * TEXT_LINE_HEIGHT)
 //#define OFFSETY_ONAIR    (5 * TEXT_LINE_HEIGHT)
+#define OFFSETY_ONAIR    97
+
 
 //extern unsigned char NewChar;
 unsigned char LCD_buffer[NUMCHARS];

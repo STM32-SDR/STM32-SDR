@@ -43,8 +43,6 @@ static _Bool UpdateHandler(GL_PageControls_TypeDef* pThis, _Bool forceRedisplay)
 	return 0;
 }
 
-
-
 /**
  * Create the screen
  */

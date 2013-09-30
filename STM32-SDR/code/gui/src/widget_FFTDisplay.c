@@ -31,6 +31,7 @@
 #include "AGC_Processing.h"
 #include "math.h"
 
+
 double NCO_0;
 double NCO_1;
 double NCO_2;
@@ -42,10 +43,10 @@ char	SMeter$[7];
 static const int FFT_WIDTH   = 240;
 static const int FFT_HEIGHT  =  64;
 static const int SELFREQ_ADJ =   4;
-static const int TEXT_OFFSET_BELOW_FFT = 4;
+//static const int TEXT_OFFSET_BELOW_FFT = 4;
 static const int CHARACTER_WIDTH = 8;
 static const int MAX_FREQ_DIGITS = 5;
-static const int SMETER_HEIGHT = 12;
+static const int SMETER_HEIGHT = 8;
 
 static uint16_t WidgetFFT_GetWidth(GL_PageControls_TypeDef* pThis);
 static uint16_t WidgetFFT_GetHeight(GL_PageControls_TypeDef* pThis);
@@ -80,8 +81,6 @@ void Widget_AddToPage_NewFFTDisplay(uint16_t x, uint16_t y, GL_Page_TypeDef *pPa
 				0);
 	AddPageControlObj(x,    y, newFFT, pPage);
 }
-
-
 
 /*
  * Private Functions
@@ -134,17 +133,6 @@ void intToCommaString(int16_t number, char *pDest, int numChar)
 	assert(index >= -1);
 }
 
-//static void WidgetFFT_EventHandler(GL_PageControls_TypeDef* pThis)
-//{
-//	// Get the coordinates:
-//	uint16_t X_Point, Y_Point;
-//	TS_GetTouchEventCoords(&X_Point, &Y_Point);
-
-//	//Update PSK NCO Frequency
-//	int fftLeftEdge = pThis->objCoordinates.MinX;
-//	NCO_Frequency = (double) ((float) ((X_Point - fftLeftEdge) + 8) * 15.625);
-//	SetRXFrequency(NCO_Frequency);
-//}
 
 static void WidgetFFT_EventHandler(GL_PageControls_TypeDef* pThis)
 {
@@ -159,8 +147,6 @@ static void WidgetFFT_EventHandler(GL_PageControls_TypeDef* pThis)
 	NCO_Frequency = (double) ((float) ((X_Point - fftLeftEdge) + 8) * 15.625);
 	NCO_0 = NCO_Frequency;
 	Acquire();
-
-	//SetRXFrequency(NCO_Frequency);
 }
 
 void	Acquire ( void ){
@@ -177,21 +163,17 @@ void	Acquire ( void ){
 				delta = 0.;
 				//for (i=-2; i<3; i++){
 				for (i=-4; i<5; i++){
-					//W = (long)FFT_Magnitude[NCO_Point + i];
 					W = (long)FFT_Filter[NCO_Point + i];
 					S1 += W*i;
 					S2 += W;
 				}
 				if (S2 != 0) delta = (double) S1/((double)S2);
-
 				NCO_Frequency +=  (double)((float)delta * 15.625);
 				NCO_1 = NCO_Frequency;
-
 				SetRXFrequency (NCO_Frequency );
 				count = 0;
 				char_count = 0;
 				}
-
 
 static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 {
@@ -200,10 +182,9 @@ static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 		return;
 	}
 
-
 	int x = pThis->objCoordinates.MinX;
 	int y = pThis->objCoordinates.MinY;
-	int Frequency_CursorX;
+	//int Frequency_CursorX;
 
 		for (int16_t j = 0; j < 256; j++) {
 		if (FFT_Filter[j] > 64.0) {
@@ -212,10 +193,9 @@ static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 		else					{
 		FFT_Display[j] = (uint8_t)FFT_Filter[j];
 		}
-
 	}
 
-	RSL =  -115 +(int) ( 0.5 *(80.0-(float)PGAGain)+ (0.5 * (float)Max_RSL)); //256 FFT
+	RSL =  -115 +(int) ( 0.5 *(80.0-(float)PGAGain)+ (0.38 * (float)RSL_Mag));
 
 	/*
 	 * Display the FFT
@@ -223,7 +203,7 @@ static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 	 *   noisy sections near band edges due to filtering.
 	 */
 	selectedFreqX = (float) (NCO_Frequency - 125) / 15.625;
-	Frequency_CursorX = (int)selectedFreqX;
+	//Frequency_CursorX = (int)selectedFreqX;
 	if (selectedFreqX < 0) {
 		selectedFreqX = 0;
 	}
@@ -265,17 +245,13 @@ static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 	if (force || oldSelectedFreq != NCO_Frequency) {
 		oldSelectedFreq = NCO_Frequency;
 
-		//int textY = y + FFT_HEIGHT + TEXT_OFFSET_BELOW_FFT;
 		int textY = FFT_HEIGHT - 18;
-		//int numberX = x + FFT_WIDTH - MAX_FREQ_DIGITS * CHARACTER_WIDTH;
 		int numberX = 4 * CHARACTER_WIDTH;
-		//int labelX = numberX - CHARACTER_WIDTH * 8;	// 7=# letters in label w/ a space
 		int labelX = 1;
 
 		GL_SetFont(GL_FONTOPTION_8x16);
 		GL_SetBackColor(LCD_COLOR_BLACK);
 		GL_SetTextColor(LCD_COLOR_WHITE);
-		//GL_PrintString(labelX, textY, "Offset:", 0);
 		GL_PrintString(labelX, textY, "AF", 0);
 
 		// Display location on label.
@@ -284,44 +260,39 @@ static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 		intToCommaString((int)NCO_Frequency, number, MAX_FREQ_DIGITS + 1);
 		GL_PrintString(numberX, textY, number, 0);
 	}
-	//Display AGC test values
-	GL_SetTextColor(LCD_COLOR_RED);
-	char test1[7];
-	intToCommaString((int)NCO_0, test1, 7);
-	//intToCommaString((int)AGC_Mag, test1, 7);
-	GL_PrintString(0, 85, test1, 0);
 
-
-
-	GL_SetTextColor(LCD_COLOR_RED);
-	char test2[7];
-	intToCommaString((int)NCO_1, test2, 7);
-	//intToCommaString((int)DDeltaPGA, test2, 7);
-	GL_PrintString(60, 85, test2, 0);
-
+	//Display AGC Variables for Testing / Troubleshooting
+	//GL_SetTextColor(LCD_COLOR_RED);
+	//GL_SetBackColor(LCD_COLOR_BLACK);
+	//char test2[7];
+	//intToCommaString((int)AGC_Mag, test2, 7);
+	//GL_PrintString(75, 80, test2, 0);
 
 	GL_SetTextColor(LCD_COLOR_RED);
-	char test3[7];
-	intToCommaString((int)NCO_2, test3, 7);
-	//intToCommaString(PGAGain, test3, 7);
-	GL_PrintString(120, 85, test3, 0);
+	GL_SetBackColor(LCD_COLOR_BLACK);
+	char test3[3];
+	intToCommaString(PGAGain/2, test3, 3);
+	//intToCommaString((int)DDeltaPGA, test3, 7);
+	GL_PrintString(175, 80, test3, 0);
+
+	//GL_SetTextColor(LCD_COLOR_RED);
+	//GL_SetBackColor(LCD_COLOR_BLACK);
+	//char test4[7];
+	//intToCommaString(PGAGain, test4, 7);
+	//GL_PrintString(195, 80, test4, 0);
 
 	GL_SetTextColor(LCD_COLOR_RED);
-	char test4[7];
-	intToCommaString((int)AGC_Mag, test4, 7);
-	GL_PrintString(180, 85, test4, 0);
-
-	GL_SetTextColor(LCD_COLOR_RED);
-	char test5[7];
-	intToCommaString(RSL, test5, 7);
-	GL_PrintString(240, 85, test5, 0);
+	GL_SetBackColor(LCD_COLOR_BLACK);
+	char test5[5];
+	intToCommaString(RSL, test5, 5);
+	GL_PrintString(277, 80, test5, 0);
 
 	//Display SMeter
 	x = 80;
 	y = 68;
 	LCD_SetDisplayWindow(x, y, SMETER_HEIGHT, FFT_WIDTH);
 	LCD_WriteRAM_PrepareDir(LCD_WriteRAMDir_Down);
-	//Signal_Level = 3 * FFT_Display[Frequency_CursorX +8];
+
 	Signal_Level = ((RSL + 120)*26)/10;
 	for (int x = 0; x < FFT_WIDTH; x++){
 		for (int y = 0; y <SMETER_HEIGHT; y++){
@@ -344,8 +315,8 @@ static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 	}
 	GL_SetBackColor(LCD_COLOR_BLACK);
 	GL_SetTextColor(LCD_COLOR_WHITE);
-	GL_PrintString (1,67,SMeter$,0);
+	GL_PrintString (1,64,SMeter$,0);
 
-	DSP_Flag = 0;   // added per Charley
+	DSP_Flag = 0;   // Final End of DSP and FFT Update Processing
 
 }

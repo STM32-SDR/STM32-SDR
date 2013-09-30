@@ -104,13 +104,10 @@ void Rcvr_DSP(void)
 	        {
 		for (i = 0; i < BUFFERSIZE / 2; i++) {
 			FIR_I_In[i] = (q15_t) ((float) Rx1BufferDMA[2 * i] * R_lgain);
+			FFT_Input[i * 2] = FIR_I_In[i];
 			phase_adjust = (float) Rx1BufferDMA[2 * i] * R_xgain;
 			FIR_Q_In[i] = (q15_t) (((float) Rx1BufferDMA[2 * i + 1] + phase_adjust) * rgain);
-		}
-
-		for (i = 0; i < 512; i++) {  //changed for 512 sampling using balanced input data
-			FFT_Input[i * 2] = (q31_t)FIR_I_In[i];
-			FFT_Input[i * 2 + 1] = (q31_t)FIR_Q_In[i];
+			FFT_Input[i * 2 + 1] = FIR_Q_In[i];
 		}
 
 		Process_FIR_I();
@@ -134,16 +131,11 @@ void Rcvr_DSP(void)
 	{
 		for (i = 0; i < BUFFERSIZE / 2; i++) {
 			FIR_I_In[i] = (q15_t) ((float) Rx0BufferDMA[2 * i] * R_lgain);
-			FFT_Input[i * 2] = (q31_t) ((float) Rx0BufferDMA[2 * i] * R_lgain);
+			FFT_Input[i * 2] = FIR_I_In[i];
 			phase_adjust = (float) Rx0BufferDMA[2 * i] * R_xgain;
 			FIR_Q_In[i] = (q15_t) (((float) Rx0BufferDMA[2 * i + 1] + phase_adjust) * rgain);
-			FFT_Input[i * 2 + 1] = (q31_t) (((float) Rx0BufferDMA[2 * i + 1] + phase_adjust) * rgain);
+			FFT_Input[i * 2 + 1] = FIR_Q_In[i];
 		}
-
-		//for (i = 0; i < 512; i++) {  //changed for 512 sampling using balanced input data
-		//	FFT_Input[i * 2] = FIR_I_In[i];
-		//	FFT_Input[i * 2 + 1] = FIR_Q_In[i];
-		//}
 
 		Process_FIR_I();
 		Process_FIR_Q();
@@ -174,11 +166,6 @@ void Xmit_SSB(void)
 			FIR_Q_In[i] = (q15_t) (((float) Rx1BufferDMA[2 * i+1] + phase_adjust) * rgain); //feed same audio in for SSB
 			FFT_Input[i * 2 + 1] = FIR_Q_In[i];
 		}
-		// Changed for 512 sampling using balanced input data
-		//for (i = 0; i < 512; i++) {
-		//	FFT_Input[i * 2] = FIR_I_In[i];
-		//	FFT_Input[i * 2 + 1] = FIR_Q_In[i];
-		//}
 
 		Process_FIR_I();
 		Process_FIR_Q();
@@ -200,15 +187,10 @@ void Xmit_SSB(void)
 			FFT_Input[i * 2 + 1] = FIR_Q_In[i];
 		}
 
-		//changed for 512 sampling using balanced input data
-		//for (i = 0; i < 512; i++) {
-		//	FFT_Input[i * 2] = FIR_I_In[i];
-		//	FFT_Input[i * 2 + 1] = FIR_Q_In[i];
-		//}
-
 		Process_FIR_I();
 		Process_FIR_Q();
 		Process_FFT();
+
 		//Output FIR filter results to codec
 		for (i = 0; i < BUFFERSIZE / 2; i++) {
 			Tx0BufferDMA[2 * i] = (int16_t) FIR_I_Out[i];
@@ -238,11 +220,9 @@ void Xmit_CW(void)
 			CW_Gain = temp / Amp0;
 
 			FIR_I_In[i] = (q15_t) ((float) NCO_I * T_lgain * CW_Gain);
+			FFT_Input[i * 2] = FIR_I_In[i];
 			phase_adjust = (float) NCO_I * T_xgain;
 			FIR_Q_In[i] = (q15_t) (((float) NCO_I + phase_adjust) * (CW_Gain) * rgain); //
-		}
-		for (i = 0; i < 512; i++) {  //changed for 512 sampling using balanced input data
-			FFT_Input[i * 2] = FIR_I_In[i];
 			FFT_Input[i * 2 + 1] = FIR_Q_In[i];
 		}
 
@@ -268,12 +248,9 @@ void Xmit_CW(void)
 			CW_Gain = temp / Amp0;
 
 			FIR_I_In[i] = (q15_t) ((float) NCO_I * T_lgain * CW_Gain);
+			FFT_Input[i * 2] = FIR_I_In[i];
 			phase_adjust = (float) NCO_I * T_xgain;
 			FIR_Q_In[i] = (q15_t) (((float) NCO_I + phase_adjust) * rgain * CW_Gain); //
-		}
-
-		for (i = 0; i < 512; i++) {  //changed for 512 sampling using balanced input data
-			FFT_Input[i * 2] = FIR_I_In[i];
 			FFT_Input[i * 2 + 1] = FIR_Q_In[i];
 		}
 
@@ -318,12 +295,9 @@ void Xmit_PSK(void)
 			TXData = Product1 + Product2;
 
 			FIR_I_In[i] = (q15_t) ((float) TXData * T_lgain);
+			FFT_Input[i * 2] = FIR_I_In[i];
 			phase_adjust = (float) TXData * T_xgain;
 			FIR_Q_In[i] = (q15_t) (((float) TXData + phase_adjust) * rgain); //
-		}
-
-		for (i = 0; i < 512; i++) {  //changed for 512 sampling using balanced input data
-			FFT_Input[i * 2] = FIR_I_In[i];
 			FFT_Input[i * 2 + 1] = FIR_Q_In[i];
 		}
 
@@ -355,13 +329,9 @@ void Xmit_PSK(void)
 			TXData = Product1 + Product2;
 
 			FIR_I_In[i] = (q15_t) ((float) TXData * T_lgain);
+			FFT_Input[i * 2] = FIR_I_In[i];
 			phase_adjust = (float) TXData * T_xgain;
 			FIR_Q_In[i] = (q15_t) (((float) TXData + phase_adjust) * rgain); //
-
-		}
-
-		for (i = 0; i < 512; i++) {  //changed for 512 sampling using balanced input data
-			FFT_Input[i * 2] = FIR_I_In[i];
 			FFT_Input[i * 2 + 1] = FIR_Q_In[i];
 		}
 
