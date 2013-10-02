@@ -47,7 +47,7 @@
 #include	"Text_Enter.h"
 #include	"xprintf.h"
 
-#define VERSION_STRING "1.024"
+#define VERSION_STRING "1.025"
 
 const uint32_t CODEC_FREQUENCY = 8000;
 

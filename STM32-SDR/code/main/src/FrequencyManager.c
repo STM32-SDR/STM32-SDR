@@ -35,21 +35,21 @@ typedef struct
 
 static BandsStruct s_bandsData[] = {
 		// Note: Does not initialize the CurrentFrequency; done in initialize function.
-	{ " 20 M PSK ",  14070000},
-	{ " 80 M PSK ",  3580000},
-	{ " 40 M PSKj",  7028000},
-	{ " 40 M PSKe",  7040000},
-	{ " 40 M PSKu",  7070000},
-	{ "10 MHz WWV",  10000000},
-	{ " 30 M PSK ",  10138000},
-	{ " 20 M SSB ",  14200000},
-	{ "15 MHz WWV",  15000000},
-	{ " 17 M PSK ",  18100000},
-	{ " 15 M PSK ",  21070000},
-	{ " 12 M PSK ",  24920000},
-	{ " 10 M PSK ",  28120000},
-	{ "  6 M PSK ",  50250000},
-	{ " SI570 F0 ",  56320000}, 	// SI570 startup frequency
+		{ " 20 M PSK ",  14070000},
+		{ " 40 M PSKu",   7070000},
+		{ "10 MHz WWV",  10000000},
+		{ "15 MHz WWV",  15000000},
+		{ " 40 M QRP ",   7285000},
+		{ " 20 M QRP ",  14285000},
+		{ " 10 M     ",  28885000},
+		{ " 15 M     ",  21385000},
+		{ "  4 M     ",  70200000},
+		{ " M1       ",   3729000},
+		{ " M2       ",   7268500},
+		{ " M3       ",   7090000},
+	    { " M4       ",  50885000},
+	    { " M5       ", 144285000},
+	    { " SI570 F0 ",  56320000},
 };
 static BandPreset s_selectedBand = FREQBAND_20M_PSK;
 
