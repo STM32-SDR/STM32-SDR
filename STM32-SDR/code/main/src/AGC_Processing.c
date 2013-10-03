@@ -65,21 +65,21 @@ void Proc_AGC(void) {
 	case 0:
 		{
 		AGC_Mag = Point_Mag;
-		RSL_Mag = Point_RSL;
+		RSL_Mag = (int)Point_RSL;
 		}
 		break;
 
 	case 1:
 		{
 		AGC_Mag = Peak_Mag;
-		RSL_Mag = Peak_RSL;
+		RSL_Mag = (int)Peak_RSL;
 		}
 		break;
 
 	case 2:
 		{
 		AGC_Mag = Avg_Mag;
-		RSL_Mag = Avg_RSL;
+		RSL_Mag = (int)Avg_RSL;
 		}
 		break;
 
