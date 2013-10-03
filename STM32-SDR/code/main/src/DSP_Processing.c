@@ -34,6 +34,12 @@ int 	Peak_RSL;
 int		Total_RSL;
 int		Avg_RSL;
 
+float  Temp_Mag;
+float  old_Temp_Mag;
+float  Temp_Mag_Filter;
+float  Avg_Coeff = 0.01;
+
+
 int		AGC_Scale;
 int 	number_bins;
 float 	AGC_Multiplier;
@@ -132,11 +138,14 @@ void Process_FFT(void)
 	Peak_Mag = 0;
 	Total_Mag =0;
 	Avg_Mag =0;
+	Temp_Mag = 0;
+
 
 	Point_RSL = 0;
 	Peak_RSL =0;
 	Total_RSL = 0;
 	Avg_RSL = 0;
+
 
 	number_bins =0;
 	AGC_Multiplier = (float)AGC_Scale/100.0;
@@ -158,17 +167,19 @@ void Process_FFT(void)
 		if(j== NCO_Bin) {
 			for (int k = NCO_Bin-2; k < NCO_Bin+3; k++)
 			if ((int)FFT_Filter[k]> Point_RSL) {
-			Point_RSL = 	(int)FFT_Filter[k];
-			Point_Mag = 10*sqrt((float32_t)FFT_Magnitude[k]);
+				Point_RSL = (int)FFT_Filter[k];
+				Point_Mag = 10*sqrt((float32_t)FFT_Magnitude[k]);
+				}
 			}
-		}
 
 		//Find Peak Values
 		if (j>16 && (uint16_t)FFT_Filter[j] >  Peak_RSL)
-		{Peak_RSL = (uint16_t)FFT_Filter[j];
+		{
+		Peak_RSL = (uint16_t)FFT_Filter[j];
 		Peak_Mag = 10*sqrt((float32_t)FFT_Magnitude[j]);
 		}
 
+		/*
 		//Calculate Average Values and Scale them
 		if (j>8 && j<64 && (uint16_t)FFT_Filter[j]>2 ) {
 			Total_RSL = Total_RSL + (uint16_t)FFT_Filter[j];
@@ -180,6 +191,16 @@ void Process_FFT(void)
 			Avg_RSL = (Total_RSL*AGC_Scale)/(number_bins*100);//Scaling is done with integer values
 			Avg_Mag = Total_Mag*AGC_Multiplier/(float)number_bins;
 		}
+
+		 *
+		 */
+		if (j>8 && j<128 && (uint16_t)FFT_Filter[j]>2 ) {
+		Temp_Mag = Temp_Mag + (float)((int)FFT_Magnitude[j]);
+		}
+		Temp_Mag_Filter = Avg_Coeff * Temp_Mag + (1.0 - Avg_Coeff)* old_Temp_Mag;
+		old_Temp_Mag = Temp_Mag_Filter;
+		Avg_RSL = (int)(10.0 * log(10*Temp_Mag_Filter + 1.0));
+		Avg_Mag = 10*sqrt((float32_t)Temp_Mag_Filter);
 		}
 	}
 

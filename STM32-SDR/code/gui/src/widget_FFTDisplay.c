@@ -141,6 +141,7 @@ static void WidgetFFT_EventHandler(GL_PageControls_TypeDef* pThis)
 	//int NCO_Point;
 	TS_GetTouchEventCoords(&X_Point, &Y_Point);
 
+
 	//Update PSK NCO Frequency
 	int fftLeftEdge = pThis->objCoordinates.MinX;
 	NCO_Point = ((int)X_Point - fftLeftEdge) +8;
@@ -242,8 +243,10 @@ static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 
 	// Update the frequency offset displayed (text):
 	static double oldSelectedFreq = -1;
-	if (force || oldSelectedFreq != NCO_Frequency) {
+	static double old_m_SQOpen = -1;
+	if (force || oldSelectedFreq != NCO_Frequency || old_m_SQOpen != m_SQOpen) {
 		oldSelectedFreq = NCO_Frequency;
+		old_m_SQOpen = m_SQOpen;
 
 		int textY = FFT_HEIGHT - 18;
 		int numberX = 4 * CHARACTER_WIDTH;
@@ -255,11 +258,16 @@ static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 		GL_PrintString(labelX, textY, "AF", 0);
 
 		// Display location on label.
+		if (m_SQOpen == 0)
 		GL_SetTextColor(LCD_COLOR_RED);
+		else GL_SetTextColor(LCD_COLOR_GREEN);
 		char number[MAX_FREQ_DIGITS + 1];
 		intToCommaString((int)NCO_Frequency, number, MAX_FREQ_DIGITS + 1);
 		GL_PrintString(numberX, textY, number, 0);
 	}
+
+
+
 
 	//Display AGC Variables for Testing / Troubleshooting
 	//GL_SetTextColor(LCD_COLOR_RED);
@@ -272,13 +280,12 @@ static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 	GL_SetBackColor(LCD_COLOR_BLACK);
 	char test3[3];
 	intToCommaString(PGAGain/2, test3, 3);
-	//intToCommaString((int)DDeltaPGA, test3, 7);
 	GL_PrintString(175, 80, test3, 0);
 
 	//GL_SetTextColor(LCD_COLOR_RED);
 	//GL_SetBackColor(LCD_COLOR_BLACK);
-	//char test4[7];
-	//intToCommaString(PGAGain, test4, 7);
+	//char test4[5];
+	//intToCommaString(RSL_Mag, test4, 5);
 	//GL_PrintString(195, 80, test4, 0);
 
 	GL_SetTextColor(LCD_COLOR_RED);
