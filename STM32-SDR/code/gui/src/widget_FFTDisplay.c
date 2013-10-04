@@ -58,6 +58,7 @@ int		NCO_Bin;
 void	Acquire ( void );
 uint8_t FFT_Display[256];
 int 	RSL;
+extern	RSL_Mag;
 float selectedFreqX;
 
 #define ID_FFTSelFreqNum_LABEL 50105
@@ -301,6 +302,7 @@ static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 	LCD_WriteRAM_PrepareDir(LCD_WriteRAMDir_Down);
 
 	Signal_Level = ((RSL + 120)*26)/10;
+	//Signal_Level = ((RSL_Mag + 120)*26)/10;
 	for (int x = 0; x < FFT_WIDTH; x++){
 		for (int y = 0; y <SMETER_HEIGHT; y++){
 			if (x <= Signal_Level){
