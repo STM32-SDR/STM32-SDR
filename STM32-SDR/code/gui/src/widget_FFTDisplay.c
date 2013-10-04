@@ -58,7 +58,7 @@ int		NCO_Bin;
 void	Acquire ( void );
 uint8_t FFT_Display[256];
 int 	RSL;
-extern	RSL_Mag;
+extern	int RSL_Mag;
 float selectedFreqX;
 
 #define ID_FFTSelFreqNum_LABEL 50105
