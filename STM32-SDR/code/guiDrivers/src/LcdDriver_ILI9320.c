@@ -38,12 +38,22 @@
 // *********************************************************************************
 // Register Settings for LCD
 // *********************************************************************************
+// LCD Selection:
+#define LCD_ILI9320  0x9320
+#define LCD_SSD1289  0x8989
+#define LCD_SSD1289_ALT  0x1289	              // Older value: default to using standard SSD1289 code when found.
+static uint16_t s_currentLCD = LCD_ILI9320;   // Which LCD is plugged in.
+
+
 #define LCD_REG      (*((volatile unsigned short *) 0x60000000))
 #define LCD_RAM      (*((volatile unsigned short *) 0x60020000))
 
-
 // Work with the direct LCD RAM access & rotation
-#define R3_CMALWAYS_SET	  0x1000
+// Pick the always on bits based on the LCD.
+#define R3_CMALWAYS_SET_ILI9320	  0x1000
+#define R3_CMALWAYS_SET_SSD1289	  0x6800
+#define R3_CMALWAYS_SET (s_currentLCD == LCD_ILI9320 ? R3_CMALWAYS_SET_ILI9320 : R3_CMALWAYS_SET_SSD1289)
+
 #define R3_VERTICAL_BIT   5		// Set 0 for Increment, 1 for decrement
 #define R3_HORIZONTAL_BIT 4		// Set 0 for Increment, 1 for decrement
 #define R3_ADDRESS_BIT    3		// Set 1 for vertical, 0 for horizontal
@@ -82,6 +92,8 @@
 #endif
 
 
+
+
 // Colours for Monochrome images.
 __IO uint16_t LCD_textColor = 0x0000;
 __IO uint16_t LCD_backColor = 0xFFFF;
@@ -116,9 +128,14 @@ void __assert_func(const char *file, int line, const char *assertFunc, const cha
 //		Initialization
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
+//#include "LcdDriver_SSD1289.h"
+void LCDILI9320_Init(void);
+void LCDSSD1289_Init(void);
 
 void LCD_Init(void)
 {
+
+	// Configure the LCD IO before checking which chip we have:
 	LCD_CtrlLinesConfig();
 	TFT_Delay(3000);
 
@@ -127,6 +144,94 @@ void LCD_Init(void)
 
 	LCD_FSMCConfig();
 	TFT_Delay(3000);
+
+
+	// Check LCD Version:
+	uint16_t version = LCD_ReadReg(0x0000);
+	xprintf("LCD Driver code: 0x%X\n", version);
+
+
+	switch (version) {
+	default:
+		xprintf("    Unknown LCD driver chip; defaulting to ILI9320...\n");
+		assert(0);
+		// Fall through to ILI9320
+	case LCD_ILI9320:
+		xprintf("    Using ILI9320 configuration (matches code 0x%X)\n", LCD_ILI9320);
+		s_currentLCD = LCD_ILI9320;
+		LCDILI9320_Init();
+		break;
+	case LCD_SSD1289:
+	case LCD_SSD1289_ALT:
+		LCDSSD1289_Init();
+		s_currentLCD = LCD_SSD1289;
+		xprintf("    Using SSD1289 configuration (matches codes 0x%X and 0x%X)\n", LCD_SSD1289, LCD_SSD1289_ALT);
+		break;
+	}
+}
+
+/* ************************************************************************
+ * BEGIN SSD1289 SECTION
+ * ************************************************************************/
+void LCDSSD1289_Init(void)
+{
+	TIM_Config();
+	LCD_BackLight(100);
+
+	LCD_WriteReg(0x0007,0x0021);    TFT_Delay(50);
+	LCD_WriteReg(0x0000,0x0001);    TFT_Delay(50);
+	LCD_WriteReg(0x0007,0x0023);    TFT_Delay(50);
+	LCD_WriteReg(0x0010,0x0000);    TFT_Delay(90);
+	LCD_WriteReg(0x0007,0x0033);    TFT_Delay(50);
+	LCD_WriteReg(0x0011,0x6830);    TFT_Delay(50);
+	LCD_WriteReg(0x0002,0x0600);    TFT_Delay(50);
+	LCD_WriteReg(0x0012,0x6CEB);    TFT_Delay(50);
+	LCD_WriteReg(0x0003,0xA8A4);    TFT_Delay(50);
+	LCD_WriteReg(0x000C,0x0000);    TFT_Delay(50);
+	LCD_WriteReg(0x000D,0x080C);    TFT_Delay(50);
+	LCD_WriteReg(0x000E,0x2B00);    TFT_Delay(50);
+	LCD_WriteReg(0x001E,0x00B0);    TFT_Delay(50);
+	LCD_WriteReg(0x0001,0x2b3F);    TFT_Delay(50);  //RGB
+	LCD_WriteReg(0x0005,0x0000);    TFT_Delay(50);
+	LCD_WriteReg(0x0006,0x0000);    TFT_Delay(50);
+	LCD_WriteReg(0x0016,0xEF1C);    TFT_Delay(50);
+	LCD_WriteReg(0x0017,0x0103);    TFT_Delay(50);
+	LCD_WriteReg(0x000B,0x0000);    TFT_Delay(50);
+	LCD_WriteReg(0x000F,0x0000);    TFT_Delay(50);
+	LCD_WriteReg(0x0041,0x0000);    TFT_Delay(50);
+	LCD_WriteReg(0x0042,0x0000);    TFT_Delay(50);
+	LCD_WriteReg(0x0048,0x0000);    TFT_Delay(50);
+	LCD_WriteReg(0x0049,0x013F);    TFT_Delay(50);
+	LCD_WriteReg(0x004A,0x0000);    TFT_Delay(50);
+	LCD_WriteReg(0x004B,0x0000);    TFT_Delay(50);
+	LCD_WriteReg(0x0044,0xEF00);    TFT_Delay(50);
+	LCD_WriteReg(0x0045,0x0000);    TFT_Delay(50);
+	LCD_WriteReg(0x0046,0x013F);    TFT_Delay(50);
+	LCD_WriteReg(0x0030,0x0707);    TFT_Delay(50);
+	LCD_WriteReg(0x0031,0x0204);    TFT_Delay(50);
+	LCD_WriteReg(0x0032,0x0204);    TFT_Delay(50);
+	LCD_WriteReg(0x0033,0x0502);    TFT_Delay(50);
+	LCD_WriteReg(0x0034,0x0507);    TFT_Delay(50);
+	LCD_WriteReg(0x0035,0x0204);    TFT_Delay(50);
+	LCD_WriteReg(0x0036,0x0204);    TFT_Delay(50);
+	LCD_WriteReg(0x0037,0x0502);    TFT_Delay(50);
+	LCD_WriteReg(0x003A,0x0302);    TFT_Delay(50);
+	LCD_WriteReg(0x002F,0x12BE);    TFT_Delay(50);
+	LCD_WriteReg(0x003B,0x0302);    TFT_Delay(50);
+	LCD_WriteReg(0x0023,0x0000);    TFT_Delay(50);
+	LCD_WriteReg(0x0024,0x0000);    TFT_Delay(50);
+	LCD_WriteReg(0x0025,0x8000);    TFT_Delay(50);
+	LCD_WriteReg(0x004f,0x0000);    TFT_Delay(50);
+	LCD_WriteReg(0x004e,0x0000);    TFT_Delay(50);
+}
+
+/* ************************************************************************
+ * END SSD1289 SECTION
+ * ************************************************************************/
+
+
+void LCDILI9320_Init()
+{
 	TIM_Config();
 	LCD_BackLight(100);
 
@@ -192,10 +297,6 @@ void LCD_Init(void)
 	LCD_WriteReg(0x0097, 0x0000);
 	LCD_WriteReg(0x0098, 0x0000);
 	LCD_WriteReg(0x0007, 0x0173);
-
-	// Check LCD Version:
-	uint16_t version = LCD_ReadReg(0x0000);
-	xprintf("LCD Driver code (expect 0x9320 for ILI9320): 0x%X\n", version);
 }
 
 
@@ -203,16 +304,20 @@ void LCD_Init(void)
 
 static void TFT_Delay(uint32_t nTime)
 {
+	// Check for multiple threads (ISR and background...) for accessing concurrently.
 	static volatile int threadWatch = 0;
 	threadWatch++;
 	assert(threadWatch == 1);
 
+	// Busy wait
 	static __IO uint32_t TimingDelay;
 	TimingDelay = nTime;
 
 	while (TimingDelay != 0) {
 		TimingDelay--;
 	}
+
+	// Check for multiple threads.
 	assert(threadWatch == 1);
 	threadWatch--;
 	assert(threadWatch == 0);
@@ -401,81 +506,6 @@ static void LCD_Reset(void)
 }
 
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////
-//		From LcdHal.c
-//////////////////////////////////////////////////////////////////////////////////////////////////////
-__IO uint32_t LCDType = LCD_ILI9320;
-
-
-/**
- * @brief  LCD_DrawColorBMP
- * @param  *ptrBitmap:   The pointer to the image
- * @param  Xpos_Init: The X axis position
- * @param  Ypos_Init: The Y axis position
- * @param  Height:    The Height of the image
- * @param  Width:     The Width of the image
- * @retval None
- */
-void LCD_DrawColorBMP(uint8_t* ptrBitmap, uint16_t Xpos_Init, uint16_t Ypos_Init, uint16_t Height, uint16_t Width)
-{
-#if 0
-	uint32_t uDataAddr = 0, uBmpSize = 0;
-	uint16_t uBmpData = 0;
-
-	BmpBuffer32BitRead(&uBmpSize, ptrBitmap + 2);
-	BmpBuffer32BitRead(&uDataAddr, ptrBitmap + 10);
-
-	if (LCD_Direction == _0_degree) {
-		GL_SetDisplayWindow(Xpos_Init, Ypos_Init, Height, Width);
-		/* Set GRAM write direction and BGR = 1 */
-		/* I/D=00 (Horizontal : decrement, Vertical : decrement) */
-		/* AM=1 (address is updated in vertical writing direction) */
-		LCD_WriteReg(R3, MAKE_R3_CMD(0x1008));
-	}
-	else if (LCD_Direction == _90_degree) {
-		GL_SetDisplayWindow(Xpos_Init + Width - 1, Ypos_Init, Width, Height);
-		/* Set GRAM write direction and BGR = 1 */
-		/* I/D=01 (Horizontal : increment, Vertical : decrement) */
-		/* AM=0 (address is updated in horizontal writing direction) */
-		LCD_WriteReg(R3, MAKE_R3_CMD(0x1010));
-	}
-	else if (LCD_Direction == _180_degree) {
-		GL_SetDisplayWindow(Xpos_Init + Height - 1, Ypos_Init + Width - 1, Height, Width);
-		/* Set GRAM write direction and BGR = 1 */
-		/* I/D=11 (Horizontal : increment, Vertical : increment) */
-		/* AM=1 (address is updated in vertical writing direction) */
-		LCD_WriteReg(R3, MAKE_R3_CMD(0x1038));
-	}
-	else if (LCD_Direction == _270_degree) {
-		GL_SetDisplayWindow(Xpos_Init, Ypos_Init + Height - 1, Width, Height);
-		/* Set GRAM write direction and BGR = 1 */
-		/* I/D=10 (Horizontal : decrement, Vertical : increment) */
-		/* AM=0 (address is updated in horizontal writing direction) */
-		LCD_WriteReg(R3, MAKE_R3_CMD(0x1020));
-	}
-
-	LCD_SetCursor(Xpos_Init, Ypos_Init);
-
-	if ((LCDType == LCD_ILI9320) || (LCDType == LCD_SPFD5408)) {
-		/* Prepare to write GRAM */
-		LCD_WriteRAM_Prepare();
-	}
-
-	/* Read bitmap data and write them to LCD */
-	for (; uDataAddr < uBmpSize; uDataAddr += 2) {
-		uBmpData = (uint16_t) (*(ptrBitmap + uDataAddr)) + (uint16_t) ((*(ptrBitmap + uDataAddr + 1)) << 8);
-		LCD_WriteRAM(uBmpData);
-	}
-	if ((LCDType == LCD_ILI9320) || (LCDType == LCD_SPFD5408)) {
-		if (pLcdHwParam.LCD_Connection_Mode == GL_SPI) {
-			GL_LCD_CtrlLinesWrite(pLcdHwParam.LCD_Ctrl_Port_NCS, pLcdHwParam.LCD_Ctrl_Pin_NCS, GL_HIGH);
-		}
-	}
-	LCD_Change_Direction(LCD_Direction);
-	GL_SetDisplayWindow(LCD_Width - 1, LCD_Height - 1, LCD_Height, LCD_Width);
-#endif
-}
-
 
 
 
@@ -592,7 +622,17 @@ void LCD_WriteRAM_PrepareDir(LCD_WriteRAM_Direction direction)
 	default:
 		assert(0);
 	}
-	LCD_WriteReg(R3, r3Cmd);
+
+	switch (s_currentLCD) {
+	case LCD_ILI9320:
+		LCD_WriteReg(R3, r3Cmd);
+		break;
+	case LCD_SSD1289:
+		LCD_WriteReg(0x11, r3Cmd);
+		break;
+	default:
+		assert(0);
+	}
 
 	LCD_WriteRAM_Prepare();
 }
@@ -610,17 +650,19 @@ void LCD_WriteRAM(uint16_t RGB_Code)
 uint16_t LCD_ReadReg(uint8_t LCD_Reg)
 {
 	// TODO: Not sure if this works; copied from a different file (stm32100e_eval_lcd.c).
+	// Seems to work for reading the version at startup, but does not seem to read other registers.
 	/* Write 16-bit Index (then Read Reg) */
 	LCD_REG = LCD_Reg;
 	/* Read 16-bit Reg */
 	uint16_t regValue = LCD_RAM;
 	regValue = LCD_RAM;
 	regValue = LCD_RAM;
+
 	return regValue;
 }
 uint16_t LCD_ReadRAM(void)
 {
-    return LCD_ReadReg(R34);
+	return LCD_ReadReg(R34);
 }
 
 // ***********************************************************************************
@@ -643,8 +685,8 @@ void LCD_SetDisplayWindow(uint16_t x, uint16_t y, uint16_t height, uint16_t widt
 	uint16_t rotatedX1 = LCD_ROTATE_GETX(x, y);
 	uint16_t rotatedX2 = LCD_ROTATE_GETX(x + width - 1, y + height - 1);
 
-	#define MAX(a, b) ((a)>(b)?(a):(b))
-	#define MIN(a, b) ((a)<(b)?(a):(b))
+#define MAX(a, b) ((a)>(b)?(a):(b))
+#define MIN(a, b) ((a)<(b)?(a):(b))
 
 	uint16_t xStart = MIN(rotatedX1, rotatedX2);
 	uint16_t xEnd   = MAX(rotatedX1, rotatedX2);
@@ -656,10 +698,25 @@ void LCD_SetDisplayWindow(uint16_t x, uint16_t y, uint16_t height, uint16_t widt
 	yStart = MAX(0, yStart);
 	yEnd   = MIN(LCD_ACTUAL_SCREEN_HEIGHT-1, yEnd);
 
-	LCD_WriteReg(0x0050, xStart); // Window X start address
-	LCD_WriteReg(0x0051, xEnd); // Window X end address
-	LCD_WriteReg(0x0052, yStart); // Window Y start address
-	LCD_WriteReg(0x0053, yEnd); // Window Y end address
+
+	switch (s_currentLCD) {
+	case LCD_ILI9320:
+		LCD_WriteReg(0x0050, xStart); // Window X start address
+		LCD_WriteReg(0x0051, xEnd); // Window X end address
+		LCD_WriteReg(0x0052, yStart); // Window Y start address
+		LCD_WriteReg(0x0053, yEnd); // Window Y end address
+		break;
+	case LCD_SSD1289:
+	{
+		uint16_t horizontalRamAddrReg = (xEnd << 8) | xStart;
+		LCD_WriteReg(0x0044, horizontalRamAddrReg); // Window X end & start address
+		LCD_WriteReg(0x0045, yStart); // Window Y start address
+		LCD_WriteReg(0x0046, yEnd); // Window Y end address
+		break;
+	}
+	default:
+		assert(0);
+	}
 
 	LCD_SetCursor(x, y);
 }
@@ -669,8 +726,18 @@ void LCD_ResetDisplayWindow(void)
 }
 void LCD_SetCursor(uint16_t Xpos, uint16_t Ypos)
 {
-	LCD_WriteReg(0x20, LCD_ROTATE_GETX(Xpos, Ypos));
-	LCD_WriteReg(0x21, LCD_ROTATE_GETY(Xpos, Ypos));
+	switch (s_currentLCD) {
+	case LCD_ILI9320:
+		LCD_WriteReg(0x20, LCD_ROTATE_GETX(Xpos, Ypos));
+		LCD_WriteReg(0x21, LCD_ROTATE_GETY(Xpos, Ypos));
+		break;
+	case LCD_SSD1289:
+		LCD_WriteReg(0x4E, LCD_ROTATE_GETX(Xpos, Ypos));
+		LCD_WriteReg(0x4F, LCD_ROTATE_GETY(Xpos, Ypos));
+		break;
+	default:
+		assert(0);
+	}
 }
 
 void LCD_DisplayOn(void)
@@ -945,7 +1012,7 @@ void LCD_TestDisplayScreen(void)
 	// Test drawing a bitmap
 	LCD_DrawBMP16Bit(0,0, gimp_image.height, gimp_image.width, (uint16_t*) gimp_image.pixel_data, 0);
 
-	#if 0
+#if 0
 	// Test put/get pixel
 	LCD_PutPixel(10, 10, 0x1234);
 	assert(LCD_GetPixel(10, 10) == 0x1234);
@@ -955,7 +1022,7 @@ void LCD_TestDisplayScreen(void)
 	assert(LCD_GetPixel(10, 10) == LCD_COLOR_GREEN);
 	LCD_PutPixel(10, 10, Blue);
 	assert(LCD_GetPixel(10, 10) == LCD_COLOR_BLUE);
-	#endif
+#endif
 
 	volatile int a = 0;
 	while (1)

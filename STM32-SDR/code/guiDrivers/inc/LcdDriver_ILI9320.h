@@ -102,10 +102,6 @@ typedef enum
 } LCD_WriteRAM_Direction;
 
 
-// TODO: Remove?
-void LCD_DrawColorBMP(uint8_t* ptrBitmap, uint16_t Xpos_Init, uint16_t Ypos_Init, uint16_t Height, uint16_t Width);
-
-
 uint16_t LCD_ReadReg(uint8_t LCD_Reg);
 uint16_t LCD_ReadRAM(void);
 void LCD_PutPixel(uint16_t Xpos, uint16_t Ypos, uint16_t Color);

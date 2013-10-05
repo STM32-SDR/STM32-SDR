@@ -2272,14 +2272,14 @@ static GL_ErrStatus SetSlidebarVisible(GL_PageControls_TypeDef* pTmp, GL_Coordin
 		minY = pTmp->objCoordinates.MinX;
 #ifndef USE_2D_OBJECTS
 //    LCD_Change_Direction(_270_degree);
-		LCD_DrawColorBMP(ptrBmpLeft, maxX, minY, SLIDEBAR_HEIGHT, SLIDEBAR_PIECE_LENGTH);
+		//LCD_DrawColorBMP(ptrBmpLeft, maxX, minY, SLIDEBAR_HEIGHT, SLIDEBAR_PIECE_LENGTH);
 
 		for (; counter < SLIDEBAR_CENTRAL_LENGTH; counter++) {
-			LCD_DrawColorBMP(ptrBmpCenter, maxX - (counter * SLIDEBAR_PIECE_LENGTH), minY, SLIDEBAR_HEIGHT,
-			        SLIDEBAR_PIECE_LENGTH);
+//			LCD_DrawColorBMP(ptrBmpCenter, maxX - (counter * SLIDEBAR_PIECE_LENGTH), minY, SLIDEBAR_HEIGHT,
+//			        SLIDEBAR_PIECE_LENGTH);
 		}
-		LCD_DrawColorBMP(ptrBmpRight, maxX - (counter * SLIDEBAR_PIECE_LENGTH), minY, SLIDEBAR_HEIGHT,
-		        SLIDEBAR_PIECE_LENGTH);
+//		LCD_DrawColorBMP(ptrBmpRight, maxX - (counter * SLIDEBAR_PIECE_LENGTH), minY, SLIDEBAR_HEIGHT,
+//		        SLIDEBAR_PIECE_LENGTH);
 //    LCD_Change_Direction(_0_degree);
 #else
 		/* Drawing the SlideBar main body */
@@ -2304,13 +2304,13 @@ static GL_ErrStatus SetSlidebarVisible(GL_PageControls_TypeDef* pTmp, GL_Coordin
 		minY = pTmp->objCoordinates.MinX;
 #ifndef USE_2D_OBJECTS
 //    LCD_Change_Direction(_90_degree);
-		LCD_DrawColorBMP(ptrBmpLeft, minX, maxY, SLIDEBAR_HEIGHT, SLIDEBAR_PIECE_LENGTH);
+//		LCD_DrawColorBMP(ptrBmpLeft, minX, maxY, SLIDEBAR_HEIGHT, SLIDEBAR_PIECE_LENGTH);
 		for (; counter < SLIDEBAR_CENTRAL_LENGTH; counter++) {
-			LCD_DrawColorBMP(ptrBmpCenter, minX + (counter * SLIDEBAR_PIECE_LENGTH), maxY, SLIDEBAR_HEIGHT,
-			        SLIDEBAR_PIECE_LENGTH);
+//			LCD_DrawColorBMP(ptrBmpCenter, minX + (counter * SLIDEBAR_PIECE_LENGTH), maxY, SLIDEBAR_HEIGHT,
+//			        SLIDEBAR_PIECE_LENGTH);
 		}
-		LCD_DrawColorBMP(ptrBmpRight, minX + (counter * SLIDEBAR_PIECE_LENGTH), maxY, SLIDEBAR_HEIGHT,
-		        SLIDEBAR_PIECE_LENGTH);
+//		LCD_DrawColorBMP(ptrBmpRight, minX + (counter * SLIDEBAR_PIECE_LENGTH), maxY, SLIDEBAR_HEIGHT,
+//		        SLIDEBAR_PIECE_LENGTH);
 //    LCD_Change_Direction(_0_degree);
 #else
 		/* Drawing the SlideBar main body */
@@ -2343,8 +2343,8 @@ static GL_ErrStatus SetSlidebarVisible(GL_PageControls_TypeDef* pTmp, GL_Coordin
 	else if (pThis->Direction == GL_LEFT_VERTICAL) {
 #ifndef USE_2D_OBJECTS
 //    LCD_Change_Direction(_270_degree);
-		LCD_DrawColorBMP(ptrCursorBmp, maxX - pThis->CurrentValue - SLIDEBAR_OFFSET_LENGTH, minY - 1,
-		        SLIDEBAR_HEIGHT + 2, SLIDEBAR_CURSOR_LENGTH);
+//		LCD_DrawColorBMP(ptrCursorBmp, maxX - pThis->CurrentValue - SLIDEBAR_OFFSET_LENGTH, minY - 1,
+//		        SLIDEBAR_HEIGHT + 2, SLIDEBAR_CURSOR_LENGTH);
 //    LCD_Change_Direction(_0_degree);
 #else
 		/* Drawing the SlideBar cursor */
@@ -2359,8 +2359,8 @@ static GL_ErrStatus SetSlidebarVisible(GL_PageControls_TypeDef* pTmp, GL_Coordin
 	else if (pThis->Direction == GL_RIGHT_VERTICAL) {
 #ifndef USE_2D_OBJECTS
 //    LCD_Change_Direction(_90_degree);
-		LCD_DrawColorBMP(ptrCursorBmp, minX + pThis->CurrentValue + SLIDEBAR_OFFSET_LENGTH, maxY + 1,
-		        SLIDEBAR_HEIGHT + 2, SLIDEBAR_CURSOR_LENGTH);
+//		LCD_DrawColorBMP(ptrCursorBmp, minX + pThis->CurrentValue + SLIDEBAR_OFFSET_LENGTH, maxY + 1,
+//		        SLIDEBAR_HEIGHT + 2, SLIDEBAR_CURSOR_LENGTH);
 //    LCD_Change_Direction(_0_degree);
 #else
 		/* Drawing the SlideBar cursor */
