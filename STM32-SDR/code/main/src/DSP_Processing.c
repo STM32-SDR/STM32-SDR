@@ -165,12 +165,24 @@ void Process_FFT(void)
 			for (int k = NCO_Bin-2; k < NCO_Bin+3; k++)
 			{
 				Sig = (int)FFT_Magnitude[k];
+<<<<<<< HEAD
 				if ( Sig > Sig_Max) Sig_Max = Sig;
 				Sig_Sum1 += Sig;
+=======
+				//if ( Sig > Sig_Max) Sig_Max = Sig;
+				Sig2 += Sig;
+>>>>>>> branch 'master' of https://github.com/chillmf/STM32-SDR.git
 			}
 			Sig_Sum0 = Sig_Max;
 		}
 
+<<<<<<< HEAD
+=======
+
+		//Peak AGC
+		if((int) FFT_Magnitude[j] > Sig_Max) Sig_Max = FFT_Magnitude[j];
+
+>>>>>>> branch 'master' of https://github.com/chillmf/STM32-SDR.git
 		//Total or SSB or Average AGC
 		if ( j > 8 && j < 128 )
 		{
@@ -178,6 +190,7 @@ void Process_FFT(void)
 			number_bins++;
 		}
 	}
+<<<<<<< HEAD
 	switch (AGC_Mode){
 		case 0:
 			Sig_Total = Sig_Sum0;
@@ -191,9 +204,50 @@ void Process_FFT(void)
 	}
 	RMS_Sig = 10*sqrt((float32_t)Sig_Total);
 	dB_Sig = 23. + 10*log((float32_t)Sig_Total + .001);
+=======
+	RMS_Sig = 10*sqrt((float32_t)Sig_Max); // Peak
+	RMS_Sig2 = 10*sqrt((float32_t)Sig2);  // Point
+>>>>>>> branch 'master' of https://github.com/chillmf/STM32-SDR.git
 
+<<<<<<< HEAD
 	AGC_Mag = FFT_Coeff*RMS_Sig + (1.-FFT_Coeff)*AGC_Mag;
 	RSL_Mag = FFT_Coeff*dB_Sig + (1.-FFT_Coeff)*RSL_Mag;
+=======
+
+	dB_Sig = 23. + 10*log((float32_t)Sig_Max + .1); //Peak
+	dB_Sig2 = 23. + 10*log((float32_t)Sig2 + .1); //Point
+	RMS_Sig_Sum = 10*sqrt((float32_t)Sig_Sum); //Average
+	dB_Sig_Sum = 23. + 10*log((float32_t)Sig_Sum + .1); //Average
+
+	RMS_Mag = FFT_Coeff*RMS_Sig + (1.-FFT_Coeff)*RMS_Mag; //Peak
+	RMS_Mag2 = FFT_Coeff*RMS_Sig2 + (1.-FFT_Coeff)*RMS_Mag2; //Point
+	dB_RSL = FFT_Coeff*dB_Sig + (1.-FFT_Coeff)*dB_RSL; //Peak
+	dB_RSL2 = FFT_Coeff*dB_Sig2 + (1.-FFT_Coeff)*dB_RSL2; //Point
+	Sig_Mag = FFT_Coeff*RMS_Sig_Sum + (1.-FFT_Coeff)*Sig_Mag;//Average
+	Sig_RSL = FFT_Coeff*dB_Sig_Sum + (1.-FFT_Coeff)*Sig_RSL; //Average
+
+	//Point_RSL = (int)dB_RSL;
+	//Point_Mag = RMS_Mag;
+	//Peak_RSL = (int)dB_RSL2;
+	//Peak_Mag = RMS_Mag2;
+
+	Point_RSL = (int)dB_RSL2;
+	Point_Mag = RMS_Mag2;
+	Peak_RSL = (int)dB_RSL;
+	Peak_Mag = RMS_Mag;
+
+	//Avg_RSL = (int)Sig_RSL*AGC_Scale/100;
+	Avg_RSL = (int)Sig_RSL;
+	//Avg_Mag = Sig_Mag*AGC_Multiplier/(float)number_bins;
+	Avg_Mag = Sig_Mag;
+}// End of if(1) block (new code by MEC W8NUE
+>>>>>>> branch 'master' of https://github.com/chillmf/STM32-SDR.git
+
+<<<<<<< HEAD
+}//End of Process_FFT
+=======
+
+>>>>>>> branch 'master' of https://github.com/chillmf/STM32-SDR.git
 
 }//End of Process_FFT
 
