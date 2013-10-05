@@ -53,6 +53,7 @@
 unsigned char NewChar;
 int count;
 int char_count;
+
 double m_PSKPeriodUpdate;
 double m_SymbolRate;
 

@@ -39,7 +39,7 @@ void Receive_Sequence(void)
 	Disconnect_PGA();
 	Connect_IQ_Inputs();
 	Set_DAC_DVC(Options_GetValue(OPTION_RX_AUDIO));
-	Set_ADC_DVC(-20);  //was -20 using Milt's AGC scheme
+	Set_ADC_DVC(-10);  //was -20 using Milt's AGC scheme
 	Set_HP_Gain(6);
 	Init_AGC ();
 }

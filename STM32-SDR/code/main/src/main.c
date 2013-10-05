@@ -51,7 +51,7 @@
 #include 	"DSP_Processing.h"
 
 //#define VERSION_STRING "1.014"
-#define VERSION_STRING "AGC_3"
+#define VERSION_STRING "AGC_4"
 
 const uint32_t CODEC_FREQUENCY = 8000;
 

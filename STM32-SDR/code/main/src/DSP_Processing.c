@@ -158,6 +158,8 @@ void Process_FFT(void)
 		//First Order Filter for FFT
 		FFT_Filter[j] =  FFT_Coeff * FFT_Output[j] + (1.0-FFT_Coeff) * FFT_Filter[j];
 
+
+		//Point AGC
 		if (j == NCO_Bin)
 		{
 			for (int k = NCO_Bin-2; k < NCO_Bin+3; k++)
@@ -168,6 +170,8 @@ void Process_FFT(void)
 			}
 			Sig_Sum0 = Sig_Max;
 		}
+
+		//Total or SSB or Average AGC
 		if ( j > 8 && j < 128 )
 		{
 			Sig_Sum2 += (int)FFT_Magnitude[j];
@@ -192,5 +196,4 @@ void Process_FFT(void)
 	RSL_Mag = FFT_Coeff*dB_Sig + (1.-FFT_Coeff)*RSL_Mag;
 
 }//End of Process_FFT
-
 
