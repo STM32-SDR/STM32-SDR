@@ -60,31 +60,6 @@ void Init_AGC (void);
 void Proc_AGC(void) {
 	if (AGC_Flag == 1) {
 
-	switch(AGC_Mode)	{
-
-	case 0:
-		{
-		AGC_Mag = Point_Mag;
-		RSL_Mag = (int)Point_RSL;
-		}
-		break;
-
-	case 1:
-		{
-		AGC_Mag = Peak_Mag;
-		RSL_Mag = (int)Peak_RSL;
-		}
-		break;
-
-	case 2:
-		{
-		AGC_Mag = Avg_Mag;
-		RSL_Mag = (int)Avg_RSL;
-		}
-		break;
-
-	}
-
 	CalcPGA_Setpoint();
 	AGC_Flag =0;
 	}

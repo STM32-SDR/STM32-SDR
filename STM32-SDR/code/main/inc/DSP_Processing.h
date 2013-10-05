@@ -29,15 +29,6 @@ void Process_FFT(void);
 void Sideband_Demod(void);
 void init_DSP(void);
 
-float 	Point_Mag;
-float 	Peak_Mag;
-float	Total_Mag;
-float	Avg_Mag;
-
-int 	Point_RSL;
-int 	Peak_RSL;
-int		Total_RSL;
-int		Avg_RSL;
 int		AGC_Scale;
 
 float32_t FFT_Output[256];

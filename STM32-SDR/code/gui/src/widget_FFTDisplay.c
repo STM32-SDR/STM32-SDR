@@ -307,13 +307,14 @@ static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 		}
 	}
 	if (Signal_Level < 120) {
+		if (Signal_Level < 0) Signal_Level = 0;
 		S = Signal_Level/12;
 		sprintf(SMeter$,"S%i    ",S);
 	}
 	else {
 		S = 9;
 		int R = (Signal_Level-100)/3;
-		sprintf(SMeter$,"S%i+%i",S,R);
+		sprintf(SMeter$,"S%i+%2i",S,R);
 	}
 	GL_SetBackColor(LCD_COLOR_BLACK);
 	GL_SetTextColor(LCD_COLOR_WHITE);

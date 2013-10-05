@@ -24,31 +24,16 @@
 #include	"FIR_Coefficients.h"
 #include	"DSP_Processing.h"
 
-float 	Point_Mag;
-float 	Peak_Mag;
-float	Total_Mag;
-float	Avg_Mag;
-float	RMS_Sig;
-float	RMS_Sig2;
-float	dB_Sig;
-float	dB_Sig2;
-float	RMS_Sig_Sum;
-float	dB_Sig_Sum;
-float	RMS_Mag;
-float	RMS_Mag2;
-float	dB_RSL;
-float	dB_RSL2;
-float	Sig_Mag;
-float	Sig_RSL;
 
-int 	Point_RSL;
-int 	Peak_RSL;
-int		Total_RSL;
-int		Avg_RSL;
+float	RMS_Sig;
+float	dB_Sig;
+
 int		Sig;
 int		Sig_Max;
-int		Sig2;
-int		Sig_Sum;
+int		Sig_Total;
+int		Sig_Sum0;
+int		Sig_Sum1;
+int		Sig_Sum2;
 
 int		AGC_Scale;
 int 	number_bins;
@@ -56,6 +41,9 @@ float 	AGC_Multiplier;
 
 float 	FFT_Coeff = 0.2;
 extern  int NCO_Bin;
+extern  int AGC_Mode;
+extern  int RSL_Mag;
+extern  float AGC_Mag;
 
 float32_t FFT_Output[256];
 float32_t FFT_Filter[256];
@@ -144,81 +132,16 @@ void Process_FFT(void)
 	//Calculate the magnitude squared of FFT results ( i.e., power level)
 	arm_cmplx_mag_squared_q15(&FFT_Scale[0], &FFT_Magnitude[0], FFT_Size);
 	//********************************************************
-	Point_Mag = 0;
-	Peak_Mag = 0;
-	Total_Mag =0;
-	Avg_Mag =0;
-
-	Point_RSL = 0;
-	Peak_RSL =0;
-	Total_RSL = 0;
-	Avg_RSL = 0;
 
 	Sig_Max = 0;
-	Sig2 = 0;
-	Sig_Sum = 0;
+	Sig_Sum0 = 0;
+	Sig_Sum1 = 0;
+	Sig_Sum2 = 0;
 
 	number_bins =0;
 	AGC_Multiplier = (float)AGC_Scale/100.0;
 
-if(0)
-{
 
-	for (int j = 0; j<256;j++) FFT_Mag_10[j] = (int) FFT_Magnitude[j] * 10; //add in 10 db gain
-	//Sift Thru the Bins
-	for (int16_t j = 8; j < 252; j++)
-	{  //Changed for 512 FFT
-		//This detects bins which are saturated and ignores them
-		if (FFT_Mag_10[j]> 0)
-		{
-			FFT_Output[j] =  (10.0 * log((float32_t)FFT_Mag_10[j] + 1.0));
-		}
-			else
-		{
-			FFT_Output[j] = 0;
-		}
-		//First Order Filter for FFT
-		FFT_Filter[j] =  FFT_Coeff * FFT_Output[j] + (1.0-FFT_Coeff) * FFT_Filter[j];
-
-
-		//Find Point Values
-		if(j== NCO_Bin)
-		{
-			for (int k = NCO_Bin-2; k < NCO_Bin+3; k++)
-			{
-				if ((int)FFT_Filter[k]> Point_RSL)
-				{
-					Point_RSL = 	(int)FFT_Filter[k];
-					Point_Mag = 10*sqrt((float32_t)FFT_Magnitude[k]);
-				}
-			}
-		}
-
-		//Find Peak Values
-		if (j>16 && (uint16_t)FFT_Filter[j] >  Peak_RSL)
-		{
-			Peak_RSL = (uint16_t)FFT_Filter[j];
-			Peak_Mag = 10*sqrt((float32_t)FFT_Magnitude[j]);
-		}
-
-		//Calculate Average Values and Scale them
-		if (j>8 && j<64 && (uint16_t)FFT_Filter[j]>2 )
-		{
-			Total_RSL = Total_RSL + (uint16_t)FFT_Filter[j];
-			Total_Mag = Total_Mag + 10*sqrt((float32_t)FFT_Magnitude[j]);
-			number_bins++;
-		}
-		if (number_bins>0)
-		{
-			Avg_RSL = (Total_RSL*AGC_Scale)/(number_bins*100);//Scaling is done with integer values
-			Avg_Mag = Total_Mag*AGC_Multiplier/(float)number_bins;
-		}
-	}//End of loop over FFT bins
-
-}// End of if(0) block
-
-if(1)
-{
 
 	for (int j = 0; j<256;j++) FFT_Mag_10[j] = (int) FFT_Magnitude[j] * 10; //add in 10 db gain
 	for (int16_t j = 8; j < 252; j++)
@@ -241,37 +164,32 @@ if(1)
 			{
 				Sig = (int)FFT_Magnitude[k];
 				if ( Sig > Sig_Max) Sig_Max = Sig;
-				Sig2 += Sig;
+				Sig_Sum1 += Sig;
 			}
+			Sig_Sum0 = Sig_Max;
 		}
 		if ( j > 8 && j < 128 )
 		{
-			Sig_Sum += (int)FFT_Magnitude[j];
+			Sig_Sum2 += (int)FFT_Magnitude[j];
 			number_bins++;
 		}
 	}
-	RMS_Sig = 10*sqrt((float32_t)Sig_Max);
-	RMS_Sig2 = 10*sqrt((float32_t)Sig2);
-	dB_Sig = 23. + 10*log((float32_t)Sig_Max + .1);
-	dB_Sig2 = 23. + 10*log((float32_t)Sig2 + .1);
-	RMS_Sig_Sum = 10*sqrt((float32_t)Sig_Sum);
-	dB_Sig_Sum = 23. + 10*log((float32_t)Sig_Sum + .1);
+	switch (AGC_Mode){
+		case 0:
+			Sig_Total = Sig_Sum0;
+			break;
+		case 1:
+			Sig_Total = Sig_Sum1;
+			break;
+		case 2:
+			Sig_Total = Sig_Sum2;
+			break;
+	}
+	RMS_Sig = 10*sqrt((float32_t)Sig_Total);
+	dB_Sig = 23. + 10*log((float32_t)Sig_Total + .001);
 
-	RMS_Mag = FFT_Coeff*RMS_Sig + (1.-FFT_Coeff)*RMS_Mag;
-	RMS_Mag2 = FFT_Coeff*RMS_Sig2 + (1.-FFT_Coeff)*RMS_Mag2;
-	dB_RSL = FFT_Coeff*dB_Sig + (1.-FFT_Coeff)*dB_RSL;
-	dB_RSL2 = FFT_Coeff*dB_Sig2 + (1.-FFT_Coeff)*dB_RSL2;
-	Sig_Mag = FFT_Coeff*RMS_Sig_Sum + (1.-FFT_Coeff)*Sig_Mag;
-	Sig_RSL = FFT_Coeff*dB_Sig_Sum + (1.-FFT_Coeff)*Sig_RSL;
-
-	Point_RSL = (int)dB_RSL;
-	Point_Mag = RMS_Mag;
-	Peak_RSL = (int)dB_RSL2;
-	Peak_Mag = RMS_Mag2;
-
-	Avg_RSL = (int)Sig_RSL*AGC_Scale/100;
-	Avg_Mag = Sig_Mag*AGC_Multiplier/(float)number_bins;
-}// End of if(1) block (new code by MEC W8NUE
+	AGC_Mag = FFT_Coeff*RMS_Sig + (1.-FFT_Coeff)*AGC_Mag;
+	RSL_Mag = FFT_Coeff*dB_Sig + (1.-FFT_Coeff)*RSL_Mag;
 
 }//End of Process_FFT
 
