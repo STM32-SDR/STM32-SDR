@@ -102,11 +102,6 @@ GL_PageControls_TypeDef* Widget_NewLabel(
 void Widget_ChangeLabelText(GL_PageControls_TypeDef *pThis, const char* strText)
 {
 	LabelData *pInstData = getInstDataFromPageCtrl(pThis);
-	// Check if the new text is different than the old text:
-		if (strncmp(pInstData->strText, strText, WIDGET_LABEL_TEXT_MAXLENGTH) == 0) {
-			// Text is unchanged; don't copy and don't redraw.
-			return;
-		}
 
 	// Store Text
 	// Note: Buffer is 1 bigger than WIDGET_LABEL_TEXT_MAXLENGTH
@@ -146,12 +141,13 @@ static void drawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 	LabelData *pInstData = getInstDataFromPageCtrl(pThis);
 
 	// Check if a call to Widget_ChangeLabelText() has happened:
-	_Bool change = 0;
+	_Bool change = pInstData->isRedrawRequired;
+	//pInstData->isRedrawRequired = 0;
+
 	// Allow code to update itself (via an update handler, if any).
 	if (pInstData->pUpdateHandler != 0) {
-		change |= pInstData->pUpdateHandler(pThis, force);
+		change = pInstData->pUpdateHandler(pThis, force);
 	}
-	change |= pInstData->isRedrawRequired;
 
 	int x = pThis->objCoordinates.MinX;
 	int y = pThis->objCoordinates.MinY;
@@ -175,4 +171,3 @@ static LabelData* getInstDataFromPageCtrl(GL_PageControls_TypeDef *pPageCtrl)
 	LabelData *pBigButtonData =(LabelData *)(pCustom->pInstanceData);
 	return pBigButtonData;
 }
-
