@@ -128,10 +128,7 @@ typedef enum{
     GL_SWITCH = 5,
     GL_ICON = 6,
     GL_COMBOBOX = 7,
-    GL_SLIDEBAR = 8,
-    GL_HISTOGRAM = 9,
-    GL_GRAPH_CHART = 10,
-    GL_CUSTOM = 11
+    GL_CUSTOM = 8
 }GL_ObjType;
 
 /** 

@@ -74,7 +74,7 @@ void Encoders_Init(void)
 	configureGPIOEncoder1();
 	configureGPIOEncoder2();
 	init_encoder1();
-	init_encoder2();  //this may be requied to introduce a delay for start up
+	init_encoder2();  //this may be required to introduce a delay for start up
 	FrequencyManager_StepFrequencyDown();
 	FrequencyManager_StepFrequencyUp();
 }
@@ -148,6 +148,22 @@ void init_encoder2(void)
 }
 
 
+// Return if one (or both) encoders pressed.
+_Bool Encoders_IsOptionsEncoderPressed(void)
+{
+	return !GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_7);
+}
+_Bool Encoders_IsFrequencyEncoderPressed(void)
+{
+	return !GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_8);
+}
+_Bool Encoders_AreBothEncodersPressed(void)
+{
+	return Encoders_IsOptionsEncoderPressed()
+			&& Encoders_IsFrequencyEncoderPressed();
+}
+
+
 
 /*
  * Process Encoder Changes
@@ -198,10 +214,8 @@ static void applyEncoderChange1(int8_t changeDirection)
 		return;
 	}
 
-	_Bool isEncoderPressedIn = !GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_8);
-
 	// Are we pressed in?
-	if (isEncoderPressedIn) {
+	if (Encoders_IsFrequencyEncoderPressed()) {
 		if (changeDirection > 0) {
 			FrequencyManager_DecreaseFreqStepSize();
 		} else {

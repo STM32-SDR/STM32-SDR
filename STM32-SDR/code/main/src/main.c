@@ -47,7 +47,7 @@
 #include	"Text_Enter.h"
 #include	"xprintf.h"
 
-#define VERSION_STRING "1.026"
+#define VERSION_STRING "1.027"
 
 const uint32_t CODEC_FREQUENCY = 8000;
 
@@ -119,10 +119,6 @@ static void initializeHardware(void)
 	I2C_Cntrl_Init();
 	main_delay(SETUP_DELAY);
 
-	TS_Initialize();
-	main_delay(SETUP_DELAY);
-
-
 	Codec_AudioInterface_Init(CODEC_FREQUENCY);
 	main_delay(SETUP_DELAY);
 
@@ -148,6 +144,9 @@ static void initializeHardware(void)
 	main_delay(SETUP_DELAY);
 
 	Encoders_Init();
+	main_delay(SETUP_DELAY);
+
+	TS_Initialize();
 	main_delay(SETUP_DELAY);
 
 	Text_Initialize();
@@ -198,6 +197,7 @@ static void displaySplashScreen(void)
 	GL_PrintString(TEXT_LEFT, 140, "STM32 SDR V" VERSION_STRING, 0);
 	GL_PrintString(TEXT_LEFT, 160, __DATE__, 0);
 	GL_PrintString(TEXT_LEFT, 180, __TIME__, 0);
+	GL_PrintString(0, 220, "Press both encoder to reset touchscreen.", 0);
 	main_delay(10000000);
 }
 

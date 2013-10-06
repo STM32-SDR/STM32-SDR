@@ -40,7 +40,7 @@
 
 
 /* Store event flag, and data. -----------------------------------------------*/
-static _Bool s_isTouchEventTriggered = 0;
+volatile static _Bool s_isTouchEventTriggered = 0;
 static uint16_t s_touchEventX = 0;
 static uint16_t s_touchEventY = 0;
 

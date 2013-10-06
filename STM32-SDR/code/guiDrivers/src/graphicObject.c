@@ -29,6 +29,7 @@
 #include <string.h>
 #include <assert.h>
 #include "TSHal.h"
+#include "xprintf.h"
 
 /** @addtogroup Embedded_GUI_Library
  * @{
@@ -71,11 +72,6 @@ extern __IO uint16_t GL_TextColor;
  */
 GL_Page_TypeDef* PagesList[PAGE_MAX_NUM];
 
-/*Header and bitmap image of cursor's symbol*/
-static uint32_t SlidebarCursorPointer[] = { 0x14, /*Height of cursor symbol*/
-0x06, /*Width of cursor symbol*/
-0x0D, /*Count of pixels of cursor symbol*/
-0x80001, 0x80001, 0x80001, 0x80001, 0x80001, 0x80001, 0x80001 };
 
 static uint16_t PageCount = 0;
 static __IO uint32_t TimingDelay;
@@ -109,9 +105,6 @@ static GL_ErrStatus Create_ComboBoxOption(GL_ComboOption_TypeDef*);
 static GL_ErrStatus Create_Checkbox(GL_Checkbox_TypeDef*);
 static GL_ErrStatus Create_Switch(GL_Switch_TypeDef*);
 static GL_ErrStatus Create_Icon(GL_Icon_TypeDef*);
-static GL_ErrStatus Create_Slidebar(GL_Slidebar_TypeDef*);
-static GL_ErrStatus Create_Histogram(GL_Histogram_TypeDef*);
-static GL_ErrStatus Create_GraphChart(GL_GraphChart_TypeDef*);
 
 static GL_ErrStatus SetLabelVisible(GL_PageControls_TypeDef*, GL_Coordinate_TypeDef);
 static GL_ErrStatus SetCheckboxVisible(GL_PageControls_TypeDef*, GL_Coordinate_TypeDef);
@@ -120,15 +113,8 @@ static GL_ErrStatus SetButtonVisible(GL_PageControls_TypeDef*, GL_Coordinate_Typ
 static GL_ErrStatus SetRadioButtonVisible(GL_PageControls_TypeDef*, GL_Coordinate_TypeDef);
 static GL_ErrStatus SetComboBoxVisible(GL_PageControls_TypeDef*, GL_Coordinate_TypeDef);
 static GL_ErrStatus SetIconVisible(GL_PageControls_TypeDef*, GL_Coordinate_TypeDef);
-static GL_ErrStatus SetSlidebarVisible(GL_PageControls_TypeDef*, GL_Coordinate_TypeDef);
-static GL_ErrStatus SetHistogramVisible(GL_PageControls_TypeDef*, GL_Coordinate_TypeDef);
-static GL_ErrStatus SetGraphChartVisible(GL_PageControls_TypeDef*, GL_Coordinate_TypeDef);
-
-static void SlidebarCursorPreDraw(GL_PageControls_TypeDef* pControl, GL_bool);
-//static GL_ObjDimensions_TypeDef GetObjSize(GL_PageControls_TypeDef* pPageControl);
 static GL_Coordinate_TypeDef GetObjCoordinates(GL_Page_TypeDef* pPage, uint16_t ID);
 static GL_ErrStatus SetPage(GL_Page_TypeDef* pThis, GL_bool bVal);
-static void GL_DrawRectangle(uint16_t maxX, uint16_t minX, uint8_t maxY, uint8_t minY);
 
 static void CallRedrawPageControlOpportunity(GL_PageControls_TypeDef* pControl);
 /**
@@ -140,18 +126,6 @@ static void CallRedrawPageControlOpportunity(GL_PageControls_TypeDef* pControl);
  * @{
  */
 
-/**
- * @brief  Displays a Rectangle.
- * @param  maxX - Maximum X coordinate
- * @param  minX - Minimum X coordinate
- * @param  maxY - Maximum Y coordinate
- * @param  minY - Minimum Y coordinate
- * @retval None
- */
-static void GL_DrawRectangle(uint16_t maxX, uint16_t minX, uint8_t maxY, uint8_t minY)
-{
-	LCD_DrawRect(minX, minY, maxY-minY+1, maxX-minX+1);
-}
 
 /**
  * @brief  Displays a filled Rectangle.
@@ -195,119 +169,6 @@ void GL_DrawFilledCircle(uint16_t Xpos, uint8_t Ypos, uint16_t Radius, uint16_t 
 	}
 }
 
-/**
- * @brief  Displays a line using Bresenham line algorithm.
- * @param  Xpos1: specifies the first point X position
- * @param  Ypos1: specifies the first point Y position
- * @param  Xpos2: specifies the second point X position
- * @param  Ypos2: specifies the second point Y position
- * @param  Color: RGB color of line.
- * @retval None
- */
-// TODO: Check X vs Y?
-static void GL_DrawObliqueLine(uint16_t Ypos1, uint16_t Xpos1, uint16_t Ypos2, uint16_t Xpos2, uint16_t Color)
-{
-	uint8_t steep = 0; /* Steepness of line,0 - non-steep (angle 45º-),1 - steep (45º+) */
-	uint16_t TempPos = 0;
-	uint16_t x = 0, y = 0;
-	uint16_t deltax = 0, deltay = 0;
-	int16_t errorX = 0;
-	int8_t ystep = 0;
-
-	/*Case the both points are identical*/
-	if ((Xpos1 == Xpos2) && (Ypos1 == Ypos2)) {
-		LCD_PutPixel(Xpos1, Ypos1, Color);
-	}
-	/*Case the line are pure horizontal*/
-	else if (Ypos1 == Ypos2) {
-		/*Swap X positions if it is necessary*/
-		if (Xpos1 > Xpos2) {
-			TempPos = Xpos2;
-			Xpos2 = Xpos1;
-			Xpos1 = TempPos;
-		}
-		/*Draw first-opening pixel.*/
-		LCD_PutPixel(Xpos1, Ypos1, Color);
-
-		/*Draw middle pixels*/
-		for (x = Xpos1 + 1; x < Xpos2; x++) {
-			LCD_PutPixel(Xpos1, Ypos1, Color);
-		}
-
-		/*Draw last-ending pixel*/
-		LCD_PutPixel(Xpos2, Ypos1, Color);
-	}
-	/*Case the line are pure vertical*/
-	else if (Xpos1 == Xpos2) {
-		/*Swap Y positions if it is necessary*/
-		if (Ypos1 > Ypos2) {
-			TempPos = Ypos2;
-			Ypos2 = Ypos1;
-			Ypos1 = TempPos;
-		}
-
-		/*Draw line as rectangle of 1 pixel width*/
-		GL_DrawFilledRectangle(Ypos2 - 1, Ypos1 - 1, Xpos2 - 1, Xpos1 - 2, Color);
-	}
-	/*The general line*/
-	else {
-		/*Calculate steepness. If elevation angle is smaller than 45º steep is reset to 0*/
-		steep = ((Ypos1 > Ypos2) ? (Ypos1 - Ypos2) : (Ypos2 - Ypos1))
-		        > ((Xpos1 > Xpos2) ? (Xpos1 - Xpos2) : (Xpos2 - Xpos1));
-
-		/*Coordinators X and Y are swapped with each other in case of steep = 1*/
-		if (steep != 0x00) {
-			TempPos = Ypos1;
-			Ypos1 = Xpos1;
-			Xpos1 = TempPos;
-
-			TempPos = Ypos2;
-			Ypos2 = Xpos2;
-			Xpos2 = TempPos;
-		}
-		/*Coordinators X and Y are swapped separetely if it is necessary.*/
-		if (Xpos1 > Xpos2) {
-			TempPos = Ypos1;
-			Ypos1 = Ypos2;
-			Ypos2 = TempPos;
-
-			TempPos = Xpos2;
-			Xpos2 = Xpos1;
-			Xpos1 = TempPos;
-		}
-
-		/*Bresenham line algorithm */
-		deltax = Xpos2 - Xpos1;
-		deltay = ((Ypos1 > Ypos2) ? (Ypos1 - Ypos2) : (Ypos2 - Ypos1));
-		errorX = -(deltax + 1) / 2;
-		y = Ypos1;
-		if (Ypos1 < Ypos2) {
-			ystep = 1;
-		}
-		else {
-			ystep = -1;
-		}
-
-		for (x = Xpos1; x <= Xpos2; x++) {
-			if (steep != 0x00) {
-				{
-					LCD_PutPixel(y, x, Color);
-				}
-			}
-			else {
-				{
-					LCD_PutPixel(x, y, Color);
-				}
-			}
-
-			errorX = errorX + deltay;
-			if (errorX >= 0) {
-				y = y + ystep;
-				errorX = errorX - deltax;
-			}
-		}
-	}
-}
 
 /**
  * @brief  Displays a Cross.
@@ -719,165 +580,7 @@ GL_PageControls_TypeDef* NewIcon(uint16_t ID, const uint8_t* Image_PTR, uint16_t
 	return pPageControlObj;
 }
 
-/**
- * @brief  Create and initialize a Slidebar object
- * @param  oName: Object Name
- * @param  label: Label for Slidebar meaning
- * @param  direction: The printing orientation.
- *         This parameter can be one of the following values:
- *     @arg  GL_Vertical
- *     @arg  GL_Horizontal
- * @param  pEventHandler: pointer to function associated to its touch event
- * @retval GL_PageControls_TypeDef* - The created Object pointer
- */
-GL_PageControls_TypeDef* NewSlidebar(uint16_t ID, const char* label, GL_Direction direction,
-        void (*pEventHandler)(void))
-{
-	GL_Slidebar_TypeDef *pControlObj = NULL;
-	GL_PageControls_TypeDef* pPageControlObj = NULL;
 
-	pControlObj = (GL_Slidebar_TypeDef *) malloc(sizeof(GL_Slidebar_TypeDef));
-
-	if (pControlObj) {
-		pControlObj->ID = ID;
-
-#ifndef USE_2D_OBJECTS
-		pControlObj->ImageCursorPTR = (uint8_t*) SlidebarCursor;
-		pControlObj->ImageBackgroundPTR = (uint8_t*) SlidebarCentral;
-#endif
-		GL_SetStringFieldValue(pControlObj->label, label, MAX_SLIDE_LABEL_LENGTH);
-
-		pControlObj->Direction = direction;
-		pControlObj->Width = 18;
-		pControlObj->Length = 118;
-		pControlObj->PrevValue = 100;
-		pControlObj->CurrentValue = 100;
-		pControlObj->MinValue = 0;
-		pControlObj->MaxValue = 100;
-		pControlObj->EventHandler = pEventHandler;
-
-		/* Create the Slidebar object */
-		Create_Slidebar(pControlObj);
-
-		pPageControlObj = (GL_PageControls_TypeDef*) malloc(sizeof(GL_PageControls_TypeDef));
-		if (pPageControlObj) {
-			pPageControlObj->objPTR = (void*) pControlObj;
-			pPageControlObj->objType = GL_SLIDEBAR;
-		}
-		else {
-			free(pControlObj);
-			pControlObj = NULL;
-		}
-	}
-	return pPageControlObj;
-}
-
-/**
- * @brief  Create and initialize a Histogram object
- * @param  oName: Object Name
- * @param  labelX: Label of the X axis
- * @param  labelY: Label of the Y axis
- * @param  data_points[]: The array of points to be plot on the LCD
- * @param  n_points: Number of points to be plot
- * @retval GL_PageControls_TypeDef* - The created Object pointer
- */
-GL_PageControls_TypeDef* NewHistogram(uint16_t ID, const char* labelX, const char* labelY, int16_t data_points[],
-        uint8_t n_points)
-{
-	GL_PageControls_TypeDef *pPageControlObj = NULL;
-	GL_Histogram_TypeDef *pControlObj = NULL;
-
-	pControlObj = (GL_Histogram_TypeDef *) malloc(sizeof(GL_Histogram_TypeDef));
-
-	if (pControlObj) {
-		pControlObj->n_points = 0;
-		pControlObj->ID = ID;
-
-		GL_SetStringFieldValue(pControlObj->label_X, labelX, MAX_HIST_LABEL_LENGTH);
-		GL_SetStringFieldValue(pControlObj->label_Y, labelY, MAX_HIST_LABEL_LENGTH);
-
-		/* Determine the length of the array of points and copy the content into the
-		 internal points array limiting the number of points to the maximum allowed */
-		if (n_points > MAX_HIST_POINTS) {
-			memcpy(pControlObj->points, data_points, MAX_HIST_POINTS * sizeof(int16_t));
-			pControlObj->n_points = MAX_HIST_POINTS;
-		}
-		else {
-			memcpy(pControlObj->points, data_points, n_points * sizeof(int16_t));
-			pControlObj->n_points = n_points;
-		}
-
-		/* Create the Histogram object */
-		Create_Histogram(pControlObj);
-
-		pPageControlObj = (GL_PageControls_TypeDef*) malloc(sizeof(GL_PageControls_TypeDef));
-		if (pPageControlObj) {
-			pPageControlObj->objPTR = (void*) pControlObj;
-			pPageControlObj->objType = GL_HISTOGRAM;
-		}
-		else {
-			free(pControlObj);
-			pControlObj = NULL;
-		}
-	}
-	return pPageControlObj;
-}
-
-/**
- * @brief  Create and initialize a Graphical Chart object
- * @param  oName: Object Name
- * @param  labelX: Label of the X axis
- * @param  labelY: Label of the Y axis
- * @param  data_points[]: The array of points to be plot on the LCD
- * @param  n_points: Number of points to be plot
- * @param  Background: Select if the black background has to be used
- *         This parameter can be one of the following values:
- *     @arg  GL_TRUE
- *     @arg  GL_FALSE
- * @retval GL_PageControls_TypeDef* - The created Object pointer
- */
-GL_PageControls_TypeDef* NewGraphChart(uint16_t ID, const char* labelX, const char* labelY, int16_t data_points[],
-        uint8_t n_points, GL_bool Background)
-{
-	GL_PageControls_TypeDef *pPageControlObj = NULL;
-	GL_GraphChart_TypeDef *pControlObj = NULL;
-
-	pControlObj = (GL_GraphChart_TypeDef *) malloc(sizeof(GL_GraphChart_TypeDef));
-
-	if (pControlObj) {
-		pControlObj->n_points = 0;
-		pControlObj->ID = ID;
-		GL_SetStringFieldValue(pControlObj->label_X, labelX, MAX_GRAPH_LABEL_LENGTH);
-		GL_SetStringFieldValue(pControlObj->label_Y, labelY, MAX_GRAPH_LABEL_LENGTH);
-
-		/* Determine the length of the array of points and copy the content into the
-		 internal points array limiting the number of points to the maximum allowed */
-		if (n_points > MAX_GRAPH_POINTS) {
-			memcpy(pControlObj->points, data_points, MAX_GRAPH_POINTS * 2);
-			pControlObj->n_points = MAX_GRAPH_POINTS;
-		}
-		else {
-			memcpy(pControlObj->points, data_points, n_points * 2);
-			pControlObj->n_points = n_points;
-		}
-
-		pControlObj->Background = Background;
-
-		/* Create the Graphical Chart object */
-		Create_GraphChart(pControlObj);
-
-		pPageControlObj = (GL_PageControls_TypeDef*) malloc(sizeof(GL_PageControls_TypeDef));
-		if (pPageControlObj) {
-			pPageControlObj->objPTR = (void*) pControlObj;
-			pPageControlObj->objType = GL_GRAPH_CHART;
-		}
-		else {
-			free(pControlObj);
-			pControlObj = NULL;
-		}
-	}
-	return pPageControlObj;
-}
 
 
 /**
@@ -1065,46 +768,6 @@ GL_ErrStatus AddPageControlObj(uint16_t PosX, uint16_t PosY, GL_PageControls_Typ
 		break;
 	}
 
-	case GL_SLIDEBAR:
-	{
-		GL_Slidebar_TypeDef* pTmp = ((GL_Slidebar_TypeDef*) (objPTR->objPTR));
-		objPTR->SetObjVisible = SetSlidebarVisible;
-		objPTR->ID = pTmp->ID;
-		if (pTmp->Direction == GL_HORIZONTAL) {
-			objCoordinates.MaxX = PosX + SLIDEBAR_PIECE_LENGTH;
-			objCoordinates.MaxY = PosY + SLIDEBAR_HEIGHT;
-		}
-		else if (pTmp->Direction == GL_LEFT_VERTICAL) {
-			objCoordinates.MinX = PosX;
-			objCoordinates.MaxX = PosX + SLIDEBAR_HEIGHT;
-			objCoordinates.MinY = PosY;
-			objCoordinates.MaxY = PosY + (SLIDEBAR_CENTRAL_LENGTH + 2) * SLIDEBAR_PIECE_LENGTH;
-		}
-		else if (pTmp->Direction == GL_RIGHT_VERTICAL) {
-			objCoordinates.MinX = PosX;
-			objCoordinates.MaxX = PosX + SLIDEBAR_HEIGHT;
-			objCoordinates.MinY = PosY + SLIDEBAR_PIECE_LENGTH;
-			objCoordinates.MaxY = PosY + (SLIDEBAR_CENTRAL_LENGTH + 2) * SLIDEBAR_PIECE_LENGTH
-					+ SLIDEBAR_PIECE_LENGTH;
-		}
-		break;
-	}
-
-	case GL_HISTOGRAM:
-	{
-		GL_Histogram_TypeDef* pTmp = ((GL_Histogram_TypeDef*) (objPTR->objPTR));
-		objPTR->SetObjVisible = SetHistogramVisible;
-		objPTR->ID = pTmp->ID;
-		break;
-	}
-	case GL_GRAPH_CHART:
-	{
-		GL_GraphChart_TypeDef* pTmp = ((GL_GraphChart_TypeDef*) (objPTR->objPTR));
-		objPTR->SetObjVisible = SetGraphChartVisible;
-		objPTR->ID = pTmp->ID;
-		break;
-	}
-
 	case GL_CUSTOM:
 	{
 		GL_Custom_TypeDef* pTmp = ((GL_Custom_TypeDef*) (objPTR->objPTR));
@@ -1202,34 +865,6 @@ GL_ErrStatus Get_Label(GL_Page_TypeDef* pPage, uint16_t ID, char* label)
 	return GL_ERROR;
 }
 
-/**
- * @brief  Return the current value of cursor position in a slidebar object
- * @param  *pPage: Pointer to Page Structure
- * @param  ID: Object Identifier
- * @retval uint8_t - The Cursor Position value (0-100 percentage)
- */
-uint8_t Get_SlidebarValue(GL_Page_TypeDef* pPage, uint16_t ID)
-{
-	GL_Slidebar_TypeDef* pTmp = NULL;
-	uint32_t index = 0;
-
-	if (!pPage) {
-		return GL_ERROR;
-	}
-
-	while (index < pPage->ControlCount) /* search for the required label */
-	{
-		if (pPage->PageControls[index]->objType == GL_SLIDEBAR) {
-			pTmp = (GL_Slidebar_TypeDef*) (pPage->PageControls[index]->objPTR);
-
-			if (pTmp->ID == ID) {
-				return pTmp->CurrentValue;
-			}
-		}
-		index++;
-	}
-	return GL_NULL;
-}
 
 /**
  * @brief  Assign Label Methods/Properties members.
@@ -1351,21 +986,6 @@ static GL_ErrStatus Create_Checkbox(GL_Checkbox_TypeDef* pThis)
 	return GL_OK;
 }
 
-/**
- * @brief  Assign Slidebar Methods/Properties members.
- * @param  *pThis: Pointer to Object Structure
- * @retval GL_ErrStatus - GL_OK if successful, GL_ERROR otherwise
- */
-static GL_ErrStatus Create_Slidebar(GL_Slidebar_TypeDef* pThis)
-{
-	if (!pThis) {
-		return GL_ERROR;
-	}
-	pThis->Control_Visible = GL_TRUE;
-	/*Allocate memory for cursor behind array. Actual behind of cursor is stored here*/
-	pThis->BehindCursor = (uint16_t *) malloc(SlidebarCursorPointer[2] * sizeof(uint16_t));
-	return GL_OK;
-}
 
 /**
  * @brief  Assign Switch Methods/Properties members.
@@ -1397,33 +1017,6 @@ static GL_ErrStatus Create_Icon(GL_Icon_TypeDef* pThis)
 	return GL_OK;
 }
 
-/**
- * @brief  Assign Histogram Methods/Properties members.
- * @param  *pThis: Pointer to Object Structure
- * @retval GL_ErrStatus - GL_OK if successful, GL_ERROR otherwise
- */
-static GL_ErrStatus Create_Histogram(GL_Histogram_TypeDef* pThis)
-{
-	if (!pThis) {
-		return GL_ERROR;
-	}
-	pThis->Control_Visible = GL_TRUE;
-	return GL_OK;
-}
-
-/**
- * @brief  Assign GraphChart Methods/Properties members.
- * @param  *pThis: Pointer to Object Structure
- * @retval GL_ErrStatus - GL_OK if successful, GL_ERROR otherwise
- */
-static GL_ErrStatus Create_GraphChart(GL_GraphChart_TypeDef* pThis)
-{
-	if (!pThis) {
-		return GL_ERROR;
-	}
-	pThis->Control_Visible = GL_TRUE;
-	return GL_OK;
-}
 
 /**
  * @brief  Assign PageObj Methods/Properties members.
@@ -1623,71 +1216,6 @@ GL_ErrStatus DestroyPageControl(GL_Page_TypeDef* pPage, uint16_t ID)
 				return GL_OK;
 			}
 		}
-		else if (pPage->PageControls[index]->objType == GL_SLIDEBAR) {
-			GL_Slidebar_TypeDef* pTmp;
-			pTmp = (GL_Slidebar_TypeDef*) (pPage->PageControls[index]->objPTR);
-
-			if (pTmp->ID == ID) {
-				if (pTmp->BehindCursor != NULL) {
-					free(pTmp->BehindCursor);
-					pTmp->BehindCursor = NULL;
-				}
-				memset(pPage->PageControls[index]->objPTR, 0x00, sizeof(GL_Slidebar_TypeDef));
-				free(pPage->PageControls[index]->objPTR);
-				pPage->PageControls[index]->objPTR = GL_NULL;
-				free(pPage->PageControls[index]);
-				if (index != pPage->ControlCount - 1) {
-					pPage->PageControls[index] = pPage->PageControls[pPage->ControlCount - 1];
-					pPage->PageControls[pPage->ControlCount - 1] = GL_NULL;
-					pPage->ControlCount--;
-				}
-				else {
-					pPage->PageControls[index] = GL_NULL;
-					pPage->ControlCount--;
-				}
-				return GL_OK;
-			}
-		}
-		else if (pPage->PageControls[index]->objType == GL_HISTOGRAM) {
-			GL_Histogram_TypeDef* pTmp;
-			pTmp = (GL_Histogram_TypeDef*) (pPage->PageControls[index]->objPTR);
-
-			if (pTmp->ID == ID) {
-				free(pPage->PageControls[index]->objPTR);
-				pPage->PageControls[index]->objPTR = GL_NULL;
-				free(pPage->PageControls[index]);
-				if (index != pPage->ControlCount - 1) {
-					pPage->PageControls[index] = pPage->PageControls[pPage->ControlCount - 1];
-					pPage->PageControls[pPage->ControlCount - 1] = GL_NULL;
-					pPage->ControlCount--;
-				}
-				else {
-					pPage->PageControls[index] = GL_NULL;
-					pPage->ControlCount--;
-				}
-				return GL_OK;
-			}
-		}
-		else if (pPage->PageControls[index]->objType == GL_GRAPH_CHART) {
-			GL_GraphChart_TypeDef* pTmp;
-			pTmp = (GL_GraphChart_TypeDef*) (pPage->PageControls[index]->objPTR);
-
-			if (pTmp->ID == ID) {
-				free(pPage->PageControls[index]->objPTR);
-				pPage->PageControls[index]->objPTR = GL_NULL;
-				free(pPage->PageControls[index]);
-				if (index != pPage->ControlCount - 1) {
-					pPage->PageControls[index] = pPage->PageControls[pPage->ControlCount - 1];
-					pPage->PageControls[pPage->ControlCount - 1] = GL_NULL;
-					pPage->ControlCount--;
-				}
-				else {
-					pPage->PageControls[index] = GL_NULL;
-					pPage->ControlCount--;
-				}
-				return GL_OK;
-			}
-		}
 		else if (pPage->PageControls[index]->objType == GL_CUSTOM) {
 			GL_Custom_TypeDef* pTmp;
 			pTmp = (GL_Custom_TypeDef*) (pPage->PageControls[index]->objPTR);
@@ -1762,21 +1290,6 @@ GL_ErrStatus DestroyPage(GL_Page_TypeDef * pPage)
 		else if (pPage->PageControls[index]->objType == GL_ICON) {
 			GL_Icon_TypeDef* pTmp;
 			pTmp = (GL_Icon_TypeDef*) (pPage->PageControls[index]->objPTR);
-			DestroyPageControl(pPage, pTmp->ID);
-		}
-		else if (pPage->PageControls[index]->objType == GL_SLIDEBAR) {
-			GL_Slidebar_TypeDef* pTmp;
-			pTmp = (GL_Slidebar_TypeDef*) (pPage->PageControls[index]->objPTR);
-			DestroyPageControl(pPage, pTmp->ID);
-		}
-		else if (pPage->PageControls[index]->objType == GL_HISTOGRAM) {
-			GL_Histogram_TypeDef* pTmp;
-			pTmp = (GL_Histogram_TypeDef*) (pPage->PageControls[index]->objPTR);
-			DestroyPageControl(pPage, pTmp->ID);
-		}
-		else if (pPage->PageControls[index]->objType == GL_GRAPH_CHART) {
-			GL_GraphChart_TypeDef* pTmp;
-			pTmp = (GL_GraphChart_TypeDef*) (pPage->PageControls[index]->objPTR);
 			DestroyPageControl(pPage, pTmp->ID);
 		}
 		else if (pPage->PageControls[index]->objType == GL_CUSTOM) {
@@ -2198,667 +1711,7 @@ static GL_ErrStatus SetIconVisible(GL_PageControls_TypeDef* pTmp, GL_Coordinate_
 	return GL_OK;
 }
 
-/**
- * @brief  Show the Control Object at the specified coordinates.
- * @param  *pThis: Pointer to Object Structure
- * @param  *objCoordinates: Pointer to objCoordinates Structure
- * @retval GL_ErrStatus - GL_OK if successful, GL_ERROR otherwise
- */
-static GL_ErrStatus SetSlidebarVisible(GL_PageControls_TypeDef* pTmp, GL_Coordinate_TypeDef objCoordinates)
-{
-#ifndef USE_2D_OBJECTS
-	uint8_t* ptrBmpLeft;
-	uint8_t* ptrBmpCenter;
-	uint8_t* ptrBmpRight;
-	uint8_t* ptrCursorBmp;
-#endif
-	uint16_t maxX = 0, minX = 0, maxY = 0, minY = 0;
-	uint8_t btn_length = 0;
-	uint8_t counter = 1;
-	__IO uint16_t TempColor = 0;
-	uint32_t label_length = 0;
-	GL_Slidebar_TypeDef* pThis = (GL_Slidebar_TypeDef*) (pTmp->objPTR);
 
-	if (!pThis) {
-		return GL_ERROR;
-	}
-	if (pThis->Control_Visible != GL_TRUE) {
-		pThis->Control_Visible = GL_TRUE;
-		if (pThis->Direction == GL_HORIZONTAL) {
-			SlidebarCursorPreDraw(pTmp, GL_FALSE);
-		}
-	}
-
-	btn_length = pThis->Length;
-
-	GL_SetFont(GL_FONT_SMALL);
-
-#ifndef USE_2D_OBJECTS
-	ptrBmpLeft = (uint8_t*) SlidebarLeft;
-	ptrBmpCenter = pThis->ImageBackgroundPTR;
-	ptrBmpRight = (uint8_t*) SlidebarRight;
-	ptrCursorBmp = pThis->ImageCursorPTR;
-#endif
-	if (pThis->Direction == GL_HORIZONTAL) {
-		maxX = pTmp->objCoordinates.MaxX;
-		maxY = pTmp->objCoordinates.MaxY;
-		minY = pTmp->objCoordinates.MinY;
-#ifndef USE_2D_OBJECTS
-		GL_DrawButtonBMP(maxX, maxX - SLIDEBAR_PIECE_LENGTH, maxY, minY, ptrBmpLeft);
-		for (; counter < SLIDEBAR_CENTRAL_LENGTH; counter++) {
-			GL_DrawButtonBMP(maxX - (counter * SLIDEBAR_PIECE_LENGTH), maxX - ((counter + 1) * SLIDEBAR_PIECE_LENGTH),
-			        maxY, minY, ptrBmpCenter);
-		}
-		GL_DrawButtonBMP(maxX - (counter * SLIDEBAR_PIECE_LENGTH), maxX - ((counter + 1) * SLIDEBAR_PIECE_LENGTH), maxY,
-		        minY, ptrBmpRight);
-#else
-		/* Drawing the SlideBar main body */
-		GL_SetTextColor(GL_Black);
-		GL_DrawFilledRectangle(maxX, maxX - ((SLIDEBAR_CENTRAL_LENGTH+1)*SLIDEBAR_PIECE_LENGTH),
-				maxY, minY+1, GL_Blue2);
-#endif
-	}
-	else if (pThis->Direction == GL_LEFT_VERTICAL) {
-		TempColor = GL_TextColor;
-		/* Cleaning the Slidebar Main Body contour */
-		GL_SetTextColor(GL_White);
-		GL_DrawRectangle(pTmp->objCoordinates.MaxX, pTmp->objCoordinates.MinX - 2, pTmp->objCoordinates.MaxY - 1,
-		        pTmp->objCoordinates.MinY);
-		GL_SetTextColor(TempColor);
-
-		maxX = pTmp->objCoordinates.MaxY - SLIDEBAR_PIECE_LENGTH;
-		minX = pTmp->objCoordinates.MinY - SLIDEBAR_PIECE_LENGTH;
-		maxY = pTmp->objCoordinates.MaxX;
-		minY = pTmp->objCoordinates.MinX;
-#ifndef USE_2D_OBJECTS
-//    LCD_Change_Direction(_270_degree);
-		//LCD_DrawColorBMP(ptrBmpLeft, maxX, minY, SLIDEBAR_HEIGHT, SLIDEBAR_PIECE_LENGTH);
-
-		for (; counter < SLIDEBAR_CENTRAL_LENGTH; counter++) {
-//			LCD_DrawColorBMP(ptrBmpCenter, maxX - (counter * SLIDEBAR_PIECE_LENGTH), minY, SLIDEBAR_HEIGHT,
-//			        SLIDEBAR_PIECE_LENGTH);
-		}
-//		LCD_DrawColorBMP(ptrBmpRight, maxX - (counter * SLIDEBAR_PIECE_LENGTH), minY, SLIDEBAR_HEIGHT,
-//		        SLIDEBAR_PIECE_LENGTH);
-//    LCD_Change_Direction(_0_degree);
-#else
-		/* Drawing the SlideBar main body */
-		GL_SetTextColor(GL_Black);
-		GL_DrawFilledRectangle(maxY-1, minY-1,
-				maxX, maxX - ((SLIDEBAR_CENTRAL_LENGTH+1)*SLIDEBAR_PIECE_LENGTH),
-				GL_Blue2);
-#endif
-	}
-	else if (pThis->Direction == GL_RIGHT_VERTICAL) {
-		TempColor = GL_TextColor;
-		/* Cleaning the Slidebar Main Body contour */
-		GL_SetTextColor(GL_White);
-		GL_DrawRectangle(pTmp->objCoordinates.MaxX + 1, pTmp->objCoordinates.MinX - 1,
-		        pTmp->objCoordinates.MaxY - SLIDEBAR_PIECE_LENGTH - 2,
-		        pTmp->objCoordinates.MinY - SLIDEBAR_PIECE_LENGTH - 1);
-		GL_SetTextColor(TempColor);
-
-		maxX = pTmp->objCoordinates.MaxY - SLIDEBAR_PIECE_LENGTH;
-		minX = pTmp->objCoordinates.MinY - SLIDEBAR_PIECE_LENGTH;
-		maxY = pTmp->objCoordinates.MaxX;
-		minY = pTmp->objCoordinates.MinX;
-#ifndef USE_2D_OBJECTS
-//    LCD_Change_Direction(_90_degree);
-//		LCD_DrawColorBMP(ptrBmpLeft, minX, maxY, SLIDEBAR_HEIGHT, SLIDEBAR_PIECE_LENGTH);
-		for (; counter < SLIDEBAR_CENTRAL_LENGTH; counter++) {
-//			LCD_DrawColorBMP(ptrBmpCenter, minX + (counter * SLIDEBAR_PIECE_LENGTH), maxY, SLIDEBAR_HEIGHT,
-//			        SLIDEBAR_PIECE_LENGTH);
-		}
-//		LCD_DrawColorBMP(ptrBmpRight, minX + (counter * SLIDEBAR_PIECE_LENGTH), maxY, SLIDEBAR_HEIGHT,
-//		        SLIDEBAR_PIECE_LENGTH);
-//    LCD_Change_Direction(_0_degree);
-#else
-		/* Drawing the SlideBar main body */
-		GL_SetTextColor(GL_Black);
-		GL_DrawFilledRectangle(maxY, minY,
-				maxX - SLIDEBAR_OFFSET_LENGTH,
-				maxX - SLIDEBAR_OFFSET_LENGTH - ((SLIDEBAR_CENTRAL_LENGTH+1)*SLIDEBAR_PIECE_LENGTH),
-				GL_Blue2);
-#endif
-	}
-
-	if (pThis->PrevValue != pThis->CurrentValue && pThis->Direction == GL_HORIZONTAL) {
-		SlidebarCursorPreDraw(pTmp, GL_FALSE);
-		SlidebarCursorPreDraw(pTmp, GL_TRUE);
-	}
-	if (pThis->Direction == GL_HORIZONTAL) {
-#ifndef USE_2D_OBJECTS
-		GL_DrawButtonBMP(maxX - pThis->CurrentValue - SLIDEBAR_OFFSET_LENGTH,
-		        maxX - pThis->CurrentValue - SLIDEBAR_OFFSET_LENGTH - SLIDEBAR_CURSOR_LENGTH, maxY + 1, minY - 1,
-		        ptrCursorBmp);
-#else
-		GL_SetTextColor(GL_Red);
-		/* Drawing the SlideBar cursor */
-		GL_DrawFilledRectangle(maxX - pThis->CurrentValue - SLIDEBAR_OFFSET_LENGTH,
-				maxX - pThis->CurrentValue - SLIDEBAR_OFFSET_LENGTH - SLIDEBAR_CURSOR_LENGTH,
-				maxY+1, minY, GL_Grey);
-		GL_SetTextColor(GL_Blue);
-#endif
-	}
-	else if (pThis->Direction == GL_LEFT_VERTICAL) {
-#ifndef USE_2D_OBJECTS
-//    LCD_Change_Direction(_270_degree);
-//		LCD_DrawColorBMP(ptrCursorBmp, maxX - pThis->CurrentValue - SLIDEBAR_OFFSET_LENGTH, minY - 1,
-//		        SLIDEBAR_HEIGHT + 2, SLIDEBAR_CURSOR_LENGTH);
-//    LCD_Change_Direction(_0_degree);
-#else
-		/* Drawing the SlideBar cursor */
-		GL_SetTextColor(GL_Red);
-		GL_DrawFilledRectangle(maxY, minY-2,
-				maxX - pThis->CurrentValue - SLIDEBAR_OFFSET_LENGTH -1,
-				maxX - pThis->CurrentValue - SLIDEBAR_OFFSET_LENGTH - SLIDEBAR_CURSOR_LENGTH,
-				GL_Grey);
-		GL_SetTextColor(GL_Blue);
-#endif
-	}
-	else if (pThis->Direction == GL_RIGHT_VERTICAL) {
-#ifndef USE_2D_OBJECTS
-//    LCD_Change_Direction(_90_degree);
-//		LCD_DrawColorBMP(ptrCursorBmp, minX + pThis->CurrentValue + SLIDEBAR_OFFSET_LENGTH, maxY + 1,
-//		        SLIDEBAR_HEIGHT + 2, SLIDEBAR_CURSOR_LENGTH);
-//    LCD_Change_Direction(_0_degree);
-#else
-		/* Drawing the SlideBar cursor */
-		GL_SetTextColor(GL_Red);
-		GL_DrawFilledRectangle(maxY+1, minY-1,
-				minX + pThis->CurrentValue + SLIDEBAR_OFFSET_LENGTH + SLIDEBAR_CURSOR_LENGTH,
-				minX + pThis->CurrentValue + SLIDEBAR_OFFSET_LENGTH + 1,
-				GL_Grey);
-		GL_SetTextColor(GL_Blue);
-#endif
-	}
-
-	pThis->PrevValue = pThis->CurrentValue;
-
-	/* Only the first 15 (MAX_SLIDE_LABEL_LENGTH) characters of the slidebar label can be printed */
-	label_length = p_strlen(pThis->label);
-	if (label_length > 0) {
-		counter = 0;
-		if (pThis->Direction == GL_HORIZONTAL) {
-			for (; counter < label_length - 1; counter++) {
-				GL_DisplayAdjStringLine(maxY + 2,
-				        maxX - ((btn_length - label_length * GL_GetFontLetterWidth(GL_GetFont())) / 2) - 3 - counter * GL_GetFontLetterWidth(GL_GetFont()),
-				        (uint8_t*) " ", GL_FALSE);
-			}
-			GL_DisplayAdjStringLine(maxY + 2, maxX - ((btn_length - label_length * GL_GetFontLetterWidth(GL_GetFont())) / 2) - 3,
-			        (uint8_t*) pThis->label, GL_TRUE);
-		}
-		else if (pThis->Direction == GL_LEFT_VERTICAL) {
-//      LCD_Change_Direction(_270_degree);
-			for (; counter < label_length - 1; counter++) {
-				GL_PrintString(LCD_WIDTH - minY + 2,
-				        maxX - ((btn_length - label_length * GL_GetFontLetterWidth(GL_GetFont())) / 2) + GL_GetFontLetterWidth(GL_GetFont()) / 2 - counter * GL_GetFontLetterWidth(GL_GetFont()),
-				        " ", GL_TRUE);
-			}
-			GL_PrintString(LCD_WIDTH - minY + 2,
-			        maxX - ((btn_length - label_length * GL_GetFontLetterWidth(GL_GetFont())) / 2) + GL_GetFontLetterWidth(GL_GetFont()) / 2, pThis->label, GL_TRUE);
-//      LCD_Change_Direction(_0_degree);
-		}
-		else if (pThis->Direction == GL_RIGHT_VERTICAL) {
-//      LCD_Change_Direction(_90_degree);
-			for (; counter < label_length - 1; counter++) {
-				GL_PrintString(maxY + 2,
-				        maxX - ((btn_length - label_length * GL_GetFontLetterWidth(GL_GetFont())) / 2) - (counter + 1) * GL_GetFontLetterWidth(GL_GetFont()),
-				        " ", GL_TRUE);
-			}
-			GL_PrintString(maxY + 2,
-			        maxX - ((btn_length - label_length * GL_GetFontLetterWidth(GL_GetFont())) / 2) - (counter + 1) * GL_GetFontLetterWidth(GL_GetFont()),
-			        pThis->label, GL_TRUE);
-//      LCD_Change_Direction(_0_degree);
-		}
-	}
-
-	GL_SetFont(GL_FONT_BIG);
-	return GL_OK;
-}
-
-/**
- * @brief  Show the Control Object at the specified coordinates.
- * @param  *pThis: Pointer to Object Structure
- * @retval GL_ErrStatus - GL_OK if successful, GL_ERROR otherwise
- */
-static GL_ErrStatus SetHistogramVisible(GL_PageControls_TypeDef* pTmp, GL_Coordinate_TypeDef objCoordinates)
-{
-	uint32_t index = 0;
-	uint8_t x_step = 0;
-	uint16_t height, width, max_x, offset_x, offset_y;
-	double base_y, y_step, max_value = 0, y_resolution = 0;
-	uint8_t value[7];
-	GL_Histogram_TypeDef* pThis = (GL_Histogram_TypeDef*) (pTmp->objPTR);
-
-	if (!pThis) {
-		return GL_ERROR;
-	}
-	pThis->Control_Visible = GL_TRUE;
-	max_x = LCD_WIDTH - HIST_MARGIN_LENGTH * 5 / 2;
-	base_y = LCD_HEIGHT - 3 * HIST_MARGIN_LENGTH - 12;
-
-	offset_x = (uint16_t) (max_x + 4);
-	offset_y = (uint16_t) (base_y - 4);
-
-	width = LCD_WIDTH - 3 * HIST_MARGIN_LENGTH;
-	height = LCD_HEIGHT - 4 * HIST_MARGIN_LENGTH;
-
-	x_step = width / (pThis->n_points);
-	y_step = (height / 10);
-
-	GL_SetTextColor(GL_Black);
-	GL_SetFont(GL_FONT_SMALL);
-	GL_DrawLine(max_x, (uint16_t) base_y, width, GL_Horizontal); /* X Axis */
-	GL_DrawLine(max_x, (uint16_t) (base_y - height), height, GL_Vertical); /* Y Axis */
-	GL_DisplayAdjStringLine((uint16_t) (base_y + 6), max_x + 5, (uint8_t*) "0", GL_TRUE);
-	GL_DisplayAdjStringLine(offset_y - 5, offset_x + HIST_MARGIN_LENGTH - 9, (uint8_t*) "0", GL_TRUE);
-
-	for (; index < (pThis->n_points); index++) {
-		if (pThis->points[index] > max_value) {
-			max_value = pThis->points[index];
-		}
-	}
-
-	y_resolution = max_value / (height - y_step);
-
-	/* Print the Y axis scale */
-	for (index = 0; index < 10; index++) {
-		GL_SetTextColor(GL_Black);
-		GL_SetTextColor(GL_Black);
-		GL_DrawLine(offset_x, (uint16_t) (offset_y - y_step * index), 4, GL_Horizontal);
-		if (index == 9) {
-			GL_DisplayAdjStringLine((uint16_t) (offset_y - y_step * index - 2 - GL_GetFontLetterWidth(GL_GetFont()) * 2),
-			        offset_x + GL_GetFontLetterWidth(GL_GetFont()) * 5, (uint8_t*) pThis->label_Y, GL_TRUE);
-
-			sprintf((char*) value, "%4.1f", max_value);
-
-			if (max_value < 1000) {
-				GL_DisplayAdjStringLine((uint16_t) (offset_y - y_step * index - 5), offset_x + HIST_MARGIN_LENGTH * 2,
-				        (uint8_t*) value, GL_TRUE);
-			}
-			else {
-				GL_DisplayAdjStringLine((uint16_t) (offset_y - y_step * index - 5),
-				        offset_x + GL_GetFontLetterWidth(GL_GetFont()) + HIST_MARGIN_LENGTH * 2, (uint8_t*) value, GL_TRUE);
-			}
-		}
-	}
-
-	/* Print the X axis scale */
-	for (index = 0; index < (pThis->n_points); index++) {
-		GL_DrawFilledRectangle(max_x, max_x - x_step + 1, (uint16_t) base_y,
-		        (uint16_t) (base_y - (double) ((pThis->points[index]) / y_resolution)), GL_Blue);
-		max_x = max_x - x_step;
-		GL_SetTextColor(GL_Black);
-		GL_DrawLine(max_x + 1, (uint16_t) base_y, 4, GL_Vertical);
-
-		if (pThis->n_points <= 15) {
-			sprintf((char*) value, "%lu", index + 1);
-			GL_DisplayAdjStringLine((uint16_t) base_y + 6, max_x + 6, (uint8_t*) value, GL_TRUE);
-		}
-		else if (pThis->n_points > 15 && pThis->n_points <= 40) {
-			if ((index + 1) % 3 == 0) {
-				sprintf((char*) value, "%lu", index + 1);
-				GL_DisplayAdjStringLine((uint16_t) (base_y + 6), max_x + 6, (uint8_t*) value, GL_TRUE);
-			}
-		}
-		else {
-			if ((index + 1) % 4 == 0) {
-				sprintf((char*) value, "%lu", index + 1);
-				GL_DisplayAdjStringLine((uint16_t) (base_y + 6), max_x + 6, (uint8_t*) value, GL_TRUE);
-			}
-		}
-		if (index == pThis->n_points - 1) {
-			GL_DisplayAdjStringLine((uint16_t) (base_y + 3 + GL_GetFontLetterWidth(GL_GetFont()) * 2), max_x + GL_GetFontLetterWidth(GL_GetFont()) * 3,
-			        (uint8_t*) (pThis->label_X), GL_TRUE);
-		}
-	}
-	GL_SetFont(GL_FONT_BIG);
-
-	return GL_OK;
-}
-
-/**
- * @brief  Show the Control Object at the specified coordinates.
- * @param  *pThis: Pointer to Object Structure
- * @retval GL_ErrStatus - GL_OK if successful, GL_ERROR otherwise
- */
-static GL_ErrStatus SetGraphChartVisible(GL_PageControls_TypeDef* pTmp, GL_Coordinate_TypeDef objCoordinates)
-{
-	uint32_t index = 0;
-	double height, width, offset_x, offset_y;
-	__IO uint16_t signal_color = GL_Red;
-	double base_y, y_step, x_step, max_value, y_resolution = 0, max_x;
-	uint8_t value[7];
-	GL_GraphChart_TypeDef* pThis = (GL_GraphChart_TypeDef*) (pTmp->objPTR);
-
-	if (!pThis) {
-		return GL_ERROR;
-	}
-	pThis->Control_Visible = GL_TRUE;
-
-	max_value = 0;
-	max_x = LCD_WIDTH - GRAPH_MARGIN_LENGTH * 5 / 2 - GL_GetFontLetterWidth(GL_GetFont());
-	base_y = LCD_HEIGHT - GRAPH_MARGIN_LENGTH * 7 / 2;
-
-	offset_x = max_x + 4;
-	offset_y = base_y;
-
-	width = LCD_WIDTH - GRAPH_MARGIN_LENGTH * 4;
-	height = LCD_HEIGHT - GRAPH_MARGIN_LENGTH * 9 / 2;
-
-	x_step = (double) (width) / (pThis->n_points);
-
-	y_step = (double) (height / 11);
-
-	GL_SetTextColor(GL_Black);
-	GL_SetFont(GL_FONT_SMALL);
-	GL_DrawLine((uint16_t) max_x, (uint16_t) base_y, (uint16_t) (width + 2), GL_Horizontal); /* X Axis */
-	GL_DrawLine((uint16_t) max_x, (uint16_t) base_y, (uint16_t) height, GL_Vertical); /* Y Axis */
-	GL_DisplayAdjStringLine((uint16_t) (base_y + 6), (uint16_t) (max_x + 5), (uint8_t*) "0", GL_TRUE); /* min X value*/
-	GL_DisplayAdjStringLine((uint16_t) (offset_y - 5), (uint16_t) (offset_x + GRAPH_MARGIN_LENGTH - 9), (uint8_t*) "0",
-	        GL_TRUE); /* min Y value*/
-
-	if (pThis->Background == GL_TRUE) {
-		/* Display the grid background color (black) */
-		GL_SetDisplayWindow((uint16_t) max_x, (uint16_t) (base_y - 1), (uint16_t) height, (uint16_t) (width + 2));
-		GL_Clear(GL_Black);
-		GL_SetDisplayWindow(LCD_WIDTH - 1, LCD_HEIGHT - 1, LCD_HEIGHT, LCD_WIDTH );
-		signal_color = GL_Yellow;
-	}
-
-	for (; index < (pThis->n_points); index++) {
-		if (pThis->points[index] > max_value)
-			max_value = pThis->points[index];
-	}
-
-	y_resolution = (double) max_value / (height - y_step);
-
-	/* Print the Y axis scale */
-	for (index = 0; index <= 10; index++) {
-		if (index > 0) {
-			GL_SetTextColor(GL_Black);
-
-			GL_DrawLine((uint16_t) offset_x, (uint16_t) (offset_y - y_step * index), 4, GL_Horizontal);
-
-			GL_SetTextColor(GL_Grey);
-
-			GL_DrawLine((uint16_t) (offset_x - 4), (uint16_t) (offset_y - y_step * index), (uint16_t) (width + 2),
-			        GL_Horizontal);
-		}
-		/* Print the Y axis Label */
-		if (index == 10) {
-			GL_SetTextColor(GL_Black);
-			GL_DisplayAdjStringLine((uint16_t) (offset_y - y_step * index - 2 - GL_GetFontLetterWidth(GL_GetFont()) * 2),
-			        (uint16_t) (offset_x + GL_GetFontLetterWidth(GL_GetFont()) * 9 / 2), (uint8_t*) (pThis->label_Y), GL_TRUE);
-
-			sprintf((char*) value, "%4.1f", max_value);
-
-			if (max_value < 1000) {
-				GL_DisplayAdjStringLine((uint16_t) (offset_y - y_step * index - 5),
-				        (uint16_t) (offset_x + GRAPH_MARGIN_LENGTH * 2), (uint8_t*) value, GL_TRUE);
-			}
-			else {
-				GL_DisplayAdjStringLine((uint16_t) (offset_y - y_step * index - 5),
-				        (uint16_t) (offset_x + GL_GetFontLetterWidth(GL_GetFont()) + GRAPH_MARGIN_LENGTH * 2), (uint8_t*) value, GL_TRUE);
-			}
-		}
-	}
-
-	/* Print the X axis scale */
-	for (index = 0; index < (pThis->n_points); index++) {
-		max_x = max_x - x_step;
-		GL_SetTextColor(GL_Black);
-		GL_DrawLine((uint16_t) (max_x + 1), (uint16_t) base_y, 4, GL_Vertical);
-		if (pThis->n_points <= 15) {
-			sprintf((char*) value, "%lu", index + 1);
-			GL_DisplayAdjStringLine((uint16_t) (base_y + 6), (uint16_t) (max_x + 6), (uint8_t*) value, GL_TRUE);
-			GL_SetTextColor(GL_Grey);
-			GL_DrawLine((uint16_t) (max_x + 1), (uint16_t) (base_y - height), (uint16_t) height, GL_Vertical);
-		}
-		else if (pThis->n_points > 15 && pThis->n_points <= 40) {
-			if ((index + 1) % 3 == 0) {
-				sprintf((char*) value, "%lu", index + 1);
-				GL_DisplayAdjStringLine((uint16_t) (base_y + 6), (uint16_t) (max_x + 6), (uint8_t*) value, GL_TRUE);
-				GL_SetTextColor(GL_Grey);
-				GL_DrawLine((uint16_t) (max_x + 1), (uint16_t) (base_y - height), (uint16_t) height, GL_Vertical);
-			}
-		}
-		else if (pThis->n_points > 40 && pThis->n_points <= 70) {
-			if ((index + 1) % 4 == 0) {
-				sprintf((char*) value, "%lu", index + 1);
-				GL_DisplayAdjStringLine((uint16_t) (base_y + 6), (uint16_t) (max_x + 6), (uint8_t*) value, GL_TRUE);
-				GL_SetTextColor(GL_Grey);
-				GL_DrawLine((uint16_t) (max_x + 1), (uint16_t) (base_y - height), (uint16_t) height, GL_Vertical);
-			}
-		}
-		else {
-			if ((index + 1) % 10 == 0) {
-				sprintf((char*) value, "%lu", index + 1);
-				GL_DisplayAdjStringLine((uint16_t) (base_y + 6), (uint16_t) (max_x + 6), (uint8_t*) value, GL_TRUE);
-				GL_SetTextColor(GL_Grey);
-				GL_DrawLine((uint16_t) (max_x + 1), (uint16_t) (base_y - height), (uint16_t) height, GL_Vertical);
-			}
-		}
-		/* Draw the Grid*/
-		if (index == 0) {
-			GL_DrawObliqueLine((uint16_t) (max_x + x_step), (uint16_t) base_y, (uint16_t) max_x,
-			        (uint16_t) (base_y - (double) ((pThis->points[index]) / y_resolution)), signal_color);
-			GL_DrawObliqueLine((uint16_t) (max_x + x_step), (uint16_t) (base_y - 1), (uint16_t) max_x,
-			        (uint16_t) (base_y - (double) ((pThis->points[index]) / y_resolution) - 1), signal_color);
-			GL_DrawObliqueLine((uint16_t) (max_x + x_step - 1), (uint16_t) base_y, (uint16_t) (max_x - 1),
-			        (uint16_t) (base_y - (double) ((pThis->points[index]) / y_resolution)), signal_color);
-		}
-		else {
-			GL_DrawObliqueLine((uint16_t) (max_x + x_step),
-			        (uint16_t) (base_y - (double) ((pThis->points[index - 1]) / y_resolution)), (uint16_t) max_x,
-			        (uint16_t) (base_y - (double) ((pThis->points[index]) / y_resolution)), signal_color);
-			GL_DrawObliqueLine((uint16_t) (max_x + x_step),
-			        (uint16_t) (base_y - (double) ((pThis->points[index - 1]) / y_resolution) - 1),
-			        (uint16_t) (max_x - 1), (uint16_t) (base_y - (double) ((pThis->points[index]) / y_resolution) - 1),
-			        signal_color);
-			GL_DrawObliqueLine((uint16_t) (max_x + x_step - 1),
-			        (uint16_t) (base_y - (double) ((pThis->points[index - 1]) / y_resolution)), (uint16_t) (max_x - 1),
-			        (uint16_t) (base_y - (double) ((pThis->points[index]) / y_resolution)), signal_color);
-		}
-		/* Print the X axis Label */
-		if (index == pThis->n_points - 1) {
-			GL_SetTextColor(GL_Black);
-			GL_DisplayAdjStringLine((uint16_t) (base_y + 3 + GL_GetFontLetterWidth(GL_GetFont()) * 2), (uint16_t) (max_x + GL_GetFontLetterWidth(GL_GetFont()) * 3),
-			        (uint8_t*) (pThis->label_X), GL_TRUE);
-		}
-	}
-	GL_SetFont(GL_FONT_BIG);
-
-	return GL_OK;
-}
-
-/**
- * @brief  Modify the points array of the GraphChart object
- * @param  *pPage: Pointer to Page Structure
- * @param  ID: Object Identifier
- * @param  data_points[]: The array of points to be plot on the LCD
- * @param  n_points: Number of points to be plot
- * @retval GL_ErrStatus - GL_OK if successful, GL_ERROR otherwise
- */
-GL_ErrStatus SetGraphChartPoints(GL_Page_TypeDef* pPage, uint16_t ID, int16_t data_points[], uint8_t n_points)
-{
-	uint32_t index = 0;
-	if (!pPage) {
-		return GL_ERROR;
-	}
-
-	while (index < pPage->ControlCount) /* search for the required object */
-	{
-		if (pPage->PageControls[index]->objType == GL_GRAPH_CHART) {
-			GL_GraphChart_TypeDef* pTmp;
-			pTmp = (GL_GraphChart_TypeDef*) (pPage->PageControls[index]->objPTR);
-
-			if (pTmp->ID == ID) {
-				pTmp->n_points = n_points;
-
-				/* Determine the length of the array of points and copy the content into the
-				 internal points array limiting the number of points to the maximum allowed */
-				if (n_points > MAX_GRAPH_POINTS) {
-					memcpy(pTmp->points, data_points, MAX_GRAPH_POINTS * 2);
-					pTmp->n_points = MAX_GRAPH_POINTS;
-				}
-				else {
-					memcpy(pTmp->points, data_points, n_points * 2);
-					pTmp->n_points = n_points;
-				}
-
-				return GL_OK;
-			}
-		}
-		index++;
-	}
-	return GL_ERROR;
-}
-
-/**
- * @brief  Modify the points array of the Histogram object
- * @param  *pPage: Pointer to Page Structure
- * @param  ID: Object Identifier
- * @param  data_points[]: The array of points to be plot on the LCD
- * @param  n_points: Number of points to be plot
- * @retval GL_ErrStatus - GL_OK if successful, GL_ERROR otherwise
- */
-GL_ErrStatus SetHistogramPoints(GL_Page_TypeDef* pPage, uint16_t ID, int16_t data_points[], uint8_t n_points)
-{
-	uint32_t index = 0;
-	if (!pPage) {
-		return GL_ERROR;
-	}
-
-	while (index < pPage->ControlCount) /* search for the required object */
-	{
-		if (pPage->PageControls[index]->objType == GL_HISTOGRAM) {
-			GL_Histogram_TypeDef* pTmp;
-			pTmp = (GL_Histogram_TypeDef*) (pPage->PageControls[index]->objPTR);
-
-			if (pTmp->ID == ID) {
-				pTmp->n_points = n_points;
-
-				/* Determine the length of the array of points and copy the content into the
-				 internal points array limiting the number of points to the maximum allowed */
-				if (n_points > MAX_HIST_POINTS) {
-					memcpy(pTmp->points, data_points, MAX_HIST_POINTS * 2);
-					pTmp->n_points = MAX_HIST_POINTS;
-				}
-				else {
-					memcpy(pTmp->points, data_points, n_points * 2);
-					pTmp->n_points = n_points;
-				}
-
-				return GL_OK;
-			}
-		}
-		index++;
-	}
-	return GL_ERROR;
-}
-
-/**
- * @brief  Display/Hide the cursor at current position. In depence to Draw parameter
- *     one of the following action is performed:
- *  - Read behind cursors at current position.
- *  - Draw cursor at current position - display cursor.
- * @param  *pControl: pointer to the cursor structure
- * @param  Draw: specifies if the cursor has to be displayed or hidden
- * @retval None
- */
-static void SlidebarCursorPreDraw(GL_PageControls_TypeDef* pControl, GL_bool Draw)
-{
-	if (pControl->objType == GL_SLIDEBAR) {
-		uint8_t tmpX = 0x00, tmpY = 0x00;
-		uint32_t Temp = 0x00;
-		uint32_t Mask = 0;
-		uint32_t* CursorImagePointer;
-		uint16_t* CursorBehindPointer;
-		uint16_t cursor_offset1 = 0, cursor_offset2 = 0;
-
-		/*Read new cursors behind at specified position.*/
-		/*Initiate pointers on Cursor bit map image and on array of cursors behind to draw*/
-		CursorImagePointer = &SlidebarCursorPointer[3];
-		CursorBehindPointer = ((GL_Slidebar_TypeDef*) pControl->objPTR)->BehindCursor;
-
-		/* Touching at the right of the cursor*/
-		if (((GL_Slidebar_TypeDef*) pControl->objPTR)->PrevValue
-		        < ((GL_Slidebar_TypeDef*) pControl->objPTR)->CurrentValue) {
-			cursor_offset1 = ((GL_Slidebar_TypeDef*) pControl->objPTR)->CurrentValue + SLIDEBAR_PIECE_LENGTH
-			        + SLIDEBAR_OFFSET_LENGTH + 2;
-			cursor_offset2 = ((GL_Slidebar_TypeDef*) pControl->objPTR)->PrevValue + SLIDEBAR_PIECE_LENGTH
-			        + SLIDEBAR_OFFSET_LENGTH + 1;
-		}
-
-		/* Touching at the left of the cursor*/
-		if (((GL_Slidebar_TypeDef*) pControl->objPTR)->PrevValue
-		        > ((GL_Slidebar_TypeDef*) pControl->objPTR)->CurrentValue) {
-			cursor_offset1 = ((GL_Slidebar_TypeDef*) pControl->objPTR)->CurrentValue + SLIDEBAR_PIECE_LENGTH
-			        + SLIDEBAR_OFFSET_LENGTH;
-			cursor_offset2 = ((GL_Slidebar_TypeDef*) pControl->objPTR)->PrevValue + SLIDEBAR_PIECE_LENGTH
-			        + SLIDEBAR_OFFSET_LENGTH + 1;
-		}
-
-		if (Draw == GL_FALSE) {
-			/*Repeat for all lines of cursor symbol*/
-			for (tmpY = 0x00; tmpY <= SlidebarCursorPointer[1]; tmpY++) {
-				Mask = 0x00;
-				/*Repeat for all columns of cursor symbol*/
-				for (tmpX = 0x00; tmpX < SlidebarCursorPointer[0]; tmpX++) {
-					if (Mask == 0) {
-						/*Read next byte of bitmap image and initiate mask*/
-						Temp = *CursorImagePointer;
-						CursorImagePointer++;
-						Mask = 0x80000;
-					}
-					/*Mask actual byte of cursor bitmap image*/
-					if (Temp & Mask) {
-						/*Read pixel which is going to be behind cursor*/
-						*CursorBehindPointer = LCD_GetPixel((pControl->objCoordinates.MaxY) - SLIDEBAR_HEIGHT + tmpX,
-						        pControl->objCoordinates.MaxX + tmpY - cursor_offset1);
-						CursorBehindPointer++;
-					}
-					/*Shift a mask right*/
-					Mask >>= 1;
-				}
-			}
-		}
-
-		else {
-			if (((GL_Slidebar_TypeDef*) pControl->objPTR)->PrevValue
-			        != ((GL_Slidebar_TypeDef*) pControl->objPTR)->CurrentValue) {
-				/*Draw last cursors behind at last position - hide cursor*/
-				/*Initiate pointers on Cursor bit map image and on array of cursors behind to draw*/
-				CursorBehindPointer = ((GL_Slidebar_TypeDef*) pControl->objPTR)->BehindCursor;
-
-				/*Repeat for all lines of cursor symbol*/
-				for (tmpY = 0x00; tmpY < SlidebarCursorPointer[1]; tmpY++) {
-					Mask = 0x00;
-					/*Repeat for all columns of cursor symbol*/
-					for (tmpX = 0x00; tmpX < SlidebarCursorPointer[0]; tmpX++) {
-						if (Mask == 0) {
-							/*Read next byte of bit map image and initiate mask*/
-							Temp = *CursorImagePointer;
-							CursorImagePointer++;
-							Mask = 0x80000;
-						}
-
-						/*Mask actual byte of cursor bitmap image*/
-						if (Temp & Mask) {
-							/*Draw pixel of cursor behind*/
-							LCD_PutPixel(pControl->objCoordinates.MaxY - SLIDEBAR_HEIGHT + tmpX,
-							        pControl->objCoordinates.MaxX + tmpY - cursor_offset2, *CursorBehindPointer++);
-						}
-						/*Shift a mask right*/
-						Mask >>= 1;
-					}
-				}
-			}
-		}
-	}
-}
 
 /**
  * @brief  Return the status of the object:
@@ -3175,15 +2028,6 @@ static GL_Coordinate_TypeDef GetObjCoordinates(GL_Page_TypeDef* pPage, uint16_t 
 			}
 			index++;
 		}
-		if (pPage->PageControls[index]->objType == GL_SLIDEBAR) {
-			GL_Slidebar_TypeDef* pTmp;
-			pTmp = (GL_Slidebar_TypeDef*) (pPage->PageControls[index]->objPTR);
-
-			if (pTmp->ID == ID) {
-				return pPage->PageControls[index]->objCoordinates;
-			}
-			index++;
-		}
 		if (pPage->PageControls[index]->objType == GL_CUSTOM) {
 			GL_Custom_TypeDef* pTmp;
 			pTmp = (GL_Custom_TypeDef*) (pPage->PageControls[index]->objPTR);
@@ -3358,7 +2202,7 @@ static void CallPreEvents(GL_PageControls_TypeDef* pControl)
 	uint32_t active_index = 0; /* needed for ComboBox */
 #ifndef USE_2D_OBJECTS
 	uint8_t* ptrBitmap = GL_NULL;
-#endif  
+#endif
 	void* pTmp;
 	GL_RadioButtonGrp_TypeDef* pTmpGrp = GL_NULL;
 	GL_ComboBoxGrp_TypeDef* pTmpComboGrp = GL_NULL;
@@ -3464,75 +2308,6 @@ static void CallPreEvents(GL_PageControls_TypeDef* pControl)
 		}
 		break;
 
-	case GL_SLIDEBAR:
-		pTmp = (GL_Slidebar_TypeDef*) (pControl->objPTR);
-		#if 0
-
-		/* GL_ObjDimensions_TypeDef tmpSize; */
-		tmpCoord = pControl->objCoordinates;
-		if (((GL_Slidebar_TypeDef*) pTmp)->Direction == GL_HORIZONTAL) {
-			/* Click on the left of the cursor - decreasing the value */
-			if (u32_TSXCoordinate
-			        >= (tmpCoord.MaxX - ((GL_Slidebar_TypeDef*) pTmp)->CurrentValue - SLIDEBAR_OFFSET_LENGTH)
-			        && ((GL_Slidebar_TypeDef*) pTmp)->CurrentValue > 0) {
-				/* Calculate a new cursor position from new value */
-				((GL_Slidebar_TypeDef*) pTmp)->PrevValue = ((GL_Slidebar_TypeDef*) pTmp)->CurrentValue;
-				((GL_Slidebar_TypeDef*) pTmp)->CurrentValue = ((GL_Slidebar_TypeDef*) pTmp)->CurrentValue - 5;
-			}
-
-			/* Click on the right of the cursor - increasing value */
-			else if (u32_TSXCoordinate
-			        <= (tmpCoord.MinX - ((GL_Slidebar_TypeDef*) pTmp)->CurrentValue - SLIDEBAR_CURSOR_LENGTH
-			                - SLIDEBAR_OFFSET_LENGTH) && ((GL_Slidebar_TypeDef*) pTmp)->CurrentValue < 100) {
-				/* Calculate a new cursor position from new value */
-				((GL_Slidebar_TypeDef*) pTmp)->PrevValue = ((GL_Slidebar_TypeDef*) pTmp)->CurrentValue;
-				((GL_Slidebar_TypeDef*) pTmp)->CurrentValue = ((GL_Slidebar_TypeDef*) pTmp)->CurrentValue + 5;
-			}
-		}
-		else if (((GL_Slidebar_TypeDef*) pTmp)->Direction == GL_LEFT_VERTICAL) {
-			/* Click on the LEFT of the cursor - decreasing the value */
-			if (u32_TSYCoordinate
-			        > (tmpCoord.MaxY - ((GL_Slidebar_TypeDef*) pTmp)->CurrentValue - SLIDEBAR_OFFSET_LENGTH)
-			        && ((GL_Slidebar_TypeDef*) pTmp)->CurrentValue > 0) {
-				/* Calculate a new cursor position from new value */
-				((GL_Slidebar_TypeDef*) pTmp)->PrevValue = ((GL_Slidebar_TypeDef*) pTmp)->CurrentValue;
-				((GL_Slidebar_TypeDef*) pTmp)->CurrentValue = ((GL_Slidebar_TypeDef*) pTmp)->CurrentValue - 5;
-			}
-
-			/* Click on the RIGHT of the cursor - increasing value */
-			else if (u32_TSYCoordinate
-			        < (tmpCoord.MaxY - ((GL_Slidebar_TypeDef*) pTmp)->CurrentValue - SLIDEBAR_CURSOR_LENGTH * 2
-			                - SLIDEBAR_OFFSET_LENGTH) && ((GL_Slidebar_TypeDef*) pTmp)->CurrentValue < 100) {
-				/* Calculate a new cursor position from new value */
-				((GL_Slidebar_TypeDef*) pTmp)->PrevValue = ((GL_Slidebar_TypeDef*) pTmp)->CurrentValue;
-				((GL_Slidebar_TypeDef*) pTmp)->CurrentValue = ((GL_Slidebar_TypeDef*) pTmp)->CurrentValue + 5;
-			}
-		}
-		else if (((GL_Slidebar_TypeDef*) pTmp)->Direction == GL_RIGHT_VERTICAL) {
-			/* Click on the RIGHT of the cursor - decreasing the value */
-			if (u32_TSYCoordinate
-			        >= (tmpCoord.MinY + ((GL_Slidebar_TypeDef*) pTmp)->CurrentValue + SLIDEBAR_CURSOR_LENGTH
-			                + SLIDEBAR_OFFSET_LENGTH) && ((GL_Slidebar_TypeDef*) pTmp)->CurrentValue < 100) {
-				/* Calculate a new cursor position from new value */
-				((GL_Slidebar_TypeDef*) pTmp)->PrevValue = ((GL_Slidebar_TypeDef*) pTmp)->CurrentValue;
-				((GL_Slidebar_TypeDef*) pTmp)->CurrentValue = ((GL_Slidebar_TypeDef*) pTmp)->CurrentValue + 5;
-			}
-
-			/* Click on the LEFT of the cursor - increasing value */
-			else if (u32_TSYCoordinate
-			        <= (tmpCoord.MinY + ((GL_Slidebar_TypeDef*) pTmp)->CurrentValue - SLIDEBAR_OFFSET_LENGTH)
-			        && ((GL_Slidebar_TypeDef*) pTmp)->CurrentValue > 0) {
-				/* Calculate a new cursor position from new value */
-				((GL_Slidebar_TypeDef*) pTmp)->PrevValue = ((GL_Slidebar_TypeDef*) pTmp)->CurrentValue;
-				((GL_Slidebar_TypeDef*) pTmp)->CurrentValue = ((GL_Slidebar_TypeDef*) pTmp)->CurrentValue - 5;
-			}
-		}
-		else
-			break;
-		#endif
-
-		pControl->SetObjVisible(pControl, pControl->objCoordinates);
-		break;
 
 	default:
 		break;
@@ -3556,8 +2331,12 @@ _Bool isTouchInsideRegion(uint16_t touchX, uint16_t touchY, GL_Coordinate_TypeDe
 void ProcessInputData(void)
 {
 	if (TS_HasNewTouchEvent()) {
+		// Get the touch event and display to screen (for hardware troubleshooting in the field).
 		uint16_t touchX = 0, touchY = 0;
 		TS_GetTouchEventCoords(&touchX, &touchY);
+		uint16_t rawX = 0, rawY = 0;
+		TS_GetUncalibratedTouchEvent(&rawX, &rawY);
+		xprintf("Touch screen touched at X=%3d, Y=%3d (Raw X=%6d, Y=%6d).\n", touchX, touchY, rawX, rawY);
 
 		// Handle sleep mode
 		if (vu8_gSleepState == 1) {
@@ -3684,11 +2463,6 @@ static void CallEvent(GL_PageControls_TypeDef* pControl)
 			pPrimaryOption->ComboOptions[index]->EventHandler();
 		}
 		break;
-	case GL_SLIDEBAR:
-		pTmp = (GL_Slidebar_TypeDef*) (pControl->objPTR);
-		((GL_Slidebar_TypeDef*) pTmp)->EventHandler();
-		break;
-
 	case GL_CUSTOM:
 		pTmp = (GL_Custom_TypeDef*) (pControl->objPTR);
 		((GL_Custom_TypeDef*) pTmp)->EventHandler(pControl);

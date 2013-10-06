@@ -24,6 +24,8 @@
 #include "TSDriver_ADS7843.h"
 #include <assert.h>
 #include "eeprom.h"
+#include "Encoders.h"
+#include "xprintf.h"
 
 
 // Calibration points:
@@ -65,8 +67,14 @@ void TS_Initialize(void)
 {
 	TSDriver_Initialize();
 
-	// Load from EEPROM if valid:
-	if (TS_HaveValidEEPROMData()) {
+	// Load from EEPROM if valid.
+	// If both encoders are pressed in at startup, don't load so that
+	// we force a Touch Screen calibration.
+	xprintf("Ecoders pressed? Option=%d, Frequency=%d. (0=no, 1=yes).\n",
+			Encoders_IsOptionsEncoderPressed(),
+			Encoders_IsFrequencyEncoderPressed());
+
+	if (TS_HaveValidEEPROMData() && !Encoders_AreBothEncodersPressed()) {
 		TS_ReadCalibrationFromEEPROM();
 	}
 }
@@ -130,8 +138,7 @@ void  TS_SetCalibrationData(CalibrationPoint touchedPoints[TS_NUM_CALIBRATION_PO
 
 
 /**
- * INFO FROM touchscreen.h file for copyright purposes
- * TODO: Remove this?!?
+ * Copyright from touchscreen.h:
   ******************************************************************************
   * @file    touchscreen.h
   * @author  MCD Application Team

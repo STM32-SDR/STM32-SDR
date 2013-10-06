@@ -25,6 +25,11 @@
 void Encoders_Init(void);
 void Encoders_CalculateAndProcessChanges(void);
 
+// Return if one (or both) encoders pressed.
+_Bool Encoders_IsOptionsEncoderPressed(void);
+_Bool Encoders_IsFrequencyEncoderPressed(void);
+_Bool Encoders_AreBothEncodersPressed(void);
+
 #endif /* ENCODERS_H_ */
 
 
