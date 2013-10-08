@@ -211,6 +211,7 @@ static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 		return;
 	}
 
+
 	// Extract the FFT's screen coordinates.
 	int x = pThis->objCoordinates.MinX;
 	int y = pThis->objCoordinates.MinY;
@@ -271,12 +272,13 @@ static void displayFFT(_Bool force, int x, int y)
 	LCD_SetDisplayWindow(x, y, FFT_HEIGHT, FFT_WIDTH);
 	LCD_WriteRAM_PrepareDir(LCD_WriteRAMDir_Down);
 
+	int selectedFreq = getSelectedFrequencyX();
 	for (int x = 0; x < FFT_WIDTH; x++) {
 		// Plot this column of the FFT.
 		for (int y = 0; y < FFT_HEIGHT; y++) {
 
 			// Draw red line for selected frequency
-			if (x == getSelectedFrequencyX()) {
+			if (x == selectedFreq) {
 				// Leave some white at the top
 				if (y <= SELFREQ_ADJ) {
 					LCD_WriteRAM(LCD_COLOR_WHITE);

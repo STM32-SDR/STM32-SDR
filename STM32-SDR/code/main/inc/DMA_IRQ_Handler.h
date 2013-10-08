@@ -26,7 +26,7 @@ void Xmit_SSB(void);
 void Xmit_CW(void);
 void Xmit_PSK(void);
 
-extern int16_t DSP_Flag;
+extern volatile int16_t DSP_Flag;
 extern float rgain;
 extern float R_lgain;
 extern float R_xgain;
