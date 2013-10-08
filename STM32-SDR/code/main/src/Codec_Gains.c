@@ -113,8 +113,7 @@ void Set_ADC_DVC(int ADC_gain)
 		ADC_gain = ADC_GAIN_MAX;
 	if (ADC_gain < ADC_GAIN_MIN)
 		ADC_gain = ADC_GAIN_MIN;
-	if (ADC_gain < 0)
-		ADC_gain += 127;
+	if (ADC_gain < 0) ADC_gain += 127;
 
 	// Check for error writing.
 	if (I2C_WriteRegister(CODEC_ADDRESS, 0x00, 0x00) != 0) {

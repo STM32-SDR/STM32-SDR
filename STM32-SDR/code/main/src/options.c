@@ -29,12 +29,16 @@
 #include "Si570.h"
 #include "FrequencyManager.h"
 #include "ChangeOver.h"
+#include "AGC_Processing.h"
+#include "DSP_Processing.h"
 
 #define EEPROM_OFFSET 200
 
 #define EEPROM_SENTINEL_LOC 50
 //#define EEPROM_SENTINEL_VAL 5680
-#define EEPROM_SENTINEL_VAL 3333
+//#define EEPROM_SENTINEL_VAL 3333
+//#define EEPROM_SENTINEL_VAL 2222
+#define EEPROM_SENTINEL_VAL 1037
 
 static OptionNumber s_currentOptionNumber = OPTION_RX_AUDIO;
 
@@ -62,7 +66,7 @@ static OptionStruct s_optionsData[] = {
 		/*Name*/ "  Rx RF  ",
 		/*Init*/ 20,
 		/*Min */ 0,
-		/*Max */ 80,
+		/*Max */ 40,
 		/*Rate*/ 1,
 		/*Data*/ 0,
 	},
@@ -132,6 +136,33 @@ static OptionStruct s_optionsData[] = {
 		/*Data*/ 0,
 	},
 	{
+		/*Name*/ "AGC Thrsh",
+		/*Init*/ 100,
+		/*Min */ 50,
+		/*Max */ 1000,
+		/*Rate*/ 10,
+		/*Data*/ 0,
+	},
+
+	{
+		/*Name*/ "AGC Mode ",
+		/*Init*/ 0,
+		/*Min */ 0,
+		/*Max */ 2,
+		/*Rate*/ 1,
+		/*Data*/ 0,
+	},
+
+	{
+		/*Name*/ "AGC Scale",
+		/*Init*/ 100,
+		/*Min */ 100,
+		/*Max */ 1000,
+		/*Rate*/ 10,
+		/*Data*/ 0,
+	},
+
+	{
 		/*Name*/ "SI570Mult",
 		/*Init*/ 4,
 		/*Min */ 2,
@@ -175,7 +206,6 @@ const char* Options_GetName(int optionIdx)
 	assert(optionIdx >= 0 && optionIdx < NUM_OPTIONS);
 	return s_optionsData[optionIdx].Name;
 }
-//uint16_t Options_GetValue(int optionIdx)
 int16_t Options_GetValue(int optionIdx)
 {
 	assert(optionIdx >= 0 && optionIdx < NUM_OPTIONS);
@@ -197,7 +227,7 @@ void Options_SetValue(int optionIdx, int16_t newValue)
 
 	case OPTION_RX_RF:
 		if (RxTx_InRxMode())
-			Set_PGA_Gain(newValue);
+			Init_AGC(); //This also sets the PGA_Gain as well
 		break;
 
 	case OPTION_Mic_Gain:
@@ -237,6 +267,19 @@ void Options_SetValue(int optionIdx, int16_t newValue)
 		} else {
 			Turn_On_Bias();
 		}
+		break;
+
+	case OPTION_AGC_THRSH:
+		if (RxTx_InRxMode())
+			Init_AGC();
+		break;
+
+	case OPTION_AGC_MODE:
+		AGC_Mode = newValue;
+		break;
+
+	case OPTION_AGC_Scale:
+		AGC_Scale = newValue;
 		break;
 
 	case OPTION_SI570_MULT:

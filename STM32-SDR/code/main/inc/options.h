@@ -19,10 +19,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-
 #include <stdint.h>
-
-
 
 typedef enum {
 	OPTION_RX_AUDIO = 0,
@@ -35,12 +32,13 @@ typedef enum {
 	OPTION_TX_AMP,
 	OPTION_TX_PHASE,
 	OPTION_MIC_BIAS,
+	OPTION_AGC_THRSH,
+	OPTION_AGC_MODE,
+	OPTION_AGC_Scale,
 	OPTION_SI570_MULT,
 
 	NUM_OPTIONS
 } OptionNumber;
-
-
 
 // Initialization
 void Options_Initialize(void);
@@ -48,7 +46,6 @@ void Options_ResetToDefaults(void);
 
 // Work with option data
 const char* Options_GetName(int optionIdx);
-//uint16_t Options_GetValue(int optionIdx);
 int16_t Options_GetValue(int optionIdx);
 void     Options_SetValue(int optionIdx, int16_t newValue);
 uint16_t Options_GetMinimum(int optionIdx);

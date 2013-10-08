@@ -28,6 +28,7 @@
 #include "DMA_IRQ_Handler.h"
 #include "options.h"
 #include "ScrollingTextBox.h"
+#include "AGC_Processing.h"
 #include "ModeSelect.h"
 #include <assert.h>
 #include <xprintf.h>
@@ -139,7 +140,6 @@ _Bool RxTx_IsPttPressed(void)
 /****************************************
  * Private Functions
  ****************************************/
-
 void Receive_Sequence(void)
 {
 	Mute_HP();
@@ -149,9 +149,9 @@ void Receive_Sequence(void)
 	Disconnect_PGA();
 	Connect_IQ_Inputs();
 	Set_DAC_DVC(Options_GetValue(OPTION_RX_AUDIO));
-	Set_PGA_Gain(Options_GetValue(OPTION_RX_RF));
-	Set_ADC_DVC(0);  //was -20 using Milt's AGC scheme
+	Set_ADC_DVC(-10);  //was -20 using Milt's AGC scheme
 	Set_HP_Gain(6);
+	Init_AGC ();
 }
 
 void Xmit_SSB_Sequence(void)

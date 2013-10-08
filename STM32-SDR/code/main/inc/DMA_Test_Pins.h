@@ -19,8 +19,15 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#define		DMA_GPIO		GPIOD
-#define		DMA_IRQ			GPIO_Pin_12
-#define		DMA_RX			GPIO_Pin_13
+//#define		DMA_GPIO		GPIOD
+//#define		DMA_IRQ			GPIO_Pin_12
+//#define		DMA_RX			GPIO_Pin_13
+
+#define			Test_GPIO		GPIOC
+#define 		Test_0			GPIO_Pin_13
+#define 		Test_1			GPIO_Pin_14
+#define 		Test_2			GPIO_Pin_15
 
 void TEST_GPIO_Init(void);
+//GPIO_WriteBit(DMA_GPIO, Test_0, Bit_SET);
+//GPIO_WriteBit(DMA_GPIO, DMA_IRQ, Bit_RESET);

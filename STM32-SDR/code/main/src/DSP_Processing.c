@@ -28,10 +28,38 @@
 #define		SAMPLING_FREQ 8000.
 #define		ALPHA 1/(SAMPLING_FREQ*FFT_TIME_CONST)
 
-q15_t FFT_Input[BUFFERSIZE / 2]; //512 sampling
-q15_t FFT_Test[BUFFERSIZE / 2]; //512 sampling
-q15_t FFT_Scale[BUFFERSIZE / 2]; //512 sampling
-q15_t FFT_Magnitude[BUFFERSIZE / 4]; //512 sampling
+float	RMS_Sig;
+float	dB_Sig;
+
+int		Sig;
+int		Sig_Max;
+int		Sig_Total;
+int		Sig_Sum0;
+int		Sig_Sum1;
+int		Sig_Sum2;
+
+int		AGC_Scale;
+int 	number_bins;
+float 	AGC_Multiplier;
+
+float 	FFT_Coeff = 0.2;
+extern  int NCO_Bin;
+extern  int AGC_Mode;
+extern  int RSL_Mag;
+extern  float AGC_Mag;
+
+float32_t FFT_Output[256];
+float32_t FFT_Filter[256];
+
+q15_t FFT_Input[1024];
+q15_t FFT_Scale[1024]; //512 sampling
+q15_t FFT_Magnitude[512]; //512 sampling
+
+int FFT_Mag_10[256];
+
+uint16_t FFT_Size = 512;  // change for 512 sampling
+uint8_t FFT_status;
+
 q15_t FIR_State_I[NUM_FIR_COEF + (BUFFERSIZE / 2) - 1];
 q15_t FIR_State_Q[NUM_FIR_COEF + (BUFFERSIZE / 2) - 1];
 q15_t FIR_I_In[BUFFERSIZE / 2];
@@ -40,12 +68,6 @@ q15_t FIR_I_Out[BUFFERSIZE / 2];
 q15_t FIR_Q_Out[BUFFERSIZE / 2];
 q15_t USB_Out[BUFFERSIZE / 2];
 q15_t LSB_Out[BUFFERSIZE / 2];
-
-float Smoothed_FFT_Magnitude[BUFFERSIZE / 4]; //512 sampling
-
-uint16_t FFT_Size = BUFFERSIZE / 4;  // change for 512 sampling
-
-uint8_t FFT_status;
 
 //chh Filter Definitions imported from NUE PSK
 q15_t Filter_delay_I1[38]; //38 = 35 + 4 -1
@@ -58,10 +80,16 @@ q15_t Filter_delay_I4[65];
 q15_t Filter_delay_Q4[65];
 //chh Filter Definitions imported from NUE PSK
 
-//chh stuff for filling PSK  Buffer
+
 
 q15_t ADC_Buffer[BUFFERSIZE / 2];  //for 1024 sampling
-arm_cfft_radix4_instance_q15 S_CFFT;
+
+arm_cfft_radix2_instance_q15 S_CFFT;
+
+void init_DSP(void) {
+	FFT_status = arm_cfft_radix2_init_q15(&S_CFFT, FFT_Size, 0, 1);
+}
+
 arm_fir_instance_q15 S_FIR_I = { NUM_FIR_COEF, &FIR_State_I[0], &coeff_fir_I[0] };
 arm_fir_instance_q15 S_FIR_Q = { NUM_FIR_COEF, &FIR_State_Q[0], &coeff_fir_Q[0] };
 
@@ -97,27 +125,71 @@ void Sideband_Demod(void)
 	}
 }
 
+
 void Process_FFT(void)
 {
-	int16_t i;
-	float	delta;
-
-	//Set up structure for complex FFT processing
-	FFT_status = arm_cfft_radix4_init_q15(&S_CFFT, FFT_Size, 0, 1);
-
 	//Execute complex FFT
-	arm_cfft_radix4_q15(&S_CFFT, &FFT_Input[0]);
-
+	arm_cfft_radix2_q15(&S_CFFT, &FFT_Input[0]);
 	//Shift FFT data to compensate for FFT scaling
-	arm_shift_q15(&FFT_Input[0], 6, &FFT_Scale[0], BUFFERSIZE / 4 //1024 sampling
-	        );
-
+	arm_shift_q15(&FFT_Input[0], 6, &FFT_Scale[0], 512 );
 	//Calculate the magnitude squared of FFT results ( i.e., power level)
 	arm_cmplx_mag_squared_q15(&FFT_Scale[0], &FFT_Magnitude[0], FFT_Size);
+	//********************************************************
 
-	for (  i = 0; i < BUFFERSIZE/4; i++){
-		delta = (float)FFT_Magnitude[i] - Smoothed_FFT_Magnitude[i];
-		Smoothed_FFT_Magnitude[i] += 512*ALPHA*delta;
+	Sig_Max = 0;
+	Sig_Sum0 = 0;
+	Sig_Sum1 = 0;
+	Sig_Sum2 = 0;
+
+	number_bins =0;
+	AGC_Multiplier = (float)AGC_Scale/100.0;
+
+
+	for (int j = 0; j < 256; j++) 
+		FFT_Mag_10[j] = (int) FFT_Magnitude[j] * 10; //add in 10 db gain
+	for (int16_t j = 8; j < 252; j++) {  
+		//Changed for 512 FFT
+		//This detects bins which are saturated and ignores them
+		if (FFT_Mag_10[j]> 0) {
+			FFT_Output[j] =  (10.0 * log((float32_t)FFT_Mag_10[j] + 1.0));
+		} else {
+			FFT_Output[j] = 0;
+		}
+		//First Order Filter for FFT
+		FFT_Filter[j] =  FFT_Coeff * FFT_Output[j] + (1.0-FFT_Coeff) * FFT_Filter[j];
+
+
+		//Point AGC
+		if (j == NCO_Bin) {
+			for (int k = NCO_Bin-2; k < NCO_Bin+3; k++)	{
+				Sig = (int)FFT_Magnitude[k];
+				if ( Sig > Sig_Max) Sig_Max = Sig;
+				Sig_Sum1 += Sig;
+			}
+			Sig_Sum0 = Sig_Max;
+		}
+
+		//Total or SSB or Average AGC
+		if ( j > 8 && j < 128 )	{
+			Sig_Sum2 += (int)FFT_Magnitude[j];
+			number_bins++;
+		}
 	}
-}
+	switch (AGC_Mode){
+		case 0:
+			Sig_Total = Sig_Sum0;
+			break;
+		case 1:
+			Sig_Total = Sig_Sum1;
+			break;
+		case 2:
+			Sig_Total = Sig_Sum2;
+			break;
+	}
+	RMS_Sig = 10*sqrt((float32_t)Sig_Total);
+	dB_Sig = 23. + 10*log((float32_t)Sig_Total + .001);
 
+	AGC_Mag = FFT_Coeff*RMS_Sig + (1.-FFT_Coeff)*AGC_Mag;
+	RSL_Mag = FFT_Coeff*dB_Sig + (1.-FFT_Coeff)*RSL_Mag;
+
+}//End of Process_FFT

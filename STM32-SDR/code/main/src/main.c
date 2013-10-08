@@ -44,10 +44,14 @@
 #include	"FrequencyManager.h"
 #include	"sdr_image.h"
 #include	"ScrollingTextBox.h"
-#include	"Text_Enter.h"
 #include	"xprintf.h"
+#include	"Text_Enter.h"
+#include	"AGC_Processing.h"
+#include	"DMA_Test_Pins.h"
+#include	"DSP_Processing.h"
+#include    "DMA_IRQ_Handler.h"
 
-#define VERSION_STRING "1.028"
+#define VERSION_STRING "1.029-1"
 
 const uint32_t CODEC_FREQUENCY = 8000;
 
@@ -97,7 +101,14 @@ int main(void)
 		ProcessInputData();
 
 		// Redraw the screen (as needed)
+		if (DSP_Flag == 1)
+			GPIO_WriteBit(Test_GPIO, Test_1, Bit_SET);
+
 		UpdateScreenWithChanges();
+		GPIO_WriteBit(Test_GPIO, Test_1, Bit_RESET);
+
+
+		Proc_AGC();
 	}
 }
 
@@ -158,6 +169,9 @@ static void initializeHardware(void)
 	displayLoadStationData();
 	main_delay(SETUP_DELAY);
 
+	Init_AGC ();
+	main_delay(SETUP_DELAY);
+
 	RxTx_Init();
 	main_delay(SETUP_DELAY);
 
@@ -181,14 +195,18 @@ static void initializeHardware(void)
 	);
 	main_delay(SETUP_DELAY);
 
+	init_DSP();
+	main_delay(SETUP_DELAY);
+
 	Audio_DMA_Start();			//Get everything up and running before starting DMA Interrupt
 	main_delay(SETUP_DELAY);
 
+	TEST_GPIO_Init();
 }
 
 static void displaySplashScreen(void)
 {
-	const int TEXT_LEFT = 180;
+	const int TEXT_LEFT = 150;
 	LCD_DrawBMP16Bit(0,0, gimp_image.height, gimp_image.width, (uint16_t*) gimp_image.pixel_data, 0);
 
 	GL_SetTextColor(LCD_COLOR_BLACK);
@@ -226,3 +244,4 @@ static void main_delay(uint32_t numLoops)
 		j++;
 	}
 }
+

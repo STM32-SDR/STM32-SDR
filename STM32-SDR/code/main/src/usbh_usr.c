@@ -364,4 +364,3 @@ void USBH_USR_DeInit(void)
 }
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
-

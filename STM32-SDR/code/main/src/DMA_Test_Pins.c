@@ -23,30 +23,25 @@
 #include	"stm32f4xx_rcc.h"
 #include	"DMA_Test_Pins.h"
 
-//This code initializes four outputs to enable testing of the DMA / DSP operation
-//These pins are:
-
-//PD-12    Used for observing the DMA Interrupt
-//PD-13   Used for observing the DMA I2S Input Stream Buffer Select
-//PD-14   Used for observing the DMA I2S Output Stream Buffer Select
-//PD-15    Used for observing the processing outside the Interrupt handler
 
 void TEST_GPIO_Init(void)
 {
 	//Structure Assignment
 	GPIO_InitTypeDef GPIO_InitStructure;
 
-	//Turn On GPIO Clock
-	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
+	/* Enable GPIOC clock */
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
+	/* Enable SYSCFG clock */
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
 
 	//Define the GPIO Structure
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_12 | GPIO_Pin_13; //Pins 14 and 15 removed for TFT
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15 ;
 
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
-	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_OD;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
 
 	//Init the GPIO Test Pins
-	GPIO_Init(GPIOD, &GPIO_InitStructure);
+	GPIO_Init(GPIOC, &GPIO_InitStructure);
 }

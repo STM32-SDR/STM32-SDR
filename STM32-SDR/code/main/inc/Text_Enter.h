@@ -18,7 +18,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-
+#ifndef _TEXT_ENTER_H_
+#define _TEXT_ENTER_H_
 #include <stdint.h>
 
 uint8_t text_cnt;
@@ -83,3 +84,4 @@ const char* Text_GetName(int TextIdx);
 //void Options_WriteToEEPROM(void);
 //_Bool Options_HaveValidEEPROMData(void);
 //void Options_ReadFromEEPROM(void);
+#endif

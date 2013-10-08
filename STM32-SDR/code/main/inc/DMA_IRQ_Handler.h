@@ -27,13 +27,12 @@ void Xmit_CW(void);
 void Xmit_PSK(void);
 
 extern volatile int16_t DSP_Flag;
+extern int16_t AGC_Flag;
 extern float rgain;
 extern float R_lgain;
 extern float R_xgain;
 extern float T_lgain;
 extern float T_xgain;
 extern float phase_adjust;
-
-extern int16_t Tx_Flag;
 
 double x_NCOphzinc;

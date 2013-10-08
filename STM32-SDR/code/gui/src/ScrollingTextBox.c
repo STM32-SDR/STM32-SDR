@@ -36,8 +36,9 @@
 
 #define TEXT_LINE_HEIGHT    (17)
 #define OFFSETX_ONAIR    0
-//#define OFFSETY_ONAIR    (6 * TEXT_LINE_HEIGHT)
-#define OFFSETY_ONAIR    (5 * TEXT_LINE_HEIGHT)
+//#define OFFSETY_ONAIR    (5 * TEXT_LINE_HEIGHT)
+#define OFFSETY_ONAIR    97
+
 
 //extern unsigned char NewChar;
 unsigned char LCD_buffer[NUMCHARS];

@@ -42,7 +42,8 @@
 
 #define AFC_OFF 0
 #define AFC_ON 1
-#define AFC_TIMELIMIT 20	/* 2.5 seconds	*/
+#define AFC_TIMELIMIT 40	/* 2.5 seconds	*/
+//#define AFC_TIMELIMIT 20	/* 2.5 seconds	*/ chh sept
 #define AFC_FTIMELIMIT 4	/* 0.5 seconds	*/
 
 #define NLP_K (100.0)		/*narrow phase derived afc constans  */
@@ -52,8 +53,11 @@
 unsigned char NewChar;
 int count;
 int char_count;
+
 double m_PSKPeriodUpdate;
 double m_SymbolRate;
+
+extern double NCO_2;
 
 /* //////////////////////////////////////////////////////////////////// */
 /* Construction/Destruction                                             */
@@ -281,6 +285,7 @@ void ProcPSKDet()
 			m_AFCmax = m_NCOphzinc + m_AFClimit;
 			m_AFCmin = m_NCOphzinc - m_AFClimit;
 			NCO_Frequency = m_NCOphzinc * (double) Sample_Frequency / PI2;
+			NCO_2 = NCO_Frequency;
 			if (m_AFCmin <= 0.0)
 				m_AFCmin = 0.0;
 		}
@@ -592,12 +597,14 @@ int SymbSync(struct Complex sample)
 /* ////////////////////////////////////////////////////////////////////  */
 /*  Decode the new symbol sample                                         */
 /* ////////////////////////////////////////////////////////////////////  */
+
+struct Complex vect;
 void DecodeSymb(struct Complex newsamp)
 {
-	struct Complex vect;
+
 	double angle;
 	double energy;
-
+	struct Complex vect;
 	unsigned char ch = 0;
 
 	int bit;
@@ -664,20 +671,7 @@ void DecodeSymb(struct Complex newsamp)
 
 	if (GotChar && (ch != 0) && m_SQOpen) {
 		NewChar = ch;
-/*		if (char_count < 38) {
-			LCD_buffer[char_count] = ch;
-			char_count++;
-		}
-		else {
-			for (i = 1; i < 38; i++) {
-				LCD_buffer[i - 1] = LCD_buffer[i];
-			}
-
-			LCD_buffer[37] = ch;
-			//if (IsBTConnected())
-			//uart_putc(ch);  // turn off char by char transmission
-		}
-*/		GotChar = FALSE;
+		GotChar = FALSE;
 	}
 
 }

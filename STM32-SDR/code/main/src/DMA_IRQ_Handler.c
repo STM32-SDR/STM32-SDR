@@ -29,12 +29,16 @@
 #include    "stm32f4xx_gpio.h"
 #include 	"PSKMod.h"
 #include	"ChangeOver.h"
+#include 	"AGC_Processing.h"
+#include 	"DMA_Test_Pins.h"
+#include	"stm32f4xx_gpio.h"
 
 uint32_t DMA_RX_Memory;
 uint32_t DMA_TX_Memory;
 volatile int16_t DSP_Flag = 0;
+int16_t AGC_Flag = 0;
+//int16_t Tx_Flag;
 int16_t i;
-
 
 float rgain;
 float R_lgain;
@@ -89,25 +93,24 @@ void DMA1_Stream0_IRQHandler(void)
 		}  //End of Mode Switch
 	}
 
-
-
 	DSP_Flag = 1;
+	AGC_Flag = 1;
 
 	//Clear the DMA buffer full interrupt flag
 	DMA_ClearITPendingBit(DMA1_Stream0, DMA_IT_TCIF0 );
+
 }
 
 void Rcvr_DSP(void)
 {
+	GPIO_WriteBit(Test_GPIO, Test_0, Bit_SET);
 	//Transfer I/Q data and fill FFT buffer on inactive buffer
 	if (DMA_RX_Memory == 0) {
 		for (i = 0; i < BUFFERSIZE / 2; i++) {
 			FIR_I_In[i] = (q15_t) ((float) Rx1BufferDMA[2 * i] * R_lgain);
+			FFT_Input[i * 2] = FIR_I_In[i];
 			phase_adjust = (float) Rx1BufferDMA[2 * i] * R_xgain;
 			FIR_Q_In[i] = (q15_t) (((float) Rx1BufferDMA[2 * i + 1] + phase_adjust) * rgain);
-		}
-		for (i = 0; i < BUFFERSIZE / 4; i++) {  //changed for 512 sampling using balanced input data
-			FFT_Input[i * 2] = FIR_I_In[i];
 			FFT_Input[i * 2 + 1] = FIR_Q_In[i];
 		}
 
@@ -115,7 +118,9 @@ void Rcvr_DSP(void)
 		Process_FIR_Q();
 		Sideband_Demod(); //PSK buffer is filled in this procedure with USB data stream
 		ProcPSKDet();
+		GPIO_WriteBit(Test_GPIO, Test_2, Bit_SET);
 		Process_FFT();
+		GPIO_WriteBit(Test_GPIO, Test_2, Bit_RESET);
 
 		for (i = 0; i < BUFFERSIZE / 2; i++) {
 			Tx1BufferDMA[2 * i] = (int16_t) USB_Out[i];
@@ -130,12 +135,9 @@ void Rcvr_DSP(void)
 	{
 		for (i = 0; i < BUFFERSIZE / 2; i++) {
 			FIR_I_In[i] = (q15_t) ((float) Rx0BufferDMA[2 * i] * R_lgain);
+			FFT_Input[i * 2] = FIR_I_In[i];
 			phase_adjust = (float) Rx0BufferDMA[2 * i] * R_xgain;
 			FIR_Q_In[i] = (q15_t) (((float) Rx0BufferDMA[2 * i + 1] + phase_adjust) * rgain);
-		}
-
-		for (i = 0; i < BUFFERSIZE / 4; i++) {  //changed for 512 sampling using balanced input data
-			FFT_Input[i * 2] = FIR_I_In[i];
 			FFT_Input[i * 2 + 1] = FIR_Q_In[i];
 		}
 
@@ -143,7 +145,9 @@ void Rcvr_DSP(void)
 		Process_FIR_Q();
 		Sideband_Demod(); //PSK Buffer is filled in this procedure
 		ProcPSKDet();
+		GPIO_WriteBit(Test_GPIO, Test_2, Bit_SET);
 		Process_FFT();
+		GPIO_WriteBit(Test_GPIO, Test_2, Bit_RESET);
 
 		for (i = 0; i < BUFFERSIZE / 2; i++) {
 			Tx0BufferDMA[2 * i] = (int16_t) USB_Out[i];
@@ -152,7 +156,7 @@ void Rcvr_DSP(void)
 		}
 
 	}   //End of Buffer 1 Processing
-
+	GPIO_WriteBit(Test_GPIO, Test_0, Bit_RESET);
 }  // End of Rcvr_DSP( )
 
 void Xmit_SSB(void)
@@ -161,19 +165,15 @@ void Xmit_SSB(void)
 	if (DMA_RX_Memory == 0) {
 		for (i = 0; i < BUFFERSIZE / 2; i++) {
 			FIR_I_In[i] = (q15_t) ((float) Rx1BufferDMA[2 * i] * T_lgain);
-			phase_adjust = (float) Rx1BufferDMA[2 * i] * T_xgain;
-			FIR_Q_In[i] = (q15_t) (((float) Rx1BufferDMA[2 * i] + phase_adjust) * rgain); //feed same audio in for SSB
-		}
-		// Changed for 512 sampling using balanced input data
-		for (i = 0; i < BUFFERSIZE / 4; i++) {
 			FFT_Input[i * 2] = FIR_I_In[i];
+			phase_adjust = (float) Rx1BufferDMA[2 * i] * T_xgain;
+			FIR_Q_In[i] = (q15_t) (((float) Rx1BufferDMA[2 * i+1] + phase_adjust) * rgain); //feed same audio in for SSB
 			FFT_Input[i * 2 + 1] = FIR_Q_In[i];
 		}
 
 		Process_FIR_I();
 		Process_FIR_Q();
 		Process_FFT();
-
 		//Output FIR filter results to codec
 		for (i = 0; i < BUFFERSIZE / 2; i++) {
 			Tx1BufferDMA[2 * i] = (int16_t) FIR_I_Out[i];
@@ -185,13 +185,9 @@ void Xmit_SSB(void)
 	else {
 		for (i = 0; i < BUFFERSIZE / 2; i++) {
 			FIR_I_In[i] = (q15_t) ((float) Rx0BufferDMA[2 * i] * T_lgain);
-			phase_adjust = (float) Rx0BufferDMA[2 * i] * T_xgain;
-			FIR_Q_In[i] = (q15_t) (((float) Rx0BufferDMA[2 * i] + phase_adjust) * rgain); //feed same audio in for SSB
-		}
-
-		//changed for 512 sampling using balanced input data
-		for (i = 0; i < BUFFERSIZE / 4; i++) {
 			FFT_Input[i * 2] = FIR_I_In[i];
+			phase_adjust = (float) Rx0BufferDMA[2 * i] * T_xgain;
+			FIR_Q_In[i] = (q15_t) (((float) Rx0BufferDMA[2 * i+1] + phase_adjust) * rgain); //feed same audio in for SSB
 			FFT_Input[i * 2 + 1] = FIR_Q_In[i];
 		}
 
@@ -228,11 +224,9 @@ void Xmit_CW(void)
 			CW_Gain = temp / Amp0;
 
 			FIR_I_In[i] = (q15_t) ((float) NCO_I * T_lgain * CW_Gain);
+			FFT_Input[i * 2] = FIR_I_In[i];
 			phase_adjust = (float) NCO_I * T_xgain;
 			FIR_Q_In[i] = (q15_t) (((float) NCO_I + phase_adjust) * (CW_Gain) * rgain); //
-		}
-		for (i = 0; i < BUFFERSIZE / 4; i++) {  //changed for 512 sampling using balanced input data
-			FFT_Input[i * 2] = FIR_I_In[i];
 			FFT_Input[i * 2 + 1] = FIR_Q_In[i];
 		}
 
@@ -258,12 +252,9 @@ void Xmit_CW(void)
 			CW_Gain = temp / Amp0;
 
 			FIR_I_In[i] = (q15_t) ((float) NCO_I * T_lgain * CW_Gain);
+			FFT_Input[i * 2] = FIR_I_In[i];
 			phase_adjust = (float) NCO_I * T_xgain;
 			FIR_Q_In[i] = (q15_t) (((float) NCO_I + phase_adjust) * rgain * CW_Gain); //
-		}
-
-		for (i = 0; i < BUFFERSIZE / 4; i++) {  //changed for 512 sampling using balanced input data
-			FFT_Input[i * 2] = FIR_I_In[i];
 			FFT_Input[i * 2 + 1] = FIR_Q_In[i];
 		}
 
@@ -308,12 +299,9 @@ void Xmit_PSK(void)
 			TXData = Product1 + Product2;
 
 			FIR_I_In[i] = (q15_t) ((float) TXData * T_lgain);
+			FFT_Input[i * 2] = FIR_I_In[i];
 			phase_adjust = (float) TXData * T_xgain;
 			FIR_Q_In[i] = (q15_t) (((float) TXData + phase_adjust) * rgain); //
-		}
-
-		for (i = 0; i < BUFFERSIZE / 4; i++) {  //changed for 512 sampling using balanced input data
-			FFT_Input[i * 2] = FIR_I_In[i];
 			FFT_Input[i * 2 + 1] = FIR_Q_In[i];
 		}
 
@@ -345,13 +333,9 @@ void Xmit_PSK(void)
 			TXData = Product1 + Product2;
 
 			FIR_I_In[i] = (q15_t) ((float) TXData * T_lgain);
+			FFT_Input[i * 2] = FIR_I_In[i];
 			phase_adjust = (float) TXData * T_xgain;
 			FIR_Q_In[i] = (q15_t) (((float) TXData + phase_adjust) * rgain); //
-
-		}
-
-		for (i = 0; i < BUFFERSIZE / 4; i++) {  //changed for 512 sampling using balanced input data
-			FFT_Input[i * 2] = FIR_I_In[i];
 			FFT_Input[i * 2 + 1] = FIR_Q_In[i];
 		}
 
