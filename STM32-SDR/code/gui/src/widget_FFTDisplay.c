@@ -31,37 +31,39 @@
 #include "AGC_Processing.h"
 #include "math.h"
 
-
-double NCO_0;
-double NCO_1;
-double NCO_2;
-
-int 	Signal_Level;
-int		S;
-char	SMeter$[7];
-
+// Constants
 static const int FFT_WIDTH   = 240;
 static const int FFT_HEIGHT  =  64;
 static const int SELFREQ_ADJ =   4;
-//static const int TEXT_OFFSET_BELOW_FFT = 4;
 static const int CHARACTER_WIDTH = 8;
 static const int MAX_FREQ_DIGITS = 5;
 static const int SMETER_HEIGHT = 8;
 
+// Private function prototypes
 static uint16_t WidgetFFT_GetWidth(GL_PageControls_TypeDef* pThis);
 static uint16_t WidgetFFT_GetHeight(GL_PageControls_TypeDef* pThis);
 static void WidgetFFT_EventHandler(GL_PageControls_TypeDef* pThis);
 static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force);
+static void displayFFT(int x, int y);
+static void displayFrequencyOffsetText(_Bool force);
+static void displayAGCVariables(int RSL);
+static void displaySMeter(int RSL);
+static void	Acquire (void);
+
+
+// TODO: Remove these? Only set; never used!
+double NCO_0;
+double NCO_1;
+double NCO_2;
+
 
 int 	NCO_Point;
 int		NCO_Bin;
-void	Acquire ( void );
 uint8_t FFT_Display[256];
-int 	RSL;
 extern	int RSL_Mag;
-float selectedFreqX;
 
 #define ID_FFTSelFreqNum_LABEL 50105
+
 
 /*
  * Public Interface
@@ -139,7 +141,6 @@ static void WidgetFFT_EventHandler(GL_PageControls_TypeDef* pThis)
 {
 	// Get the coordinates:
 	uint16_t X_Point, Y_Point;
-	//int NCO_Point;
 	TS_GetTouchEventCoords(&X_Point, &Y_Point);
 
 
@@ -151,9 +152,8 @@ static void WidgetFFT_EventHandler(GL_PageControls_TypeDef* pThis)
 	Acquire();
 }
 
-void Acquire( void )
+static void Acquire( void )
 {
-	//extern double NCO_Frequency;
 	extern int count;
 	extern int char_count;
 	long i, S1, S2, W;
@@ -178,6 +178,7 @@ void Acquire( void )
 	char_count = 0;
 }
 
+
 static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 {
 	// Bail if nothing to draw.
@@ -185,10 +186,33 @@ static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 		return;
 	}
 
+	// Extract the FFT's screen coordinates.
 	int x = pThis->objCoordinates.MinX;
 	int y = pThis->objCoordinates.MinY;
-	//int Frequency_CursorX;
 
+	// Compute RSL
+	// TODO: Remove hard-coded numbers? Change to constants?
+	int RSL =  -115 +(int) ( 0.5 *(80.0-(float)PGAGain)+ (0.38 * (float)RSL_Mag));
+
+	// Draw the FFT
+	displayFFT(x, y);
+
+	// Write the frequency offset text
+	displayFrequencyOffsetText(force);
+
+	// Display AGC Variables for Testing / Troubleshooting
+	displayAGCVariables(RSL);
+
+	// Display SMeter
+	displaySMeter(RSL);
+
+	// Final End of DSP and FFT Update Processing
+	DSP_Flag = 0;
+}
+
+
+static void displayFFT(int x, int y)
+{
 	for (int16_t j = 0; j < 256; j++) {
 		if (FFT_Filter[j] > 64.0) {
 			FFT_Display[j]  = 64;
@@ -197,14 +221,12 @@ static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 		}
 	}
 
-	RSL =  -115 +(int) ( 0.5 *(80.0-(float)PGAGain)+ (0.38 * (float)RSL_Mag));
-
 	/*
 	 * Display the FFT
 	 * - Drop the bottom 8, and top 8 frequency-display bins to discard
 	 *   noisy sections near band edges due to filtering.
 	 */
-	selectedFreqX = (float) (NCO_Frequency - 125) / 15.625;
+	float selectedFreqX = (float) (NCO_Frequency - 125) / 15.625;
 	if (selectedFreqX < 0) {
 		selectedFreqX = 0;
 	}
@@ -240,7 +262,10 @@ static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 			}
 		}
 	}
+}
 
+static void displayFrequencyOffsetText(_Bool force)
+{
 	// Update the frequency offset displayed (text):
 	static double oldSelectedFreq = -1;
 	static double old_m_SQOpen = -1;
@@ -259,17 +284,18 @@ static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 
 		// Display location on label.
 		if (m_SQOpen == 0)
-		GL_SetTextColor(LCD_COLOR_RED);
-		else GL_SetTextColor(LCD_COLOR_GREEN);
+			GL_SetTextColor(LCD_COLOR_RED);
+		else
+			GL_SetTextColor(LCD_COLOR_GREEN);
 		char number[MAX_FREQ_DIGITS + 1];
-		intToCommaString((int)NCO_Frequency, number, MAX_FREQ_DIGITS + 1);
+		intToCommaString((int) NCO_Frequency, number, MAX_FREQ_DIGITS + 1);
 		GL_PrintString(numberX, textY, number, 0);
 	}
+}
 
-
-
-
-	//Display AGC Variables for Testing / Troubleshooting
+static void displayAGCVariables(int RSL)
+{
+	// Display AGC Variables for Testing / Troubleshooting
 	//GL_SetTextColor(LCD_COLOR_RED);
 	//GL_SetBackColor(LCD_COLOR_BLACK);
 	//char test2[7];
@@ -279,7 +305,7 @@ static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 	GL_SetTextColor(LCD_COLOR_RED);
 	GL_SetBackColor(LCD_COLOR_BLACK);
 	char test3[3];
-	intToCommaString(PGAGain/2, test3, 3);
+	intToCommaString(PGAGain / 2, test3, 3);
 	GL_PrintString(175, 80, test3, 0);
 
 	//GL_SetTextColor(LCD_COLOR_RED);
@@ -293,37 +319,44 @@ static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 	char test5[5];
 	intToCommaString(RSL, test5, 5);
 	GL_PrintString(277, 80, test5, 0);
+}
 
-	//Display SMeter
-	x = 80;
-	y = 68;
+static void displaySMeter(int RSL)
+{
+	int x = 80;
+	int y = 68;
 	LCD_SetDisplayWindow(x, y, SMETER_HEIGHT, FFT_WIDTH);
 	LCD_WriteRAM_PrepareDir(LCD_WriteRAMDir_Down);
-
-	Signal_Level = ((RSL + 120)*26)/10;
-	for (int x = 0; x < FFT_WIDTH; x++){
-		for (int y = 0; y <SMETER_HEIGHT; y++){
-			if (x <= Signal_Level){
+	int Signal_Level = ((RSL + 120) * 26) / 10;
+	for (int x = 0; x < FFT_WIDTH; x++) {
+		for (int y = 0; y < SMETER_HEIGHT; y++) {
+			if (x <= Signal_Level) {
 				LCD_WriteRAM(LCD_COLOR_GREEN);
-			} else {
+			}
+			else {
 				LCD_WriteRAM(LCD_COLOR_DGRAY);
 			}
 		}
 	}
+
+	char SMeter$[7];
 	if (Signal_Level < 120) {
 		if (Signal_Level < 0)
 			Signal_Level = 0;
-		S = Signal_Level/12;
-		sprintf(SMeter$,"S%i    ",S);
+
+		int SLevel = Signal_Level / 12;
+		sprintf(SMeter$, "S%i    ", SLevel);
 	}
 	else {
-		S = 9;
-		int R = (Signal_Level-100)/3;
-		sprintf(SMeter$,"S%i+%2i",S,R);
+		int SLevel = 9;
+		int R = (Signal_Level - 100) / 3;
+		sprintf(SMeter$, "S%i+%2i", SLevel, R);
 	}
 	GL_SetBackColor(LCD_COLOR_BLACK);
 	GL_SetTextColor(LCD_COLOR_WHITE);
-	GL_PrintString (1,64,SMeter$,0);
-
-	DSP_Flag = 0;   // Final End of DSP and FFT Update Processing
+	GL_PrintString(1, 64, SMeter$, 0);
 }
+
+
+
+

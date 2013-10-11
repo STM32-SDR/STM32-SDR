@@ -4,12 +4,19 @@
  *  Created on: Sep 6, 2013
  *      Author: CharleyK
  */
+
+#ifndef _AGC_PROCESSING_H_
+#define _AGC_PROCESSING_H_
+
 void Proc_AGC(void);
 void Init_AGC (void);
 
-int PGAGain;
-int AGC_Mode;
-float   DDeltaPGA;
+// Global variables exposed by AGC module
+extern int   PGAGain;
+extern int   AGC_Mode;
+extern float DDeltaPGA;
 
-float   AGC_Mag;
-int		RSL_Mag;
+extern float AGC_Mag;
+extern int   RSL_Mag;
+
+#endif
