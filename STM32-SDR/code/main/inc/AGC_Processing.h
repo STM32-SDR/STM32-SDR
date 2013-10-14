@@ -13,3 +13,8 @@ float   DDeltaPGA;
 
 float   AGC_Mag;
 int		RSL_Mag;
+
+int PGAGAIN0;
+int dac_gain;
+
+int 	AGC_On;

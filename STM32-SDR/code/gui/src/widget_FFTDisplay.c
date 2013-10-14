@@ -294,6 +294,8 @@ static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 	intToCommaString(RSL, test5, 5);
 	GL_PrintString(277, 80, test5, 0);
 
+
+	/*
 	//Display SMeter
 	x = 80;
 	y = 68;
@@ -324,6 +326,42 @@ static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 	GL_SetBackColor(LCD_COLOR_BLACK);
 	GL_SetTextColor(LCD_COLOR_WHITE);
 	GL_PrintString (1,64,SMeter$,0);
+	 *
+	 *
+	 */
+
+    //Display SMeter
+    x = 80;
+    y = 68;
+    LCD_SetDisplayWindow(x, y, SMETER_HEIGHT, FFT_WIDTH);
+    LCD_WriteRAM_PrepareDir(LCD_WriteRAMDir_Down);
+
+    Signal_Level = ((RSL + 120)*26)/10;
+    //Signal_Level = ((RSL_Mag + 120)*26)/10;
+    for (int x = 0; x < FFT_WIDTH; x++){
+        for (int y = 0; y <SMETER_HEIGHT; y++){
+            if (x <= Signal_Level){
+                LCD_WriteRAM(LCD_COLOR_GREEN);
+            }
+            else {
+                LCD_WriteRAM(LCD_COLOR_DGRAY);
+            }
+        }
+    }
+    S = (int)((float)RSL/6. + 21.5);
+    if (S < 0) S = 0;
+    if (RSL < -73) {
+        sprintf(SMeter$,"S%i    ",S);
+    }
+    else {
+        S = 9;
+        int R = RSL + 73;
+        sprintf(SMeter$,"S%i+%2i",S,R);
+    }
+    GL_SetBackColor(LCD_COLOR_BLACK);
+    GL_SetTextColor(LCD_COLOR_WHITE);
+    GL_PrintString (1,64,SMeter$,0);
+
 
 	DSP_Flag = 0;   // Final End of DSP and FFT Update Processing
 }

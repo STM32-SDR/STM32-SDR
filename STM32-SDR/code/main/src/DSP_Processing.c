@@ -23,6 +23,7 @@
 #include	"arm_math.h"
 #include	"FIR_Coefficients.h"
 #include	"DSP_Processing.h"
+#include	"AGC_Processing.h"
 
 #define		FFT_TIME_CONST	0.25
 #define		SAMPLING_FREQ 8000.
@@ -30,6 +31,7 @@
 
 float	RMS_Sig;
 float	dB_Sig;
+float 	DAC_RMS_Sig;
 
 int		Sig;
 int		Sig_Max;
@@ -37,6 +39,8 @@ int		Sig_Total;
 int		Sig_Sum0;
 int		Sig_Sum1;
 int		Sig_Sum2;
+
+
 
 int		AGC_Scale;
 int 	number_bins;
@@ -47,6 +51,7 @@ extern  int NCO_Bin;
 extern  int AGC_Mode;
 extern  int RSL_Mag;
 extern  float AGC_Mag;
+extern  float DAC_AGC_Mag;
 
 float32_t FFT_Output[256];
 float32_t FFT_Filter[256];
@@ -141,6 +146,7 @@ void Process_FFT(void)
 	Sig_Sum1 = 0;
 	Sig_Sum2 = 0;
 
+
 	number_bins =0;
 	AGC_Multiplier = (float)AGC_Scale/100.0;
 
@@ -158,38 +164,57 @@ void Process_FFT(void)
 		//First Order Filter for FFT
 		FFT_Filter[j] =  FFT_Coeff * FFT_Output[j] + (1.0-FFT_Coeff) * FFT_Filter[j];
 
-
-		//Point AGC
+		//Digi AGC
 		if (j == NCO_Bin) {
 			for (int k = NCO_Bin-2; k < NCO_Bin+3; k++)	{
 				Sig = (int)FFT_Magnitude[k];
-				if ( Sig > Sig_Max) Sig_Max = Sig;
 				Sig_Sum1 += Sig;
 			}
-			Sig_Sum0 = Sig_Max;
+
 		}
 
-		//Total or SSB or Average AGC
-		if ( j > 8 && j < 128 )	{
+		//Peak / SSB  AGC
+		if ( j > 8 && j < 252 )  //Limit Search to less than 2000 hz
+		{
+			Sig = (int)FFT_Magnitude[j];
+		    if ( Sig > Sig_Max) {
+		    	Sig_Max = Sig;
+		    }
 			Sig_Sum2 += (int)FFT_Magnitude[j];
-			number_bins++;
 		}
-	}
+
+	  }  // End of Search
+
+	Sig_Sum0 = Sig_Max;
+
+
 	switch (AGC_Mode){
 		case 0:
 			Sig_Total = Sig_Sum0;
+			AGC_On =1;
 			break;
 		case 1:
 			Sig_Total = Sig_Sum1;
+			AGC_On =1;
 			break;
 		case 2:
 			Sig_Total = Sig_Sum2;
+			AGC_On =1;
 			break;
+
+		case 3:
+			Sig_Total = Sig_Sum1;
+			AGC_On =0;
+			break;
+
 	}
 	RMS_Sig = 10*sqrt((float32_t)Sig_Total);
+	DAC_RMS_Sig = 10*sqrt((float32_t)Sig_Sum0); //Always use Peak value for DAC AGC
 	dB_Sig = 23. + 10*log((float32_t)Sig_Total + .001);
 
-	AGC_Mag = FFT_Coeff*RMS_Sig + (1.-FFT_Coeff)*AGC_Mag;
+	if (RMS_Sig <1000.0)	AGC_Mag = FFT_Coeff*RMS_Sig + (1.-FFT_Coeff)*AGC_Mag;
+	if (DAC_RMS_Sig <1000.0)	DAC_AGC_Mag = FFT_Coeff*DAC_RMS_Sig + (1.-FFT_Coeff)*DAC_AGC_Mag;
+
 	RSL_Mag = FFT_Coeff*dB_Sig + (1.-FFT_Coeff)*RSL_Mag;
 
 }//End of Process_FFT

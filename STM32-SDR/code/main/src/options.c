@@ -148,7 +148,7 @@ static OptionStruct s_optionsData[] = {
 		/*Name*/ "AGC Mode ",
 		/*Init*/ 0,
 		/*Min */ 0,
-		/*Max */ 2,
+		/*Max */ 3,
 		/*Rate*/ 1,
 		/*Data*/ 0,
 	},
@@ -222,13 +222,15 @@ void Options_SetValue(int optionIdx, int16_t newValue)
 	switch (optionIdx) {
 	case OPTION_RX_AUDIO:
 		if (RxTx_InRxMode())
-			Set_DAC_DVC(newValue);
+			//Set_DAC_DVC(newValue);
+			dac_gain = newValue;
 		break;
 
 	case OPTION_RX_RF:
 		if (RxTx_InRxMode())
-			Init_AGC(); //This also sets the PGA_Gain as well
-		break;
+			//Init_AGC(); //This also sets the PGA_Gain as well
+			PGAGAIN0 = 2*newValue;
+			break;
 
 	case OPTION_Mic_Gain:
 		if (RxTx_InTxMode() && (Mode_GetCurrentMode() == MODE_SSB))
