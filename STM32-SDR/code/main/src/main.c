@@ -51,7 +51,7 @@
 #include	"DSP_Processing.h"
 #include    "DMA_IRQ_Handler.h"
 
-#define VERSION_STRING "1.029-1"
+#define VERSION_STRING "1.029-2"
 
 const uint32_t CODEC_FREQUENCY = 8000;
 
