@@ -64,9 +64,9 @@ static OptionStruct s_optionsData[] = {
 	},
 	{
 		/*Name*/ "  Rx RF  ",
-		/*Init*/ 20,
+		/*Init*/ 80,
 		/*Min */ 0,
-		/*Max */ 40,
+		/*Max */ 80,
 		/*Rate*/ 1,
 		/*Data*/ 0,
 	},
@@ -136,7 +136,16 @@ static OptionStruct s_optionsData[] = {
 		/*Data*/ 0,
 	},
 	{
-		/*Name*/ "AGC Thrsh",
+		/*Name*/ "AGC Thr 1",
+		/*Init*/ 400,
+		/*Min */ 50,
+		/*Max */ 1000,
+		/*Rate*/ 10,
+		/*Data*/ 0,
+	},
+
+	{
+		/*Name*/ "AGC Thr 2",
 		/*Init*/ 100,
 		/*Min */ 50,
 		/*Max */ 1000,
@@ -150,15 +159,6 @@ static OptionStruct s_optionsData[] = {
 		/*Min */ 0,
 		/*Max */ 3,
 		/*Rate*/ 1,
-		/*Data*/ 0,
-	},
-
-	{
-		/*Name*/ "AGC Scale",
-		/*Init*/ 100,
-		/*Min */ 100,
-		/*Max */ 1000,
-		/*Rate*/ 10,
 		/*Data*/ 0,
 	},
 
@@ -222,14 +222,14 @@ void Options_SetValue(int optionIdx, int16_t newValue)
 	switch (optionIdx) {
 	case OPTION_RX_AUDIO:
 		if (RxTx_InRxMode())
-			//Set_DAC_DVC(newValue);
 			dac_gain = newValue;
+			Old_dac_gain = -200;  //Set to an outrageous value for change testing in AGC_Processsing.c
 		break;
 
 	case OPTION_RX_RF:
 		if (RxTx_InRxMode())
-			//Init_AGC(); //This also sets the PGA_Gain as well
-			PGAGAIN0 = 2*newValue;
+			PGAGAIN0 = newValue;
+			Old_PGAGAIN0 = -200; //Set to an outrageous value for change testing in AGC_Processsing.c
 			break;
 
 	case OPTION_Mic_Gain:
@@ -271,17 +271,19 @@ void Options_SetValue(int optionIdx, int16_t newValue)
 		}
 		break;
 
-	case OPTION_AGC_THRSH:
+	case OPTION_AGC_THRSH1:
 		if (RxTx_InRxMode())
 			Init_AGC();
 		break;
 
-	case OPTION_AGC_MODE:
-		AGC_Mode = newValue;
+	case OPTION_AGC_THRSH2:
+		if (RxTx_InRxMode())
+			Init_AGC();
 		break;
 
-	case OPTION_AGC_Scale:
-		AGC_Scale = newValue;
+	case OPTION_AGC_Mode:
+		AGC_Mode = newValue;
+		Init_AGC();
 		break;
 
 	case OPTION_SI570_MULT:

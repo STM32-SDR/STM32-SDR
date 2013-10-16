@@ -21,5 +21,8 @@ int		RSL_Mag;
 
 int PGAGAIN0;
 int dac_gain;
+int	AGC_Signal;
 
-int 	AGC_On;
+int AGC_On;
+int Old_PGAGAIN0;
+int Old_dac_gain;

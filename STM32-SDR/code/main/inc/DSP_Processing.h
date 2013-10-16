@@ -29,7 +29,6 @@ void Process_FFT(void);
 void Sideband_Demod(void);
 void init_DSP(void);
 
-int		AGC_Scale;
 
 extern float32_t FFT_Output[256];
 extern float32_t FFT_Filter[256];

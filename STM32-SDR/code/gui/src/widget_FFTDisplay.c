@@ -305,14 +305,14 @@ static void displayAGCVariables(int RSL)
 	GL_SetTextColor(LCD_COLOR_RED);
 	GL_SetBackColor(LCD_COLOR_BLACK);
 	char test3[3];
-	intToCommaString(PGAGain / 2, test3, 3);
-	GL_PrintString(175, 80, test3, 0);
+	intToCommaString(PGAGain, test3, 3);
+	GL_PrintString(110, 80, test3, 0);
 
-	//GL_SetTextColor(LCD_COLOR_RED);
-	//GL_SetBackColor(LCD_COLOR_BLACK);
-	//char test4[5];
-	//intToCommaString(RSL_Mag, test4, 5);
-	//GL_PrintString(195, 80, test4, 0);
+	GL_SetTextColor(LCD_COLOR_RED);
+	GL_SetBackColor(LCD_COLOR_BLACK);
+	char test4[5];
+	intToCommaString(AGC_Signal, test4, 5);
+	GL_PrintString(180, 80, test4, 0);
 
 	GL_SetTextColor(LCD_COLOR_RED);
 	GL_SetBackColor(LCD_COLOR_BLACK);

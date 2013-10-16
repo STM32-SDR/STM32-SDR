@@ -36,6 +36,7 @@ static GL_Page_TypeDef *s_pThisScreen = &g_screenMainPSK;
 static GL_PageControls_TypeDef* pKeyboardLabel;
 static GL_PageControls_TypeDef* pAGCLabel;
 static GL_PageControls_TypeDef* pPGALabel;
+static GL_PageControls_TypeDef* pDACLabel;
 static GL_PageControls_TypeDef* pRSLLabel;
 
 /**
@@ -95,6 +96,10 @@ static _Bool PGAUpdateHandler(GL_PageControls_TypeDef* pThis, _Bool forceRedispl
 	 return 0;
 }
 
+static _Bool DACUpdateHandler(GL_PageControls_TypeDef* pThis, _Bool forceRedisplay){
+	 return 0;
+}
+
 
 static _Bool RSLUpdateHandler(GL_PageControls_TypeDef* pThis, _Bool forceRedisplay){
 	return 0;
@@ -139,9 +144,14 @@ void ScreenMainPSK_Create(void)
 	AddPageControlObj(0,  80, pAGCLabel, s_pThisScreen);
 
 	//PGA Label
-	pPGALabel = Widget_NewLabel(" Rx RF ", LCD_COLOR_YELLOW, LCD_COLOR_BLACK, 0, GL_FONTOPTION_8x16,PGAUpdateHandler);
-	AddPageControlObj(115,  80, pPGALabel, s_pThisScreen);
+	pPGALabel = Widget_NewLabel(" RF ", LCD_COLOR_YELLOW, LCD_COLOR_BLACK, 0, GL_FONTOPTION_8x16,PGAUpdateHandler);
+	AddPageControlObj(75,  80, pPGALabel, s_pThisScreen);
 	
+	//DAC Label
+	pDACLabel = Widget_NewLabel(" AF ", LCD_COLOR_YELLOW, LCD_COLOR_BLACK, 0, GL_FONTOPTION_8x16,DACUpdateHandler);
+	AddPageControlObj(150,  80, pDACLabel, s_pThisScreen);
+
+
 	//RSL Label
 	pRSLLabel = Widget_NewLabel(" RSL ", LCD_COLOR_YELLOW, LCD_COLOR_BLACK, 0, GL_FONTOPTION_8x16,RSLUpdateHandler);
 	AddPageControlObj(235,  80, pRSLLabel, s_pThisScreen);

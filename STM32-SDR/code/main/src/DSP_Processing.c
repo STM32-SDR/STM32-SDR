@@ -40,12 +40,6 @@ int		Sig_Sum0;
 int		Sig_Sum1;
 int		Sig_Sum2;
 
-
-
-int		AGC_Scale;
-int 	number_bins;
-float 	AGC_Multiplier;
-
 float 	FFT_Coeff = 0.2;
 extern  int NCO_Bin;
 extern  int AGC_Mode;
@@ -146,11 +140,6 @@ void Process_FFT(void)
 	Sig_Sum1 = 0;
 	Sig_Sum2 = 0;
 
-
-	number_bins =0;
-	AGC_Multiplier = (float)AGC_Scale/100.0;
-
-
 	for (int j = 0; j < 256; j++) 
 		FFT_Mag_10[j] = (int) FFT_Magnitude[j] * 10; //add in 10 db gain
 	for (int16_t j = 8; j < 252; j++) {  
@@ -203,7 +192,7 @@ void Process_FFT(void)
 			break;
 
 		case 3:
-			Sig_Total = Sig_Sum1;
+			Sig_Total = Sig_Sum1;  //This forces RSL to be derived from Peak magnitude
 			AGC_On =0;
 			break;
 
@@ -212,8 +201,8 @@ void Process_FFT(void)
 	DAC_RMS_Sig = 10*sqrt((float32_t)Sig_Sum0); //Always use Peak value for DAC AGC
 	dB_Sig = 23. + 10*log((float32_t)Sig_Total + .001);
 
-	if (RMS_Sig <1000.0)	AGC_Mag = FFT_Coeff*RMS_Sig + (1.-FFT_Coeff)*AGC_Mag;
-	if (DAC_RMS_Sig <1000.0)	DAC_AGC_Mag = FFT_Coeff*DAC_RMS_Sig + (1.-FFT_Coeff)*DAC_AGC_Mag;
+	if (RMS_Sig <1000.0)	AGC_Mag = FFT_Coeff*RMS_Sig + (1.-FFT_Coeff)*AGC_Mag; //Limits upper value
+	if (DAC_RMS_Sig <1000.0)	DAC_AGC_Mag = FFT_Coeff*DAC_RMS_Sig + (1.-FFT_Coeff)*DAC_AGC_Mag; //Limits upper value
 
 	RSL_Mag = FFT_Coeff*dB_Sig + (1.-FFT_Coeff)*RSL_Mag;
 
