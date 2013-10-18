@@ -37,7 +37,6 @@ uint32_t DMA_RX_Memory;
 uint32_t DMA_TX_Memory;
 volatile int16_t DSP_Flag = 0;
 int16_t AGC_Flag = 0;
-//int16_t Tx_Flag;
 int16_t i;
 
 float rgain;

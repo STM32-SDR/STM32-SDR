@@ -51,7 +51,7 @@
 #include	"DSP_Processing.h"
 #include    "DMA_IRQ_Handler.h"
 
-#define VERSION_STRING "1.029-3"
+#define VERSION_STRING "1.029-4"
 
 const uint32_t CODEC_FREQUENCY = 8000;
 
@@ -94,21 +94,21 @@ int main(void)
 		// Process any pending USB events
 		USBH_Process(&USB_OTG_Core_dev, &USB_Host);
 
-		// Polling tasks:
-		RxTx_CheckAndHandlePTT();
-
 		 // Touch Events
 		ProcessInputData();
 
+		// Polling tasks:
+		RxTx_CheckAndHandlePTT();
+
 		// Redraw the screen (as needed)
 		if (DSP_Flag == 1)
-			GPIO_WriteBit(Test_GPIO, Test_1, Bit_SET);
-
+		{
+		GPIO_WriteBit(Test_GPIO, Test_1, Bit_SET);
 		UpdateScreenWithChanges();
 		GPIO_WriteBit(Test_GPIO, Test_1, Bit_RESET);
+		}
 
-
-		Proc_AGC();
+		if (AGC_Flag == 1) Proc_AGC();
 	}
 }
 

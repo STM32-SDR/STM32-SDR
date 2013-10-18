@@ -177,26 +177,21 @@ void Process_FFT(void)
 	Sig_Sum0 = Sig_Max;
 
 
-	switch (AGC_Mode){
+	switch (AGC_Mode){   // AGC Mode Switch
 		case 0:
 			Sig_Total = Sig_Sum0;
-			AGC_On =1;
 			break;
 		case 1:
 			Sig_Total = Sig_Sum1;
-			AGC_On =1;
 			break;
 		case 2:
 			Sig_Total = Sig_Sum2;
-			AGC_On =1;
 			break;
-
 		case 3:
 			Sig_Total = Sig_Sum1;  //This forces RSL to be derived from Peak magnitude
-			AGC_On =0;
 			break;
+		} // End of AGC Mode Switch
 
-	}
 	RMS_Sig = 10*sqrt((float32_t)Sig_Total);
 	DAC_RMS_Sig = 10*sqrt((float32_t)Sig_Sum0); //Always use Peak value for DAC AGC
 	dB_Sig = 23. + 10*log((float32_t)Sig_Total + .001);

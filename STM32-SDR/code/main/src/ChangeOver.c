@@ -145,13 +145,21 @@ void Receive_Sequence(void)
 	Mute_HP();
 	Mute_LO();
 	s_inTxMode = 0;
+	if (AGC_Mode != 3)
+	{AGC_On =1;
+	Init_AGC();
+	}
+	else
+	{
+	AGC_On =0;  //This forces the manual AGC mode
+	}
+
 	GPIO_WriteBit(GPIOD, GPIO_Pin_3, Bit_SET);	//Make PTT_Out High, Remember FET Inversion
 	Disconnect_PGA();
 	Connect_IQ_Inputs();
 	Set_DAC_DVC(Options_GetValue(OPTION_RX_AUDIO));
 	Set_ADC_DVC(-10);  //was -20 using Milt's AGC scheme
 	Set_HP_Gain(6);
-	Init_AGC ();
 }
 
 void Xmit_SSB_Sequence(void)
@@ -159,6 +167,7 @@ void Xmit_SSB_Sequence(void)
 	Mute_HP();
 	Mute_LO();
 	s_inTxMode = 1;
+	AGC_On = 0;  //Turn off AGC so that DAC is held constant during transmit
 	Disconnect_PGA();
 	Set_DAC_DVC(-10);
 	//Set_DAC_DVC(Options_GetValue(OPTION_CW_LEVEL));
@@ -176,6 +185,7 @@ void Xmit_CW_Sequence(void)
 	Mute_HP();
 	Mute_LO();
 	s_inTxMode = 1;
+	AGC_On = 0;
 	Disconnect_PGA();
 	Set_DAC_DVC(-60);
 	GPIO_WriteBit(GPIOD, GPIO_Pin_3, Bit_RESET);  //Make PTT_Out Low,Remember FET Inversion
@@ -190,6 +200,7 @@ void Xmit_PSK_Sequence(void)
 	Mute_HP();
 	Mute_LO();
 	s_inTxMode = 1;
+	AGC_On = 0;  //Turn off AGC so that DAC is held constant during transmit
 	Disconnect_PGA();
 	Set_DAC_DVC(-10);
 	GPIO_WriteBit(GPIOD, GPIO_Pin_3, Bit_RESET);  //Make PTT_Out Low,Remember FET Inversion

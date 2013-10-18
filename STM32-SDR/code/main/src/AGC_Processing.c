@@ -13,6 +13,8 @@
 #include	"Codec_Gains.h"
 #include	"options.h"
 #include	"DMA_IRQ_Handler.h"
+#include    "ChangeOver.h"
+
 
 float   AGC_Mag;
 float   DAC_AGC_Mag;
@@ -68,11 +70,9 @@ void Proc_AGC(void);
 void Init_AGC (void);
 
 void Proc_AGC(void) {
-	if (AGC_Flag == 1) {
 	Calc_AGC_Setpoints();
 	AGC_Flag =0;
 	}
-}
 
 void Calc_AGC_Setpoints(void) {
 	//PGA AGC Section
@@ -90,7 +90,7 @@ void Calc_AGC_Setpoints(void) {
 		Old_DDeltaPGA = DDeltaPGA;
 
 	if(AGC_On == 1)
-		{				//AGC is On
+			{		//AGC is On
 			PGAGain += (int)DDeltaPGA;
 			if (PGAGain<0) PGAGain = 0;
 			if (PGAGain > PGAGAIN0) PGAGain = PGAGAIN0;
@@ -102,7 +102,7 @@ void Calc_AGC_Setpoints(void) {
 		} //AGC is On
 			else
 		{				//AGC is Off
-			if (PGAGAIN0 != Old_PGAGAIN0)
+			if (PGAGAIN0 != Old_PGAGAIN0 && RxTx_InRxMode())
 			{Set_PGA_Gain(PGAGAIN0);
 			PGAGain = PGAGAIN0;
 			Old_PGAGAIN0 = PGAGAIN0;
@@ -135,7 +135,7 @@ void Calc_AGC_Setpoints(void) {
 			}   //AGC On
 		else
 		{	//AGC is Off
-		if (dac_gain != Old_dac_gain)
+		if (dac_gain != Old_dac_gain && RxTx_InRxMode())
 				{Set_DAC_DVC (dac_gain);
 				AGC_Signal = dac_gain;
 				Old_dac_gain = dac_gain;
@@ -169,8 +169,6 @@ void Init_AGC (void)			{
 		Old_PGAGAIN0 = -200; //Set to an outrageous value for change testing in AGC_Processsing.c
 		Old_dac_gain = -200; //Set to an outrageous value for change testing in AGC_Processsing.c
 
-		//Set to an outrageous value for change testing in AGC_Processsing.c
-
 		dac_gain = Options_GetValue(OPTION_RX_AUDIO);
 		AGC_Signal = dac_gain;
 		Old_AGC_Signal = AGC_Signal;
@@ -178,6 +176,11 @@ void Init_AGC (void)			{
 
 		Vmin = (float)Options_GetValue(OPTION_AGC_THRSH2);
 		Sig_Thr = (float)Options_GetValue(OPTION_AGC_THRSH1);
+
+		if (AGC_Mode != 3)
+		AGC_On =1;
+		else
+		AGC_On =0;
 
 	}
 

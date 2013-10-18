@@ -38,7 +38,8 @@
 //#define EEPROM_SENTINEL_VAL 5680
 //#define EEPROM_SENTINEL_VAL 3333
 //#define EEPROM_SENTINEL_VAL 2222
-#define EEPROM_SENTINEL_VAL 1037
+//#define EEPROM_SENTINEL_VAL 1037
+#define EEPROM_SENTINEL_VAL 1005
 
 static OptionNumber s_currentOptionNumber = OPTION_RX_AUDIO;
 
@@ -222,15 +223,20 @@ void Options_SetValue(int optionIdx, int16_t newValue)
 	switch (optionIdx) {
 	case OPTION_RX_AUDIO:
 		if (RxTx_InRxMode())
+		{
 			dac_gain = newValue;
 			Old_dac_gain = -200;  //Set to an outrageous value for change testing in AGC_Processsing.c
+		}
 		break;
 
 	case OPTION_RX_RF:
 		if (RxTx_InRxMode())
+		{
 			PGAGAIN0 = newValue;
 			Old_PGAGAIN0 = -200; //Set to an outrageous value for change testing in AGC_Processsing.c
+		}
 			break;
+
 
 	case OPTION_Mic_Gain:
 		if (RxTx_InTxMode() && (Mode_GetCurrentMode() == MODE_SSB))
@@ -282,8 +288,11 @@ void Options_SetValue(int optionIdx, int16_t newValue)
 		break;
 
 	case OPTION_AGC_Mode:
+		if (RxTx_InRxMode())
+		{
 		AGC_Mode = newValue;
 		Init_AGC();
+		}
 		break;
 
 	case OPTION_SI570_MULT:

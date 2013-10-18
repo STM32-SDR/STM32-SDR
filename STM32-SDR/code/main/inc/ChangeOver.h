@@ -29,6 +29,7 @@ void RxTx_Init(void);
 void RxTx_SetReceive(void);
 void RxTx_SetTransmit(void);
 
+
 // Query current mode (transmit or receive).
 _Bool RxTx_InRxMode(void);
 _Bool RxTx_InTxMode(void);
