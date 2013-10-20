@@ -49,7 +49,7 @@ static void Xmit_CW_Sequence(void);
 static void Xmit_PSK_Sequence(void);
 static void Init_PTT_IO(void);
 void handlePttStateChange(void);
-
+extern void Init_Waterfall(void);
 
 /****************************************
  * Public interface
@@ -160,6 +160,7 @@ void Receive_Sequence(void)
 	Set_DAC_DVC(Options_GetValue(OPTION_RX_AUDIO));
 	Set_ADC_DVC(-10);  //was -20 using Milt's AGC scheme
 	Set_HP_Gain(6);
+	//Init_Waterfall();
 }
 
 void Xmit_SSB_Sequence(void)

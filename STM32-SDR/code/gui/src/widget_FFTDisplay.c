@@ -30,11 +30,21 @@
 #include "DMA_IRQ_Handler.h"
 #include "AGC_Processing.h"
 #include "math.h"
+#include "widget_FFTDisplay.h"
+
+//waterfall
+int		line;
+int		WF_Line0 = 0;
+int 	WF_Scroll_Flag = 0;
+int		WF_Count = 0;
+int		WF_Bfr[15360];
+int		*pWFBfr;
+//waterfall
 
 // Constants
 static const int FFT_WIDTH   = 240;
 static const int FFT_HEIGHT  =  64;
-static const int SELFREQ_ADJ =   4;
+//static const int SELFREQ_ADJ =   4;
 static const int CHARACTER_WIDTH = 8;
 static const int MAX_FREQ_DIGITS = 5;
 static const int SMETER_HEIGHT = 8;
@@ -61,6 +71,8 @@ int 	NCO_Point;
 int		NCO_Bin;
 uint8_t FFT_Display[256];
 extern	int RSL_Mag;
+
+void Init_Waterfall( void );
 
 #define ID_FFTSelFreqNum_LABEL 50105
 
@@ -233,6 +245,8 @@ static void displayFFT(int x, int y)
 
 	NCO_Bin = (int)selectedFreqX + 8;
 
+#if 0
+
 	// Draw the FFT using direct memory writes (fast).
 	LCD_SetDisplayWindow(x, y, FFT_HEIGHT, FFT_WIDTH);
 	LCD_WriteRAM_PrepareDir(LCD_WriteRAMDir_Down);
@@ -262,6 +276,51 @@ static void displayFFT(int x, int y)
 			}
 		}
 	}
+
+#else
+
+	// Draw the Waterfall using direct memory writes (fast).
+	LCD_SetDisplayWindow(x, y, FFT_HEIGHT, FFT_WIDTH);
+	LCD_WriteRAM_PrepareDir(LCD_WriteRAMDir_Right);
+
+	// Send colorized FFT data to Waterfall Buffer
+	for (int i = 0; i < FFT_WIDTH; i++)
+	{
+		*(pWFBfr + (FFT_WIDTH*WF_Line0) + i) = WFPalette[(FFT_Display[i + 8] )];
+	}
+	WF_Count++;
+
+	// Refresh the waterfall display--scrolling begins after 64 lines
+	for (line = WF_Line0; line < FFT_HEIGHT; line++){
+		for (int i = 0; i < FFT_WIDTH; i++) {
+			if (i == (int)(selectedFreqX +0.5)) {
+				//LCD_WriteRAM(LCD_COLOR_RED);
+				LCD_WriteRAM(LCD_COLOR_WHITE);
+			}
+			else {
+				LCD_WriteRAM(*(pWFBfr + line*FFT_WIDTH + i));
+			}
+		}
+	}
+	for ( line = 0;line < WF_Line0; line++){
+		for (int i = 0; i < FFT_WIDTH; i++){
+			if (i == (int)(selectedFreqX +0.5)){
+				//LCD_WriteRAM(LCD_COLOR_RED);
+				LCD_WriteRAM(LCD_COLOR_WHITE);
+			}
+			else {
+				LCD_WriteRAM(*(pWFBfr + line*FFT_WIDTH + i));
+			}
+		}
+	}
+
+	if ((WF_Count == FFT_HEIGHT) || (WF_Scroll_Flag ==1)){
+		WF_Count = 0;
+		WF_Scroll_Flag = 1;
+		WF_Line0++;
+		WF_Line0 %= FFT_HEIGHT;
+	}
+#endif
 }
 
 static void displayFrequencyOffsetText(_Bool force)
@@ -361,6 +420,12 @@ static void displaySMeter(int RSL)
 
 }
 
+void Init_Waterfall (void){
 
+	pWFBfr = &WF_Bfr[0];
+	WF_Count = 0;
+	WF_Scroll_Flag = 0;
+	WF_Line0 = 0;
+}
 
 

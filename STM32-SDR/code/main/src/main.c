@@ -51,7 +51,8 @@
 #include	"DSP_Processing.h"
 #include    "DMA_IRQ_Handler.h"
 
-#define VERSION_STRING "1.029-4"
+
+#define VERSION_STRING "1.030"
 
 const uint32_t CODEC_FREQUENCY = 8000;
 
@@ -68,6 +69,8 @@ static void displaySplashScreen(void);
 static void displaySerialPortWelcome(void);
 static void main_delay(uint32_t numLoops);
 static void displayLoadStationData(void);
+
+extern void Init_Waterfall( void );
 
 /*
  * FUNCTIONS
@@ -179,6 +182,9 @@ static void initializeHardware(void)
 	main_delay(SETUP_DELAY);
 
 	Init_CW_GPIO();
+	main_delay(SETUP_DELAY);
+
+	Init_Waterfall();
 	main_delay(SETUP_DELAY);
 
 	// Init USB Host Library
