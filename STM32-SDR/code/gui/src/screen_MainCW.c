@@ -24,15 +24,66 @@
 #include "ModeSelect.h"
 #include "options.h"
 #include <assert.h>
+#include "AGC_Processing.h"
 
+extern 	int WF_Flag;
 
 // Used in this file to refer to the correct screen (helps to keep code copy-paste friendly.
 static GL_Page_TypeDef *s_pThisScreen = &g_screenMainCW;
+
+// following 4 lines added by MEC
+static GL_PageControls_TypeDef* pAGCLabel;
+static GL_PageControls_TypeDef* pPGALabel;
+static GL_PageControls_TypeDef* pDACLabel;
+static GL_PageControls_TypeDef* pRSLLabel;
 /**
  * Call-back prototypes
  */
-static void tx_Click(GL_PageControls_TypeDef* pThis);
-static void rx_Click(GL_PageControls_TypeDef* pThis);
+static void WS_Click(GL_PageControls_TypeDef* pThis);
+static void TR_Click(GL_PageControls_TypeDef* pThis);
+
+extern void Init_Waterfall( void );
+extern void ClearTextDisplay(void);
+
+// following 4 functions added by MEC
+static _Bool AGCStatusUpdateHandler(GL_PageControls_TypeDef* pThis, _Bool forceRedisplay)
+{
+
+     switch(AGC_Mode){
+
+     case 0: Widget_ChangeLabelText(pAGCLabel, "Peak AGC ");
+     break;
+
+     case 1: Widget_ChangeLabelText(pAGCLabel, "Digi AGC ");
+     break;
+
+     case 2: Widget_ChangeLabelText(pAGCLabel, "SSB AGC  ");
+     break;
+
+     case 3: Widget_ChangeLabelText(pAGCLabel, "AGC Off   ");
+     break;
+     return 0;
+
+     }
+      // No need to indicate update required because changing the
+      // label text forces an update (redraw).
+     return 0;
+}
+
+static _Bool PGAUpdateHandler(GL_PageControls_TypeDef* pThis, _Bool forceRedisplay){
+	 return 0;
+}
+
+static _Bool DACUpdateHandler(GL_PageControls_TypeDef* pThis, _Bool forceRedisplay){
+	 return 0;
+}
+
+
+static _Bool RSLUpdateHandler(GL_PageControls_TypeDef* pThis, _Bool forceRedisplay){
+	return 0;
+}
+
+
 
 /**
  * Create the screen
@@ -42,7 +93,7 @@ void ScreenMainCW_Create(void)
 	Create_PageObj(s_pThisScreen);
 
 	// Title
-	GL_PageControls_TypeDef* ctrlPskText = Widget_NewLabel("CW Screen", LCD_COLOR_YELLOW, LCD_COLOR_BLACK, 1, GL_FONTOPTION_16x24, 0);
+	GL_PageControls_TypeDef* ctrlPskText = Widget_NewLabel("", LCD_COLOR_YELLOW, LCD_COLOR_BLACK, 1, GL_FONTOPTION_16x24, 0);
 	AddPageControlObj(0,  85, ctrlPskText, s_pThisScreen);
 
 	// FFT
@@ -64,10 +115,31 @@ void ScreenMainCW_Create(void)
 			btnFreq, s_pThisScreen);
 
 	// .. Rx & Tx buttons (Remove when code can automatically switch)
-	GL_PageControls_TypeDef* btnRx  = NewButton(10, " Rx ", rx_Click);
-	GL_PageControls_TypeDef* btnTx  = NewButton(9,  " Tx ", tx_Click);
-	AddPageControlObj(120, LCD_HEIGHT - 42, btnRx, s_pThisScreen);
-	AddPageControlObj(165, LCD_HEIGHT - 42, btnTx, s_pThisScreen);
+	GL_PageControls_TypeDef* btnTR  = NewButton(10, " T/R ", TR_Click);
+	GL_PageControls_TypeDef* btnWS  = NewButton(9,  " W/S ", WS_Click);
+	AddPageControlObj(100, LCD_HEIGHT - 42, btnTR, s_pThisScreen);
+	AddPageControlObj(170, LCD_HEIGHT - 42, btnWS, s_pThisScreen);
+
+	// following 4 sections added by MEC
+	//AGC Mode Label
+	pAGCLabel = Widget_NewLabel("AGC_Mode ", LCD_COLOR_YELLOW, LCD_COLOR_BLACK, 0, GL_FONTOPTION_8x16,AGCStatusUpdateHandler);
+	AddPageControlObj(0,  80, pAGCLabel, s_pThisScreen);
+
+	//PGA Label
+	pPGALabel = Widget_NewLabel(" RF ", LCD_COLOR_YELLOW, LCD_COLOR_BLACK, 0, GL_FONTOPTION_8x16,PGAUpdateHandler);
+	AddPageControlObj(75,  80, pPGALabel, s_pThisScreen);
+
+	//DAC Label
+	pDACLabel = Widget_NewLabel(" AF ", LCD_COLOR_YELLOW, LCD_COLOR_BLACK, 0, GL_FONTOPTION_8x16,DACUpdateHandler);
+	AddPageControlObj(150,  80, pDACLabel, s_pThisScreen);
+
+
+	//RSL Label
+	pRSLLabel = Widget_NewLabel(" RSL ", LCD_COLOR_YELLOW, LCD_COLOR_BLACK, 0, GL_FONTOPTION_8x16,RSLUpdateHandler);
+	AddPageControlObj(235,  80, pRSLLabel, s_pThisScreen);
+
+
+
 }
 
 
@@ -75,11 +147,18 @@ void ScreenMainCW_Create(void)
  * Button callbacks
  */
 #include "ChangeOver.h"
-static void tx_Click(GL_PageControls_TypeDef* pThis)
+static void WS_Click(GL_PageControls_TypeDef* pThis)
 {
-	RxTx_SetTransmit();
+	WF_Flag = !WF_Flag;
+	if (WF_Flag) Init_Waterfall();
 }
-static void rx_Click(GL_PageControls_TypeDef* pThis)
+static void TR_Click(GL_PageControls_TypeDef* pThis)
 {
-	RxTx_SetReceive();
+	if (RxTx_InTxMode()){
+		RxTx_SetReceive();
+		ClearTextDisplay();
+	}
+	else {
+		RxTx_SetTransmit();
+	}
 }

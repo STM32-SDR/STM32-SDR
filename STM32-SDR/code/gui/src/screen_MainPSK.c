@@ -31,6 +31,8 @@
 #include "KeyboardStatus.h"
 #include "AGC_Processing.h"
 
+extern 	int WF_Flag;
+
 // Used in this file to refer to the correct screen (helps to keep code copy-paste friendly.
 static GL_Page_TypeDef *s_pThisScreen = &g_screenMainPSK;
 static GL_PageControls_TypeDef* pKeyboardLabel;
@@ -42,8 +44,8 @@ static GL_PageControls_TypeDef* pRSLLabel;
 /**
  * Call-back prototypes
  */
-static void tx_Click(GL_PageControls_TypeDef* pThis);
-static void rx_Click(GL_PageControls_TypeDef* pThis);
+static void WS_Click(GL_PageControls_TypeDef* pThis);
+static void TR_Click(GL_PageControls_TypeDef* pThis);
 static void N_Click(GL_PageControls_TypeDef* pThis);
 static void C_Click(GL_PageControls_TypeDef* pThis);
 static void T_Click(GL_PageControls_TypeDef* pThis);
@@ -157,16 +159,16 @@ void ScreenMainPSK_Create(void)
 	AddPageControlObj(235,  80, pRSLLabel, s_pThisScreen);
 
 	// .. Rx & Tx buttons (Remove when code can automatically switch)
-	GL_PageControls_TypeDef* btnRx  = NewButton(10, " Rx ", rx_Click);
-	GL_PageControls_TypeDef* btnTx  = NewButton(9,  " Tx ", tx_Click);
+	GL_PageControls_TypeDef* btnTR  = NewButton(10, " T/R ", TR_Click);
+	GL_PageControls_TypeDef* btnWS  = NewButton(9,  " W/S ", WS_Click);
 	GL_PageControls_TypeDef* btnN  = NewButton(13,  "N ", N_Click);
 	GL_PageControls_TypeDef* btnC  = NewButton(14,  "C ", C_Click);
 	GL_PageControls_TypeDef* btnT  = NewButton(15,  "T ", T_Click);
 	GL_PageControls_TypeDef* btnClear  = NewButton(16,  "* ", Clear_Click);
 
 
-	AddPageControlObj(120, LCD_HEIGHT - 42, btnRx, s_pThisScreen);
-	AddPageControlObj(165, LCD_HEIGHT - 42, btnTx, s_pThisScreen);
+	AddPageControlObj(100, LCD_HEIGHT - 42, btnTR, s_pThisScreen);
+	AddPageControlObj(170, LCD_HEIGHT - 42, btnWS, s_pThisScreen);
 	AddPageControlObj(126,   170, btnN, s_pThisScreen);
 	AddPageControlObj(0, 170, btnC, s_pThisScreen);
 	AddPageControlObj(240, 170, btnT, s_pThisScreen);
@@ -178,15 +180,22 @@ void ScreenMainPSK_Create(void)
  * Button callbacks
  */
 #include "ChangeOver.h"
-static void tx_Click(GL_PageControls_TypeDef* pThis)
+static void WS_Click(GL_PageControls_TypeDef* pThis)
 {
-	RxTx_SetTransmit();
+	WF_Flag = !WF_Flag;
+	if (WF_Flag) Init_Waterfall();
 }
-static void rx_Click(GL_PageControls_TypeDef* pThis)
+static void TR_Click(GL_PageControls_TypeDef* pThis)
 {
-	RxTx_SetReceive();
-	ClearTextDisplay();
+	if (RxTx_InTxMode()){
+		RxTx_SetReceive();
+		ClearTextDisplay();
+	}
+	else {
+		RxTx_SetTransmit();
+	}
 }
+
 
 static void N_Click(GL_PageControls_TypeDef* pThis)
 {

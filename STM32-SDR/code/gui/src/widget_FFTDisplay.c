@@ -31,23 +31,27 @@
 #include "AGC_Processing.h"
 #include "math.h"
 #include "widget_FFTDisplay.h"
+#include "ModeSelect.h"
 
 //waterfall
-int		line;
-int		WF_Line0 = 0;
-int 	WF_Scroll_Flag = 0;
+//int		line;
+int		WF_Line0 ;
 int		WF_Count = 0;
 int		WF_Bfr[15360];
 int		*pWFBfr;
+int		WF_Flag = 1; //Default to Spectrum Display
 //waterfall
+int		tmode;
 
 // Constants
 static const int FFT_WIDTH   = 240;
 static const int FFT_HEIGHT  =  64;
-//static const int SELFREQ_ADJ =   4;
+static const int SELFREQ_ADJ =   4;
 static const int CHARACTER_WIDTH = 8;
 static const int MAX_FREQ_DIGITS = 5;
 static const int SMETER_HEIGHT = 8;
+
+static const int MAX_WF_COUNT = 2;
 
 // Private function prototypes
 static uint16_t WidgetFFT_GetWidth(GL_PageControls_TypeDef* pThis);
@@ -59,6 +63,8 @@ static void displayFrequencyOffsetText(_Bool force);
 static void displayAGCVariables(int RSL);
 static void displaySMeter(int RSL);
 static void	Acquire (void);
+
+
 
 
 // TODO: Remove these? Only set; never used!
@@ -245,83 +251,88 @@ static void displayFFT(int x, int y)
 
 	NCO_Bin = (int)selectedFreqX + 8;
 
-#if 0
+if (!WF_Flag) {
 
-	// Draw the FFT using direct memory writes (fast).
-	LCD_SetDisplayWindow(x, y, FFT_HEIGHT, FFT_WIDTH);
-	LCD_WriteRAM_PrepareDir(LCD_WriteRAMDir_Down);
+		// Draw the FFT using direct memory writes (fast).
+		LCD_SetDisplayWindow(x, y, FFT_HEIGHT, FFT_WIDTH);
+		LCD_WriteRAM_PrepareDir(LCD_WriteRAMDir_Down);
 
-	for (int x = 0; x < FFT_WIDTH; x++) {
-		// Plot this column of the FFT.
-		for (int y = 0; y < FFT_HEIGHT; y++) {
+		tmode = (int)Mode_GetCurrentMode();
 
-			// Draw red line for selected frequency
-			if (x == (int) (selectedFreqX + 0.5)) {
-				// Leave some white at the top
-				if (y <= SELFREQ_ADJ) {
+		for (int x = 0; x < FFT_WIDTH; x++) {
+			// Plot this column of the FFT.
+			for (int y = 0; y < FFT_HEIGHT; y++) {
+
+					// Draw red line for selected frequency
+					if ((x == (int) (selectedFreqX + 0.5))&& (tmode != MODE_SSB)){
+						// Leave some white at the top
+						if (y <= SELFREQ_ADJ) {
+							LCD_WriteRAM(LCD_COLOR_WHITE);
+						} else {
+							LCD_WriteRAM(LCD_COLOR_RED);
+						}
+					}
+
+
+				// Draw data
+				else if (FFT_HEIGHT - y < FFT_Display[x + 8]) {
+					LCD_WriteRAM(LCD_COLOR_BLUE);
+				}
+
+				// Draw background
+				else {
 					LCD_WriteRAM(LCD_COLOR_WHITE);
-				} else {
-					LCD_WriteRAM(LCD_COLOR_RED);
 				}
 			}
-
-			// Draw data
-			else if (FFT_HEIGHT - y < FFT_Display[x + 8]) {
-				LCD_WriteRAM(LCD_COLOR_BLUE);
-			}
-
-			// Draw background
-			else {
-				LCD_WriteRAM(LCD_COLOR_WHITE);
-			}
 		}
 	}
-
-#else
-
-	// Draw the Waterfall using direct memory writes (fast).
-	LCD_SetDisplayWindow(x, y, FFT_HEIGHT, FFT_WIDTH);
-	LCD_WriteRAM_PrepareDir(LCD_WriteRAMDir_Right);
-
-	// Send colorized FFT data to Waterfall Buffer
-	for (int i = 0; i < FFT_WIDTH; i++)
+	else
 	{
-		*(pWFBfr + (FFT_WIDTH*WF_Line0) + i) = WFPalette[(FFT_Display[i + 8] )];
-	}
-	WF_Count++;
 
-	// Refresh the waterfall display--scrolling begins after 64 lines
-	for (line = WF_Line0; line < FFT_HEIGHT; line++){
-		for (int i = 0; i < FFT_WIDTH; i++) {
-			if (i == (int)(selectedFreqX +0.5)) {
-				//LCD_WriteRAM(LCD_COLOR_RED);
-				LCD_WriteRAM(LCD_COLOR_WHITE);
+		if (WF_Count == 0){
+			// Draw the Waterfall using direct memory writes (fast).
+			LCD_SetDisplayWindow(x, y, FFT_HEIGHT, FFT_WIDTH);
+			LCD_WriteRAM_PrepareDir(LCD_WriteRAMDir_Right);
+
+			// Send colorized FFT data to Waterfall Buffer
+			for (int x = 0; x < FFT_WIDTH; x++)
+			{
+				*(pWFBfr + (FFT_WIDTH*WF_Line0) + x) = WFPalette[(FFT_Display[x + 8] )];
 			}
-			else {
-				LCD_WriteRAM(*(pWFBfr + line*FFT_WIDTH + i));
+
+			// Refresh the waterfall display--scrolling begins after 64 lines
+			for (int y = WF_Line0; y < FFT_HEIGHT; y++){
+				for (int x = 0; x <FFT_WIDTH; x++) {
+					if (x == (int)(selectedFreqX +0.5)) {
+						//LCD_WriteRAM(LCD_COLOR_RED);
+						LCD_WriteRAM(LCD_COLOR_WHITE);
+					}
+					else {
+						LCD_WriteRAM(*(pWFBfr + y*FFT_WIDTH + x));
+					}
+				}
+			}
+			for ( int y = 0; y < WF_Line0; y++){
+				for (int x = 0; x < FFT_WIDTH; x++){
+					if (x == (int)(selectedFreqX +0.5)){
+						//LCD_WriteRAM(LCD_COLOR_RED);
+						LCD_WriteRAM(LCD_COLOR_WHITE);
+					}
+					else {
+						LCD_WriteRAM(*(pWFBfr + y*FFT_WIDTH + x));
+					}
+				}
 			}
 		}
-	}
-	for ( line = 0;line < WF_Line0; line++){
-		for (int i = 0; i < FFT_WIDTH; i++){
-			if (i == (int)(selectedFreqX +0.5)){
-				//LCD_WriteRAM(LCD_COLOR_RED);
-				LCD_WriteRAM(LCD_COLOR_WHITE);
-			}
-			else {
-				LCD_WriteRAM(*(pWFBfr + line*FFT_WIDTH + i));
-			}
+
+		if (++WF_Count == MAX_WF_COUNT) {
+			WF_Count = 0;
+			WF_Line0--;
+			if (WF_Line0 < 0) WF_Line0 = FFT_HEIGHT-1;
 		}
 	}
-
-	if ((WF_Count == FFT_HEIGHT) || (WF_Scroll_Flag ==1)){
-		WF_Count = 0;
-		WF_Scroll_Flag = 1;
-		WF_Line0++;
-		WF_Line0 %= FFT_HEIGHT;
-	}
-#endif
 }
+
 
 static void displayFrequencyOffsetText(_Bool force)
 {
@@ -424,8 +435,7 @@ void Init_Waterfall (void){
 
 	pWFBfr = &WF_Bfr[0];
 	WF_Count = 0;
-	WF_Scroll_Flag = 0;
-	WF_Line0 = 0;
+	WF_Line0 = FFT_HEIGHT - 1;
 }
 
 
