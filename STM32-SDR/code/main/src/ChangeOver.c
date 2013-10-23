@@ -49,7 +49,7 @@ static void Xmit_CW_Sequence(void);
 static void Xmit_PSK_Sequence(void);
 static void Init_PTT_IO(void);
 void handlePttStateChange(void);
-extern void Init_Waterfall(void);
+//extern void Init_Waterfall(void);
 
 /****************************************
  * Public interface
@@ -170,8 +170,7 @@ void Xmit_SSB_Sequence(void)
 	s_inTxMode = 1;
 	AGC_On = 0;  //Turn off AGC so that DAC is held constant during transmit
 	Disconnect_PGA();
-	Set_DAC_DVC(-10);
-	//Set_DAC_DVC(Options_GetValue(OPTION_CW_LEVEL));
+	Set_DAC_DVC(15); //SSB Xmit DAC Gain
 	Set_ADC_DVC(0);
 	Connect_Microphone_Input();
 	Set_PGA_Gain(Options_GetValue(OPTION_Mic_Gain));
@@ -188,7 +187,7 @@ void Xmit_CW_Sequence(void)
 	s_inTxMode = 1;
 	AGC_On = 0;
 	Disconnect_PGA();
-	Set_DAC_DVC(-60);
+	Set_DAC_DVC(-33); //CW Xmit DAC Gain
 	GPIO_WriteBit(GPIOD, GPIO_Pin_3, Bit_RESET);  //Make PTT_Out Low,Remember FET Inversion
 	Delay(1000);
 	//Set_LO_Gain(20);
@@ -203,7 +202,7 @@ void Xmit_PSK_Sequence(void)
 	s_inTxMode = 1;
 	AGC_On = 0;  //Turn off AGC so that DAC is held constant during transmit
 	Disconnect_PGA();
-	Set_DAC_DVC(-10);
+	Set_DAC_DVC(12); //PSK Xmit DAC Gain
 	GPIO_WriteBit(GPIOD, GPIO_Pin_3, Bit_RESET);  //Make PTT_Out Low,Remember FET Inversion
 	Delay(1000);
 	//Set_LO_Gain(20);
