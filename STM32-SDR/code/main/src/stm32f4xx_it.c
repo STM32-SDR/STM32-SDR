@@ -211,6 +211,18 @@ void OTG_HS_IRQHandler(void)
 }
 
 // ------------------------------------------------------------------------------
+#include "CW_Mod.h"
+/**
+  * @brief  TIM3_IRQHandler
+  *         This function handles Timer3 Handler.
+  * @param  None
+  * @retval None
+  */
+void TIM3_IRQHandler(void)
+{
+	CW_KeyPollTimerIRQ();
+}
+
 /**
  * @}
  */

@@ -78,7 +78,6 @@ int		NCO_Bin;
 uint8_t FFT_Display[256];
 extern	int RSL_Mag;
 
-void Init_Waterfall( void );
 
 #define ID_FFTSelFreqNum_LABEL 50105
 

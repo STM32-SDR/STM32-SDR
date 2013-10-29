@@ -44,7 +44,6 @@ static GL_PageControls_TypeDef* pRSLLabel;
 static void WS_Click(GL_PageControls_TypeDef* pThis);
 static void TR_Click(GL_PageControls_TypeDef* pThis);
 
-extern void Init_Waterfall( void );
 extern void ClearTextDisplay(void);
 
 // following 4 functions added by MEC

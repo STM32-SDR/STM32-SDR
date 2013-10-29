@@ -115,7 +115,7 @@ void RxTx_CheckAndHandlePTT(void)
 		if (debounceCount < DEBOUNCE_COUNT_REQUIRED) {
 			// Count up:
 			debounceCount++;
-			xprintf("#%d\n", debounceCount);
+//			xprintf("#%d\n", debounceCount);
 
 			// Debounce done?
 			if (debounceCount == DEBOUNCE_COUNT_REQUIRED) {

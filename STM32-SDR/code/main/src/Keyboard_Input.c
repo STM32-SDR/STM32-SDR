@@ -22,6 +22,7 @@
 #include "PSKMod.h"
 #include "widgets.h"
 #include "Text_Enter.h"
+#include "STM32-SDR-Subroutines.h"
 
 #define KBD_BUFF_LEN 41 // 40 characters on the screen, +1 for null.
 

@@ -30,6 +30,7 @@
 
 // Display the FFT onscreen and allow user to click to select a frequency.
 void Widget_AddToPage_NewFFTDisplay(uint16_t x, uint16_t y, GL_Page_TypeDef *pPage);
+void Init_Waterfall (void);
 
 
 
