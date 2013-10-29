@@ -196,8 +196,8 @@ void Process_FFT(void)
 	DAC_RMS_Sig = 10*sqrt((float32_t)Sig_Sum0); //Always use Peak value for DAC AGC
 	dB_Sig = 23. + 10*log((float32_t)Sig_Total + .001);
 
-	if (RMS_Sig <1000.0)	AGC_Mag = FFT_Coeff*RMS_Sig + (1.-FFT_Coeff)*AGC_Mag; //Limits upper value
-	if (DAC_RMS_Sig <1000.0)	DAC_AGC_Mag = FFT_Coeff*DAC_RMS_Sig + (1.-FFT_Coeff)*DAC_AGC_Mag; //Limits upper value
+	if (RMS_Sig <4000.0)	AGC_Mag = FFT_Coeff*RMS_Sig + (1.-FFT_Coeff)*AGC_Mag; //Limits upper value
+	if (DAC_RMS_Sig <4000.0)	DAC_AGC_Mag = FFT_Coeff*DAC_RMS_Sig + (1.-FFT_Coeff)*DAC_AGC_Mag; //Limits upper value
 
 	RSL_Mag = FFT_Coeff*dB_Sig + (1.-FFT_Coeff)*RSL_Mag;
 

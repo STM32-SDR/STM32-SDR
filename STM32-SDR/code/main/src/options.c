@@ -39,7 +39,8 @@
 //#define EEPROM_SENTINEL_VAL 3333
 //#define EEPROM_SENTINEL_VAL 2222
 //#define EEPROM_SENTINEL_VAL 1037
-#define EEPROM_SENTINEL_VAL 1005
+//#define EEPROM_SENTINEL_VAL 1005
+#define EEPROM_SENTINEL_VAL 1508
 
 static OptionNumber s_currentOptionNumber = OPTION_RX_AUDIO;
 
@@ -82,7 +83,7 @@ static OptionStruct s_optionsData[] = {
 	{
 		/*Name*/ "Tx Level ",
 		/*Init*/ 29,
-		/*Min */ 0,
+		/*Min */ -6,
 		/*Max */ 29,
 		/*Rate*/ 1,
 		/*Data*/ 0,
@@ -91,7 +92,7 @@ static OptionStruct s_optionsData[] = {
 	{
 		/*Name*/ "ST Level ",
 		/*Init*/ 0,
-		/*Min */ 0,
+		/*Min */ -6,
 		/*Max */ 29,
 		/*Rate*/ 1,
 		/*Data*/ 0,
@@ -136,8 +137,18 @@ static OptionStruct s_optionsData[] = {
 		/*Rate*/ 1,
 		/*Data*/ 0,
 	},
+
 	{
-		/*Name*/ "AGC Thr 1",
+		/*Name*/ "AGC Mode ",
+		/*Init*/ 0,
+		/*Min */ 0,
+		/*Max */ 3,
+		/*Rate*/ 1,
+		/*Data*/ 0,
+	},
+
+	{
+		/*Name*/ "AGC Thrsh",
 		/*Init*/ 400,
 		/*Min */ 50,
 		/*Max */ 1000,
@@ -146,19 +157,10 @@ static OptionStruct s_optionsData[] = {
 	},
 
 	{
-		/*Name*/ "AGC Thr 2",
-		/*Init*/ 100,
-		/*Min */ 50,
-		/*Max */ 1000,
-		/*Rate*/ 10,
-		/*Data*/ 0,
-	},
-
-	{
-		/*Name*/ "AGC Mode ",
-		/*Init*/ 0,
-		/*Min */ 0,
-		/*Max */ 3,
+		/*Name*/ "RSL Cal  ",
+		/*Init*/ -115,
+		/*Min */ -140,
+		/*Max */ -100,
 		/*Rate*/ 1,
 		/*Data*/ 0,
 	},
@@ -277,16 +279,6 @@ void Options_SetValue(int optionIdx, int16_t newValue)
 		}
 		break;
 
-	case OPTION_AGC_THRSH1:
-		if (RxTx_InRxMode())
-			Init_AGC();
-		break;
-
-	case OPTION_AGC_THRSH2:
-		if (RxTx_InRxMode())
-			Init_AGC();
-		break;
-
 	case OPTION_AGC_Mode:
 		if (RxTx_InRxMode())
 		{
@@ -294,6 +286,18 @@ void Options_SetValue(int optionIdx, int16_t newValue)
 		Init_AGC();
 		}
 		break;
+
+	case OPTION_AGC_THRSH:
+		if (RxTx_InRxMode())
+			Init_AGC();
+		break;
+
+	case OPTION__RSL_CAL:
+		if (RxTx_InRxMode())
+			Init_AGC();
+		break;
+
+
 
 	case OPTION_SI570_MULT:
 		FrequencyManager_SetFreqMultiplier(newValue);

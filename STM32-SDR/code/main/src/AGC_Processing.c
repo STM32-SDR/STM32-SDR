@@ -32,6 +32,8 @@ int Old_PGAGain;
 int AGC_Mode;
 int AGC_On;
 
+int RSL_Cal;
+
 
 double  Vmin;
 double  SigRatio;
@@ -174,8 +176,9 @@ void Init_AGC (void)			{
 		Old_AGC_Signal = AGC_Signal;
 		Set_DAC_DVC(AGC_Signal);
 
-		Vmin = (float)Options_GetValue(OPTION_AGC_THRSH2);
-		Sig_Thr = (float)Options_GetValue(OPTION_AGC_THRSH1);
+		Vmin = 100.0;
+		Sig_Thr = (float)Options_GetValue(OPTION_AGC_THRSH);
+		RSL_Cal = Options_GetValue(OPTION__RSL_CAL);
 
 		if (AGC_Mode != 3)
 		AGC_On =1;

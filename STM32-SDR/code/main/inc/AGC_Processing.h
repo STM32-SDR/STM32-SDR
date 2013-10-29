@@ -26,3 +26,5 @@ int	AGC_Signal;
 int AGC_On;
 int Old_PGAGAIN0;
 int Old_dac_gain;
+
+int RSL_Cal;

@@ -52,7 +52,7 @@
 #include    "DMA_IRQ_Handler.h"
 
 
-#define VERSION_STRING "1.031"
+#define VERSION_STRING "1.032"
 
 const uint32_t CODEC_FREQUENCY = 8000;
 

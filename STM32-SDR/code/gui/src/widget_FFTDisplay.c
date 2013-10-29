@@ -210,7 +210,8 @@ static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 
 	// Compute RSL
 	// TODO: Remove hard-coded numbers? Change to constants?
-	int RSL =  -115 +(int) ( 0.5 *(80.0-(float)PGAGain)+ (0.38 * (float)RSL_Mag));
+	//int RSL =  -115 +(int) ( 0.5 *(80.0-(float)PGAGain)+ (0.38 * (float)RSL_Mag));
+	int RSL =  RSL_Cal +(int) ( 0.5 *(80.0-(float)PGAGain)+ (0.38 * (float)RSL_Mag));
 
 	// Draw the FFT
 	displayFFT(x, y);

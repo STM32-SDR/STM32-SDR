@@ -32,6 +32,8 @@ void Set_HP_Gain(int HP_gain)
 	}
 	Delay(Codec_Pause);
 
+	if (HP_gain < 0) HP_gain += 64;
+
 	I2C_WriteRegister(CODEC_ADDRESS, 0x10, HP_gain);
 	Delay(Codec_Pause);
 
@@ -48,6 +50,8 @@ void Set_LO_Gain(int LO_gain)
 		return;
 	}
 	Delay(Codec_Pause);
+
+	if (LO_gain < 0) LO_gain += 64;
 
 	I2C_WriteRegister(CODEC_ADDRESS, 0x12, LO_gain);
 	Delay(Codec_Pause);
