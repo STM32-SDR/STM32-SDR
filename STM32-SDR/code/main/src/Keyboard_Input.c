@@ -94,7 +94,7 @@ void kybd_dispFunctionKey(uint8_t data)
 	case 6: compose_F7(); break;
 	case 7: compose_F8(); break;
 	case 8: compose_F9(); break;
-	case 9: compose_F10(); break;
+	case 9: ToggleRxTx(); break;
 	}
 }
 

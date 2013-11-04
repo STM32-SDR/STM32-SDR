@@ -100,6 +100,47 @@ extern HID_cb_TypeDef HID_KEYBRD_cb;
  */
 void USR_KEYBRD_Init(void);
 void USR_KEYBRD_ProcessData(uint8_t pbuf, uint8_t d);
+
+void CtlAFunc (void) ;
+void CtlBFunc (void) ;
+void CtlCFunc (void) ;
+void CtlDFunc (void) ;
+void CtlEFunc (void) ;
+void CtlFFunc (void) ;
+
+void AltAFunc (void) ;
+void AltBFunc (void) ;
+void AltCFunc (void) ;
+void AltDFunc (void) ;
+void AltEFunc (void) ;
+void AltFFunc (void) ;
+
+void FKeyFunc (void) ;
+void SFKeyFunc (void) ;
+void CFKeyFunc (void) ;
+void AFKeyFunc (void) ;
+void AFKey10Func (void) ;
+
+void (*Ctl_A_Pointer)(void);
+void (*Ctl_B_Pointer)(void);
+void (*Ctl_C_Pointer)(void);
+void (*Ctl_D_Pointer)(void);
+void (*Ctl_E_Pointer)(void);
+void (*Ctl_F_Pointer)(void);
+
+void (*Alt_A_Pointer)(void);
+void (*Alt_B_Pointer)(void);
+void (*Alt_C_Pointer)(void);
+void (*Alt_D_Pointer)(void);
+void (*Alt_E_Pointer)(void);
+void (*Alt_F_Pointer)(void);
+
+void (*FKey_Pointer)(void);
+void (*SFKey_Pointer)(void);
+void (*CFKey_Pointer)(void);
+void (*AFKey_Pointer)(void);
+void (*AFKey10_Pointer)(void);
+
 /**
  * @}
  */
