@@ -19,7 +19,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-
 // Includes ------------------------------------------------------------------
 
 #include	"ChangeOver.h"
@@ -52,8 +51,7 @@
 #include    "DMA_IRQ_Handler.h"
 #include	"widgets.h"
 
-
-#define VERSION_STRING "1.033"
+#define VERSION_STRING "1.034"
 
 const uint32_t CODEC_FREQUENCY = 8000;
 
@@ -165,8 +163,6 @@ static void initializeHardware(void)
 
 	Text_Initialize();
 	main_delay(SETUP_DELAY);
-
-
 
 	//Load stored macro data
 	displayLoadStationData();

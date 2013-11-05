@@ -25,6 +25,7 @@
 #include "Codec_Gains.h"
 #include "Init_I2C.h"  //Referenced for Delay(n);
 #include "PSKMod.h"
+#include "CW_Mod.h"
 #include "DMA_IRQ_Handler.h"
 #include "options.h"
 #include "ScrollingTextBox.h"
@@ -49,7 +50,6 @@ static void Xmit_CW_Sequence(void);
 static void Xmit_PSK_Sequence(void);
 static void Init_PTT_IO(void);
 void handlePttStateChange(void);
-//extern void Init_Waterfall(void);
 
 /****************************************
  * Public interface
@@ -128,6 +128,19 @@ void RxTx_CheckAndHandlePTT(void)
 	} else {
 		// Not currently trying to change:
 		debounceCount = 0;
+	}
+
+
+	// Special case to handle CW:
+	if (Mode_GetCurrentMode() == MODE_CW) {
+		if (CW_DesiresTransmitMode() && !RxTx_InTxMode()) {
+			RxTx_SetTransmit();
+			xprintf("To CW Tx\n");
+		}
+		if (!CW_DesiresTransmitMode() && RxTx_InTxMode()) {
+			RxTx_SetReceive();
+			xprintf("To CW Rx\n");
+		}
 	}
 }
 

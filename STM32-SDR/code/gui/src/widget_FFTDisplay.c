@@ -251,7 +251,7 @@ static void displayFFT(int x, int y)
 
 	NCO_Bin = (int)selectedFreqX + 8;
 
-if (!WF_Flag) {
+	if (!WF_Flag) {
 
 		// Draw the FFT using direct memory writes (fast).
 		LCD_SetDisplayWindow(x, y, FFT_HEIGHT, FFT_WIDTH);
@@ -431,8 +431,8 @@ static void displaySMeter(int RSL)
 
 }
 
-void Init_Waterfall (void){
-
+void Init_Waterfall (void)
+{
 	pWFBfr = &WF_Bfr[0];
 	WF_Count = 0;
 	WF_Line0 = FFT_HEIGHT - 1;

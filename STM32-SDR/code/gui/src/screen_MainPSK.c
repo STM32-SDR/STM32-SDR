@@ -27,7 +27,7 @@
 #include "Keyboard_Input.h"
 #include <assert.h>
 #include <PSKMod.h>
-#include <ScrollingTextBox.h>
+#include "ScrollingTextBox.h"
 #include "KeyboardStatus.h"
 #include "AGC_Processing.h"
 

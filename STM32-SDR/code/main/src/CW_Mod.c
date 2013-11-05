@@ -30,6 +30,7 @@
 static _Bool s_keySamples[KEY_SAMPLE_ARRAY_SIZE];
 static int s_keySampleWriteIdx = 0;
 static int s_keySampleReadIdx = 0;
+static _Bool s_wantToTransmit = 0;
 
 // Number samples required on key to accept a change in state.
 #define DEBOUNCE_THRESHOLD 2
@@ -40,6 +41,11 @@ static int s_keySampleReadIdx = 0;
 #define CW_AMPLITUDE_RISE_SLOPE (SAMPLE_PERIOD / SLEW_RATE)
 #define CW_AMPLITUDE_FALL_SLOPE (-1 * CW_AMPLITUDE_RISE_SLOPE)
 
+// Handle return to RX timeout
+#define RETURN_TO_RX_TIME_MS       500
+#define RETURN_TO_RX_COUNTER_RESET (RETURN_TO_RX_TIME_MS * 55 / 65)
+	// 55 = approximate number of ISRs per DMA ISR
+	// 65 = approximate number of ms per DMA ISR
 
 
 // Prototypes:
@@ -133,6 +139,20 @@ void CW_KeyPollTimerIRQ(void)
 			debounceCounter = 0;
 		}
 
+		// Handle if we "want" to transmit:
+		static int returnToRxCounter = RETURN_TO_RX_COUNTER_RESET;
+		if (debouncedIsKeyPressed) {
+			s_wantToTransmit = 1;
+			returnToRxCounter = RETURN_TO_RX_COUNTER_RESET;
+		} else {
+			if (returnToRxCounter) {
+				returnToRxCounter --;
+				if (returnToRxCounter == 0) {
+					s_wantToTransmit = 0;
+				}
+			}
+		}
+
 		// Process current state
 		writeKeySampleToKeyBuffer(debouncedIsKeyPressed);
 
@@ -143,6 +163,10 @@ void CW_KeyPollTimerIRQ(void)
 }
 
 
+_Bool CW_DesiresTransmitMode(void)
+{
+	return s_wantToTransmit;
+}
 
 // Called in the DMA IRQ to get the desired amplitudes for each sample.
 // Buffer to be filled with values between 0 and 1; I/Q encoding done

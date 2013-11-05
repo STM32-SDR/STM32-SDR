@@ -59,7 +59,7 @@ float PSK_Gain;
 // IRQ called at about 15.7hz (~64ms)
 void DMA1_Stream0_IRQHandler(void)
 {
-	// DEBUG HACK! REMOVE!
+	// REVISIT DEBUG HACK! REMOVE!
 	extern volatile int g_numDMAInterrupts;
 	g_numDMAInterrupts++;
 
@@ -67,9 +67,7 @@ void DMA1_Stream0_IRQHandler(void)
 	DMA_RX_Memory = DMA_GetCurrentMemoryTarget(DMA1_Stream0 );
 	DMA_TX_Memory = DMA_GetCurrentMemoryTarget(DMA1_Stream5 );
 
-	//if (Tx_Flag == 0) {
 	if(RxTx_InRxMode())	 {
-
 		Rcvr_DSP();
 	}
 	else {
@@ -85,7 +83,7 @@ void DMA1_Stream0_IRQHandler(void)
 		case MODE_PSK:
 			Xmit_PSK();
 			break;
-		}  //End of Mode Switch
+		}
 	}
 
 	DSP_Flag = 1;
@@ -110,27 +108,27 @@ void Rcvr_DSP(void)
 		pTXDMABfr = &Tx0BufferDMA[0];
 	}
 
-		for (i = 0; i < BUFFERSIZE / 2; i++) {
-			FIR_I_In[i] = (q15_t)((float)*(pRXDMABfr + 2 * i)*R_lgain);
-			FFT_Input[i * 2] = FIR_I_In[i];
-			phase_adjust = (float) *(pRXDMABfr + 2 * i) * R_xgain;
-			FIR_Q_In[i] = (q15_t) (((float) *(pRXDMABfr + 2 * i + 1) + phase_adjust) * rgain);
-			FFT_Input[i * 2 + 1] = FIR_Q_In[i];
-		}
+	for (i = 0; i < BUFFERSIZE / 2; i++) {
+		FIR_I_In[i] = (q15_t)((float)*(pRXDMABfr + 2 * i)*R_lgain);
+		FFT_Input[i * 2] = FIR_I_In[i];
+		phase_adjust = (float) *(pRXDMABfr + 2 * i) * R_xgain;
+		FIR_Q_In[i] = (q15_t) (((float) *(pRXDMABfr + 2 * i + 1) + phase_adjust) * rgain);
+		FFT_Input[i * 2 + 1] = FIR_Q_In[i];
+	}
 
-		Process_FIR_I();
-		Process_FIR_Q();
-		Sideband_Demod(); //PSK buffer is filled in this procedure with USB data stream
-		ProcPSKDet();
-		GPIO_WriteBit(Test_GPIO, Test_2, Bit_SET);
-		Process_FFT();
-		GPIO_WriteBit(Test_GPIO, Test_2, Bit_RESET);
+	Process_FIR_I();
+	Process_FIR_Q();
+	Sideband_Demod(); //PSK buffer is filled in this procedure with USB data stream
+	ProcPSKDet();
+	GPIO_WriteBit(Test_GPIO, Test_2, Bit_SET);
+	Process_FFT();
+	GPIO_WriteBit(Test_GPIO, Test_2, Bit_RESET);
 
-		for (i = 0; i < BUFFERSIZE / 2; i++) {
-			*(pTXDMABfr + 2 * i) = (int16_t) USB_Out[i];
-			//*(pTXDMABfr + 2*i + 1) = (int16_t)LSB_Out[i];  //left for future testing
-			*(pTXDMABfr + 2 * i + 1) = (int16_t) USB_Out[i];
-		}
+	for (i = 0; i < BUFFERSIZE / 2; i++) {
+		*(pTXDMABfr + 2 * i) = (int16_t) USB_Out[i];
+		//*(pTXDMABfr + 2*i + 1) = (int16_t)LSB_Out[i];  //left for future testing
+		*(pTXDMABfr + 2 * i + 1) = (int16_t) USB_Out[i];
+	}
 
 	GPIO_WriteBit(Test_GPIO, Test_0, Bit_RESET);
 
@@ -175,6 +173,9 @@ void Xmit_CW(void)
 	static long NCO_phz;
 	static float cwAmplitudes[BUFFERSIZE / 2];
 
+	// REVISIT:- remove test-bit change-code.
+	GPIO_WriteBit(Test_GPIO, Test_0, Bit_SET);
+
 	x_NCOphzinc = (PI2 * (double) NCO_Frequency / (double) Sample_Frequency);
 
 	//Transfer I/Q data and fill FFT buffer on inactive buffer
@@ -212,6 +213,9 @@ void Xmit_CW(void)
 		*(pTXDMABfr + 2 * i) = (int16_t) FIR_I_Out[i];
 		*(pTXDMABfr + 2 * i + 1) = (int16_t) FIR_Q_Out[i];
 	}
+
+	// REVISIT:- Remove
+	GPIO_WriteBit(Test_GPIO, Test_0, Bit_RESET);
 
 }  //End of Xmit_CW()
 

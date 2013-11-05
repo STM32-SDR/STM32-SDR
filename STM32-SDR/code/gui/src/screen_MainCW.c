@@ -26,6 +26,7 @@
 #include <assert.h>
 #include "AGC_Processing.h"
 #include "xprintf.h"
+#include "ScrollingTextBox.h"
 
 extern 	int WF_Flag;
 volatile int g_numDMAInterrupts = 0;
