@@ -21,7 +21,13 @@
 
 #ifndef CW_MOD_H_
 #define CW_MOD_H_
-void Init_CW_GPIO(void);
+
+void CW_Init(void);
+void CW_KeyPollTimerIRQ(void);
+void CW_FillTxAmplitudeBuffer(float amplitudeBuffer[], int bufferSize);
+_Bool CW_DesiresTransmitMode(void);
+
+
 #endif /* CW_MOD_H_ */
 
 

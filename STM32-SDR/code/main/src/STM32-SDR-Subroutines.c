@@ -2,10 +2,10 @@
 
 #include "STM32-SDR-Subroutines.h"
 #include "ChangeOver.h"
+#include "widgets.h"
 
 extern 	int WF_Flag;
 
-extern void Init_Waterfall( void );
 extern void ClearTextDisplay(void);
 
 void ToggleRxTx (void) {

@@ -37,7 +37,10 @@ uint32_t DMA_RX_Memory;
 uint32_t DMA_TX_Memory;
 volatile int16_t DSP_Flag = 0;
 int16_t AGC_Flag = 0;
+
+// REVISIT: Remove?
 int16_t Tx_Flag;
+
 int16_t i;
 
 q15_t	*pRXDMABfr;
@@ -50,28 +53,21 @@ float T_lgain;
 float T_xgain;
 float phase_adjust;
 
-const float Amp0 = 32766;
-static float temp;
-static float temp_old;
-float key;
-
-const float A = 0.000125 / .005; // sample interval divided by keying time constant
-const float B = 1.0 - 0.000125 / .005;
-
 float PSK_Tx;
 float PSK_Gain;
 
+// IRQ called at about 15.7hz (~64ms)
 void DMA1_Stream0_IRQHandler(void)
 {
-	uint8_t Key_Down;
+	// REVISIT DEBUG HACK! REMOVE!
+	extern volatile int g_numDMAInterrupts;
+	g_numDMAInterrupts++;
 
 	//Check to see which set of buffers are currently in use
 	DMA_RX_Memory = DMA_GetCurrentMemoryTarget(DMA1_Stream0 );
 	DMA_TX_Memory = DMA_GetCurrentMemoryTarget(DMA1_Stream5 );
 
-	//if (Tx_Flag == 0) {
 	if(RxTx_InRxMode())	 {
-
 		Rcvr_DSP();
 	}
 	else {
@@ -81,18 +77,13 @@ void DMA1_Stream0_IRQHandler(void)
 			break;
 
 		case MODE_CW:
-			Key_Down = GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_9 );
-			if (Key_Down == 0)
-				key = Amp0;
-			else
-				key = 0.0;
 			Xmit_CW();
 			break;
 
 		case MODE_PSK:
 			Xmit_PSK();
 			break;
-		}  //End of Mode Switch
+		}
 	}
 
 	DSP_Flag = 1;
@@ -117,27 +108,27 @@ void Rcvr_DSP(void)
 		pTXDMABfr = &Tx0BufferDMA[0];
 	}
 
-		for (i = 0; i < BUFFERSIZE / 2; i++) {
-			FIR_I_In[i] = (q15_t)((float)*(pRXDMABfr + 2 * i)*R_lgain);
-			FFT_Input[i * 2] = FIR_I_In[i];
-			phase_adjust = (float) *(pRXDMABfr + 2 * i) * R_xgain;
-			FIR_Q_In[i] = (q15_t) (((float) *(pRXDMABfr + 2 * i + 1) + phase_adjust) * rgain);
-			FFT_Input[i * 2 + 1] = FIR_Q_In[i];
-		}
+	for (i = 0; i < BUFFERSIZE / 2; i++) {
+		FIR_I_In[i] = (q15_t)((float)*(pRXDMABfr + 2 * i)*R_lgain);
+		FFT_Input[i * 2] = FIR_I_In[i];
+		phase_adjust = (float) *(pRXDMABfr + 2 * i) * R_xgain;
+		FIR_Q_In[i] = (q15_t) (((float) *(pRXDMABfr + 2 * i + 1) + phase_adjust) * rgain);
+		FFT_Input[i * 2 + 1] = FIR_Q_In[i];
+	}
 
-		Process_FIR_I();
-		Process_FIR_Q();
-		Sideband_Demod(); //PSK buffer is filled in this procedure with USB data stream
-		ProcPSKDet();
-		GPIO_WriteBit(Test_GPIO, Test_2, Bit_SET);
-		Process_FFT();
-		GPIO_WriteBit(Test_GPIO, Test_2, Bit_RESET);
+	Process_FIR_I();
+	Process_FIR_Q();
+	Sideband_Demod(); //PSK buffer is filled in this procedure with USB data stream
+	ProcPSKDet();
+	GPIO_WriteBit(Test_GPIO, Test_2, Bit_SET);
+	Process_FFT();
+	GPIO_WriteBit(Test_GPIO, Test_2, Bit_RESET);
 
-		for (i = 0; i < BUFFERSIZE / 2; i++) {
-			*(pTXDMABfr + 2 * i) = (int16_t) USB_Out[i];
-			//*(pTXDMABfr + 2*i + 1) = (int16_t)LSB_Out[i];  //left for future testing
-			*(pTXDMABfr + 2 * i + 1) = (int16_t) USB_Out[i];
-		}
+	for (i = 0; i < BUFFERSIZE / 2; i++) {
+		*(pTXDMABfr + 2 * i) = (int16_t) USB_Out[i];
+		//*(pTXDMABfr + 2*i + 1) = (int16_t)LSB_Out[i];  //left for future testing
+		*(pTXDMABfr + 2 * i + 1) = (int16_t) USB_Out[i];
+	}
 
 	GPIO_WriteBit(Test_GPIO, Test_0, Bit_RESET);
 
@@ -180,31 +171,36 @@ void Xmit_CW(void)
 {
 	static q15_t NCO_I;
 	static long NCO_phz;
-	float CW_Gain;
+	static float cwAmplitudes[BUFFERSIZE / 2];
+
+	// REVISIT:- remove test-bit change-code.
+	GPIO_WriteBit(Test_GPIO, Test_0, Bit_SET);
 
 	x_NCOphzinc = (PI2 * (double) NCO_Frequency / (double) Sample_Frequency);
 
-	if (DMA_RX_Memory == 0) //Transfer I/Q data and fill FFT buffer on inactive buffer
-	{
+	//Transfer I/Q data and fill FFT buffer on inactive buffer
+	if (DMA_RX_Memory == 0) {
 		pRXDMABfr = &Rx1BufferDMA[0];
 		pTXDMABfr = &Tx1BufferDMA[0];
-	}
-	else
-	{
+	} else {
 		pRXDMABfr = &Rx0BufferDMA[0];
 		pTXDMABfr = &Tx0BufferDMA[0];
 	}
+
+	// Compute the desired CW amplitudes
+	CW_FillTxAmplitudeBuffer(cwAmplitudes, BUFFERSIZE / 2);
+
+	//Transfer I/Q data and fill FFT buffer on inactive buffer
 	for (i = 0; i < BUFFERSIZE / 2; i++) {
 		NCO_phz += (long) (KCONV * (x_NCOphzinc));
 		NCO_I = (Sine_table[((NCO_phz >> 4) + 0x400) & 0xFFF]);
 
-		temp = A * (key - temp_old) + B * temp_old;
-		temp_old = temp;
-		CW_Gain = temp / Amp0;
+		float CW_Gain = cwAmplitudes[i];
+
 		FIR_I_In[i] = (q15_t) ((float) NCO_I * T_lgain * CW_Gain);
 		FFT_Input[i * 2] = FIR_I_In[i];
 		phase_adjust = (float) NCO_I * T_xgain;
-		FIR_Q_In[i] = (q15_t) (((float) NCO_I + phase_adjust) * (CW_Gain) * rgain); //
+		FIR_Q_In[i] = (q15_t) (((float) NCO_I + phase_adjust) * (CW_Gain) * rgain);
 		FFT_Input[i * 2 + 1] = FIR_Q_In[i];
 	}
 
@@ -212,12 +208,14 @@ void Xmit_CW(void)
 	Process_FIR_Q();
 	Process_FFT();
 
-	for (i = 0; i < BUFFERSIZE / 2; i++)				//Output FIR filter results to codec
-	{
+	// Output FIR filter results to codec in correct buffer (double buffered)
+	for (i = 0; i < BUFFERSIZE / 2; i++) {
 		*(pTXDMABfr + 2 * i) = (int16_t) FIR_I_Out[i];
 		*(pTXDMABfr + 2 * i + 1) = (int16_t) FIR_Q_Out[i];
 	}
 
+	// REVISIT:- Remove
+	GPIO_WriteBit(Test_GPIO, Test_0, Bit_RESET);
 
 }  //End of Xmit_CW()
 

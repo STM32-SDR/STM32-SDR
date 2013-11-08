@@ -60,7 +60,7 @@ typedef struct
 	fractional imag;
 } fractcomplex;
 
-const int Sine_table[4096];
+extern const int Sine_table[4096];
 
 float Sample_Frequency;
 Flag_type Flag;

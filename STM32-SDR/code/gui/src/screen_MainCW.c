@@ -25,8 +25,12 @@
 #include "options.h"
 #include <assert.h>
 #include "AGC_Processing.h"
+#include "xprintf.h"
+#include "ScrollingTextBox.h"
 
 extern 	int WF_Flag;
+volatile int g_numDMAInterrupts = 0;
+volatile int g_numTimer3Interrupts = 0;
 
 // Used in this file to refer to the correct screen (helps to keep code copy-paste friendly.
 static GL_Page_TypeDef *s_pThisScreen = &g_screenMainCW;
@@ -41,8 +45,8 @@ static GL_PageControls_TypeDef* pRSLLabel;
  */
 static void WS_Click(GL_PageControls_TypeDef* pThis);
 static void TR_Click(GL_PageControls_TypeDef* pThis);
+static void testButton_Click(GL_PageControls_TypeDef* pThis);
 
-extern void Init_Waterfall( void );
 extern void ClearTextDisplay(void);
 
 // following 4 functions added by MEC
@@ -139,7 +143,9 @@ void ScreenMainCW_Create(void)
 	AddPageControlObj(235,  80, pRSLLabel, s_pThisScreen);
 
 
-
+	// Just for testing
+	GL_PageControls_TypeDef* btnTest  = NewButton(11,  " Test ", testButton_Click);
+	AddPageControlObj(0, 150, btnTest, s_pThisScreen);
 }
 
 
@@ -161,4 +167,20 @@ static void TR_Click(GL_PageControls_TypeDef* pThis)
 	else {
 		RxTx_SetTransmit();
 	}
+}
+
+static void testButton_Click(GL_PageControls_TypeDef* pThis)
+{
+	// Grab the values to prevent UART timing from affecting the count.
+	int dmaCount = g_numDMAInterrupts;
+	int timerCount = g_numTimer3Interrupts;
+	g_numDMAInterrupts = 0;
+	g_numTimer3Interrupts = 0;
+
+	xprintf("\n\n\n");
+	xprintf("Debug dump\n");
+	xprintf("==========\n");
+	xprintf("Number of DMA Interrupts serviced since last dump:    %10d\n", dmaCount);
+	xprintf("Number of Timer3 Interrupts serviced since last dump: %10d\n", timerCount);
+
 }

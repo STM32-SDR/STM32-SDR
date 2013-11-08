@@ -19,7 +19,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-
 // Includes ------------------------------------------------------------------
 
 #include	"ChangeOver.h"
@@ -50,9 +49,9 @@
 #include	"DMA_Test_Pins.h"
 #include	"DSP_Processing.h"
 #include    "DMA_IRQ_Handler.h"
+#include	"widgets.h"
 
-
-#define VERSION_STRING "1.033"
+#define VERSION_STRING "1.034"
 
 const uint32_t CODEC_FREQUENCY = 8000;
 
@@ -69,8 +68,6 @@ static void displaySplashScreen(void);
 static void displaySerialPortWelcome(void);
 static void main_delay(uint32_t numLoops);
 static void displayLoadStationData(void);
-
-extern void Init_Waterfall( void );
 
 /*
  * FUNCTIONS
@@ -104,14 +101,15 @@ int main(void)
 		RxTx_CheckAndHandlePTT();
 
 		// Redraw the screen (as needed)
-		if (DSP_Flag == 1)
-		{
-		GPIO_WriteBit(Test_GPIO, Test_1, Bit_SET);
-		UpdateScreenWithChanges();
-		GPIO_WriteBit(Test_GPIO, Test_1, Bit_RESET);
+		if (DSP_Flag == 1) {
+			GPIO_WriteBit(Test_GPIO, Test_1, Bit_SET);
+			UpdateScreenWithChanges();
+			GPIO_WriteBit(Test_GPIO, Test_1, Bit_RESET);
 		}
 
-		if (AGC_Flag == 1) Proc_AGC();
+		if (AGC_Flag == 1) {
+			Proc_AGC();
+		}
 	}
 }
 
@@ -166,8 +164,6 @@ static void initializeHardware(void)
 	Text_Initialize();
 	main_delay(SETUP_DELAY);
 
-
-
 	//Load stored macro data
 	displayLoadStationData();
 	main_delay(SETUP_DELAY);
@@ -181,7 +177,7 @@ static void initializeHardware(void)
 	Mode_Init();
 	main_delay(SETUP_DELAY);
 
-	Init_CW_GPIO();
+	CW_Init();
 	main_delay(SETUP_DELAY);
 
 	Init_Waterfall();

@@ -27,6 +27,7 @@ extern 	int WF_Flag;
 #include "options.h"
 #include <assert.h>
 #include "AGC_Processing.h"
+#include "ScrollingTextBox.h"
 
 // Used in this file to refer to the correct screen (helps to keep code copy-paste friendly.
 static GL_Page_TypeDef *s_pThisScreen = &g_screenMainSSB;
@@ -44,7 +45,6 @@ static GL_PageControls_TypeDef* pRSLLabel;
 static void WS_Click(GL_PageControls_TypeDef* pThis);
 static void TR_Click(GL_PageControls_TypeDef* pThis);
 
-extern void Init_Waterfall( void );
 extern void ClearTextDisplay(void);
 
 // following 4 functions added by MEC
