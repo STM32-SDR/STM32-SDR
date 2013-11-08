@@ -57,5 +57,7 @@ void USBH_USR_DeInit(void);
 void USBH_USR_DeviceNotSupported(void);
 void USBH_USR_UnrecoveredError(void);
 
+extern void Acquire (void);
+
 #endif /* __USBH_USR_H */
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

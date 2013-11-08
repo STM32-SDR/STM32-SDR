@@ -103,8 +103,8 @@ HID_cb_TypeDef HID_KEYBRD_cb = { KEYBRD_Init, KEYBRD_Decode };
  *******************************************************************************
  */
 
-//keyboard function pointers
 
+extern void Acquire (void);
 
 void Dummy (void);
 
@@ -114,69 +114,86 @@ void Dummy(void){
 
 }
 
+//keyboard function pointers
+#define  Ctl_A Dummy
+#define  Ctl_B Dummy
+#define  Ctl_C Dummy
+#define  Ctl_D Dummy
+#define  Ctl_E Dummy
+#define  Ctl_F Dummy
+#define  Ctl_G Dummy
+#define  Ctl_H Dummy
+#define  Ctl_I Dummy
+#define  Ctl_J Dummy
+#define  Ctl_K Dummy
+#define  Ctl_L Dummy
+#define  Ctl_M Dummy
+#define  Ctl_N Dummy
+#define  Ctl_O Dummy
+#define  Ctl_P Dummy
+#define  Ctl_Q Dummy
+#define  Ctl_R Dummy
+#define  Ctl_S Dummy
+#define  Ctl_T Dummy
+#define  Ctl_U Dummy
+#define  Ctl_V Dummy
+#define  Ctl_W Dummy
+#define  Ctl_X Dummy
+#define  Ctl_Y Dummy
+#define  Ctl_Z Dummy
 
-#define  Ctl_A (pfunc0_t)CtlAFunc
-#define  Ctl_B (pfunc0_t)CtlBFunc
-#define  Ctl_C (pfunc0_t)CtlCFunc
-#define  Ctl_D (pfunc0_t)CtlDFunc
-#define  Ctl_E (pfunc0_t)CtlEFunc
-#define  Ctl_F (pfunc0_t)CtlFFunc
+#define  Alt_A Dummy
+#define  Alt_B Dummy
+#define  Alt_C Dummy
+#define  Alt_D Dummy
+#define  Alt_E Dummy
+#define  Alt_F Dummy
+#define  Alt_G Dummy
+#define  Alt_H Dummy
+#define  Alt_I Dummy
+#define  Alt_J Dummy
+#define  Alt_K Dummy
+#define  Alt_L Dummy
+#define  Alt_M Dummy
+#define  Alt_N Dummy
+#define  Alt_O Dummy
+#define  Alt_P Dummy
+#define  Alt_Q Dummy
+#define  Alt_R Dummy
+#define  Alt_S Dummy
+#define  Alt_T Dummy
+#define  Alt_U Dummy
+#define  Alt_V Dummy
+#define  Alt_W Dummy
+#define  Alt_X Dummy
+#define  Alt_Y Dummy
+#define  Alt_Z Dummy
 
-#define  Alt_A (pfunc0_t)AltAFunc
-#define  Alt_B (pfunc0_t)AltBFunc
-#define  Alt_C (pfunc0_t)AltCFunc
-#define  Alt_D (pfunc0_t)AltDFunc
-#define  Alt_E (pfunc0_t)AltEFunc
-#define  Alt_F (pfunc0_t)AltFFunc
+//Note--Fn and Shift-Fn are handled with special ASCII characters
 
+#define  C_F1 Dummy
+#define  C_F2 Dummy
+#define  C_F3 Dummy
+#define  C_F4 Dummy
+#define  C_F5 Dummy
+#define  C_F6 Dummy
+#define  C_F7 Dummy
+#define  C_F8 Dummy
+#define  C_F9 Dummy
+#define  C_F10 Dummy
+#define	 C_END Acquire
 
-#define  Fkey (pfunc0_t)FKeyFunc
-#define  Fkey10 (pfunc0_t)FKey10Func
-#define  S_Fkey (pfunc0_t)SFKeyFunc
-#define  C_Fkey (pfunc0_t)CFKeyFunc
-#define  A_Fkey (pfunc0_t)AFKeyFunc
-#define  A_Fkey10 (pfunc0_t)AFKey10Func
-
-void (*Ctl_A_Pointer)(void) = Dummy;
-void (*Ctl_B_Pointer)(void) = Dummy;
-void (*Ctl_C_Pointer)(void) = Dummy;
-void (*Ctl_D_Pointer)(void) = Dummy;
-void (*Ctl_E_Pointer)(void) = Dummy;
-void (*Ctl_F_Pointer)(void) = Dummy;
-
-void (*Alt_A_Pointer)(void) = Dummy;
-void (*Alt_B_Pointer)(void) = Dummy;
-void (*Alt_C_Pointer)(void) = Dummy;
-void (*Alt_D_Pointer)(void) = Dummy;
-void (*Alt_E_Pointer)(void) = Dummy;
-void (*Alt_F_Pointer)(void) = Dummy;
-
-void (*FKey_Pointer)(void) = Dummy;
-void (*SFKey_Pointer)(void) = Dummy;
-void (*CFKey_Pointer)(void) = Dummy;
-void (*AFKey_Pointer)(void) = Dummy;
-void (*AFKey10_Pointer)(void) = ToggleRxTx;
-
-//Initialize pointers
-void CtlAFunc (void) { (*Ctl_A_Pointer) (); }
-void CtlBFunc (void) { (*Ctl_B_Pointer) (); }
-void CtlCFunc (void) { (*Ctl_C_Pointer) (); }
-void CtlDFunc (void) { (*Ctl_D_Pointer) (); }
-void CtlEFunc (void) { (*Ctl_E_Pointer) (); }
-void CtlFFunc (void) { (*Ctl_F_Pointer) (); }
-
-void AltAFunc (void) { (*Alt_A_Pointer) (); }
-void AltBFunc (void) { (*Alt_B_Pointer) (); }
-void AltCFunc (void) { (*Alt_C_Pointer) (); }
-void AltDFunc (void) { (*Alt_D_Pointer) (); }
-void AltEFunc (void) { (*Alt_E_Pointer) (); }
-void AltFFunc (void) { (*Alt_F_Pointer) (); }
-
-void FKeyFunc (void) { (*FKey_Pointer) (); }
-void SFKeyFunc (void) { (*SFKey_Pointer) (); }
-void CFKeyFunc (void) { (*CFKey_Pointer) (); }
-void AFKeyFunc (void) { (*AFKey_Pointer) (); }
-void AFKey10Func (void) { (*AFKey10_Pointer) (); }
+#define  A_F1 Dummy
+#define  A_F2 Dummy
+#define  A_F3 Dummy
+#define  A_F4 Dummy
+#define  A_F5 Dummy
+#define  A_F6 Dummy
+#define  A_F7 Dummy
+#define  A_F8 Dummy
+#define  A_F9 Dummy
+#define  A_F10 ToggleRxTx
+#define  A_END Acquire
 
 
 static const uint8_t	HID_KEYBOARD_DECODER1 [ 0x64 ][ 2 ] 	=	{
@@ -267,7 +284,7 @@ static const uint8_t	HID_KEYBOARD_DECODER1 [ 0x64 ][ 2 ] 	=	{
 /*	4A	HM	*/	{	'\0',	'\0' },
 /*	4B	PU	*/	{	'\0',	'\0' },
 /*	4C	DEL	*/	{	0x08,	0x08 },
-/*	4D	END	*/	{	'\0',	'\0' },
+/*	4D	END	*/	{	0x79,	0x79 },
 /*	4E	PD	*/	{	'\0',	'\0' },
 /*	4F	RGT	*/	{	0xA0,	0xB0 },
 
@@ -281,7 +298,7 @@ static const uint8_t	HID_KEYBOARD_DECODER1 [ 0x64 ][ 2 ] 	=	{
 /*	56	-	*/	{	'-',	'-'  },
 /*	57	+	*/	{	'+',	'+'  },
 /*	58	ENT	*/	{	0x0D,	0x0D },
-/*	59	1END*/	{	'1',	'\0' },
+/*	59	1END*/	{	'1',	0x79 },
 /*	5A	2DWN*/	{	'2',	'\0' },
 /*	5B	3PD	*/	{	'3',	'\0' },
 /*	5C	4LFT*/	{	'4',	'\0' },
@@ -309,28 +326,28 @@ static pfunc0_t HID_KEYBOARD_DECODER2 [ 0x64 ][ 3 ]	=	{
 /*	07	dD	*/	{	Ctl_D, 		Alt_D, 		NULL },
 /*	08	eE	*/	{	Ctl_E, 		Alt_E, 		NULL },
 /*	09	fF	*/	{	Ctl_F, 		Alt_F, 		NULL },
-/*	0A	gG	*/	{	NULL, 		NULL, 		NULL },
-/*	0B	hH	*/	{	NULL, 		NULL, 		NULL },
-/*	0C	iI	*/	{	NULL, 		NULL, 		NULL },
-/*	0D	jJ	*/	{	NULL, 		NULL, 		NULL },
-/*	0E	kK	*/	{	NULL, 		NULL, 		NULL },
-/*	0F	lL	*/	{	NULL, 		NULL, 		NULL },
+/*	0A	gG	*/	{	Ctl_G, 		Alt_G, 		NULL },
+/*	0B	hH	*/	{	Ctl_H, 		Alt_H, 		NULL },
+/*	0C	iI	*/	{	Ctl_I, 		Alt_I, 		NULL },
+/*	0D	jJ	*/	{	Ctl_J, 		Alt_J, 		NULL },
+/*	0E	kK	*/	{	Ctl_K, 		Alt_K, 		NULL },
+/*	0F	lL	*/	{	Ctl_L, 		Alt_L, 		NULL },
 
 /*	Hex				Ctrl		Alt			Ctl+Alt	*/
-/*	10	mM	*/	{	NULL, 		NULL, 		NULL },
-/*	11	nN	*/	{	NULL, 		NULL, 		NULL },
-/*	12	oO	*/	{	NULL, 		NULL, 		NULL },
-/*	13	pP	*/	{	NULL, 		NULL, 		NULL },
-/*	14	qQ	*/	{	NULL, 		NULL, 		NULL },
-/*	15	rR	*/	{	NULL, 		NULL, 		NULL },
-/*	16	sS	*/	{	NULL, 		NULL, 		NULL },
-/*	17	tT	*/	{	NULL, 		NULL, 		NULL },
-/*	18	uU	*/	{	NULL, 		NULL, 		NULL },
-/*	19	vV	*/	{	NULL, 		NULL, 		NULL },
-/*	1A	wW	*/	{	NULL, 		NULL, 		NULL },
-/*	1B	xX	*/	{	NULL, 		NULL, 		NULL },
-/*	1C	yY	*/	{	NULL, 		NULL, 		NULL },
-/*	1D	zZ	*/	{	NULL, 		NULL, 		NULL },
+/*	10	mM	*/	{	Ctl_M, 		Alt_M, 		NULL },
+/*	11	nN	*/	{	Ctl_N, 		Alt_N, 		NULL },
+/*	12	oO	*/	{	Ctl_O, 		Alt_O, 		NULL },
+/*	13	pP	*/	{	Ctl_P, 		Alt_P, 		NULL },
+/*	14	qQ	*/	{	Ctl_Q, 		Alt_Q, 		NULL },
+/*	15	rR	*/	{	Ctl_R, 		Alt_R, 		NULL },
+/*	16	sS	*/	{	Ctl_S, 		Alt_S, 		NULL },
+/*	17	tT	*/	{	Ctl_T, 		Alt_T, 		NULL },
+/*	18	uU	*/	{	Ctl_U, 		Alt_U, 		NULL },
+/*	19	vV	*/	{	Ctl_V, 		Alt_V, 		NULL },
+/*	1A	wW	*/	{	Ctl_W, 		Alt_W, 		NULL },
+/*	1B	xX	*/	{	Ctl_X, 		Alt_X, 		NULL },
+/*	1C	yY	*/	{	Ctl_Y, 		Alt_Y, 		NULL },
+/*	1D	zZ	*/	{	Ctl_Z, 		Alt_Z, 		NULL },
 /*	1E	1!	*/	{	NULL,  		NULL, 		NULL },
 /*	1F	2@	*/	{	NULL,		NULL, 		NULL },
 
@@ -363,18 +380,18 @@ static pfunc0_t HID_KEYBOARD_DECODER2 [ 0x64 ][ 3 ]	=	{
 /*	37	.>	*/	{	NULL,		NULL,		NULL },
 /*	38	/?	*/	{	NULL,		NULL, 		NULL },
 /*	39	CAP	*/	{	NULL,		NULL, 		NULL },
-/*	3A	F1	*/	{	C_Fkey,		A_Fkey,		NULL },
-/*	3B	F2	*/	{	C_Fkey,		A_Fkey, 	NULL },
-/*	3C	F3	*/	{	C_Fkey,		A_Fkey,		NULL },
-/*	3D	F4	*/	{	C_Fkey,		A_Fkey,		NULL },
-/*	3E	F5	*/	{	C_Fkey,		A_Fkey,		NULL },
-/*	3F	F6	*/	{	C_Fkey,		A_Fkey,		NULL },
+/*	3A	F1	*/	{	C_F1,		A_F1,		NULL },
+/*	3B	F2	*/	{	C_F2,		A_F2, 		NULL },
+/*	3C	F3	*/	{	C_F3,		A_F3,		NULL },
+/*	3D	F4	*/	{	C_F4,		A_F4,		NULL },
+/*	3E	F5	*/	{	C_F5,		A_F5,		NULL },
+/*	3F	F6	*/	{	C_F6,		A_F6,		NULL },
 
 /*	Hex				Ctrl		Alt	 		Ctl+Alt	*/
-/*	40	F7	*/	{	C_Fkey,		A_Fkey,		NULL },
-/*	41	F8	*/	{	C_Fkey,		A_Fkey, 	NULL },
-/*	42	F9	*/	{	C_Fkey,		A_Fkey, 	NULL },
-/*	43	F10	*/	{	C_Fkey,		A_Fkey10, 	NULL },
+/*	40	F7	*/	{	C_F7,		A_F7,		NULL },
+/*	41	F8	*/	{	C_F8,		A_F8, 		NULL },
+/*	42	F9	*/	{	C_F9,		A_F9, 		NULL },
+/*	43	F10	*/	{	C_F10,		A_F10, 		NULL },
 /*	44	F11	*/	{	NULL,		NULL,		NULL },
 /*	45	F12	*/	{	NULL,		NULL, 		NULL },
 /*	46	PS	*/	{	NULL,		NULL, 		NULL },
@@ -384,7 +401,7 @@ static pfunc0_t HID_KEYBOARD_DECODER2 [ 0x64 ][ 3 ]	=	{
 /*	4A	HM	*/	{	NULL,		NULL, 		NULL },
 /*	4B	PU	*/	{	NULL,		NULL, 		NULL },
 /*	4C	DEL	*/	{	NULL,		NULL, 		NULL },
-/*	4D	END	*/	{	NULL,		NULL, 		NULL },
+/*	4D	END	*/	{	C_END,		A_END, 		NULL },
 /*	4E	PD	*/	{	NULL,		NULL, 		NULL },
 /*	4F	RGT	*/	{	NULL,		NULL, 		NULL },
 
@@ -454,7 +471,6 @@ static void KEYBRD_Decode(uint8_t *pbuf)
 	static uint8_t nbr_keys_new;
 	static uint8_t nbr_keys_last;
 
-	static uint8_t temp;
 	static uint8_t Decoder_Col;
 
 	void (* tempf)(void);

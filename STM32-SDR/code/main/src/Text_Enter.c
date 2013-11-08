@@ -225,9 +225,9 @@ void Text_SetSelectedText(TextNumber newText)
 
 
 void kybd_edit_text(char data){
-	if(data != 10 && text_cnt< text_length)
+	if(data != 0x0D && text_cnt< text_length)
 	{
-		if(data == 13 && text_cnt >0){
+		if(data == 0x08 && text_cnt >0){
 		text_cnt--;
 		s_TextData[s_currentTextNumber].Text[text_cnt] = ' ';
 		s_TextData[s_currentTextNumber].count = text_cnt;
@@ -248,9 +248,12 @@ void kybd_edit_text(char data){
 }
 
 void kybd_edit_contact(char data, int ContactIdx){
-	if(data != 10 && text_cnt< contact_length)
+
+	if(data != 0x0D && text_cnt< contact_length)
+	//if(data != 10 && text_cnt< contact_length)
 	{
-		if(data == 13 && text_cnt >0){
+		if(data == 0x08 && text_cnt >0){
+		//if(data == 13 && text_cnt >0){
 		text_cnt--;
 		s_ContactData[ContactIdx].Text[text_cnt] = ' ';
 		s_ContactData[ContactIdx].count = text_cnt;
@@ -330,7 +333,7 @@ void compose_F5(void){
 	if(s_ContactData[1].count != 0)
 	String2Buffer(" Well, ");
 	Text2Buffer(s_ContactData[1].Text,s_ContactData[1].count);
-	String2Buffer("TNX for the PSK31 QSO");
+	String2Buffer(" TNX for the PSK31 QSO");
 	String2Buffer(" ");
 	String2Buffer("Vy 73's, ");
 	if(s_ContactData[0].count != 0)

@@ -13,3 +13,5 @@ void TuneUpBig( void);
 void TuneUpSmall( void);
 void TuneDownBig( void);
 void TuneDownSmall( void);
+void Acquire( void );
+extern void SetRXFrequency(double freq);

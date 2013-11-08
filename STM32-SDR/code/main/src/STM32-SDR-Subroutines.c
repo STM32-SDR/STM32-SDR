@@ -93,3 +93,35 @@ void TuneDownBig (void) {
 void TuneDownSmall (void) {
 
 }
+
+
+void Acquire( void )
+{
+	extern int count;
+	extern int char_count;
+	extern unsigned char FFT_Filter[];
+	extern int NCO_Point;
+	extern double NCO_Frequency;
+	extern double NCO_1;
+	long i, S1, S2, W;
+	double delta;
+
+	/* this is where I  add a correction to the NCO frequency
+		based on the nearby spectral peaks */
+	S1 = 0;
+	S2 = 0;
+	delta = 0.;
+	//for (i=-2; i<3; i++){
+	for (i=-4; i<5; i++){
+		W = (long)FFT_Filter[NCO_Point + i];
+		S1 += W*i;
+		S2 += W;
+	}
+	if (S2 != 0) delta = (double) S1/((double)S2);
+	NCO_Frequency +=  (double)((float)delta * 15.625);
+	NCO_1 = NCO_Frequency;
+	SetRXFrequency (NCO_Frequency );
+	count = 0;
+	char_count = 0;
+}
+

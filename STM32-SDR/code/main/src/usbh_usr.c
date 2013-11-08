@@ -25,12 +25,15 @@
  ******************************************************************************
  */
 
+
 /* Includes ------------------------------------------------------------------*/
 #include "usbh_usr.h"
 #include "usbh_hid_keybd.h"
 #include "Keyboard_Input.h"
 #include "KeyboardStatus.h"
 #include "xprintf.h"
+
+extern void Acquire(void);
 
 // A macro to allow tracing of all USB events.
 #define USB_DEBUG_MARKER() do { \
@@ -347,6 +350,7 @@ void USR_KEYBRD_ProcessData(uint8_t data1,uint8_t data2 )
 		kybd_dispFunctionKey(data1);
 		//Note: 0x90 to 0x99 denote shifted Function keys 1 to 10.
 	}
+	else if (data1 == 0x79) { Acquire();}
 	else {
 		//data1 is ASCII data
 		kybd_char_switch(data1);
@@ -355,14 +359,14 @@ void USR_KEYBRD_ProcessData(uint8_t data1,uint8_t data2 )
 }
 
 /**
- * @brief  USBH_USR_DeInit
- *         Deint User state and associated variables
- * @param  None
- * @retval None
- */
+* @brief USBH_USR_DeInit
+* Deint User state and associated variables
+* @param None
+* @retval None
+*/
 void USBH_USR_DeInit(void)
 {
-	USB_DEBUG_MARKER();
+        USB_DEBUG_MARKER();
 }
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
