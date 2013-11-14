@@ -40,8 +40,6 @@ int		WF_Count = 0;
 int		WF_Bfr[15360];
 int		*pWFBfr;
 int		WF_Flag = 1; //Default to Spectrum Display
-//waterfall
-int		tmode;
 
 // Constants
 static const int FFT_WIDTH   = 240;
@@ -64,7 +62,7 @@ static void displayAGCVariables(int RSL);
 static void displaySMeter(int RSL);
 void	Acquire (void);
 
-
+static _Bool showAFOffsetOnScreen(void);
 
 
 // TODO: Remove these? Only set; never used!
@@ -190,7 +188,9 @@ static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 	displayFFT(x, y);
 
 	// Write the frequency offset text
-	displayFrequencyOffsetText(force);
+	if (showAFOffsetOnScreen()) {
+		displayFrequencyOffsetText(force);
+	}
 
 	// Display AGC Variables for Testing / Troubleshooting
 	displayAGCVariables(RSL);
@@ -201,7 +201,6 @@ static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 	// Final End of DSP and FFT Update Processing
 	DSP_Flag = 0;
 }
-
 
 static void displayFFT(int x, int y)
 {
@@ -224,6 +223,7 @@ static void displayFFT(int x, int y)
 	}
 
 	NCO_Bin = (int)selectedFreqX + 8;
+	_Bool isShowingAFOffset = showAFOffsetOnScreen();
 
 	if (!WF_Flag) {
 
@@ -231,14 +231,13 @@ static void displayFFT(int x, int y)
 		LCD_SetDisplayWindow(x, y, FFT_HEIGHT, FFT_WIDTH);
 		LCD_WriteRAM_PrepareDir(LCD_WriteRAMDir_Down);
 
-		tmode = (int)Mode_GetCurrentMode();
 
 		for (int x = 0; x < FFT_WIDTH; x++) {
 			// Plot this column of the FFT.
 			for (int y = 0; y < FFT_HEIGHT; y++) {
 
 					// Draw red line for selected frequency
-					if ((x == (int) (selectedFreqX + 0.5))&& (tmode != MODE_SSB)){
+					if ((x == (int) (selectedFreqX + 0.5)) && isShowingAFOffset){
 						// Leave some white at the top
 						if (y <= SELFREQ_ADJ) {
 							LCD_WriteRAM(LCD_COLOR_WHITE);
@@ -277,7 +276,7 @@ static void displayFFT(int x, int y)
 			// Refresh the waterfall display--scrolling begins after 64 lines
 			for (int y = WF_Line0; y < FFT_HEIGHT; y++){
 				for (int x = 0; x <FFT_WIDTH; x++) {
-					if (x == (int)(selectedFreqX +0.5)) {
+					if (x == (int)(selectedFreqX +0.5) && isShowingAFOffset) {
 						//LCD_WriteRAM(LCD_COLOR_RED);
 						LCD_WriteRAM(LCD_COLOR_WHITE);
 					}
@@ -288,7 +287,7 @@ static void displayFFT(int x, int y)
 			}
 			for ( int y = 0; y < WF_Line0; y++){
 				for (int x = 0; x < FFT_WIDTH; x++){
-					if (x == (int)(selectedFreqX +0.5)){
+					if (x == (int)(selectedFreqX +0.5) && isShowingAFOffset){
 						//LCD_WriteRAM(LCD_COLOR_RED);
 						LCD_WriteRAM(LCD_COLOR_WHITE);
 					}
@@ -307,6 +306,11 @@ static void displayFFT(int x, int y)
 	}
 }
 
+static _Bool showAFOffsetOnScreen(void)
+{
+	ModeType currentMode = Mode_GetCurrentMode();
+	return (currentMode != MODE_SSB);
+}
 
 static void displayFrequencyOffsetText(_Bool force)
 {
@@ -346,6 +350,7 @@ static void displayAGCVariables(int RSL)
 	//intToCommaString((int)AGC_Mag, test2, 7);
 	//GL_PrintString(75, 80, test2, 0);
 
+	GL_SetFont(GL_FONTOPTION_8x16);
 	GL_SetTextColor(LCD_COLOR_RED);
 	GL_SetBackColor(LCD_COLOR_BLACK);
 	char test3[3];
@@ -370,7 +375,6 @@ static void displaySMeter(int RSL)
 {
 	int x = 80;
 	int y = 68;
-//>>>>>>> branch 'master' of https://github.com/ve7pke/STM32-SDR.git
 	LCD_SetDisplayWindow(x, y, SMETER_HEIGHT, FFT_WIDTH);
 	LCD_WriteRAM_PrepareDir(LCD_WriteRAMDir_Down);
 	int Signal_Level = ((RSL + 120) * 26) / 10;
