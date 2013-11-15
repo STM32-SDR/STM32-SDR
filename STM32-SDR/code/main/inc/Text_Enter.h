@@ -34,7 +34,7 @@ typedef enum {
 	Text_F7,
 	Text_F8,
 	Text_F9,
-	Text_F10,
+	//Text_F10,
 	Text_Items
 } TextNumber;
 
@@ -64,7 +64,7 @@ void compose_F6(void);
 void compose_F7(void);
 void compose_F8(void);
 void compose_F9(void);
-void compose_F10(void);
+//void compose_F10(void);
 
  void Text_SetSelectedText(TextNumber newText);
  void Text_Display(int TextIdx);

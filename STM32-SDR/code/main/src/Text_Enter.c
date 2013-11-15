@@ -366,11 +366,11 @@ void compose_F9(void){
 	String2Buffer(" ");
 }
 
-void compose_F10(void){
-	if(s_TextData[Text_F10].count != 0)
-	Text2Buffer(s_TextData[Text_F10].Text, s_TextData[Text_F10].count);
-	String2Buffer(" ");
-}
+//void compose_F10(void){
+//	if(s_TextData[Text_F10].count != 0)
+//	Text2Buffer(s_TextData[Text_F10].Text, s_TextData[Text_F10].count);
+//	String2Buffer(" ");
+//}
 
 
 void Text_Initialize(void)
