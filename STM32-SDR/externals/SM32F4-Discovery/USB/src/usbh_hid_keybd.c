@@ -284,7 +284,7 @@ static const uint8_t	HID_KEYBOARD_DECODER1 [ 0x64 ][ 2 ] 	=	{
 /*	4A	HM	*/	{	'\0',	'\0' },
 /*	4B	PU	*/	{	'\0',	'\0' },
 /*	4C	DEL	*/	{	0x08,	0x08 },
-/*	4D	END	*/	{	0x79,	0x79 },
+/*	4D	END	*/	{	0x8C,	0x8C },
 /*	4E	PD	*/	{	'\0',	'\0' },
 /*	4F	RGT	*/	{	0xA0,	0xB0 },
 
@@ -298,7 +298,7 @@ static const uint8_t	HID_KEYBOARD_DECODER1 [ 0x64 ][ 2 ] 	=	{
 /*	56	-	*/	{	'-',	'-'  },
 /*	57	+	*/	{	'+',	'+'  },
 /*	58	ENT	*/	{	0x0D,	0x0D },
-/*	59	1END*/	{	'1',	0x79 },
+/*	59	1END*/	{	'1',	0x8C },
 /*	5A	2DWN*/	{	'2',	'\0' },
 /*	5B	3PD	*/	{	'3',	'\0' },
 /*	5C	4LFT*/	{	'4',	'\0' },

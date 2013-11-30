@@ -350,7 +350,7 @@ void USR_KEYBRD_ProcessData(uint8_t data1,uint8_t data2 )
 		kybd_dispFunctionKey(data1);
 		//Note: 0x90 to 0x99 denote shifted Function keys 1 to 10.
 	}
-	else if (data1 == 0x79) { Acquire();}
+	else if (data1 == 0x8C) { Acquire();}
 	else {
 		//data1 is ASCII data
 		kybd_char_switch(data1);
