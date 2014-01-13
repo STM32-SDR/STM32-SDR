@@ -183,16 +183,16 @@ void Dummy(void){
 #define  C_F10 Dummy
 #define	 C_END Acquire
 
-#define  A_F1 Dummy
-#define  A_F2 Dummy
-#define  A_F3 Dummy
-#define  A_F4 Dummy
-#define  A_F5 Dummy
+#define  A_F1 Sel_Filt1
+#define  A_F2 Sel_Filt2
+#define  A_F3 Sel_Filt3
+#define  A_F4 Sel_Filt4
+#define  A_F5 Sel_Filt5
 #define  A_F6 Dummy
 #define  A_F7 Dummy
 #define  A_F8 Dummy
 #define  A_F9 Dummy
-#define  A_F10 ToggleRxTx
+#define  A_F10 No_Filt
 #define  A_END Acquire
 
 

@@ -3,6 +3,14 @@
 #include "STM32-SDR-Subroutines.h"
 #include "ChangeOver.h"
 #include "widgets.h"
+#include "arm_math.h"
+
+#define		POST_FILT_SIZE 125
+int i;
+int NoFILT = 1;
+
+extern const q15_t post_FILT_Coeff[125][5];
+q15_t PFC[125];
 
 extern 	int WF_Flag;
 
@@ -125,3 +133,42 @@ void Acquire( void )
 	char_count = 0;
 }
 
+void Sel_Filt1 ( void )
+{
+	NoFILT = 0;
+	for ( i=0; i < POST_FILT_SIZE; i++)
+	PFC[i] = post_FILT_Coeff[i][0];
+}
+
+void Sel_Filt2 ( void )
+{
+	NoFILT = 0;
+	for ( i=0; i < POST_FILT_SIZE; i++)
+	PFC[i] = post_FILT_Coeff[i][1];
+}
+
+void Sel_Filt3 ( void )
+{
+	NoFILT = 0;
+	for ( i=0; i < POST_FILT_SIZE; i++)
+	PFC[i] = post_FILT_Coeff[i][2];
+}
+
+void Sel_Filt4 ( void )
+{
+	NoFILT = 0;
+	for ( i=0; i < POST_FILT_SIZE; i++)
+	PFC[i] = post_FILT_Coeff[i][3];
+}
+
+void Sel_Filt5 ( void )
+{
+	NoFILT = 0;
+	for ( i=0; i < POST_FILT_SIZE; i++)
+	PFC[i] = post_FILT_Coeff[i][4];
+}
+
+void No_Filt ( void )
+{
+	NoFILT = 1;
+}

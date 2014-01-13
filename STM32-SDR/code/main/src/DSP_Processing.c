@@ -28,6 +28,7 @@
 #define		FFT_TIME_CONST	0.25
 #define		SAMPLING_FREQ 8000.
 #define		ALPHA 1/(SAMPLING_FREQ*FFT_TIME_CONST)
+#define		POST_FILT_SIZE 125
 
 float	RMS_Sig;
 float	dB_Sig;
@@ -47,6 +48,8 @@ extern  int RSL_Mag;
 extern  float AGC_Mag;
 extern  float DAC_AGC_Mag;
 
+extern q15_t PFC[125];
+
 float32_t FFT_Output[256];
 float32_t FFT_Filter[256];
 
@@ -58,6 +61,10 @@ int FFT_Mag_10[256];
 
 uint16_t FFT_Size = 512;  // change for 512 sampling
 uint8_t FFT_status;
+
+q15_t post_FILT_State[POST_FILT_SIZE + (BUFFERSIZE / 2) - 1];
+q15_t post_FILT_In[BUFFERSIZE / 2];
+q15_t post_FILT_Out[BUFFERSIZE / 2];
 
 q15_t FIR_State_I[NUM_FIR_COEF + (BUFFERSIZE / 2) - 1];
 q15_t FIR_State_Q[NUM_FIR_COEF + (BUFFERSIZE / 2) - 1];
@@ -89,6 +96,8 @@ void init_DSP(void) {
 	FFT_status = arm_cfft_radix2_init_q15(&S_CFFT, FFT_Size, 0, 1);
 }
 
+arm_fir_instance_q15 S_post_FILT = { POST_FILT_SIZE, &post_FILT_State[0], &PFC[0]};
+
 arm_fir_instance_q15 S_FIR_I = { NUM_FIR_COEF, &FIR_State_I[0], &coeff_fir_I[0] };
 arm_fir_instance_q15 S_FIR_Q = { NUM_FIR_COEF, &FIR_State_Q[0], &coeff_fir_Q[0] };
 
@@ -113,12 +122,18 @@ void Process_FIR_Q(void)
 	arm_fir_q15(&S_FIR_Q, &FIR_Q_In[0], &FIR_Q_Out[0], BUFFERSIZE / 2);
 }
 
+void Process_post_FILT (void)
+{
+	arm_fir_q15(&S_post_FILT, &post_FILT_In[0], &post_FILT_Out[0], BUFFERSIZE / 2);
+}
+
 void Sideband_Demod(void)
 {
 	int16_t j;
 	for (j = 0; j < BUFFERSIZE / 2; j++) {
 		USB_Out[j] = FIR_I_Out[j] - FIR_Q_Out[j];
 		LSB_Out[j] = FIR_I_Out[j] + FIR_Q_Out[j];
+		post_FILT_In[j]= USB_Out[j];
 		//Fill the PSK Buffer
 		ADC_Buffer[j] = USB_Out[j]; //made change to get display to work for psk
 	}

@@ -51,7 +51,7 @@
 #include    "DMA_IRQ_Handler.h"
 #include	"widgets.h"
 
-#define VERSION_STRING "1.036"
+#define VERSION_STRING "1.037"
 
 const uint32_t CODEC_FREQUENCY = 8000;
 
@@ -134,6 +134,9 @@ static void initializeHardware(void)
 	Codec_AudioInterface_Init(CODEC_FREQUENCY);
 	main_delay(SETUP_DELAY);
 
+	No_Filt ();
+	main_delay(SETUP_DELAY);
+
 	Audio_DMA_Init();
 	main_delay(SETUP_DELAY);
 
@@ -198,6 +201,7 @@ static void initializeHardware(void)
 	main_delay(SETUP_DELAY);
 
 	init_DSP();
+
 	main_delay(SETUP_DELAY);
 
 	Audio_DMA_Start();			//Get everything up and running before starting DMA Interrupt
