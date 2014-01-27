@@ -43,6 +43,9 @@
 #include "usbh_hid_core.h"
 #include "usbh_hid_keybd.h"
 
+#define TRUE 1
+#define FALSE 0
+
 /** @addtogroup USBH_LIB
  * @{
  */

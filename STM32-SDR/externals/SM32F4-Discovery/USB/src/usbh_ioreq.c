@@ -27,7 +27,7 @@
 /* Includes ------------------------------------------------------------------*/
 
 #include "usbh_ioreq.h"
-
+#include "xprintf.h"
 /** @addtogroup USBH_LIB
   * @{
   */
@@ -314,13 +314,11 @@ USBH_Status USBH_InterruptReceiveData( USB_OTG_CORE_HANDLE *pdev,
                                 uint8_t hc_num)
 {
 
-  xprintf("USB_InterruptReceiveData on ch %d.\n",hc_num);
+  xprintf("USB_InterruptReceiveData on ch %d.\n", hc_num);
 
   pdev->host.hc[hc_num].ep_is_in = 1;  
   pdev->host.hc[hc_num].xfer_buff = buff;
   pdev->host.hc[hc_num].xfer_len = length;
-  
-
   
   if(pdev->host.hc[hc_num].toggle_in == 0)
   {

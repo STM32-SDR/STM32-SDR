@@ -32,6 +32,16 @@
 #include "usbh_def.h"
 #include <stdio.h>
 #include "STM32-SDR-Subroutines.h"
+#include "xprintf.h"
+
+#define TRUE 1
+#define FALSE 0
+
+// A macro to allow tracing of all USB events.
+#define USB_KEYBRD_MARKER() do { \
+	xprintf("USB KEYBRDEvent:   %s()   at line %d.\n", __func__, __LINE__); \
+	} while (0)
+		//USB_debugEvent(__LINE__);
 /** @addtogroup USBH_LIB
  * @{
  */
@@ -462,6 +472,9 @@ static void KEYBRD_Init(void)
 
 static void KEYBRD_Decode(uint8_t *pbuf)
 {
+
+	USB_KEYBRD_MARKER();
+
 	//static uint8_t shift;
 	static uint8_t keys[KBR_MAX_NBR_PRESSED];
 	static uint8_t keys_new[KBR_MAX_NBR_PRESSED];
@@ -523,7 +536,7 @@ static void KEYBRD_Decode(uint8_t *pbuf)
 	if (nbr_keys_new == 1) {
 		key_newest = keys_new[0];
 
-
+		xputc(key_newest);
 
 		switch (pbuf[0]) {
 			case 0x0:	//normal

@@ -281,7 +281,7 @@ void USBH_USR_DeviceNotSupported(void)
 USBH_USR_Status USBH_USR_UserInput(void)
 {
 	// ** This function seems to be called often! **
-	//USB_DEBUG_MARKER();
+	USB_DEBUG_MARKER();
 
 	USBH_USR_Status usbh_usr_status;
 
@@ -355,7 +355,7 @@ void USR_KEYBRD_ProcessData(uint8_t data1,uint8_t data2 )
 		//data1 is ASCII data
 		kybd_char_switch(data1);
 	}
-
+	xputc(data1);
 }
 
 /**

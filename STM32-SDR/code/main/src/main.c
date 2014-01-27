@@ -56,7 +56,6 @@
 
 const uint32_t CODEC_FREQUENCY = 8000;
 
-
 // USB structures (Must be 4-byte aligned if DMA active)
 __ALIGN_BEGIN USB_OTG_CORE_HANDLE USB_OTG_Core_dev __ALIGN_END;
 __ALIGN_BEGIN USBH_HOST USB_Host __ALIGN_END;
@@ -116,6 +115,10 @@ int main(void)
 			Proc_AGC();
 		}
 	}
+}
+
+void Strobe_USB(void) {
+	USBH_Process(&USB_OTG_Core_dev, &USB_Host);
 }
 
 static void initializeHardware(void)
