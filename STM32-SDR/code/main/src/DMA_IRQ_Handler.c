@@ -37,7 +37,7 @@ uint32_t DMA_RX_Memory;
 uint32_t DMA_TX_Memory;
 volatile int16_t DSP_Flag = 0;
 int16_t AGC_Flag = 0;
-extern int NoFILT;
+extern int FilterNumber;
 
 extern q15_t post_FILT_Out[BUFFERSIZE / 2];
 
@@ -122,7 +122,7 @@ void Rcvr_DSP(void)
 	Process_FIR_I();
 	Process_FIR_Q();
 	Sideband_Demod(); //PSK buffer is filled in this procedure with USB data stream
-	if (!NoFILT){
+	if (FilterNumber){
 		Process_post_FILT();
 	}
 	ProcPSKDet();
@@ -131,7 +131,7 @@ void Rcvr_DSP(void)
 	GPIO_WriteBit(Test_GPIO, Test_2, Bit_RESET);
 
 	for (i = 0; i < BUFFERSIZE / 2; i++) {
-		if (NoFILT){
+		if (!FilterNumber){
 			*(pTXDMABfr + 2 * i) = (int16_t) USB_Out[i];
 			*(pTXDMABfr + 2 * i + 1) = (int16_t) USB_Out[i];
 		}

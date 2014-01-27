@@ -4,10 +4,27 @@
 #include "ChangeOver.h"
 #include "widgets.h"
 #include "arm_math.h"
+#include <string.h>
+#include <stdio.h>
 
 #define		POST_FILT_SIZE 125
 int i;
-int NoFILT = 1;
+
+char sFilt[3];
+unsigned int Flow;
+unsigned int Fhigh;
+
+typedef enum {
+	Filt0 = 0,
+	Filt1,
+	Filt2,
+	Filt3,
+	Filt4,
+	Filt5,
+	NumFilts //automatically set count
+}FiltNum;
+
+FiltNum FilterNumber;
 
 extern const q15_t post_FILT_Coeff[125][5];
 q15_t PFC[125];
@@ -15,6 +32,8 @@ q15_t PFC[125];
 extern 	int WF_Flag;
 
 extern void ClearTextDisplay(void);
+
+extern _Bool Encoders_IsOptionsEncoderPressed(void);
 
 void ToggleRxTx (void) {
 	if (RxTx_InTxMode()){
@@ -135,40 +154,94 @@ void Acquire( void )
 
 void Sel_Filt1 ( void )
 {
-	NoFILT = 0;
+	Flow = 300;
+	Fhigh = 3300;
+	sprintf(sFilt,"F1");
 	for ( i=0; i < POST_FILT_SIZE; i++)
 	PFC[i] = post_FILT_Coeff[i][0];
 }
 
 void Sel_Filt2 ( void )
 {
-	NoFILT = 0;
+	Flow = 300;
+	Fhigh = 2700;
+	sprintf(sFilt,"F2");
 	for ( i=0; i < POST_FILT_SIZE; i++)
 	PFC[i] = post_FILT_Coeff[i][1];
 }
 
 void Sel_Filt3 ( void )
 {
-	NoFILT = 0;
+	Flow = 300;
+	Fhigh = 1300;
+	sprintf(sFilt,"F3");
 	for ( i=0; i < POST_FILT_SIZE; i++)
 	PFC[i] = post_FILT_Coeff[i][2];
 }
 
 void Sel_Filt4 ( void )
 {
-	NoFILT = 0;
+	Flow = 400;
+	Fhigh = 700;
+	sprintf(sFilt,"F4");
 	for ( i=0; i < POST_FILT_SIZE; i++)
 	PFC[i] = post_FILT_Coeff[i][3];
 }
 
 void Sel_Filt5 ( void )
 {
-	NoFILT = 0;
+	Flow = 500;
+	Fhigh = 600;
+	sprintf(sFilt,"F5");
 	for ( i=0; i < POST_FILT_SIZE; i++)
 	PFC[i] = post_FILT_Coeff[i][4];
 }
 
 void No_Filt ( void )
 {
-	NoFILT = 1;
+	Flow = 125;
+	Fhigh = 3875;
+	FilterNumber = Filt0;
+}
+
+void process_button ( void ){
+	static unsigned char Press_cnt;
+	static unsigned char ButtonPress;
+	static unsigned char button_one_shot;
+	ButtonPress = Encoders_IsOptionsEncoderPressed();
+	button_one_shot |= ButtonPress;
+	if (button_one_shot) Press_cnt++;
+	if (!ButtonPress && Press_cnt){
+		if(Press_cnt >=2){
+			FilterNumber++;
+			FilterNumber %= NumFilts;
+			button_one_shot = 0;
+			Press_cnt = 0;
+			ProcessFilters (FilterNumber);
+		}
+	}
+}
+
+void ProcessFilters ( unsigned char filternumber){
+	switch (filternumber){
+	case 0:
+		No_Filt();
+		break;
+	case 1:
+		Sel_Filt1();
+		break;
+	case 2:
+		Sel_Filt2();
+		break;
+	case 3:
+		Sel_Filt3();
+		break;
+	case 4:
+		Sel_Filt4();
+		break;
+	case 5:
+		Sel_Filt5();
+		break;
+	}
+
 }

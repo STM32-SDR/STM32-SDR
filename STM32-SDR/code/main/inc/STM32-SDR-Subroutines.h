@@ -14,6 +14,8 @@ void TuneUpSmall( void);
 void TuneDownBig( void);
 void TuneDownSmall( void);
 void Acquire( void );
+void process_button ( void );
+void ProcessFilters (unsigned char filternumber);
 void Sel_Filt1 ( void );
 void Sel_Filt2 ( void );
 void Sel_Filt3 ( void );

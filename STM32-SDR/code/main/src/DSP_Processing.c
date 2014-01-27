@@ -30,6 +30,8 @@
 #define		ALPHA 1/(SAMPLING_FREQ*FFT_TIME_CONST)
 #define		POST_FILT_SIZE 125
 
+#define		df 15.625
+
 float	RMS_Sig;
 float	dB_Sig;
 float 	DAC_RMS_Sig;
@@ -47,6 +49,8 @@ extern  int AGC_Mode;
 extern  int RSL_Mag;
 extern  float AGC_Mag;
 extern  float DAC_AGC_Mag;
+extern  unsigned int Flow;
+extern  unsigned int Fhigh;
 
 extern q15_t PFC[125];
 
@@ -155,9 +159,12 @@ void Process_FFT(void)
 	Sig_Sum1 = 0;
 	Sig_Sum2 = 0;
 
+	int jl = (int)(Flow/df);
+	int jh = (int)(Fhigh/df);
+
 	for (int j = 0; j < 256; j++) 
 		FFT_Mag_10[j] = (int) FFT_Magnitude[j] * 10; //add in 10 db gain
-	for (int16_t j = 8; j < 252; j++) {  
+	for (int16_t j = 8; j < 252; j++) {
 		//Changed for 512 FFT
 		//This detects bins which are saturated and ignores them
 		if (FFT_Mag_10[j]> 0) {
@@ -178,7 +185,7 @@ void Process_FFT(void)
 		}
 
 		//Peak / SSB  AGC
-		if ( j > 8 && j < 252 )  //Limit Search to less than 2000 hz
+		if ( j >= jl && j <= jh )  //Limit Search to filter passbands
 		{
 			Sig = (int)FFT_Magnitude[j];
 		    if ( Sig > Sig_Max) {

@@ -60,6 +60,7 @@ static void displayFFT(int x, int y);
 static void displayFrequencyOffsetText(_Bool force);
 static void displayAGCVariables(int RSL);
 static void displaySMeter(int RSL);
+static void displayFilterBW (void);
 void	Acquire (void);
 
 static _Bool showAFOffsetOnScreen(void);
@@ -75,7 +76,10 @@ int 	NCO_Point;
 int		NCO_Bin;
 uint8_t FFT_Display[256];
 extern	int RSL_Mag;
+extern  unsigned int Flow;
+extern	unsigned int Fhigh;
 
+#define df 15.625
 
 #define ID_FFTSelFreqNum_LABEL 50105
 
@@ -198,6 +202,9 @@ static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 	// Display SMeter
 	displaySMeter(RSL);
 
+	// display Filter Passband
+	displayFilterBW();
+
 	// Final End of DSP and FFT Update Processing
 	DSP_Flag = 0;
 }
@@ -237,7 +244,8 @@ static void displayFFT(int x, int y)
 			for (int y = 0; y < FFT_HEIGHT; y++) {
 
 					// Draw red line for selected frequency
-					if ((x == (int) (selectedFreqX + 0.5)) && isShowingAFOffset){
+					//if ((x == (int) (selectedFreqX + 0.5)) && isShowingAFOffset){
+					if (x == (int) (selectedFreqX + 0.5)){
 						// Leave some white at the top
 						if (y <= SELFREQ_ADJ) {
 							LCD_WriteRAM(LCD_COLOR_WHITE);
@@ -276,7 +284,8 @@ static void displayFFT(int x, int y)
 			// Refresh the waterfall display--scrolling begins after 64 lines
 			for (int y = WF_Line0; y < FFT_HEIGHT; y++){
 				for (int x = 0; x <FFT_WIDTH; x++) {
-					if (x == (int)(selectedFreqX +0.5) && isShowingAFOffset) {
+					//if (x == (int)(selectedFreqX +0.5) && isShowingAFOffset) {
+					if (x == (int) (selectedFreqX + 0.5)){
 						//LCD_WriteRAM(LCD_COLOR_RED);
 						LCD_WriteRAM(LCD_COLOR_WHITE);
 					}
@@ -287,7 +296,8 @@ static void displayFFT(int x, int y)
 			}
 			for ( int y = 0; y < WF_Line0; y++){
 				for (int x = 0; x < FFT_WIDTH; x++){
-					if (x == (int)(selectedFreqX +0.5) && isShowingAFOffset){
+					//if (x == (int)(selectedFreqX +0.5) && isShowingAFOffset){
+					if (x == (int) (selectedFreqX + 0.5)){
 						//LCD_WriteRAM(LCD_COLOR_RED);
 						LCD_WriteRAM(LCD_COLOR_WHITE);
 					}
@@ -408,6 +418,29 @@ static void displaySMeter(int RSL)
 	GL_PrintString(1, 64, SMeter$, 0);
 
 }
+
+static void displayFilterBW( void )
+{
+	int x = 80;
+	int y = 66;
+	LCD_SetDisplayWindow(x, y, 2, FFT_WIDTH);
+	LCD_WriteRAM_PrepareDir(LCD_WriteRAMDir_Down);
+
+	int x1 = (int)(Flow/df)-8;
+	int x2 = (int)(Fhigh/df)-8;
+
+	for (int x = 0; x < FFT_WIDTH; x++) {
+		for (int y = 0; y < 2; y++) {
+			if ((x >= x1)&&(x<=x2)) {
+				LCD_WriteRAM(LCD_COLOR_YELLOW);
+			}
+			else {
+				LCD_WriteRAM(LCD_COLOR_BLACK);
+			}
+		}
+	}
+}
+
 
 void Init_Waterfall (void)
 {

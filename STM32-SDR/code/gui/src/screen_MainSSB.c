@@ -20,6 +20,7 @@
  */
 
 extern 	int WF_Flag;
+extern 	int FilterNumber;
 
 #include "screen_All.h"
 #include "widgets.h"
@@ -37,6 +38,7 @@ static GL_PageControls_TypeDef* pAGCLabel;
 static GL_PageControls_TypeDef* pPGALabel;
 static GL_PageControls_TypeDef* pDACLabel;
 static GL_PageControls_TypeDef* pRSLLabel;
+static GL_PageControls_TypeDef* pFiltLabel;
 
 
 /**
@@ -71,6 +73,36 @@ static _Bool AGCStatusUpdateHandler(GL_PageControls_TypeDef* pThis, _Bool forceR
       // label text forces an update (redraw).
      return 0;
 }
+
+static _Bool FilterStatusUpdateHandler(GL_PageControls_TypeDef* pThis, _Bool forceRedisplay)
+{
+      // For CW, put this in code\gui\src\screen_MainCW.c
+	  switch(FilterNumber) {
+	  case 0:
+    	  Widget_ChangeLabelText(pFiltLabel, "F0");
+    	  break;
+	  case 1:
+    	  Widget_ChangeLabelText(pFiltLabel, "F1");
+    	  break;
+	  case 2:
+    	  Widget_ChangeLabelText(pFiltLabel, "F2");
+    	  break;
+	  case 3:
+    	  Widget_ChangeLabelText(pFiltLabel, "F3");
+    	  break;
+	  case 4:
+    	  Widget_ChangeLabelText(pFiltLabel, "F4");
+    	  break;
+	  case 5:
+    	  Widget_ChangeLabelText(pFiltLabel, "F5");
+    	  break;
+	  }
+
+      // No need to indicate update required because changing the
+      // label text forces an update (redraw).
+      return 0;
+}
+
 
 static _Bool PGAUpdateHandler(GL_PageControls_TypeDef* pThis, _Bool forceRedisplay){
 	 return 0;
@@ -147,6 +179,10 @@ void ScreenMainSSB_Create(void)
 	//RSL Label
 	pRSLLabel = Widget_NewLabel(" RSL ", LCD_COLOR_YELLOW, LCD_COLOR_BLACK, 0, GL_FONTOPTION_8x16,RSLUpdateHandler);
 	AddPageControlObj(235,  80, pRSLLabel, s_pThisScreen);
+
+	//Filt Label
+		pFiltLabel = Widget_NewLabel("F0", LCD_COLOR_YELLOW, LCD_COLOR_BLACK, 0, GL_FONTOPTION_8x16,FilterStatusUpdateHandler);
+		AddPageControlObj(52, 12, pFiltLabel, s_pThisScreen);
 
 
 }

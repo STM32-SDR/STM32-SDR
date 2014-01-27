@@ -24,6 +24,8 @@
 #include "DMA_IRQ_Handler.h"
 #include "ChangeOver.h"
 
+extern double NCO_Frequency;
+
 typedef struct
 {
 	const char*        Name;
@@ -31,6 +33,7 @@ typedef struct
 	const UserModeType UserMode;
 	const ModeType     Mode;
 	const SideBandType SideBand;
+	const double	   DefaultNCO;
 } ModeStruct;
 
 static ModeStruct s_modeData[] = {
@@ -40,6 +43,7 @@ static ModeStruct s_modeData[] = {
 		/*Usr */ USERMODE_USB,
 		/*Mode*/ MODE_SSB,
 		/*Side*/ SIDEBAND_USB,
+		/*NCO*/  1000.,
 	},
 	{
 		/*Name*/ " LSB ",
@@ -47,6 +51,7 @@ static ModeStruct s_modeData[] = {
 		/*Usr */ USERMODE_LSB,
 		/*Mode*/ MODE_SSB,
 		/*Side*/ SIDEBAND_LSB,
+		/*NCO*/  1000.,
 	},
 	{
 		/*Name*/ " CW  ",
@@ -54,6 +59,7 @@ static ModeStruct s_modeData[] = {
 		/*Usr */ USERMODE_CW,
 		/*Mode*/ MODE_CW,
 		/*Side*/ SIDEBAND_LSB,
+		/*NCO*/  550.
 	},
 	{
 		/*Name*/ " CWR ",
@@ -61,6 +67,7 @@ static ModeStruct s_modeData[] = {
 		/*Usr */ USERMODE_CWR,
 		/*Mode*/ MODE_CW,
 		/*Side*/ SIDEBAND_USB,
+		/*NCO*/  550.
 	},
 	{
 		/*Name*/ "PSK-U",
@@ -68,6 +75,7 @@ static ModeStruct s_modeData[] = {
 		/*Usr */ USERMODE_DIGU,
 		/*Mode*/ MODE_PSK,
 		/*Side*/ SIDEBAND_USB,
+		/*NCO*/  1500.
 	},
 	{
 		/*Name*/ "PSK-L",
@@ -75,6 +83,7 @@ static ModeStruct s_modeData[] = {
 		/*Usr */ USERMODE_DIGL,
 		/*Mode*/ MODE_PSK,
 		/*Side*/ SIDEBAND_LSB,
+		/*NCO*/  1500.
 	},
 };
 
@@ -108,6 +117,9 @@ void Mode_SetCurrentMode(UserModeType newMode)
 	else {
 		assert(0);
 	}
+
+	NCO_Frequency = s_pCurrentMode->DefaultNCO;
+
 }
 
 // Query current state:

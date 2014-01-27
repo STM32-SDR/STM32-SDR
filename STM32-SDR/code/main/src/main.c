@@ -50,10 +50,12 @@
 #include	"DSP_Processing.h"
 #include    "DMA_IRQ_Handler.h"
 #include	"widgets.h"
+#include	"STM32-SDR-Subroutines.h"
 
-#define VERSION_STRING "1.037"
+#define VERSION_STRING "1.043"
 
 const uint32_t CODEC_FREQUENCY = 8000;
+
 
 // USB structures (Must be 4-byte aligned if DMA active)
 __ALIGN_BEGIN USB_OTG_CORE_HANDLE USB_OTG_Core_dev __ALIGN_END;
@@ -90,6 +92,9 @@ int main(void)
 	while (1) {
 		// Check if encoder-knobs have changed:
 		Encoders_CalculateAndProcessChanges();
+
+		// Check encoder 2 push button
+		process_button();
 
 		// Process any pending USB events
 		USBH_Process(&USB_OTG_Core_dev, &USB_Host);
@@ -208,6 +213,9 @@ static void initializeHardware(void)
 	main_delay(SETUP_DELAY);
 
 	TEST_GPIO_Init();
+
+	FrequencyManager_SetCurrentFrequency(FrequencyManager_GetCurrentFrequency());
+	main_delay(SETUP_DELAY);
 }
 
 static void displaySplashScreen(void)
