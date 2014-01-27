@@ -21,6 +21,7 @@
 
 
 void DMA1_Stream0_IRQHandler(void);
+void Process_All_DSP(void);
 void Rcvr_DSP(void);
 void Xmit_SSB(void);
 void Xmit_CW(void);

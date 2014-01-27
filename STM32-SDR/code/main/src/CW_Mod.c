@@ -23,6 +23,8 @@
 #include "stm32f4xx_gpio.h"
 #include "xprintf.h"
 #include <assert.h>
+#include "stm32f4xx_tim.h"
+
 
 // Create a circular buffer used for reading/writing key samples.
 // Need not match our sampling rate or the DMA rate. Just our data-storage area
@@ -157,8 +159,8 @@ void CW_KeyPollTimerIRQ(void)
 		writeKeySampleToKeyBuffer(debouncedIsKeyPressed);
 
 		// DEBUG: Count interrupts
-		extern volatile int g_numTimer3Interrupts;
-		g_numTimer3Interrupts++;
+		//extern volatile int g_numTimer3Interrupts;
+		//g_numTimer3Interrupts++;
 	}
 }
 

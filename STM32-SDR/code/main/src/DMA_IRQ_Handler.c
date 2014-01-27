@@ -63,12 +63,23 @@ float PSK_Gain;
 void DMA1_Stream0_IRQHandler(void)
 {
 	// REVISIT DEBUG HACK! REMOVE!
-	extern volatile int g_numDMAInterrupts;
-	g_numDMAInterrupts++;
+	//extern volatile int g_numDMAInterrupts;
+	//g_numDMAInterrupts++;
 
 	//Check to see which set of buffers are currently in use
 	DMA_RX_Memory = DMA_GetCurrentMemoryTarget(DMA1_Stream0 );
 	DMA_TX_Memory = DMA_GetCurrentMemoryTarget(DMA1_Stream5 );
+
+	DSP_Flag = 1;
+	AGC_Flag = 1;
+
+	//Clear the DMA buffer full interrupt flag
+	DMA_ClearITPendingBit(DMA1_Stream0, DMA_IT_TCIF0 );
+
+}
+
+void Process_All_DSP(void)  {
+
 
 	if(RxTx_InRxMode())	 {
 		Rcvr_DSP();
@@ -89,11 +100,11 @@ void DMA1_Stream0_IRQHandler(void)
 		}
 	}
 
-	DSP_Flag = 1;
-	AGC_Flag = 1;
+	//DSP_Flag = 1;
+	//AGC_Flag = 1;
 
 	//Clear the DMA buffer full interrupt flag
-	DMA_ClearITPendingBit(DMA1_Stream0, DMA_IT_TCIF0 );
+	//DMA_ClearITPendingBit(DMA1_Stream0, DMA_IT_TCIF0 );
 
 }
 

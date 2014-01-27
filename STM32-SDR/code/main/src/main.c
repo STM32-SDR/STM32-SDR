@@ -52,7 +52,11 @@
 #include	"widgets.h"
 #include	"STM32-SDR-Subroutines.h"
 
+<<<<<<< HEAD
 #define VERSION_STRING "1.043"
+=======
+#define VERSION_STRING "1.038"
+>>>>>>> refs/remotes/origin/master
 
 const uint32_t CODEC_FREQUENCY = 8000;
 
@@ -107,6 +111,7 @@ int main(void)
 		// Redraw the screen (as needed)
 		if (DSP_Flag == 1) {
 			GPIO_WriteBit(Test_GPIO, Test_1, Bit_SET);
+			Process_All_DSP();
 			UpdateScreenWithChanges();
 			GPIO_WriteBit(Test_GPIO, Test_1, Bit_RESET);
 		}
@@ -115,6 +120,10 @@ int main(void)
 			Proc_AGC();
 		}
 	}
+}
+
+void Strobe_USB(void) {
+	USBH_Process(&USB_OTG_Core_dev, &USB_Host);
 }
 
 void Strobe_USB(void) {
@@ -217,8 +226,11 @@ static void initializeHardware(void)
 
 	TEST_GPIO_Init();
 
+<<<<<<< HEAD
 	FrequencyManager_SetCurrentFrequency(FrequencyManager_GetCurrentFrequency());
 	main_delay(SETUP_DELAY);
+=======
+>>>>>>> refs/remotes/origin/master
 }
 
 static void displaySplashScreen(void)
