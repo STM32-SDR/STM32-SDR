@@ -2336,7 +2336,7 @@ void ProcessInputData(void)
 		TS_GetTouchEventCoords(&touchX, &touchY);
 		uint16_t rawX = 0, rawY = 0;
 		TS_GetUncalibratedTouchEvent(&rawX, &rawY);
-		xprintf("Touch screen touched at X=%3d, Y=%3d (Raw X=%6d, Y=%6d).\n", touchX, touchY, rawX, rawY);
+		//xprintf("Touch screen touched at X=%3d, Y=%3d (Raw X=%6d, Y=%6d).\n", touchX, touchY, rawX, rawY);
 
 		// Handle sleep mode
 		if (vu8_gSleepState == 1) {

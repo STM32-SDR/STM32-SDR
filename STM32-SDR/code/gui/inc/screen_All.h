@@ -63,7 +63,6 @@
 #include "graphicObject.h"
 #include "LcdHal.h"
 
-
 // Screen global variables (defined in screen_all.c) for switching screens
 // ## Add new screens here:
 extern GL_Page_TypeDef g_screenMainPSK;

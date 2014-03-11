@@ -206,7 +206,7 @@ static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 	displayFilterBW();
 
 	// Final End of DSP and FFT Update Processing
-	DSP_Flag = 0;
+	// chh DSP_Flag = 0;
 }
 
 static void displayFFT(int x, int y)

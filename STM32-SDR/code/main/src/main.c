@@ -53,7 +53,7 @@
 #include	"STM32-SDR-Subroutines.h"
 
 
-#define VERSION_STRING "1.044"
+#define VERSION_STRING "1.045"
 
 
 const uint32_t CODEC_FREQUENCY = 8000;
@@ -109,14 +109,17 @@ int main(void)
 		// Redraw the screen (as needed)
 		if (DSP_Flag == 1) {
 			GPIO_WriteBit(Test_GPIO, Test_1, Bit_SET);
-			//Process_All_DSP();
+			Process_All_DSP();
 			UpdateScreenWithChanges();
 			GPIO_WriteBit(Test_GPIO, Test_1, Bit_RESET);
+			DSP_Flag = 0;
 		}
 
 		if (AGC_Flag == 1) {
 			Proc_AGC();
 		}
+
+		UpdateScreenWithChanges();
 	}
 }
 
