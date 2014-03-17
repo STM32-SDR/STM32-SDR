@@ -37,7 +37,7 @@ extern void Acquire(void);
 
 // A macro to allow tracing of all USB events.
 #define USB_DEBUG_MARKER() do { \
-	xprintf("USB Event:   %s()   at line %d.\n", __func__, __LINE__); \
+	debug (USB, "USB Event:   %s()   at line %d.\n", __func__, __LINE__); \
 	} while (0)
 		//USB_debugEvent(__LINE__);
 
@@ -70,7 +70,7 @@ void USB_debugEvent(int lineNumber)
 	static int usbEventCounter = 0;
 	usbEventCounter++;
 
-	xprintf("USB_debugEvent #%4d from line %d.\n", usbEventCounter, lineNumber);
+	debug (USB, "USB_debugEvent #%4d from line %d.\n", usbEventCounter, lineNumber);
 }
 
 /**

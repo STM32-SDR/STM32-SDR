@@ -32,5 +32,6 @@ _Bool Encoders_AreBothEncodersPressed(void);
 
 #endif /* ENCODERS_H_ */
 
-
+//Change encoder for Options or Filter setting
+void Encoders_FilterMode(int value);
 

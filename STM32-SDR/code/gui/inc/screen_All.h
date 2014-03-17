@@ -63,6 +63,12 @@
 #include "graphicObject.h"
 #include "LcdHal.h"
 
+// Option screen modes
+#define MAIN 0
+#define OPTIONS 1
+#define ADVANCED 2
+#define FILTER 3
+#define FUNCTION 4
 
 // Screen global variables (defined in screen_all.c) for switching screens
 // ## Add new screens here:
@@ -73,6 +79,8 @@ extern GL_Page_TypeDef g_screenCalibrate;
 extern GL_Page_TypeDef g_screenCalibrationTest;
 extern GL_Page_TypeDef g_screenMode;
 extern GL_Page_TypeDef g_screenOptions;
+extern GL_Page_TypeDef g_screenAdvanced;
+extern GL_Page_TypeDef g_screenFilter;
 extern GL_Page_TypeDef g_screenFrequencies;
 extern GL_Page_TypeDef g_screenEditText;
 
@@ -85,6 +93,9 @@ void ScreenCalibrate_Create(void);
 void ScreenCalibrationTest_Create(void);
 void ScreenMode_Create(void);
 void ScreenOptions_Create(void);
+void ScreenAdvanced_Create(void);
+void ScreenFilter_Create(void);
+void ScreenRefreshFilter(int);
 void ScreenFrequencies_Create(void);
 void ScreenEditText_Create(void);
 
@@ -93,5 +104,13 @@ void Screen_CreateAllScreens(void);
 void Screen_ShowScreen(GL_Page_TypeDef *pNewScreen);
 void Screen_ShowMainScreen(void);
 
+// void Screen_done(GL_PageControls_TypeDef* pThis);
+void Screen_Done(void);
+
+int Screen_GetFilterCodeID(void);
+int Screen_GetFilterFreqID(void);
+int Screen_GetScreenMode(void);
+void Screen_SetScreenMode(int value);
+void Screen_filter_Click(GL_PageControls_TypeDef* pThis);
 
 #endif

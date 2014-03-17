@@ -314,7 +314,7 @@ USBH_Status USBH_InterruptReceiveData( USB_OTG_CORE_HANDLE *pdev,
                                 uint8_t hc_num)
 {
 
-  xprintf("USB_InterruptReceiveData on ch %d.\n", hc_num);
+	debug (USB, "USB_InterruptReceiveData on ch %d.\n", hc_num);
 
   pdev->host.hc[hc_num].ep_is_in = 1;  
   pdev->host.hc[hc_num].xfer_buff = buff;

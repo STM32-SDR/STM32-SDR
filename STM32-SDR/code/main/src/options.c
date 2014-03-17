@@ -31,6 +31,8 @@
 #include "ChangeOver.h"
 #include "AGC_Processing.h"
 #include "DSP_Processing.h"
+#include "screen_all.h"
+#include "xprintf.h"
 
 #define EEPROM_OFFSET 200
 
@@ -57,7 +59,7 @@ typedef struct
 // Order must match OptionNumber in options.h
 static OptionStruct s_optionsData[] = {
 	{
-		/*Name*/ "Rx Audio ",
+		/*Name*/ " AF Gain ",
 		/*Init*/ 0,
 		/*Min */ DAC_GAIN_MIN,
 		/*Max */ DAC_GAIN_MAX,
@@ -65,10 +67,18 @@ static OptionStruct s_optionsData[] = {
 		/*Data*/ 0
 	},
 	{
-		/*Name*/ "  Rx RF  ",
+		/*Name*/ " RF Gain ",
 		/*Init*/ 80,
 		/*Min */ 0,
 		/*Max */ 80,
+		/*Rate*/ 1,
+		/*Data*/ 0,
+	},
+	{
+		/*Name*/ "AGC Mode ",
+		/*Init*/ 0,
+		/*Min */ 0,
+		/*Max */ 3,
 		/*Rate*/ 1,
 		/*Data*/ 0,
 	},
@@ -90,7 +100,7 @@ static OptionStruct s_optionsData[] = {
 	},
 
 	{
-		/*Name*/ "ST Level ",
+		/*Name*/ "Side Tone",
 		/*Init*/ 0,
 		/*Min */ -6,
 		/*Max */ 29,
@@ -139,15 +149,6 @@ static OptionStruct s_optionsData[] = {
 	},
 
 	{
-		/*Name*/ "AGC Mode ",
-		/*Init*/ 0,
-		/*Min */ 0,
-		/*Max */ 3,
-		/*Rate*/ 1,
-		/*Data*/ 0,
-	},
-
-	{
 		/*Name*/ "AGC Thrsh",
 		/*Init*/ 400,
 		/*Min */ 50,
@@ -173,6 +174,7 @@ static OptionStruct s_optionsData[] = {
 		/*Rate*/ 2,
 		/*Data*/ 0,
 	},
+
 };
 
 // Initialization
@@ -216,6 +218,7 @@ int16_t Options_GetValue(int optionIdx)
 }
 void Options_SetValue(int optionIdx, int16_t newValue)
 {
+	debug(GUI, "Options_SetValue: optionIdx = %d, newValue = %d\n", optionIdx, newValue);
 	assert(optionIdx >= 0 && optionIdx < NUM_OPTIONS);
 	s_optionsData[optionIdx].CurrentValue = newValue;
 
@@ -223,6 +226,7 @@ void Options_SetValue(int optionIdx, int16_t newValue)
 	 * Process each option individually as needed.
 	 */
 	switch (optionIdx) {
+
 	case OPTION_RX_AUDIO:
 		if (RxTx_InRxMode())
 		{
@@ -238,7 +242,6 @@ void Options_SetValue(int optionIdx, int16_t newValue)
 			Old_PGAGAIN0 = -200; //Set to an outrageous value for change testing in AGC_Processsing.c
 		}
 			break;
-
 
 	case OPTION_Mic_Gain:
 		if (RxTx_InTxMode() && (Mode_GetCurrentMode() == MODE_SSB))
@@ -297,8 +300,6 @@ void Options_SetValue(int optionIdx, int16_t newValue)
 			Init_AGC();
 		break;
 
-
-
 	case OPTION_SI570_MULT:
 		FrequencyManager_SetFreqMultiplier(newValue);
 		break;
@@ -309,6 +310,7 @@ void Options_SetValue(int optionIdx, int16_t newValue)
 	}
 
 }
+
 uint16_t Options_GetMinimum(int optionIdx)
 {
 	assert(optionIdx >= 0 && optionIdx < NUM_OPTIONS);
@@ -338,12 +340,18 @@ void Options_SetSelectedOption(OptionNumber newOption)
 	}
 }
 
-
 // EEPROM Access
 void Options_WriteToEEPROM(void)
 {
+	int16_t eepromValue, setValue;
+	debug(GUI, "Options_WriteToEEPROM\n");
 	for (int i = 0; i < NUM_OPTIONS; i++) {
-		Write_Int_EEProm(EEPROM_OFFSET + i * 2, Options_GetValue(i));
+		eepromValue = Read_Int_EEProm(EEPROM_OFFSET + i * 2);
+		setValue = Options_GetValue(i);
+		if (setValue != eepromValue){
+			Write_Int_EEProm(EEPROM_OFFSET + i * 2, Options_GetValue(i));
+			debug(GUI, "option = %d, value = %d\n", i, Options_GetValue(i));
+		}
 	}
 
 	// Add Sentinel
@@ -358,8 +366,10 @@ _Bool Options_HaveValidEEPROMData(void)
 }
 void Options_ReadFromEEPROM(void)
 {
+	debug(GUI, "Options_ReadFromEEPROM\n");
 	for (int i = 0; i < NUM_OPTIONS; i++) {
 		int16_t newValue = Read_Int_EEProm(EEPROM_OFFSET + i * 2);
 		Options_SetValue(i, newValue);
+		debug(GUI, "option = %d, value = %d\n", i, Options_GetValue(i));
 	}
 }

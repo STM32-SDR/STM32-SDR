@@ -52,7 +52,7 @@ static void DelayUS(vu32 cnt);
 
 
 /* Private define ------------------------------------------------------------*/
-#define TOUCH_CLOSENESS_THRESHOLD 20
+#define TOUCH_CLOSENESS_THRESHOLD 80
 
 
 /*******************************************************************************

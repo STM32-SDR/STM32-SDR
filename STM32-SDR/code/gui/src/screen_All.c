@@ -40,6 +40,8 @@ GL_Page_TypeDef g_screenCalibrate;
 GL_Page_TypeDef g_screenCalibrationTest;
 GL_Page_TypeDef g_screenMode;
 GL_Page_TypeDef g_screenOptions;
+GL_Page_TypeDef g_screenAdvanced;
+GL_Page_TypeDef g_screenFilter;
 GL_Page_TypeDef g_screenFrequencies;
 GL_Page_TypeDef g_screenEditText;
 
@@ -55,6 +57,8 @@ void Screen_CreateAllScreens(void)
 	ScreenCalibrationTest_Create();
 	ScreenMode_Create();
 	ScreenOptions_Create();
+	ScreenAdvanced_Create();
+	ScreenFilter_Create();
 	ScreenFrequencies_Create();
 	ScreenEditText_Create();
 }

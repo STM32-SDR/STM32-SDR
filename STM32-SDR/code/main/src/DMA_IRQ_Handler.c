@@ -29,7 +29,7 @@
 #include    "stm32f4xx_gpio.h"
 #include 	"PSKMod.h"
 #include 	"AGC_Processing.h"
-#include 	"DMA_Test_Pins.h"
+//#include 	"DMA_Test_Pins.h"
 #include	"stm32f4xx_gpio.h"
 #include	"ChangeOver.h"
 
@@ -110,7 +110,7 @@ void Process_All_DSP(void)  {
 
 void Rcvr_DSP(void)
 {
-	GPIO_WriteBit(Test_GPIO, Test_0, Bit_SET);
+//	GPIO_WriteBit(Test_GPIO, Test_0, Bit_SET);
 	if (DMA_RX_Memory == 0) //Transfer I/Q data and fill FFT buffer on inactive buffer
 	{
 		pRXDMABfr = &Rx1BufferDMA[0];
@@ -137,9 +137,9 @@ void Rcvr_DSP(void)
 		Process_post_FILT();
 	}
 	ProcPSKDet();
-	GPIO_WriteBit(Test_GPIO, Test_2, Bit_SET);
+//	GPIO_WriteBit(Test_GPIO, Test_2, Bit_SET);
 	Process_FFT();
-	GPIO_WriteBit(Test_GPIO, Test_2, Bit_RESET);
+//	GPIO_WriteBit(Test_GPIO, Test_2, Bit_RESET);
 
 	for (i = 0; i < BUFFERSIZE / 2; i++) {
 		if (!FilterNumber){
@@ -152,7 +152,7 @@ void Rcvr_DSP(void)
 		}
 	}
 
-	GPIO_WriteBit(Test_GPIO, Test_0, Bit_RESET);
+//	GPIO_WriteBit(Test_GPIO, Test_0, Bit_RESET);
 
 }  // End of Rcvr_DSP( )
 
@@ -196,7 +196,7 @@ void Xmit_CW(void)
 	static float cwAmplitudes[BUFFERSIZE / 2];
 
 	// REVISIT:- remove test-bit change-code.
-	GPIO_WriteBit(Test_GPIO, Test_0, Bit_SET);
+//	GPIO_WriteBit(Test_GPIO, Test_0, Bit_SET);
 
 	x_NCOphzinc = (PI2 * (double) NCO_Frequency / (double) Sample_Frequency);
 
@@ -237,7 +237,7 @@ void Xmit_CW(void)
 	}
 
 	// REVISIT:- Remove
-	GPIO_WriteBit(Test_GPIO, Test_0, Bit_RESET);
+//	GPIO_WriteBit(Test_GPIO, Test_0, Bit_RESET);
 
 }  //End of Xmit_CW()
 

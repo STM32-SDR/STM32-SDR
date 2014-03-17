@@ -33,6 +33,8 @@
 #include	"options.h"
 #include	"LcdHal.h"
 #include	"ChangeOver.h"
+#include	"xprintf.h"
+#include	"screen_All.h"
 
 
 // Data for the encoder state.
@@ -55,6 +57,8 @@ typedef struct
 static EncoderStruct_t s_encoderStruct1 = {0, 0, 0, GPIOC, 5};
 static EncoderStruct_t s_encoderStruct2 = {0, 0, 0, GPIOB, 4};
 
+// Encoder used for options =0 or filter code selection = 1
+
 // Prototypes
 static void configureGPIOEncoder1(void);
 static void configureGPIOEncoder2(void);
@@ -64,7 +68,6 @@ static void init_encoder2(void);
 static int8_t calculateEncoderChange(EncoderStruct_t *pEncoder);
 static void applyEncoderChange1(int8_t changeDirection);
 static void applyEncoderChange2(int8_t changeDirection);
-
 
 /* ----------------------
  * Initialization
@@ -127,8 +130,6 @@ static void configureGPIOEncoder2(void)
 	GPIO_InitStructure.GPIO_Pin = (GPIO_Pin_4 | GPIO_Pin_5 | GPIO_Pin_7 );
 	GPIO_Init(GPIOB, &GPIO_InitStructure);
 }
-
-
 
 void init_encoder1(void)
 {
@@ -229,29 +230,65 @@ static void applyEncoderChange1(int8_t changeDirection)
 			FrequencyManager_StepFrequencyDown();
 		}
 	}
+
+	// Filter screen requires an update band frequency
+	if (Screen_GetScreenMode() == FILTER){
+		int band = Screen_GetFilterFreqID();
+		uint32_t currentFrequency = FrequencyManager_GetCurrentFrequency();
+		FrequencyManager_SetBandFreqFilter (band, currentFrequency);
+	}
+
 }
 static void applyEncoderChange2(int8_t changeDirection)
 {
+	int curOptIdx;
+	int16_t currentValue;
+	int16_t newValue;
+	int16_t minValue;
+	int16_t maxValue;
+
 	// Check for no change
 	if (changeDirection == 0) {
 		return;
 	}
+	// Are we setting general options or the band filter code values
+	// Options uses an array of min/max values
+	// Filter sets a fixed 3-bit binary code
+	if (Screen_GetScreenMode() != FILTER){
+		/*
+		 * Check the limits
+		 */
+		curOptIdx = Options_GetSelectedOption();
+		currentValue = Options_GetValue(curOptIdx);
+		newValue = currentValue + Options_GetChangeRate(curOptIdx) * changeDirection;
+		minValue = Options_GetMinimum(curOptIdx);
+		maxValue = Options_GetMaximum(curOptIdx);
+		if (newValue < minValue) {
+			newValue = minValue;
+		}
+		if (newValue > maxValue) {
+			newValue = maxValue;
+		}
+		// Set the value & Display it
 
-	/*
-	 * Check the limits
-	 */
-	int curOptIdx = Options_GetSelectedOption();
-	int16_t currentValue = Options_GetValue(curOptIdx);
-	int16_t newValue = currentValue + Options_GetChangeRate(curOptIdx) * changeDirection;
-	int16_t minValue = Options_GetMinimum(curOptIdx);
-	int16_t maxValue = Options_GetMaximum(curOptIdx);
-	if (newValue < minValue) {
-		newValue = minValue;
-	}
-	if (newValue > maxValue) {
-		newValue = maxValue;
-	}
+		Options_SetValue(curOptIdx, newValue);
+	} else {
+		int band = Screen_GetFilterCodeID();
+		currentValue = FrequencyManager_GetFilterCode (band);
+		int changeRate = BAND_FILTER_CHANGE_RATE;
+		newValue = currentValue + changeRate * changeDirection;
+		minValue = BAND_FILTER_MINIMUM;
+		maxValue = BAND_FILTER_MAXIMUM;
+		if (newValue < minValue) {
+			newValue = minValue;
+		}
+		if (newValue > maxValue) {
+			newValue = maxValue;
+		}
 
-	// Set the value & Display it
-	Options_SetValue(curOptIdx, newValue);
+		// Set the value & Display it
+		FrequencyManager_SetBandCodeFilter (band, newValue);
+	}
 }
+
+

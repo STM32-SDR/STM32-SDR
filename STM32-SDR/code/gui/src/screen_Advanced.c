@@ -1,5 +1,5 @@
 /*
- * code for Basic Options screen
+ * code for  Advanced Options screen
  *
  * STM32-SDR: A software defined HAM radio embedded system.
  * Copyright (C) 2013, STM32-SDR Group
@@ -27,23 +27,23 @@
 #include "xprintf.h"
 #include "Encoders.h"
 #include <string.h>
-#include "Init_I2C.h"  //Referenced for Delay(n);
 
 // Used in this file to refer to the correct screen (helps to keep code copy-paste friendly.
-static GL_Page_TypeDef *s_pThisScreen = &g_screenOptions;
+static GL_Page_TypeDef *s_pThisScreen = &g_screenAdvanced;
 
 static GL_PageControls_TypeDef* s_lblStatus;
 
-static int screenMode = MAIN;
+//used to store frequency to be restored when done
 
 /**
  * Call-back prototypes
  */
 static void optionButton_Click(GL_PageControls_TypeDef* pThis);
-static void advanced_Click(GL_PageControls_TypeDef* pThis);
-static void function_Click(GL_PageControls_TypeDef* pThis);
+static void defaults_Click(GL_PageControls_TypeDef* pThis);
+static void calibrate_Click(GL_PageControls_TypeDef* pThis);
 
 #define ID_OPTION_START      100
+#define ID_FILTER_OPTION_START      160
 #define FIRST_BUTTON_Y       40
 #define SPACE_PER_BUTTON_Y   35
 #define LEFT_COL_X           0
@@ -54,22 +54,24 @@ static void function_Click(GL_PageControls_TypeDef* pThis);
 /**
  * Create the screen
  */
-void ScreenOptions_Create(void)
+
+void ScreenAdvanced_Create(void)
 {
 	Create_PageObj(s_pThisScreen);
 
 	/*
 	 * Create the UI widgets
 	 */
-	GL_PageControls_TypeDef* lblTitle = Widget_NewLabel("Settings", LCD_COLOR_WHITE, LCD_COLOR_BLACK, 0, GL_FONTOPTION_12x12, 0);
+	GL_PageControls_TypeDef* lblTitle = Widget_NewLabel("Advanced", LCD_COLOR_WHITE, LCD_COLOR_BLACK, 0, GL_FONTOPTION_12x12, 0);
 	GL_PageControls_TypeDef* lblDirections1 = Widget_NewLabel("Tap to select", LCD_COLOR_WHITE, LCD_COLOR_BLACK, 0, GL_FONTOPTION_8x12Bold, 0);
 	GL_PageControls_TypeDef* lblDirections2 = Widget_NewLabel("setting changes value", LCD_COLOR_WHITE, LCD_COLOR_BLACK, 0, GL_FONTOPTION_8x12Bold, 0);
 	s_lblStatus = Widget_NewLabel("Tap setting to exit", LCD_COLOR_WHITE, LCD_COLOR_BLACK, 0, GL_FONTOPTION_8x12Bold, 0);
 
+
 	GL_PageControls_TypeDef* btnOptionsBigButton = Widget_NewBigButtonOptions();
-	GL_PageControls_TypeDef* btnAdvanced = NewButton(15, " Advanced  ", advanced_Click);
-	GL_PageControls_TypeDef* btnFunctions  = NewButton(17,  " Functions ", function_Click);
-	GL_PageControls_TypeDef* btnFilter = NewButton(18, " Filter    ", Screen_filter_Click);
+	GL_PageControls_TypeDef* btnDefaults = NewButton(0, "Defaults", defaults_Click);
+	GL_PageControls_TypeDef* btnCalibrate = NewButton(13, "Cal. Screen", calibrate_Click);
+
 	/*
 	 * Place the widgets onto the screen
 	 */
@@ -79,29 +81,26 @@ void ScreenOptions_Create(void)
 	AddPageControlObj(115,  10, lblDirections2,  s_pThisScreen);
 
 	// Populate the options buttons:
-	for (int i = START_BASIC_OPTIONS; i < END_BASIC_OPTIONS; i++) {
+	for (int i = START_ADVANCED_OPTIONS; i < END_ADVANCED_OPTIONS; i++) {
 		GL_PageControls_TypeDef* btnOption = NewButton(ID_OPTION_START + i, Options_GetName(i), optionButton_Click);
 
-		int x = (i / BUTTONS_PER_COLUMN) * COLUMN_WIDTH;
-		int y = (i % BUTTONS_PER_COLUMN) * SPACE_PER_BUTTON_Y + FIRST_BUTTON_Y;
+		int x = ((i - START_ADVANCED_OPTIONS) / BUTTONS_PER_ADV_COLUMN) * COLUMN_WIDTH;
+		int y = ((i - START_ADVANCED_OPTIONS) % BUTTONS_PER_ADV_COLUMN) * SPACE_PER_BUTTON_Y + FIRST_BUTTON_Y;
 		AddPageControlObj(x, y, btnOption, s_pThisScreen);
 	}
 
 	// Button Row
 	AddPageControlObj(0, LCD_HEIGHT - 42, btnOptionsBigButton, s_pThisScreen);
 	AddPageControlObj(0, LCD_HEIGHT - 60, s_lblStatus,  s_pThisScreen);
-	AddPageControlObj(220, FIRST_BUTTON_Y, btnAdvanced, s_pThisScreen);
-	AddPageControlObj(220, FIRST_BUTTON_Y + SPACE_PER_BUTTON_Y, btnFunctions, s_pThisScreen);
-	AddPageControlObj(220, FIRST_BUTTON_Y + 2 * SPACE_PER_BUTTON_Y, btnFilter, s_pThisScreen);
+
+	AddPageControlObj(204, FIRST_BUTTON_Y, btnCalibrate, s_pThisScreen);
+	AddPageControlObj(85, LCD_HEIGHT - 30, btnDefaults, s_pThisScreen);
 }
 
-void Screen_SetScreenMode(int value) {
-	screenMode = value;
-	debug(GUI, "Screen_SetScreenMode\n", screenMode);
-}
-
-int Screen_GetScreenMode() {
-	return screenMode;
+static void displayDefaultsFeedback(void)
+{
+	Widget_ChangeLabelColour(s_lblStatus, LCD_COLOR_YELLOW);
+	Widget_ChangeLabelText(s_lblStatus, "All values reset to default.");
 }
 
 /**
@@ -120,21 +119,13 @@ static void optionButton_Click(GL_PageControls_TypeDef* pThis)
 	pThis->SetObjVisible(pThis, pThis->objCoordinates);
 }
 
-void Screen_Done() {
-
-	Options_WriteToEEPROM();
-	Screen_ShowMainScreen();
-	Screen_SetScreenMode(MAIN);
+static void defaults_Click(GL_PageControls_TypeDef* pThis)
+{
+	displayDefaultsFeedback();
+	Options_ResetToDefaults();
 }
 
-void advanced_Click(GL_PageControls_TypeDef* pThis) {
-	Screen_SetScreenMode(ADVANCED);
-	Options_SetSelectedOption(START_ADVANCED_OPTIONS);
-	Screen_ShowScreen(&g_screenAdvanced);
+static void calibrate_Click(GL_PageControls_TypeDef* pThis) {
+	Screen_ShowScreen(&g_screenCalibrate);
 }
 
-static void function_Click(GL_PageControls_TypeDef* pThis) {
-	Screen_SetScreenMode(FUNCTION);
-	Screen_ShowScreen(&g_screenEditText);
-
-}

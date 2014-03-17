@@ -57,7 +57,7 @@ void ScreenFrequencies_Create(void)
 	/*
 	 * Create the UI widgets
 	 */
-	GL_PageControls_TypeDef* lblTitle = Widget_NewLabel("Frequencies", LCD_COLOR_WHITE, LCD_COLOR_BLACK, 0, GL_FONTOPTION_16x24, 0);
+	GL_PageControls_TypeDef* lblTitle = Widget_NewLabel("Frequencies", LCD_COLOR_WHITE, LCD_COLOR_BLACK, 0, GL_FONTOPTION_12x12, 0);
 	GL_PageControls_TypeDef* lblDirections1 = Widget_NewLabel("Tap a band", LCD_COLOR_YELLOW, LCD_COLOR_BLACK, 0, GL_FONTOPTION_8x12Bold, 0);
 	GL_PageControls_TypeDef* lblDirections2 = Widget_NewLabel("to select.", LCD_COLOR_YELLOW, LCD_COLOR_BLACK, 0, GL_FONTOPTION_8x12Bold, 0);
 	lblStatus1 = Widget_NewLabel("Press & turn frequency knob", LCD_COLOR_WHITE, LCD_COLOR_BLACK, 0, GL_FONTOPTION_8x12Bold, 0);
@@ -65,7 +65,7 @@ void ScreenFrequencies_Create(void)
 
 
 	GL_PageControls_TypeDef* btnFreqBigButton = Widget_NewBigButtonFrequency();
-	GL_PageControls_TypeDef* btnStore = NewButton(0, " Store ", store_Click);
+	GL_PageControls_TypeDef* btnStore = NewButton(0, " Store  ", store_Click);
 	GL_PageControls_TypeDef* btnDefaults = NewButton(0, "Defaults", defaults_Click);
 	GL_PageControls_TypeDef* btnDone = NewButton(0, "  Done  ", done_Click);
 
@@ -90,9 +90,9 @@ void ScreenFrequencies_Create(void)
 	// Button Row
 	AddPageControlObj(0,   LCD_HEIGHT - 54, lblStatus1,  s_pThisScreen);
 	AddPageControlObj(0,   LCD_HEIGHT - 42, lblStatus2,  s_pThisScreen);
-	AddPageControlObj(0,   LCD_HEIGHT - 30, btnStore, s_pThisScreen);
-	AddPageControlObj(70,  LCD_HEIGHT - 30, btnDefaults, s_pThisScreen);
-	AddPageControlObj(150, LCD_HEIGHT - 30, btnDone, s_pThisScreen);
+	AddPageControlObj(80,   LCD_HEIGHT - 30, btnStore, s_pThisScreen);
+	AddPageControlObj(160,  LCD_HEIGHT - 30, btnDefaults, s_pThisScreen);
+	AddPageControlObj(0, LCD_HEIGHT - 30, btnDone, s_pThisScreen);
 	AddPageControlObj(
 			LCD_WIDTH - ((GL_Custom_TypeDef*)(btnFreqBigButton->objPTR))->GetWidth(btnFreqBigButton),
 			LCD_HEIGHT - ((GL_Custom_TypeDef*)(btnFreqBigButton->objPTR))->GetHeight(btnFreqBigButton),

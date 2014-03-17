@@ -109,16 +109,16 @@ static void TIM_Config(void);
 
 void __assert_func(const char *file, int line, const char *assertFunc, const char *e)
 {
-	xprintf("\n\n\n\n");
-	xprintf("******************************\n");
-	xprintf("ASSERT FAILED!\n");
-	xprintf("******************************\n");
+	debug( LCD, "\n\n\n\n");
+	debug( LCD, "******************************\n");
+	debug( LCD, "ASSERT FAILED!\n");
+	debug( LCD, "******************************\n");
 	volatile int bugger = 0;
 	while (1) {
-		xprintf("Assert failed:\n");
-		xprintf("   File %s, Line %d\n", file, line);
-		xprintf("   Function  %s\n", assertFunc);
-		xprintf("   Condition %s\n", e);
+		debug( LCD, "Assert failed:\n");
+		debug( LCD, "   File %s, Line %d\n", file, line);
+		debug( LCD, "   Function  %s\n", assertFunc);
+		debug( LCD, "   Condition %s\n", e);
 		bugger ++;
 	}
 }
@@ -148,16 +148,17 @@ void LCD_Init(void)
 
 	// Check LCD Version:
 	uint16_t version = LCD_ReadReg(0x0000);
-	xprintf("LCD Driver code: 0x%X\n", version);
+	debug (LCD, "LCD Driver code: 0x%X\n", version);
 
 
 	switch (version) {
 	default:
-		xprintf("    Unknown LCD driver chip; defaulting to ILI9320...\n");
+		debug (LCD, "    Unknown LCD driver chip; defaulting to ILI9320...\n");
 		assert(0);
+		break;
 		// Fall through to ILI9320
 	case LCD_ILI9320:
-		xprintf("    Using ILI9320 configuration (matches code 0x%X)\n", LCD_ILI9320);
+		debug (LCD, "    Using ILI9320 configuration (matches code 0x%X)\n", LCD_ILI9320);
 		s_currentLCD = LCD_ILI9320;
 		LCDILI9320_Init();
 		break;
@@ -165,7 +166,7 @@ void LCD_Init(void)
 	case LCD_SSD1289_ALT:
 		LCDSSD1289_Init();
 		s_currentLCD = LCD_SSD1289;
-		xprintf("    Using SSD1289 configuration (matches codes 0x%X and 0x%X)\n", LCD_SSD1289, LCD_SSD1289_ALT);
+		debug (LCD, "    Using SSD1289 configuration (matches codes 0x%X and 0x%X)\n", LCD_SSD1289, LCD_SSD1289_ALT);
 		break;
 	}
 }

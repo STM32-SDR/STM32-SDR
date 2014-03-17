@@ -70,7 +70,7 @@ void TS_Initialize(void)
 	// Load from EEPROM if valid.
 	// If both encoders are pressed in at startup, don't load so that
 	// we force a Touch Screen calibration.
-	xprintf("Ecoders pressed? Option=%d, Frequency=%d. (0=no, 1=yes).\n",
+	debug (ENCODER, "Encoders pressed? Option=%d, Frequency=%d. (0=no, 1=yes).\n",
 			Encoders_IsOptionsEncoderPressed(),
 			Encoders_IsFrequencyEncoderPressed());
 

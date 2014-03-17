@@ -151,8 +151,8 @@ void ScreenMainCW_Create(void)
 			btnFreq, s_pThisScreen);
 
 	// .. Rx & Tx buttons (Remove when code can automatically switch)
-	GL_PageControls_TypeDef* btnTR  = NewButton(10, " T/R ", TR_Click);
-	GL_PageControls_TypeDef* btnWS  = NewButton(9,  " W/S ", WS_Click);
+	GL_PageControls_TypeDef* btnTR  = NewButton(10, "Tx/Rx", TR_Click);
+	GL_PageControls_TypeDef* btnWS  = NewButton(9,  "Wf/Sp", WS_Click);
 	AddPageControlObj(100, LCD_HEIGHT - 42, btnTR, s_pThisScreen);
 	AddPageControlObj(170, LCD_HEIGHT - 42, btnWS, s_pThisScreen);
 

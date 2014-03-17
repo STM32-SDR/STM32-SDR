@@ -41,8 +41,6 @@
  */
 
 /* External variables --------------------------------------------------------*/
-extern __IO uint16_t GL_TextColor;
-
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private defines -----------------------------------------------------------*/
@@ -1398,7 +1396,7 @@ static GL_ErrStatus SetButtonVisible(GL_PageControls_TypeDef* pTmp, GL_Coordinat
 	_Bool showAsPress = (isTouched && isNormal) || (!isTouched && !isNormal);
 	if (showAsPress) {
 		ptrBitmapLeft = (uint8_t*) BtnPressedLeft;
-		ptrBitmapCenter = pThis->ImageUnClickedPTR;
+		ptrBitmapCenter = pThis->ImageClickedPTR;
 		ptrBitmapRight = (uint8_t*) BtnPressedRight;
 	}
 	else {
@@ -2336,7 +2334,7 @@ void ProcessInputData(void)
 		TS_GetTouchEventCoords(&touchX, &touchY);
 		uint16_t rawX = 0, rawY = 0;
 		TS_GetUncalibratedTouchEvent(&rawX, &rawY);
-		xprintf("Touch screen touched at X=%3d, Y=%3d (Raw X=%6d, Y=%6d).\n", touchX, touchY, rawX, rawY);
+		debug (TOUCH, "Touch screen touched at X=%3d, Y=%3d (Raw X=%6d, Y=%6d).\n", touchX, touchY, rawX, rawY);
 
 		// Handle sleep mode
 		if (vu8_gSleepState == 1) {

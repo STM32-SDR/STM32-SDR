@@ -46,14 +46,14 @@
 #include	"xprintf.h"
 #include	"Text_Enter.h"
 #include	"AGC_Processing.h"
-#include	"DMA_Test_Pins.h"
+#include	"Band_Filter.h"
 #include	"DSP_Processing.h"
 #include    "DMA_IRQ_Handler.h"
 #include	"widgets.h"
 #include	"STM32-SDR-Subroutines.h"
 
 
-#define VERSION_STRING "1.043"
+#define VERSION_STRING "1.047"
 
 
 const uint32_t CODEC_FREQUENCY = 8000;
@@ -108,10 +108,10 @@ int main(void)
 
 		// Redraw the screen (as needed)
 		if (DSP_Flag == 1) {
-			GPIO_WriteBit(Test_GPIO, Test_1, Bit_SET);
+//			GPIO_WriteBit(Test_GPIO, Test_1, Bit_SET);
 			Process_All_DSP();
 			UpdateScreenWithChanges();
-			GPIO_WriteBit(Test_GPIO, Test_1, Bit_RESET);
+//			GPIO_WriteBit(Test_GPIO, Test_1, Bit_RESET);
 		}
 
 		if (AGC_Flag == 1) {
@@ -218,7 +218,7 @@ static void initializeHardware(void)
 	Audio_DMA_Start();			//Get everything up and running before starting DMA Interrupt
 	main_delay(SETUP_DELAY);
 
-	TEST_GPIO_Init();
+	GPIO_BandFilterInit();
 
 
 	FrequencyManager_SetCurrentFrequency(FrequencyManager_GetCurrentFrequency());

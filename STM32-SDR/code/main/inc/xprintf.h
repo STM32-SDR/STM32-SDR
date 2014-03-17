@@ -21,6 +21,7 @@ void xprintf(const char* fmt, ...);
 void xsprintf(char* buff, const char* fmt, ...);
 void xfprintf(void (*func)(unsigned char), const char* fmt, ...);
 void put_dump(const void* buff, unsigned long addr, int len, int width);
+void debug (int debug_code,	const char* fmt, ... );
 #define DW_CHAR		sizeof(char)
 #define DW_SHORT	sizeof(short)
 #define DW_LONG		sizeof(long)
@@ -35,3 +36,15 @@ int xatoi (char** str, long* res);
 #endif
 
 #endif
+
+//debug enabling codes are used to xprintf information to the console
+
+#define NONE 0 // used to turn off debugging statements
+#define GUI 1 // used to print high-level debug statement related to GUI
+#define USB 2 // used to print high-level debug statement related to USB
+#define CAL 4 // screen calibration
+#define TOUCH 8 // touch screen
+#define LCD 16 // LCD obviously!
+#define ENCODER 32 // Encoders
+#define GUI_DETAIL 64 // Encoders
+	// etc.

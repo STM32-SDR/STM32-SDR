@@ -1,5 +1,5 @@
 /*
- * Code to handle Test Pint for performance testing
+ * Code to handle setting the GPIO bits for the external band filter
  *
  * STM32-SDR: A software defined HAM radio embedded system.
  * Copyright (C) 2013, STM32-SDR Group
@@ -21,10 +21,10 @@
 
 #include	"stm32f4xx_gpio.h"
 #include	"stm32f4xx_rcc.h"
-#include	"DMA_Test_Pins.h"
+//#include	"DMA_Test_Pins.h"
 
 
-void TEST_GPIO_Init(void)
+void GPIO_BandFilterInit(void)
 {
 	//Structure Assignment
 	GPIO_InitTypeDef GPIO_InitStructure;
@@ -39,9 +39,25 @@ void TEST_GPIO_Init(void)
 
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
 	GPIO_InitStructure.GPIO_OType = GPIO_OType_OD;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
 
 	//Init the GPIO Test Pins
 	GPIO_Init(GPIOC, &GPIO_InitStructure);
+}
+void GPIO_SetFilter(uint8_t  val){
+	if (val % 2)
+		GPIO_WriteBit(GPIOC, GPIO_Pin_13, Bit_SET);
+	else
+		GPIO_WriteBit(GPIOC, GPIO_Pin_13, Bit_RESET);
+	val /= 2;
+	if (val % 2)
+		GPIO_WriteBit(GPIOC, GPIO_Pin_14, Bit_SET);
+	else
+		GPIO_WriteBit(GPIOC, GPIO_Pin_14, Bit_RESET);
+	val /= 2;
+	if (val % 2)
+		GPIO_WriteBit(GPIOC, GPIO_Pin_15, Bit_SET);
+	else
+		GPIO_WriteBit(GPIOC, GPIO_Pin_15, Bit_RESET);
 }

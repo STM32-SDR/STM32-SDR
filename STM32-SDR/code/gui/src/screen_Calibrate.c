@@ -82,7 +82,7 @@ static void calibration_Click(GL_PageControls_TypeDef* pThis)
 	// Get raw touched location
 	uint16_t x, y;
 	TS_GetUncalibratedTouchEvent(&x, &y);
-	xprintf("Touch screen calibration event: Uncalibrated touch at X=%6d, Y=%6d.\n", x, y);
+	debug(CAL, "Touch screen calibration event: Uncalibrated touch at X=%6d, Y=%6d.\n", x, y);
 
 	// Store touch:
 	assert(currentTouchPoint >= 0);

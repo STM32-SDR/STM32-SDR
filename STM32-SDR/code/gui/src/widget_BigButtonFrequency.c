@@ -40,7 +40,6 @@
 // Prototypes:
 static void insideEventHandler(GL_PageControls_TypeDef* pThis, int relX, int relY);
 static void insideDrawHandler(GL_PageControls_TypeDef* pThis, _Bool force, int relX, int relY);
-
 static void displayFrequency(uint32_t number, uint8_t x, uint8_t y, uint32_t changeRate);
 
 /*
@@ -49,7 +48,7 @@ static void displayFrequency(uint32_t number, uint8_t x, uint8_t y, uint32_t cha
 GL_PageControls_TypeDef* Widget_NewBigButtonFrequency(void)
 {
 	GL_PageControls_TypeDef* newControl = Widget_NewBigButton(
-			"FREQUENCY",
+			"Frequency",
 			INSIDE_WIDTH, INSIDE_HEIGHT,
 			insideEventHandler,
 			insideDrawHandler
@@ -63,7 +62,9 @@ GL_PageControls_TypeDef* Widget_NewBigButtonFrequency(void)
  */
 static void insideEventHandler(GL_PageControls_TypeDef* pThis, int relX, int relY)
 {
-#if 0
+	if (Screen_GetScreenMode() == FILTER)
+	{
+
 	_Bool touchLeftHalf = relX < INSIDE_WIDTH / 2;
 	if (touchLeftHalf) {
 		FrequencyManager_IncreaseFreqStepSize();
@@ -71,9 +72,9 @@ static void insideEventHandler(GL_PageControls_TypeDef* pThis, int relX, int rel
 	else {
 		FrequencyManager_DecreaseFreqStepSize();
 	}
-#else
-	Screen_ShowScreen(&g_screenFrequencies);
-#endif
+	}
+	else
+		Screen_ShowScreen(&g_screenFrequencies);
 }
 
 static void insideDrawHandler(GL_PageControls_TypeDef* pThis, _Bool force, int relX, int relY)

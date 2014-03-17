@@ -47,6 +47,7 @@ typedef enum {
 	FREQBAND_NUMBER_OF_BANDS
 } BandPreset;
 
+#define NULL_BAND FREQBAND_NUMBER_OF_BANDS
 
 void FrequencyManager_Initialize(void);
 void FrequencyManager_ResetBandsToDefault(void);
@@ -59,7 +60,7 @@ BandPreset FrequencyManager_GetSelectedBand(void);
 const char* FrequencyManager_GetBandName(BandPreset band);
 uint32_t FrequencyManager_GetBandValue(BandPreset band);
 
-// Get/Set curent frequency to radio (in Hz)
+// Get/Set current frequency to radio (in Hz)
 void FrequencyManager_SetCurrentFrequency(uint32_t newFrequency);
 uint32_t FrequencyManager_GetCurrentFrequency(void);
 void FrequencyManager_SetFreqMultiplier(int16_t newFreqMult);
@@ -70,9 +71,24 @@ void FrequencyManager_StepFrequencyDown(void);
 void FrequencyManager_IncreaseFreqStepSize(void);
 void FrequencyManager_DecreaseFreqStepSize(void);
 uint32_t FrequencyManager_GetFrequencyStepSize(void);
+void FrequencyManager_SetFrequencyStepSize(uint32_t step);
 
 // EEPROM Routines:
 void FrequencyManager_WriteBandsToEeprom(void);
 void FrequencyManager_ReadBandsFromEeprom(void);
+void FrequencyManager_WriteFiltersToEeprom(void);
+void FrequencyManager_ReadFiltersFromEeprom(void);
+
+// Band Filter Selection
+void FrequencyManager_ResetFiltersToDefault(void);
+void FrequencyManager_SetBandCodeFilter (uint8_t band, uint8_t value);
+void FrequencyManager_SetBandFreqFilter (uint8_t band, uint32_t frequency);
+uint8_t FrequencyManager_GetFilterCode (int band);
+uint32_t FrequencyManager_GetFilterFrequency (int band);
+char* FrequencyManager_Code_ascii(int band);
+char* FrequencyManager_Freq_ascii(int band);
+int FrequencyManager_GetFilterMode(void);
+void FrequencyManager_SetFilterMode(int value);
+void FrequencyManager_Check_FilterBand(uint32_t newFreq);
 
 #endif

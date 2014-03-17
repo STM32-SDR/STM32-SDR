@@ -39,7 +39,7 @@
 
 // A macro to allow tracing of all USB events.
 #define USB_KEYBRD_MARKER() do { \
-	xprintf("USB KEYBRDEvent:   %s()   at line %d.\n", __func__, __LINE__); \
+	debug (USB, "USB KEYBRDEvent:   %s()   at line %d.\n", __func__, __LINE__); \
 	} while (0)
 		//USB_debugEvent(__LINE__);
 /** @addtogroup USBH_LIB

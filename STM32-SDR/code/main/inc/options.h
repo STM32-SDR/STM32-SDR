@@ -21,9 +21,11 @@
 
 #include <stdint.h>
 
+// This sequence must be the same as options.c
 typedef enum {
 	OPTION_RX_AUDIO = 0,
 	OPTION_RX_RF,
+	OPTION_AGC_Mode,
 	OPTION_Mic_Gain,
 	OPTION_Tx_LEVEL,
 	OPTION_ST_LEVEL,
@@ -32,13 +34,26 @@ typedef enum {
 	OPTION_TX_AMP,
 	OPTION_TX_PHASE,
 	OPTION_MIC_BIAS,
-	OPTION_AGC_Mode,
 	OPTION_AGC_THRSH,
 	OPTION__RSL_CAL,
 	OPTION_SI570_MULT,
-
 	NUM_OPTIONS
 } OptionNumber;
+
+// Define the ranges for basic, advanced and filter options
+#define START_BASIC_OPTIONS OPTION_RX_AUDIO
+#define END_BASIC_OPTIONS OPTION_RX_AMP
+
+#define START_ADVANCED_OPTIONS END_BASIC_OPTIONS
+#define END_ADVANCED_OPTIONS NUM_OPTIONS
+
+#define START_BAND_OPTIONS OPTION_BAND0
+#define END_BAND_OPTIONS NUM_FILTER_OPTIONS
+
+// Options selector limits for band external filters
+#define BAND_FILTER_MINIMUM 0
+#define BAND_FILTER_MAXIMUM 7
+#define BAND_FILTER_CHANGE_RATE 1
 
 // Initialization
 void Options_Initialize(void);

@@ -24,6 +24,7 @@
 #include "widgets.h"
 #include "Text_Enter.h"
 #include "Keyboard_Input.h"
+#include "xprintf.h"
 //#include <assert.h>
 
 // Used in this file to refer to the correct screen (helps to keep code copy-paste friendly.
@@ -48,6 +49,7 @@ static void resetLabel(void);
 #define LEFT_COL_X           0
 #define COLUMN_WIDTH         110
 #define BUTTONS_PER_COLUMN   5
+#define DEBUG_CODE		"GUI"
 
 /**
  * Create the screen
@@ -61,8 +63,8 @@ void ScreenEditText_Create(void)
 	 */
 
 	s_lblStatus = Widget_NewLabel("Tap Item then Edit.", LCD_COLOR_WHITE, LCD_COLOR_BLACK, 0, GL_FONTOPTION_8x12Bold, 0);
-	GL_PageControls_TypeDef* btnStore = NewButton(0, " Store ", store_Click);
-	GL_PageControls_TypeDef* btnEdit = NewButton(0, " Edit ", edit_Click);
+	GL_PageControls_TypeDef* btnStore = NewButton(0, " Store  ", store_Click);
+	GL_PageControls_TypeDef* btnEdit = NewButton(0, "  Edit  ", edit_Click);
 	GL_PageControls_TypeDef* btnDone = NewButton(0, "  Done  ", done_Click);
 
 
@@ -78,9 +80,9 @@ void ScreenEditText_Create(void)
 	// Button Row
 
 	AddPageControlObj(90, LCD_HEIGHT - 50, s_lblStatus,  s_pThisScreen);
-	AddPageControlObj(120 , LCD_HEIGHT - 30, btnStore, s_pThisScreen);
-	AddPageControlObj(0, LCD_HEIGHT - 30, btnEdit, s_pThisScreen);
-	AddPageControlObj(LCD_WIDTH - 75, LCD_HEIGHT - 30, btnDone, s_pThisScreen);
+	AddPageControlObj(80 , LCD_HEIGHT - 30, btnStore, s_pThisScreen);
+	AddPageControlObj(160, LCD_HEIGHT - 30, btnEdit, s_pThisScreen);
+	AddPageControlObj(0, LCD_HEIGHT - 30, btnDone, s_pThisScreen);
 }
 
 static void resetLabel(void)
@@ -133,9 +135,11 @@ static void edit_Click(GL_PageControls_TypeDef* pThis)
 
 static void done_Click(GL_PageControls_TypeDef* pThis) {
 	// Change text back to normal for next time.
+	debug (GUI, "done_Click\n");
 	clearLabel();
 	resetLabel();
 	set_kybd_mode(0);
+	Screen_SetScreenMode(MAIN );
 	Screen_ShowScreen(&g_screenMainPSK);
 }
 

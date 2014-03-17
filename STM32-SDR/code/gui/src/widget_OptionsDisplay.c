@@ -24,6 +24,7 @@
 #include "screen_All.h"
 #include <assert.h>
 #include "options.h"
+#include "xprintf.h"
 
 #define TEXT_HEIGHT_PER_CHAR 12
 #define TEXT_WIDTH_PER_CHAR  8
@@ -52,7 +53,7 @@ static void insideDrawHandler(GL_PageControls_TypeDef* pThis, _Bool force, int r
 GL_PageControls_TypeDef* Widget_NewBigButtonOptions()
 {
 	GL_PageControls_TypeDef* newControl = Widget_NewBigButton(
-			"OPTIONS",
+			"Setting ",
 			INSIDE_WIDTH, INSIDE_HEIGHT,
 			insideEventHandler,
 			insideDrawHandler
@@ -66,7 +67,25 @@ GL_PageControls_TypeDef* Widget_NewBigButtonOptions()
  */
 static void insideEventHandler(GL_PageControls_TypeDef* pThis, int relX, int relY)
 {
-	Screen_ShowScreen(&g_screenOptions);
+	switch (Screen_GetScreenMode())
+	{
+		case MAIN :
+			debug (GUI, "insideEventHandler: MAIN -> Screen_ShowScreen options\n");
+			Screen_SetScreenMode(OPTIONS);
+			Screen_ShowScreen(&g_screenOptions);
+			break;
+		case OPTIONS :
+			debug (GUI, "insideEventHandler: OPTIONS -> Screen_Done\n");
+			Screen_Done();
+			break;
+		case ADVANCED :
+			debug (GUI, "insideEventHandler: ADVANCED -> Screen_Done\n");
+			Screen_Done();
+			break;
+		default:
+			assert(0);
+	}
+
 }
 static void insideDrawHandler(GL_PageControls_TypeDef* pThis, _Bool force, int relX, int relY)
 {

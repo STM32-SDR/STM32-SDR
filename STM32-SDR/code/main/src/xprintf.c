@@ -19,6 +19,51 @@ void (*xfunc_out)(unsigned char); /* Pointer to the output stream */
 static char *outptr;
 
 /*----------------------------------------------*/
+/* Debug message printing                       */
+/*----------------------------------------------*/
+
+// A macro to allow tracing of all debug events.
+#define DEBUG_MARKER() do { \
+	debug ("%s()   at line %d.\n", __func__, __LINE__); \
+	} while (0)
+		//debugEvent(__LINE__);
+
+// DEBUG_SELECTED can be the sum of all the enabling codes
+// e.g. DEBUG_SELECTED GUI + GUI_DETAIL + USB etc.
+// uncomment one of the following lines or create your own custom set
+
+//#define DEBUG_SELECTED	(GUI + TOUCH)
+//#define DEBUG_SELECTED	(LCD + ENCODER)
+//#define DEBUG_SELECTED	(GUI + USB + CAL + TOUCH + LCD + ENCODER)
+#define DEBUG_SELECTED NONE
+
+void debug (int debug_code,
+
+		/* Put a formatted string to the default device */
+		const char* fmt, /* Pointer to the format string */
+		... /* Optional arguments */
+)
+{
+	if ((debug_code & DEBUG_SELECTED) != NONE) {
+		if (debug_code & GUI)
+			xprintf ("Debug GUI: ");
+		if (debug_code & GUI_DETAIL)
+			xprintf ("Debug GUI detail: ");
+		if (debug_code & USB)
+			xprintf ("Debug USB: ");
+		if (debug_code & CAL)
+			xprintf ("Debug calibrate: ");
+		if (debug_code & TOUCH)
+			xprintf ("Debug touch display: ");
+		if (debug_code & LCD)
+			xprintf ("Debug LCD: ");
+		if (debug_code & ENCODER)
+			xprintf ("Debug Encoder: ");
+		xprintf (fmt);
+	}
+}
+
+/*----------------------------------------------*/
 /* Put a character                              */
 /*----------------------------------------------*/
 
