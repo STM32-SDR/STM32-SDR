@@ -53,7 +53,11 @@
 #include	"STM32-SDR-Subroutines.h"
 
 
+<<<<<<< HEAD
 #define VERSION_STRING "1.047"
+=======
+#define VERSION_STRING "1.046"
+>>>>>>> refs/remotes/origin/master
 
 
 const uint32_t CODEC_FREQUENCY = 8000;
@@ -111,12 +115,18 @@ int main(void)
 //			GPIO_WriteBit(Test_GPIO, Test_1, Bit_SET);
 			Process_All_DSP();
 			UpdateScreenWithChanges();
+<<<<<<< HEAD
 //			GPIO_WriteBit(Test_GPIO, Test_1, Bit_RESET);
+=======
+			GPIO_WriteBit(Test_GPIO, Test_1, Bit_RESET);
+			DSP_Flag = 0;
+>>>>>>> refs/remotes/origin/master
 		}
 
 		if (AGC_Flag == 1) {
 			Proc_AGC();
 		}
+
 	}
 }
 

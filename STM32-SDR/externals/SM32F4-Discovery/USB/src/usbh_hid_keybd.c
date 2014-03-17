@@ -473,7 +473,7 @@ static void KEYBRD_Init(void)
 static void KEYBRD_Decode(uint8_t *pbuf)
 {
 
-	USB_KEYBRD_MARKER();
+	//USB_KEYBRD_MARKER();
 
 	//static uint8_t shift;
 	static uint8_t keys[KBR_MAX_NBR_PRESSED];

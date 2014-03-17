@@ -85,6 +85,7 @@ void Screen_ShowScreen(GL_Page_TypeDef *pNewScreen)
 	pNewScreen->ShowPage(pNewScreen, GL_TRUE);
 
 	s_pCurrentScreen = pNewScreen;
+
 }
 
 // Transition to the correct main screen, based on the mode.

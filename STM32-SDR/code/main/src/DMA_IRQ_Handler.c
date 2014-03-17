@@ -70,6 +70,8 @@ void DMA1_Stream0_IRQHandler(void)
 	DMA_RX_Memory = DMA_GetCurrentMemoryTarget(DMA1_Stream0 );
 	DMA_TX_Memory = DMA_GetCurrentMemoryTarget(DMA1_Stream5 );
 
+	//Process_All_DSP();
+
 	DSP_Flag = 1;
 	AGC_Flag = 1;
 

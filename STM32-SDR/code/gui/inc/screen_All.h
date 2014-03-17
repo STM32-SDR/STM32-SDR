@@ -63,6 +63,7 @@
 #include "graphicObject.h"
 #include "LcdHal.h"
 
+<<<<<<< HEAD
 // Option screen modes
 #define MAIN 0
 #define OPTIONS 1
@@ -70,6 +71,8 @@
 #define FILTER 3
 #define FUNCTION 4
 
+=======
+>>>>>>> refs/remotes/origin/master
 // Screen global variables (defined in screen_all.c) for switching screens
 // ## Add new screens here:
 extern GL_Page_TypeDef g_screenMainPSK;

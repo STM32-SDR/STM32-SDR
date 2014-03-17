@@ -92,7 +92,7 @@ void USBH_USR_Init(void)
  */
 void USBH_USR_DeviceAttached(void)
 {
-	USB_DEBUG_MARKER();
+	//USB_DEBUG_MARKER();
 	KeyboardStatus_SetDeviceAttached();
 }
 
@@ -114,7 +114,7 @@ void USBH_USR_UnrecoveredError(void)
  */
 void USBH_USR_DeviceDisconnected(void)
 {
-	USB_DEBUG_MARKER();
+	//USB_DEBUG_MARKER();
 	KeyboardStatus_SetDeviceDesconnected();
 }
 
@@ -281,7 +281,7 @@ void USBH_USR_DeviceNotSupported(void)
 USBH_USR_Status USBH_USR_UserInput(void)
 {
 	// ** This function seems to be called often! **
-	USB_DEBUG_MARKER();
+	//USB_DEBUG_MARKER();
 
 	USBH_USR_Status usbh_usr_status;
 
@@ -323,7 +323,7 @@ void USBH_USR_OverCurrentDetected(void)
  */
 void USR_KEYBRD_Init(void)
 {
-	USB_DEBUG_MARKER();
+	//USB_DEBUG_MARKER();
 	KeyboardStatus_SetKeyboardWorking();
 
 }
@@ -336,7 +336,7 @@ void USR_KEYBRD_Init(void)
  */
 void USR_KEYBRD_ProcessData(uint8_t data1,uint8_t data2 )
 {
-	USB_DEBUG_MARKER();
+	//USB_DEBUG_MARKER();
 
 	// Skip control characters like enter, bell, escape..
 	//if ((data1 >= ' ' && data2 < 112)||(data1 == 10)||(data1==8)) {
