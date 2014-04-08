@@ -17,6 +17,7 @@
 #include <stdarg.h>
 void (*xfunc_out)(unsigned char); /* Pointer to the output stream */
 static char *outptr;
+static void xvprintf(const char* fmt, va_list arp);
 
 /*----------------------------------------------*/
 /* Debug message printing                       */
@@ -34,14 +35,17 @@ static char *outptr;
 
 //#define DEBUG_SELECTED	(GUI + TOUCH)
 //#define DEBUG_SELECTED	(LCD + ENCODER)
-//#define DEBUG_SELECTED	(GUI + USB + CAL + TOUCH + LCD + ENCODER)
-#define DEBUG_SELECTED NONE
+#define DEBUG_SELECTED	(GUI + USB + CAL + TOUCH + LCD + ENCODER)
+// #define DEBUG_SELECTED NONE
 
 void debug (int debug_code,
 
 		/* Put a formatted string to the default device */
 		const char* fmt, /* Pointer to the format string */
 		... /* Optional arguments */
+
+
+
 )
 {
 	if ((debug_code & DEBUG_SELECTED) != NONE) {
@@ -59,7 +63,11 @@ void debug (int debug_code,
 			xprintf ("Debug LCD: ");
 		if (debug_code & ENCODER)
 			xprintf ("Debug Encoder: ");
-		xprintf (fmt);
+        // Call the xprintf using the var-args
+        va_list arp;
+        va_start(arp, fmt);
+        xvprintf(fmt, arp);
+        va_end(arp);
 	}
 }
 

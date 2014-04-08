@@ -185,7 +185,8 @@ void CW_FillTxAmplitudeBuffer(float amplitudeBuffer[], int bufferSize)
 //	xprintf("#key=%d\n", numKeySamples);
 
 	if (numKeySamples == 0) {
-		assert(0);
+		xprintf("no samples\n");
+		// assert(0); // Revisit hacked for debug
 		return;
 	}
 

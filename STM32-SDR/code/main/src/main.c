@@ -53,7 +53,7 @@
 #include	"STM32-SDR-Subroutines.h"
 
 
-#define VERSION_STRING "1.047"
+#define VERSION_STRING "1.048"
 
 const uint32_t CODEC_FREQUENCY = 8000;
 

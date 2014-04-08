@@ -122,8 +122,10 @@ void Calc_AGC_Setpoints(void) {
 		AGC = AGCF_Coeff*SigRatio + R_AGCF_Coeff*Old_AGC;
 			}
 
-		if ((long)Old_AGC==0x7FFFFFFF) Old_AGC = 0.; //test for error condition
-		if ((long)AGC==0x7FFFFFFF) AGC = 0.; //test for error condition
+		//if ((long)Old_AGC==0x7FFFFFFF) Old_AGC = 0.; //test for error condition
+		// if ((long)AGC==0x7FFFFFFF) AGC = 0.; //test for error condition
+		if ((long)Old_AGC >= 0x7FFFFFFF) Old_AGC = 0.4999; //test for error condition
+		if ((long)AGC >= 0x7FFFFFFF) AGC = 0.4999; //test for error condition
 
 	if(AGC_On == 1)  //AGC ON
 		{	//AGC is On
