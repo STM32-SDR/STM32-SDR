@@ -223,6 +223,15 @@ void TIM3_IRQHandler(void)
 	CW_KeyPollTimerIRQ();
 }
 
+
+void TIM4_IRQHandler(void)
+{
+  if (TIM_GetITStatus(TIM4, TIM_IT_Update) != RESET)
+  {
+    TIM_ClearITPendingBit(TIM4, TIM_IT_Update);
+    GPIO_ToggleBits(GPIOE, GPIO_Pin_2);
+  }
+}
 /**
  * @}
  */

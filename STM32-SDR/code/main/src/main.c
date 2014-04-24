@@ -51,9 +51,9 @@
 #include    "DMA_IRQ_Handler.h"
 #include	"widgets.h"
 #include	"STM32-SDR-Subroutines.h"
+#include	"Oscillator.h"
 
-
-#define VERSION_STRING "1.048"
+#define VERSION_STRING "1.048_alphaST"
 
 const uint32_t CODEC_FREQUENCY = 8000;
 
@@ -198,6 +198,12 @@ static void initializeHardware(void)
 	main_delay(SETUP_DELAY);
 
 	Init_Waterfall();
+	main_delay(SETUP_DELAY);
+
+	INTTIM_Config();			//Setup interrupt 4 for 1 mS
+	main_delay(SETUP_DELAY);
+
+	SideTone_Config();			 //SideTone Configuration
 	main_delay(SETUP_DELAY);
 
 	// Init USB Host Library

@@ -56,3 +56,7 @@ void Mute_LO(void);
 void Connect_IQ_Inputs(void);
 
 void Connect_Microphone_Input(void);
+
+void Connect_Sidetone_Input(void);
+
+void Disonnect_Sidetone_Input(void);

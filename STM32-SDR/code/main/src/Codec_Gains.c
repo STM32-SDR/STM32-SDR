@@ -214,4 +214,32 @@ void Connect_Microphone_Input(void)
 	I2C_WriteRegister(CODEC_ADDRESS, 0x34, 0x0C);  //IN3L routed to Left MICPGA
 	Delay(Codec_Pause);
 }
+//Connect IN3R (Sidetone) to PGA
+void Connect_Sidetone_Input(void)
+{
+	I2C_WriteRegister(CODEC_ADDRESS, 0x00, 0x01);	//Page Select
+	Delay(Codec_Pause);
+
+	I2C_WriteRegister(CODEC_ADDRESS, 0x37, 0x0C);  //IN3R routed to RIght MICPGA
+	Delay(Codec_Pause);
+
+	I2C_WriteRegister(CODEC_ADDRESS, 0x09, 0x3F);  //Power up MARr & Headphone
+	Delay(Codec_Pause);
+
+	I2C_WriteRegister(CODEC_ADDRESS, 0x0C, 0x01);  //MAR to HPL
+	Delay(Codec_Pause);
+
+	I2C_WriteRegister(CODEC_ADDRESS, 0x0D, 0x02);  //MAR to HPR
+	Delay(Codec_Pause);
+}
+void Disconnect_Sidetone_Input(void)
+{
+	I2C_WriteRegister(CODEC_ADDRESS, 0x00, 0x01);	//Page Select
+	Delay(Codec_Pause);
+
+	I2C_WriteRegister(CODEC_ADDRESS, 0x09, 0x3C);  //Power down MARr
+	Delay(Codec_Pause);
+
+
+}
 
