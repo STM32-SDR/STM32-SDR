@@ -24,6 +24,7 @@
 #include "xprintf.h"
 #include <assert.h>
 #include "stm32f4xx_tim.h"
+#include "Codec_Gains.h"
 
 
 // Create a circular buffer used for reading/writing key samples.
@@ -156,6 +157,9 @@ void CW_KeyPollTimerIRQ(void)
 		}
 
 		// Process current state
+		//if(debouncedIsKeyPressed) Sidetone_Key_Down();
+			//		else Sidetone_Key_Up();
+
 		writeKeySampleToKeyBuffer(debouncedIsKeyPressed);
 
 		// DEBUG: Count interrupts
@@ -203,12 +207,17 @@ void CW_FillTxAmplitudeBuffer(float amplitudeBuffer[], int bufferSize)
 		curAmplitude += amplitudeChange;
 		if (curAmplitude > 1.0) {
 			curAmplitude = 1.0;
+
 		}
 		if (curAmplitude < 0) {
 			curAmplitude = 0;
 		}
 
+		if(curAmplitude>0) Sidetone_Key_Down();
+				else Sidetone_Key_Up();
+
 		// Store the value:
+
 		amplitudeBuffer[ampBuffIdx] = curAmplitude;
 
 		// Move to next key sample (if required)
