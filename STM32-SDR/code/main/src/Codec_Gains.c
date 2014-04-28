@@ -22,6 +22,7 @@
 #include 	"Init_Codec.h"
 #include 	"Init_I2C.h"
 #include	"Codec_Gains.h"
+#include	"Options.h"
 
 void Set_HP_Gain(int HP_gain)
 {
@@ -229,17 +230,23 @@ void Connect_Sidetone_Input(void)  // Power Up MAR and HP
 	I2C_WriteRegister(CODEC_ADDRESS, 0x0D, 0x02);  //MAR to HPR
 	Delay(Codec_Pause);
 
+	I2C_WriteRegister(CODEC_ADDRESS, 0x37, 0x0C);  //IN3R routed to Right MICPGA
+		Delay(Codec_Pause);
+
 	Sidetone_Key_Up();
 
 }
 
 void Sidetone_Key_Down(void)
 {
-	I2C_WriteRegister(CODEC_ADDRESS, 0x37, 0x0C);
+
+	Set_HP_Gain(Options_GetValue(OPTION_ST_LEVEL));
+	//I2C_WriteRegister(CODEC_ADDRESS, 0x37, 0x0C);
 }
 
 void Sidetone_Key_Up(void)
 {
-	I2C_WriteRegister(CODEC_ADDRESS, 0x37, 0x00);
+	Mute_HP();
+	//I2C_WriteRegister(CODEC_ADDRESS, 0x37, 0x00);
 }
 
