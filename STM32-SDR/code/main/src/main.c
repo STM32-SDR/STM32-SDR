@@ -53,7 +53,7 @@
 #include	"STM32-SDR-Subroutines.h"
 
 
-#define VERSION_STRING "1.048"
+#define VERSION_STRING "1.049"
 
 const uint32_t CODEC_FREQUENCY = 8000;
 
@@ -223,8 +223,9 @@ static void initializeHardware(void)
 
 	GPIO_BandFilterInit();
 
-
-	FrequencyManager_SetCurrentFrequency(FrequencyManager_GetCurrentFrequency());
+	int newFreq = FrequencyManager_GetCurrentFrequency();
+	FrequencyManager_SetCurrentFrequency(newFreq);
+	FrequencyManager_Check_FilterBand(newFreq);
 	main_delay(SETUP_DELAY);
 
 }
