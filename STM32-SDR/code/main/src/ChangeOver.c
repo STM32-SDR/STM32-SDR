@@ -31,6 +31,7 @@
 #include "ScrollingTextBox.h"
 #include "AGC_Processing.h"
 #include "ModeSelect.h"
+#include "Init_Codec.h"
 #include <assert.h>
 #include <xprintf.h>
 
@@ -155,6 +156,8 @@ _Bool RxTx_IsPttPressed(void)
  ****************************************/
 void Receive_Sequence(void)
 {
+	//Codec_Init();
+	Disconnect_Sidetone_Input();  //  Disconnect the CW Sidetone to Headphones
 	Mute_HP();
 	Mute_LO();
 	s_inTxMode = 0;

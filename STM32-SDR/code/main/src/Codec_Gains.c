@@ -221,19 +221,39 @@ void Connect_Sidetone_Input(void)  // Power Up MAR and HP
 	I2C_WriteRegister(CODEC_ADDRESS, 0x00, 0x01);	//Page Select
 	Delay(Codec_Pause);
 
-	I2C_WriteRegister(CODEC_ADDRESS, 0x09, 0x3F);  //Power up MARr & Headphone
+	I2C_WriteRegister(CODEC_ADDRESS, 0x0c, 0x01);  //MAR to HPL and LDAC AFIR not routed to HPL
 	Delay(Codec_Pause);
 
-	I2C_WriteRegister(CODEC_ADDRESS, 0x0C, 0x01);  //MAR to HPL
+	I2C_WriteRegister(CODEC_ADDRESS, 0x0d, 0x02);  //MAR to HPR and RDAC AFIR not routed to HPR
 	Delay(Codec_Pause);
 
-	I2C_WriteRegister(CODEC_ADDRESS, 0x0D, 0x02);  //MAR to HPR
+	I2C_WriteRegister(CODEC_ADDRESS, 0x3c, 0x80);  //UnMute PGAr 0 db Gain
 	Delay(Codec_Pause);
 
-	I2C_WriteRegister(CODEC_ADDRESS, 0x37, 0x0C);  //IN3R routed to Right MICPGA
-		Delay(Codec_Pause);
+	I2C_WriteRegister(CODEC_ADDRESS, 0x19, 0x00);  //UnMute MAR 0 db Gain
+	Delay(Codec_Pause);
 
-	Sidetone_Key_Up();
+	//I2C_WriteRegister(CODEC_ADDRESS, 0x09, 0x3d);  //Power up MARr & Headphone
+	//Delay(Codec_Pause);
+
+	I2C_WriteRegister(CODEC_ADDRESS, 0x37, 0x0c);  //IN3R routed to Right MICPGA
+	Delay(Codec_Pause);
+
+	Sidetone_Key_Down();
+
+}
+void Disconnect_Sidetone_Input(void)
+{
+	I2C_WriteRegister(CODEC_ADDRESS, 0x00, 0x01);	//Page Select
+	Delay(Codec_Pause);
+
+	//LDAC AFIR  routed to HPL and MAR disconnected
+	I2C_WriteRegister(CODEC_ADDRESS, 0x0c, 0x08);
+	Delay(Codec_Pause);
+
+	//RDAC AFIR routed to HPR and MAR disconnected
+	I2C_WriteRegister(CODEC_ADDRESS, 0x0d, 0x08);
+	Delay(Codec_Pause);
 
 }
 
@@ -241,12 +261,13 @@ void Sidetone_Key_Down(void)
 {
 
 	Set_HP_Gain(Options_GetValue(OPTION_ST_LEVEL));
-	//I2C_WriteRegister(CODEC_ADDRESS, 0x37, 0x0C);
+
 }
 
 void Sidetone_Key_Up(void)
 {
+
 	Mute_HP();
-	//I2C_WriteRegister(CODEC_ADDRESS, 0x37, 0x00);
+
 }
 

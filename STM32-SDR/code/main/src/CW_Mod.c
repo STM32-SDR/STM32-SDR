@@ -34,6 +34,7 @@ static _Bool s_keySamples[KEY_SAMPLE_ARRAY_SIZE];
 static int s_keySampleWriteIdx = 0;
 static int s_keySampleReadIdx = 0;
 static _Bool s_wantToTransmit = 0;
+static char lastsample = 0;
 
 // Number samples required on key to accept a change in state.
 #define DEBOUNCE_THRESHOLD 2
@@ -116,6 +117,14 @@ static void initCwTimerInterrupt(void)
 // Sampling
 void writeKeySampleToKeyBuffer(char key)
 {
+
+	if(key != lastsample)  // only change sidetone if state changed.
+		{
+		if(key) Sidetone_Key_Down();
+			else Sidetone_Key_Up();
+		lastsample = key;
+		}
+
 	s_keySamples[s_keySampleWriteIdx] = key;
 	s_keySampleWriteIdx = (s_keySampleWriteIdx + 1) % KEY_SAMPLE_ARRAY_SIZE;
 }
@@ -213,8 +222,8 @@ void CW_FillTxAmplitudeBuffer(float amplitudeBuffer[], int bufferSize)
 			curAmplitude = 0;
 		}
 
-		if(curAmplitude>0) Sidetone_Key_Down();
-				else Sidetone_Key_Up();
+		//if(curAmplitude>0) Sidetone_Key_Down();
+		//		else Sidetone_Key_Up();
 
 		// Store the value:
 

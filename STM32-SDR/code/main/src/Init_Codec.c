@@ -211,7 +211,7 @@ void Codec_Init(void)
 	Delay(Codec_Pause);
 
 	//Power up HPL,HPR,LOL,LOR
-	I2C_WriteRegister(CODEC_ADDRESS, 0x09, 0x3c);
+	I2C_WriteRegister(CODEC_ADDRESS, 0x09, 0x3d); // added MAR
 	Delay(Codec_Pause);
 
 	//***********************************************************************
