@@ -92,3 +92,6 @@ void FrequencyManager_SetFilterMode(int value);
 void FrequencyManager_Check_FilterBand(uint32_t newFreq);
 
 #endif
+
+void Tune_NCO_Up (void);
+void Tune_NCO_Down (void);

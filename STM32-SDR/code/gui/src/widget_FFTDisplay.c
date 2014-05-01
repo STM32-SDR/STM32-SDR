@@ -41,6 +41,9 @@ int		WF_Bfr[15360];
 int		*pWFBfr;
 int		WF_Flag = 1; //Default to Spectrum Display
 
+extern int	NCOTUNE;
+extern int NCO_Point;
+
 // Constants
 static const int FFT_WIDTH   = 240;
 static const int FFT_HEIGHT  =  64;
@@ -72,7 +75,6 @@ double NCO_1;
 double NCO_2;
 
 
-int 	NCO_Point;
 int		NCO_Bin;
 uint8_t FFT_Display[256];
 extern	int RSL_Mag;
@@ -165,9 +167,8 @@ static void WidgetFFT_EventHandler(GL_PageControls_TypeDef* pThis)
 
 	//Update PSK NCO Frequency
 	int fftLeftEdge = pThis->objCoordinates.MinX;
-	NCO_Point = ((int)X_Point - fftLeftEdge) +8;
-	NCO_Frequency = (double) ((float) ((X_Point - fftLeftEdge) + 8) * 15.625);
-	NCO_0 = NCO_Frequency;
+	NCO_Point = (X_Point - fftLeftEdge);
+	NCO_Frequency = (double) ((NCO_Point * 15.625) + 125.);
 	Acquire();
 }
 
@@ -206,7 +207,7 @@ static void WidgetFFT_DrawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 	displayFilterBW();
 
 	// Final End of DSP and FFT Update Processing
-	DSP_Flag = 0;
+	// chh DSP_Flag = 0;
 }
 
 static void displayFFT(int x, int y)
@@ -224,12 +225,15 @@ static void displayFFT(int x, int y)
 	 * - Drop the bottom 8, and top 8 frequency-display bins to discard
 	 *   noisy sections near band edges due to filtering.
 	 */
-	float selectedFreqX = (float) (NCO_Frequency - 125) / 15.625;
-	if (selectedFreqX < 0) {
-		selectedFreqX = 0;
-	}
+	//float selectedFreqX = (float) (NCO_Frequency - 125) / 15.625;
+	//if (selectedFreqX < 0) {
+	//	selectedFreqX = 0;
+	//}
 
-	NCO_Bin = (int)selectedFreqX + 8;
+	//NCO_Bin = (int)selectedFreqX + 8;
+
+	NCO_Bin = NCO_Point + 8;
+
 	_Bool isShowingAFOffset = showAFOffsetOnScreen();
 
 	if (!WF_Flag) {
@@ -245,7 +249,7 @@ static void displayFFT(int x, int y)
 
 					// Draw red line for selected frequency
 					//if ((x == (int) (selectedFreqX + 0.5)) && isShowingAFOffset){
-					if (x == (int) (selectedFreqX + 0.5)){
+					if (x == NCO_Point){
 						// Leave some white at the top
 						if (y <= SELFREQ_ADJ) {
 							LCD_WriteRAM(LCD_COLOR_WHITE);
@@ -285,7 +289,7 @@ static void displayFFT(int x, int y)
 			for (int y = WF_Line0; y < FFT_HEIGHT; y++){
 				for (int x = 0; x <FFT_WIDTH; x++) {
 					//if (x == (int)(selectedFreqX +0.5) && isShowingAFOffset) {
-					if (x == (int) (selectedFreqX + 0.5)){
+					if (x == NCO_Point){
 						//LCD_WriteRAM(LCD_COLOR_RED);
 						LCD_WriteRAM(LCD_COLOR_WHITE);
 					}
@@ -297,7 +301,7 @@ static void displayFFT(int x, int y)
 			for ( int y = 0; y < WF_Line0; y++){
 				for (int x = 0; x < FFT_WIDTH; x++){
 					//if (x == (int)(selectedFreqX +0.5) && isShowingAFOffset){
-					if (x == (int) (selectedFreqX + 0.5)){
+					if (x == NCO_Point){
 						//LCD_WriteRAM(LCD_COLOR_RED);
 						LCD_WriteRAM(LCD_COLOR_WHITE);
 					}

@@ -46,10 +46,10 @@ static GL_PageControls_TypeDef* pFiltLabel;
  * Call-back prototypes
  */
 static void WS_Click(GL_PageControls_TypeDef* pThis);
-static void TR_Click(GL_PageControls_TypeDef* pThis);
-static void testButton_Click(GL_PageControls_TypeDef* pThis);
+//static void TR_Click(GL_PageControls_TypeDef* pThis);
+//static void testButton_Click(GL_PageControls_TypeDef* pThis);
 
-extern void ClearTextDisplay(void);
+//extern void ClearTextDisplay(void);
 
 // following 4 functions added by MEC
 static _Bool AGCStatusUpdateHandler(GL_PageControls_TypeDef* pThis, _Bool forceRedisplay)
@@ -151,9 +151,9 @@ void ScreenMainCW_Create(void)
 			btnFreq, s_pThisScreen);
 
 	// .. Rx & Tx buttons (Remove when code can automatically switch)
-	GL_PageControls_TypeDef* btnTR  = NewButton(10, "Tx/Rx", TR_Click);
+//	GL_PageControls_TypeDef* btnTR  = NewButton(10, "Tx/Rx", TR_Click);
 	GL_PageControls_TypeDef* btnWS  = NewButton(9,  "Wf/Sp", WS_Click);
-	AddPageControlObj(100, LCD_HEIGHT - 42, btnTR, s_pThisScreen);
+//	AddPageControlObj(100, LCD_HEIGHT - 42, btnTR, s_pThisScreen);
 	AddPageControlObj(170, LCD_HEIGHT - 42, btnWS, s_pThisScreen);
 
 	// following 4 sections added by MEC
@@ -180,8 +180,8 @@ void ScreenMainCW_Create(void)
 
 
 	// Just for testing
-	GL_PageControls_TypeDef* btnTest  = NewButton(11,  " Test ", testButton_Click);
-	AddPageControlObj(0, 150, btnTest, s_pThisScreen);
+//	GL_PageControls_TypeDef* btnTest  = NewButton(11,  " Test ", testButton_Click);
+//	AddPageControlObj(0, 150, btnTest, s_pThisScreen);
 }
 
 
@@ -194,6 +194,7 @@ static void WS_Click(GL_PageControls_TypeDef* pThis)
 	WF_Flag = !WF_Flag;
 	if (WF_Flag) Init_Waterfall();
 }
+/*
 static void TR_Click(GL_PageControls_TypeDef* pThis)
 {
 	if (RxTx_InTxMode()){
@@ -220,3 +221,4 @@ static void testButton_Click(GL_PageControls_TypeDef* pThis)
 	xprintf("Number of Timer3 Interrupts serviced since last dump: %10d\n", timerCount);
 
 }
+*/

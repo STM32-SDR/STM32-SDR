@@ -25,6 +25,7 @@
 #include "ChangeOver.h"
 
 extern double NCO_Frequency;
+extern int NCOTUNE;
 
 typedef struct
 {
@@ -110,9 +111,11 @@ void Mode_SetCurrentMode(UserModeType newMode)
 	// Change the operation band:
 	if (s_pCurrentMode->SideBand == SIDEBAND_LSB) {
 		rgain = -0.5;
+		NCOTUNE = 0;
 	}
 	else if (s_pCurrentMode->SideBand == SIDEBAND_USB) {
 		rgain = 0.5;
+		NCOTUNE = 0;
 	}
 	else {
 		assert(0);

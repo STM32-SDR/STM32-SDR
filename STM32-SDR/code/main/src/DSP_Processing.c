@@ -38,10 +38,10 @@ float 	DAC_RMS_Sig;
 
 int		Sig;
 int		Sig_Max;
-int		Sig_Total;
-int		Sig_Sum0;
-int		Sig_Sum1;
-int		Sig_Sum2;
+long	Sig_Total;
+long	Sig_Sum0;
+long	Sig_Sum1;
+long	Sig_Sum2;
 
 float 	FFT_Coeff = 0.2;
 extern  int NCO_Bin;
@@ -61,7 +61,7 @@ q15_t FFT_Input[1024];
 q15_t FFT_Scale[1024]; //512 sampling
 q15_t FFT_Magnitude[512]; //512 sampling
 
-int FFT_Mag_10[256];
+long FFT_Mag_10[256];
 
 uint16_t FFT_Size = 512;  // change for 512 sampling
 uint8_t FFT_status;
