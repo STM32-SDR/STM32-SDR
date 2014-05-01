@@ -88,7 +88,7 @@ void Calc_AGC_Setpoints(void) {
 		DDeltaPGA = FPGA_Coeff*DeltaPGA + (1-FPGA_Coeff)*Old_DDeltaPGA;
 		}
 
-	if ((long)DDeltaPGA == 0x7FFFFFFF) DDeltaPGA = 0.0;
+	// if ((long)DDeltaPGA == 0x7FFFFFFF) DDeltaPGA = 0.0;
 		Old_DDeltaPGA = DDeltaPGA;
 
 	if(AGC_On == 1)
@@ -122,10 +122,10 @@ void Calc_AGC_Setpoints(void) {
 		AGC = AGCF_Coeff*SigRatio + R_AGCF_Coeff*Old_AGC;
 			}
 
-		//if ((long)Old_AGC==0x7FFFFFFF) Old_AGC = 0.; //test for error condition
+		// if ((long)Old_AGC==0x7FFFFFFF) Old_AGC = 0.; //test for error condition
 		// if ((long)AGC==0x7FFFFFFF) AGC = 0.; //test for error condition
-		if ((long)Old_AGC >= 0x7FFFFFFF) Old_AGC = 0.4999; //test for error condition
-		if ((long)AGC >= 0x7FFFFFFF) AGC = 0.4999; //test for error condition
+	//	if ((long)Old_AGC >= 0x7FFFFFFF) Old_AGC = 0.4999; //test for error condition
+	//	if ((long)AGC >= 0x7FFFFFFF) AGC = 0.4999; //test for error condition
 
 	if(AGC_On == 1)  //AGC ON
 		{	//AGC is On

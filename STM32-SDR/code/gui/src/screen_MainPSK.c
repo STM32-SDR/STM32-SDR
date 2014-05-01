@@ -31,6 +31,7 @@
 #include "KeyboardStatus.h"
 #include "AGC_Processing.h"
 
+extern 	int	NCOTUNE;
 extern 	int WF_Flag;
 extern 	int FilterNumber;
 
@@ -42,6 +43,7 @@ static GL_PageControls_TypeDef* pPGALabel;
 static GL_PageControls_TypeDef* pDACLabel;
 static GL_PageControls_TypeDef* pRSLLabel;
 static GL_PageControls_TypeDef* pFiltLabel;
+static GL_PageControls_TypeDef* pNCOLabel;
 
 /**
  * Call-back prototypes
@@ -50,6 +52,7 @@ static void WS_Click(GL_PageControls_TypeDef* pThis);
 static void TR_Click(GL_PageControls_TypeDef* pThis);
 static void N_Click(GL_PageControls_TypeDef* pThis);
 static void C_Click(GL_PageControls_TypeDef* pThis);
+static void T_Click(GL_PageControls_TypeDef* pThis);
 static void Clear_Click(GL_PageControls_TypeDef* pThis);
 
 static _Bool KeyboardStatusUpdateHandler(GL_PageControls_TypeDef* pThis, _Bool forceRedisplay)
@@ -137,6 +140,19 @@ static _Bool RSLUpdateHandler(GL_PageControls_TypeDef* pThis, _Bool forceRedispl
 	return 0;
 }
 
+
+static _Bool NCOUpdateHandler(GL_PageControls_TypeDef* pThis, _Bool forceRedisplay){
+
+	if (NCOTUNE) {
+		Widget_ChangeLabelText(pNCOLabel, "N");
+	}
+	else {
+		Widget_ChangeLabelText(pNCOLabel, "V");
+	}
+	return 0;
+}
+
+
 /**
  * Create the screen
  */
@@ -188,11 +204,17 @@ void ScreenMainPSK_Create(void)
 	AddPageControlObj(235,  80, pRSLLabel, s_pThisScreen);
 
 	//Filt Label
-		pFiltLabel = Widget_NewLabel("F0", LCD_COLOR_YELLOW, LCD_COLOR_BLACK, 0, GL_FONTOPTION_8x16,FilterStatusUpdateHandler);
-		AddPageControlObj(52, 12, pFiltLabel, s_pThisScreen);
+	pFiltLabel = Widget_NewLabel("F0", LCD_COLOR_YELLOW, LCD_COLOR_BLACK, 0, GL_FONTOPTION_8x16,FilterStatusUpdateHandler);
+	AddPageControlObj(52, 12, pFiltLabel, s_pThisScreen);
+
+	//NCO label
+	pNCOLabel = Widget_NewLabel("V", LCD_COLOR_YELLOW, LCD_COLOR_BLACK, 0, GL_FONTOPTION_8x16,NCOUpdateHandler);
+	AddPageControlObj(155, 204, pNCOLabel, s_pThisScreen);
+
+
 
 	// .. Rx & Tx buttons (Remove when code can automatically switch)
-	GL_PageControls_TypeDef* btnTR  = NewButton(10, "Tx/Rx", TR_Click);
+	GL_PageControls_TypeDef* btnTR  = NewButton(10, "Tune ", TR_Click);
 	GL_PageControls_TypeDef* btnWS  = NewButton(9,  "Wf/Sp", WS_Click);
 	GL_PageControls_TypeDef* btnN  = NewButton(13,  "NM ", N_Click);
 	GL_PageControls_TypeDef* btnC  = NewButton(14,  "CS ", C_Click);
@@ -218,13 +240,14 @@ static void WS_Click(GL_PageControls_TypeDef* pThis)
 }
 static void TR_Click(GL_PageControls_TypeDef* pThis)
 {
-	if (RxTx_InTxMode()){
+	/*if (RxTx_InTxMode()){
 		RxTx_SetReceive();
 		ClearTextDisplay();
 	}
 	else {
 		RxTx_SetTransmit();
-	}
+	} */
+	NCOTUNE = !NCOTUNE;
 }
 
 
@@ -240,6 +263,12 @@ static void C_Click(GL_PageControls_TypeDef* pThis)
 	set_kybd_mode(1);
 	Contact_Clear(0);
 	text_cnt = 0;
+}
+
+static void T_Click(GL_PageControls_TypeDef* pThis)
+{
+	Screen_ShowScreen(&g_screenEditText);
+
 }
 
 static void Clear_Click(GL_PageControls_TypeDef* pThis)

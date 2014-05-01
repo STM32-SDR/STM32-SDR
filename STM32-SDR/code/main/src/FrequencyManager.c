@@ -27,6 +27,12 @@
 #include "screen_All.h"
 #include "stm32f4xx_gpio.h"
 #include "Band_Filter.h"
+int NCOTUNE;
+int NCO_Point;
+int NCOTuneCount;
+int NCO_Flag;
+
+extern double NCO_Frequency;
 
 // Band Values:
 typedef struct
@@ -363,3 +369,21 @@ char* FrequencyManager_Freq_ascii(int band){
 	return &buf[i+1];
 
 }
+
+void Tune_NCO_Up (void)
+{
+	NCO_Point += 1;
+	if (NCO_Point > 240) NCO_Point = 240;
+	NCOTuneCount=5;
+	NCO_Flag = 1;
+}
+
+void Tune_NCO_Down (void)
+{
+	NCO_Point -= 1;
+	if (NCO_Point < 0) NCO_Point = 0;
+	NCOTuneCount=5;
+	NCO_Flag = 1;
+}
+
+

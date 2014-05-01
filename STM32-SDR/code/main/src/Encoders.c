@@ -37,6 +37,9 @@
 #include	"screen_All.h"
 
 
+extern int 	NCOTUNE;
+extern double NCO_Frequency;
+
 // Data for the encoder state.
 const int16_t ENC_SENS = 2;
 const int8_t ENCODER_STATES[] = {
@@ -224,10 +227,20 @@ static void applyEncoderChange1(int8_t changeDirection)
 		}
 	}
 	else {
-		if (changeDirection > 0) {
-			FrequencyManager_StepFrequencyUp();
-		} else {
-			FrequencyManager_StepFrequencyDown();
+
+		if (NCOTUNE){
+			if (changeDirection > 0) {
+				Tune_NCO_Up( );
+			} else {
+				Tune_NCO_Down();
+			}
+		}
+		else {
+			if (changeDirection > 0) {
+				FrequencyManager_StepFrequencyUp();
+			} else {
+				FrequencyManager_StepFrequencyDown();
+			}
 		}
 	}
 

@@ -53,7 +53,12 @@
 #include	"STM32-SDR-Subroutines.h"
 #include	"Oscillator.h"
 
-#define VERSION_STRING "1.048_alphaST"
+#define VERSION_STRING "1.050_STalp"
+
+extern int NCO_Point;
+extern int NCOTuneCount;
+extern int NCO_Flag;
+
 
 const uint32_t CODEC_FREQUENCY = 8000;
 
@@ -92,6 +97,14 @@ int main(void)
 	while (1) {
 		// Check if encoder-knobs have changed:
 		Encoders_CalculateAndProcessChanges();
+
+		if (NCO_Flag){
+			if (--NCOTuneCount <= 0){
+				NCO_Flag = 0;
+				NCO_Frequency = (double)NCO_Point*15.625 +125.0;
+				Acquire();
+			}
+		}
 
 		// Check encoder 2 push button
 		process_button();
@@ -161,6 +174,7 @@ static void initializeHardware(void)
 	main_delay(SETUP_DELAY);
 
 	SetRXFrequency(1000);
+	NCO_Point = (int)((1000./15.625)+.5);
 	main_delay(SETUP_DELAY);
 
 	SetAFCLimit(1000);
@@ -229,8 +243,9 @@ static void initializeHardware(void)
 
 	GPIO_BandFilterInit();
 
-
-	FrequencyManager_SetCurrentFrequency(FrequencyManager_GetCurrentFrequency());
+	int newFreq = FrequencyManager_GetCurrentFrequency();
+	FrequencyManager_SetCurrentFrequency(newFreq);
+	FrequencyManager_Check_FilterBand(newFreq);
 	main_delay(SETUP_DELAY);
 
 }
