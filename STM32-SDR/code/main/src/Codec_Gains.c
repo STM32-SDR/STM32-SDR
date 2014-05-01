@@ -230,11 +230,8 @@ void Connect_Sidetone_Input(void)  // Power Up MAR and HP
 	I2C_WriteRegister(CODEC_ADDRESS, 0x3c, 0x80);  //UnMute PGAr 0 db Gain
 	Delay(Codec_Pause);
 
-	I2C_WriteRegister(CODEC_ADDRESS, 0x19, 0x00);  //UnMute MAR 0 db Gain
+	I2C_WriteRegister(CODEC_ADDRESS, 0x19, 0x1a);  //UnMute MAR -10 db Gain
 	Delay(Codec_Pause);
-
-	//I2C_WriteRegister(CODEC_ADDRESS, 0x09, 0x3d);  //Power up MARr & Headphone
-	//Delay(Codec_Pause);
 
 	I2C_WriteRegister(CODEC_ADDRESS, 0x37, 0x0c);  //IN3R routed to Right MICPGA
 	Delay(Codec_Pause);
