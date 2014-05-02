@@ -41,7 +41,6 @@ int		WF_Bfr[15360];
 int		*pWFBfr;
 int		WF_Flag = 1; //Default to Spectrum Display
 
-extern int	NCOTUNE;
 extern int NCO_Point;
 
 // Constants
@@ -233,8 +232,6 @@ static void displayFFT(int x, int y)
 	//NCO_Bin = (int)selectedFreqX + 8;
 
 	NCO_Bin = NCO_Point + 8;
-
-	_Bool isShowingAFOffset = showAFOffsetOnScreen();
 
 	if (!WF_Flag) {
 

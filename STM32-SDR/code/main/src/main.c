@@ -53,7 +53,7 @@
 #include	"STM32-SDR-Subroutines.h"
 
 
-#define VERSION_STRING "1.050"
+#define VERSION_STRING "1.051"
 
 extern int NCO_Point;
 extern int NCOTuneCount;

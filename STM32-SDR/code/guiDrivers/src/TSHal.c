@@ -303,9 +303,10 @@ static uint16_t getDisplayCoordinateY(uint16_t x_touch, uint16_t y_touch)
  *
  * ********************************************************/
 // options start at 200; choose something quite a bit higher.
-#define EEPROM_OFFSET 1000
+// relocated to 10 for safety by Chris S.
+#define EEPROM_OFFSET 10
 #define EEPROM_SENTINEL_LOC (EEPROM_OFFSET - 2) // 2 byte sentinel
-#define EEPROM_SENTINEL_VAL 11413
+#define EEPROM_SENTINEL_VAL 11414
 
 _Bool TS_HaveValidEEPROMData(void)
 {

@@ -38,7 +38,6 @@
 
 
 extern int 	NCOTUNE;
-extern double NCO_Frequency;
 
 // Data for the encoder state.
 const int16_t ENC_SENS = 2;

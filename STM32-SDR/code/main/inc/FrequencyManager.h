@@ -87,9 +87,10 @@ uint8_t FrequencyManager_GetFilterCode (int band);
 uint32_t FrequencyManager_GetFilterFrequency (int band);
 char* FrequencyManager_Code_ascii(int band);
 char* FrequencyManager_Freq_ascii(int band);
-int FrequencyManager_GetFilterMode(void);
-void FrequencyManager_SetFilterMode(int value);
+//int FrequencyManager_GetFilterMode(void);
+//void FrequencyManager_SetFilterMode(int value);
 void FrequencyManager_Check_FilterBand(uint32_t newFreq);
+void FrequencyManager_Output_FilterCode(int newCode);
 
 #endif
 

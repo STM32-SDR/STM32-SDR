@@ -52,7 +52,6 @@ static void WS_Click(GL_PageControls_TypeDef* pThis);
 static void TR_Click(GL_PageControls_TypeDef* pThis);
 static void N_Click(GL_PageControls_TypeDef* pThis);
 static void C_Click(GL_PageControls_TypeDef* pThis);
-static void T_Click(GL_PageControls_TypeDef* pThis);
 static void Clear_Click(GL_PageControls_TypeDef* pThis);
 
 static _Bool KeyboardStatusUpdateHandler(GL_PageControls_TypeDef* pThis, _Bool forceRedisplay)
@@ -214,14 +213,14 @@ void ScreenMainPSK_Create(void)
 
 
 	// .. Rx & Tx buttons (Remove when code can automatically switch)
-	GL_PageControls_TypeDef* btnTR  = NewButton(10, "Tune ", TR_Click);
+	GL_PageControls_TypeDef* btnFT  = NewButton(10, "Tune ", TR_Click);
 	GL_PageControls_TypeDef* btnWS  = NewButton(9,  "Wf/Sp", WS_Click);
 	GL_PageControls_TypeDef* btnN  = NewButton(13,  "NM ", N_Click);
 	GL_PageControls_TypeDef* btnC  = NewButton(14,  "CS ", C_Click);
 	GL_PageControls_TypeDef* btnClear  = NewButton(16,  " Clear ", Clear_Click);
 
 
-	AddPageControlObj(100, LCD_HEIGHT - 42, btnTR, s_pThisScreen);
+	AddPageControlObj(100, LCD_HEIGHT - 42, btnFT, s_pThisScreen);
 	AddPageControlObj(170, LCD_HEIGHT - 42, btnWS, s_pThisScreen);
 	AddPageControlObj(126,   170, btnN, s_pThisScreen);
 	AddPageControlObj(0, 170, btnC, s_pThisScreen);
@@ -263,12 +262,6 @@ static void C_Click(GL_PageControls_TypeDef* pThis)
 	set_kybd_mode(1);
 	Contact_Clear(0);
 	text_cnt = 0;
-}
-
-static void T_Click(GL_PageControls_TypeDef* pThis)
-{
-	Screen_ShowScreen(&g_screenEditText);
-
 }
 
 static void Clear_Click(GL_PageControls_TypeDef* pThis)

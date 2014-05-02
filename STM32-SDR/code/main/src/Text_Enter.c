@@ -35,10 +35,10 @@
 #include "widgets.h"
 #include "Keyboard_Input.h"
 
-#define EEPROM_OFFSET_text 300
+#define EEPROM_OFFSET_text 1000
 #define EEPROM_OFFSET_count 900
 #define EEPROM_SENTINEL_LOC 75
-#define EEPROM_SENTINEL_VAL 1037
+#define EEPROM_SENTINEL_VAL 1038
 
 #define text_length 30
 #define contact_length 10

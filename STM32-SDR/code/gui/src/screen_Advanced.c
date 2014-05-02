@@ -27,6 +27,7 @@
 #include "xprintf.h"
 #include "Encoders.h"
 #include <string.h>
+#include "Init_I2C.h"
 
 // Used in this file to refer to the correct screen (helps to keep code copy-paste friendly.
 static GL_Page_TypeDef *s_pThisScreen = &g_screenAdvanced;

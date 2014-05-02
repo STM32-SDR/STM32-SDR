@@ -192,6 +192,8 @@ static void optionsCodeUp_Click(GL_PageControls_TypeDef* pThis)
 	if (filterCodeSelected < MIN_BAND)
 		filterCodeSelected = MAX_BAND;
 	debug(GUI, "optionsCodeUp_Click: ID = %d\n", filterCodeSelected);
+	int newCode = FrequencyManager_GetFilterCode (filterCodeSelected);
+	FrequencyManager_Output_FilterCode(newCode);
 }
 
 static void optionsCodeDown_Click(GL_PageControls_TypeDef* pThis)
@@ -200,6 +202,8 @@ static void optionsCodeDown_Click(GL_PageControls_TypeDef* pThis)
 	if (filterCodeSelected > MAX_BAND)
 		filterCodeSelected = MIN_BAND;
 	debug(GUI, "optionsCodeDown_Click: ID = %d\n", filterCodeSelected);
+	int newCode = FrequencyManager_GetFilterCode (filterCodeSelected);
+	FrequencyManager_Output_FilterCode(newCode);
 }
 
 static void optionsFreqUp_Click(GL_PageControls_TypeDef* pThis)
@@ -233,21 +237,32 @@ static void doneFilter_Click(GL_PageControls_TypeDef* pThis) {
 	debug (GUI, "doneFilter_Click\n");
 	FrequencyManager_WriteFiltersToEeprom();
 	FrequencyManager_SetCurrentFrequency(saveFrequency);
+
 	FrequencyManager_SetFrequencyStepSize(100);
 	Options_SetSelectedOption(OPTION_RX_AUDIO);
+
 	Screen_SetScreenMode(MAIN);
+	FrequencyManager_Check_FilterBand(saveFrequency); // Must be done in Main mode
 
 	Screen_ShowMainScreen();
 }
 
 void Screen_filter_Click(GL_PageControls_TypeDef* pThis) {
-	debug (GUI, "Screen_filter_Click\n");
+	debug (GUI, "Screen_filter_Click:\n");
+
+	// save the current synthesizer frequency to put back later and set new value
 	saveFrequency = FrequencyManager_GetCurrentFrequency();
 	uint32_t setFreq = FrequencyManager_GetFilterFrequency(filterFreqSelected);
+	debug (GUI, "Set frequency to %d\n", setFreq);
 	FrequencyManager_SetCurrentFrequency(setFreq);
 	FrequencyManager_SetFrequencyStepSize(1000000);
-	Screen_SetScreenMode(FILTER);
 
+	// output the selected code for the filter
+	int newCode = FrequencyManager_GetFilterCode (filterCodeSelected);
+	debug (GUI, "Set filter code to %d\n", newCode);
+	FrequencyManager_Output_FilterCode(newCode);
+
+	Screen_SetScreenMode(FILTER);
 	Screen_ShowScreen(&g_screenFilter);
 }
 
