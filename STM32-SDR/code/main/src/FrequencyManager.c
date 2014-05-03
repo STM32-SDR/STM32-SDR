@@ -32,8 +32,6 @@ int NCO_Point;
 int NCOTuneCount;
 int NCO_Flag;
 
-extern double NCO_Frequency;
-
 // Band Values:
 typedef struct
 {
@@ -74,10 +72,10 @@ static uint32_t s_stepSize = 100;
 #define EEPROM_FREQBAND_OFFSET 100
 #define EEPROM_SENTINEL_LOC 0
 //#define EEPROM_SENTINEL_VAL 1235
-#define EEPROM_SENTINEL_VAL 1236
+#define EEPROM_SENTINEL_VAL 1237
 
 // Filter bands, See also options.h and options.c Options_GetValue
-#define EEPROM_FILTERBAND_OFFSET 2000
+#define EEPROM_FILTERBAND_OFFSET 300
 #define FREQ_NUMBER_OF_FILTER_BANDS 8
 
 static uint8_t s_frequencyMultiplier = 4;
@@ -141,7 +139,9 @@ void FrequencyManager_SetSelectedBand(BandPreset newBand)
 {
 	assert(newBand >= 0 && newBand < FREQBAND_NUMBER_OF_BANDS);
 	s_selectedBand = newBand;
-	FrequencyManager_SetCurrentFrequency(s_bandsData[newBand].CurrentFrequency);
+	uint32_t newFreq = s_bandsData[newBand].CurrentFrequency;
+	FrequencyManager_SetCurrentFrequency(newFreq);
+	FrequencyManager_Check_FilterBand(newFreq);
 }
 BandPreset FrequencyManager_GetSelectedBand(void)
 {
@@ -241,6 +241,7 @@ void FrequencyManager_SetFrequencyStepSize(uint32_t step)
 //External band filter needs to be selected
 void FrequencyManager_Check_FilterBand(uint32_t newFreq){
 
+// check which band we are in by testing the frequency against each filter limit
 	int newCode;
 	for (int i = 0; i<8; i++){
 		if (newFreq > s_bandTable[i].Frequency){
@@ -249,12 +250,27 @@ void FrequencyManager_Check_FilterBand(uint32_t newFreq){
 			newCode = s_bandTable[i].Code;
 			if (newCode != oldCode){
 				debug(GUI, "FrequencyManager_Check_FilterBand: ");
-				debug(GUI, "changing band, Freq = %d, code = %d\n", newFreq, newCode);
-				GPIO_SetFilter (newCode);
-				oldCode = newCode;
+				debug(GUI, "changing filter band, frequency = %d\n", newFreq);
+				if(Screen_GetScreenMode() != FILTER) // In filter screen code set by buttons
+					FrequencyManager_Output_FilterCode(newCode);
+
+//				debug(GUI, "FrequencyManager_Check_FilterBand: ");
+//				debug(GUI, "changing band, Freq = %d, code = %d\n", newFreq, newCode);
+//				GPIO_SetFilter (newCode);
+//				oldCode = newCode;
 			}
-			break;
+			break; // stop after finding a match
 		}
+	}
+}
+
+void FrequencyManager_Output_FilterCode(int newCode){
+
+	if (newCode != oldCode){ //only output to GPIO if there is a change
+		debug(GUI, "FrequencyManager_Output_FilterBand: ");
+		debug(GUI, "changing code, code = %d\n", newCode);
+		GPIO_SetFilter (newCode);
+		oldCode = newCode;
 	}
 }
 
@@ -321,6 +337,7 @@ void FrequencyManager_SetBandCodeFilter (uint8_t band, uint8_t value)
 	debug(GUI, "FrequencyManager_SetBandCodeFilter\n");
 	s_bandTable[band].Code = value;
 	debug(GUI, "band = %d, code = %d\n", band, value);
+	FrequencyManager_Output_FilterCode(value);
 }
 
 void FrequencyManager_SetBandFreqFilter (uint8_t band, uint32_t frequency)
@@ -370,8 +387,7 @@ char* FrequencyManager_Freq_ascii(int band){
 
 }
 
-void Tune_NCO_Up (void)
-{
+void Tune_NCO_Up (void){
 	NCO_Point += 1;
 	if (NCO_Point > 240) NCO_Point = 240;
 	NCOTuneCount=5;
@@ -385,5 +401,3 @@ void Tune_NCO_Down (void)
 	NCOTuneCount=5;
 	NCO_Flag = 1;
 }
-
-

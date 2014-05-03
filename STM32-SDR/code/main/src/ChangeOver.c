@@ -157,9 +157,10 @@ _Bool RxTx_IsPttPressed(void)
 void Receive_Sequence(void)
 {
 	//Codec_Init();
-	Disconnect_Sidetone_Input();  //  Disconnect the CW Sidetone to Headphones
+
 	Mute_HP();
 	Mute_LO();
+	Disconnect_Sidetone_Input();  //  Disconnect the CW Sidetone to Headphones
 	s_inTxMode = 0;
 	if (AGC_Mode != 3)
 	{AGC_On =1;

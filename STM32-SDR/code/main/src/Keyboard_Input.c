@@ -27,7 +27,7 @@
 #define KBD_BUFF_LEN 41 // 40 characters on the screen, +1 for null.
 
 int kybd_mode = 0;
-char Call[]    = "   Call   " ;
+char Call[]    = " Call     ";
 char Name[]    = " Name     ";
 
 int i;

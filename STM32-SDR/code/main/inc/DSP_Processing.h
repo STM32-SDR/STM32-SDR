@@ -28,6 +28,7 @@ void Process_FIR_Q(void);
 void Process_FFT(void);
 void Sideband_Demod(void);
 void init_DSP(void);
+void Process_post_FILT (void);
 
 
 extern float32_t FFT_Output[256];

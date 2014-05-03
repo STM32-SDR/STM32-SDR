@@ -35,8 +35,8 @@ static void xvprintf(const char* fmt, va_list arp);
 
 //#define DEBUG_SELECTED	(GUI + TOUCH)
 //#define DEBUG_SELECTED	(LCD + ENCODER)
-#define DEBUG_SELECTED	(GUI + USB + CAL + TOUCH + LCD + ENCODER)
-// #define DEBUG_SELECTED NONE
+//#define DEBUG_SELECTED	(GUI + CAL + TOUCH + LCD + ENCODER)
+#define DEBUG_SELECTED NONE
 
 void debug (int debug_code,
 

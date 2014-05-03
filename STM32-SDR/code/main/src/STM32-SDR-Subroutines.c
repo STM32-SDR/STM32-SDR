@@ -129,7 +129,6 @@ void Acquire( void )
 	extern unsigned char FFT_Filter[];
 	int TempIndex;
 	extern double NCO_Frequency;
-	extern double NCO_1;
 	long i, S1, S2, W;
 	double delta;
 
