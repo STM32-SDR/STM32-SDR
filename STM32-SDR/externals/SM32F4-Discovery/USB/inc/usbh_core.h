@@ -2,8 +2,8 @@
   ******************************************************************************
   * @file    usbh_core.h
   * @author  MCD Application Team
-  * @version V2.1.0
-  * @date    19-March-2012
+  * @version V1.0.0RC4
+  * @date    12-August-2013
   * @brief   Header file for usbh_core.c
   ******************************************************************************
   * @attention
@@ -61,6 +61,7 @@
 #define USBH_MAX_ERROR_COUNT                            2
 #define USBH_DEVICE_ADDRESS_DEFAULT                     0
 #define USBH_DEVICE_ADDRESS                             1
+#define CFG_DESC_MAX_SIZE                               512
 
 
 /**
@@ -85,6 +86,7 @@ typedef enum {
 /* Following states are used for gState */
 typedef enum {
   HOST_IDLE =0,
+  HOST_WAIT_PRT_ENABLED,
   HOST_DEV_ATTACHED,
   HOST_DEV_DISCONNECTED,  
   HOST_DETECT_DEVICE_SPEED,
@@ -184,9 +186,9 @@ typedef struct _USBH_Class_cb
   void         (*DeInit)\
     (USB_OTG_CORE_HANDLE *pdev , void *phost);
   USBH_Status  (*Requests)\
-    (USB_OTG_CORE_HANDLE *pdev , void *phost);  
+    (USB_OTG_CORE_HANDLE *pdev ,void *phost);
   USBH_Status  (*Machine)\
-    (USB_OTG_CORE_HANDLE *pdev , void *phost);     
+    (USB_OTG_CORE_HANDLE *pdev, void *phost);
   
 } USBH_Class_cb_TypeDef;
 
@@ -290,6 +292,3 @@ void USBH_ErrorHandle(USBH_HOST *phost,
 */ 
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
-
-
-

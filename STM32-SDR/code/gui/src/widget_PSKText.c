@@ -122,7 +122,7 @@ static void drawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 		GL_SetFont(GL_FONTOPTION_8x16);
 		GL_SetBackColor(LCD_COLOR_BLACK);
 		GL_SetTextColor(LCD_COLOR_WHITE);
-		GL_PrintString(25, 175,Get_Contact(0), 0);
+		GL_PrintString(35, 175,Get_Contact(0), 0);
 		lastCallHash = curCallHash;
 	}
 
@@ -131,7 +131,7 @@ static void drawHandler(GL_PageControls_TypeDef* pThis, _Bool force)
 		GL_SetFont(GL_FONTOPTION_8x16);
 		GL_SetBackColor(LCD_COLOR_BLACK);
 		GL_SetTextColor(LCD_COLOR_WHITE);
-		GL_PrintString(151, 175,Get_Contact(1), 0);
+		GL_PrintString(161, 175,Get_Contact(1), 0);
 		lastNameHash = curNameHash;
 	}
 
