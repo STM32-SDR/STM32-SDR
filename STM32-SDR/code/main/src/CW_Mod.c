@@ -117,7 +117,6 @@ static void initCwTimerInterrupt(void)
 // Sampling
 void writeKeySampleToKeyBuffer(char key)
 {
-
 	if(key != lastsample)  // only change sidetone if state changed.
 		{
 		if(key) Sidetone_Key_Down();
@@ -127,8 +126,8 @@ void writeKeySampleToKeyBuffer(char key)
 
 	s_keySamples[s_keySampleWriteIdx] = key;
 	s_keySampleWriteIdx = (s_keySampleWriteIdx + 1) % KEY_SAMPLE_ARRAY_SIZE;
-}
 
+}
 // ISR which samples the key pin.
 void CW_KeyPollTimerIRQ(void)
 {
@@ -221,9 +220,6 @@ void CW_FillTxAmplitudeBuffer(float amplitudeBuffer[], int bufferSize)
 		if (curAmplitude < 0) {
 			curAmplitude = 0;
 		}
-
-		//if(curAmplitude>0) Sidetone_Key_Down();
-		//		else Sidetone_Key_Up();
 
 		// Store the value:
 

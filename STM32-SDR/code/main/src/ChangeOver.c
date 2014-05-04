@@ -122,7 +122,7 @@ void RxTx_CheckAndHandlePTT(void)
 			if (debounceCount == DEBOUNCE_COUNT_REQUIRED) {
 				s_isPttPressed = isKeyDown;
 				debounceCount = 0;
-				xprintf("PTT Changed to %d\n", s_isPttPressed);
+				//xprintf("PTT Changed to %d\n", s_isPttPressed);
 				handlePttStateChange();
 			}
 		}
@@ -139,6 +139,7 @@ void RxTx_CheckAndHandlePTT(void)
 			xprintf("To CW Tx\n");
 		}
 		if (!CW_DesiresTransmitMode() && RxTx_InTxMode()) {
+			Disconnect_Sidetone_Input();  //  Disconnect the CW Sidetone to Headphones
 			RxTx_SetReceive();
 			xprintf("To CW Rx\n");
 		}
@@ -160,7 +161,6 @@ void Receive_Sequence(void)
 
 	Mute_HP();
 	Mute_LO();
-	Disconnect_Sidetone_Input();  //  Disconnect the CW Sidetone to Headphones
 	s_inTxMode = 0;
 	if (AGC_Mode != 3)
 	{AGC_On =1;
@@ -170,10 +170,12 @@ void Receive_Sequence(void)
 	{
 	AGC_On =0;  //This forces the manual AGC mode
 	}
-
 	GPIO_WriteBit(GPIOD, GPIO_Pin_3, Bit_SET);	//Make PTT_Out High, Remember FET Inversion
+	Delay(1000);
 	Disconnect_PGA();
+
 	Connect_IQ_Inputs();
+
 	Set_DAC_DVC(Options_GetValue(OPTION_RX_AUDIO));
 	Set_ADC_DVC(-10);  //was -20 using Milt's AGC scheme
 	Set_HP_Gain(6);
@@ -210,7 +212,7 @@ void Xmit_CW_Sequence(void)
 	Delay(1000);
 	//Set_LO_Gain(20);
 	Set_LO_Gain(Options_GetValue(OPTION_Tx_LEVEL));
-	Set_HP_Gain(Options_GetValue(OPTION_ST_LEVEL));
+
 }
 
 void Xmit_PSK_Sequence(void)

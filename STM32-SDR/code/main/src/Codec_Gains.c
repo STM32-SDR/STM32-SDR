@@ -155,7 +155,6 @@ void Turn_Off_Bias(void)
 		return;
 	}
 	Delay(Codec_Pause);
-
 	I2C_WriteRegister(CODEC_ADDRESS, 0x33, 0x00);
 	Delay(Codec_Pause);
 }
@@ -227,12 +226,6 @@ void Connect_Sidetone_Input(void)  // Power Up MAR and HP
 	I2C_WriteRegister(CODEC_ADDRESS, 0x0d, 0x02);  //MAR to HPR and RDAC AFIR not routed to HPR
 	Delay(Codec_Pause);
 
-	//I2C_WriteRegister(CODEC_ADDRESS, 0x3c, 0x80);  //UnMute PGAr 0 db Gain
-	//Delay(Codec_Pause);
-
-	//I2C_WriteRegister(CODEC_ADDRESS, 0x19, 0x1a);  //UnMute MAR -10 db Gain
-	//Delay(Codec_Pause);
-
 	I2C_WriteRegister(CODEC_ADDRESS, 0x37, 0x0c);  //IN3R routed to Right MICPGA
 	Delay(Codec_Pause);
 
@@ -251,6 +244,9 @@ void Disconnect_Sidetone_Input(void)
 	//RDAC AFIR routed to HPR and MAR disconnected
 	I2C_WriteRegister(CODEC_ADDRESS, 0x0d, 0x08);
 	Delay(Codec_Pause);
+
+	Disconnect_PGA();
+	Delay(800000);
 
 }
 
