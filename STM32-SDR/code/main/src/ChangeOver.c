@@ -206,6 +206,7 @@ void Xmit_CW_Sequence(void)
 	AGC_On = 0;
 	Disconnect_PGA();
 	Connect_Sidetone_Input();  //  Route the CW Sidetone to Headphones
+	Sidetone_Key_Down();
 	Set_DAC_DVC(-33); //CW Xmit DAC Gain
 	GPIO_WriteBit(GPIOD, GPIO_Pin_3, Bit_RESET);  //Make PTT_Out Low,Remember FET Inversion
 	Delay(1000);
