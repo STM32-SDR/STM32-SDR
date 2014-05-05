@@ -229,7 +229,6 @@ void Connect_Sidetone_Input(void)  // Power Up MAR and HP
 	I2C_WriteRegister(CODEC_ADDRESS, 0x37, 0x0c);  //IN3R routed to Right MICPGA
 	Delay(Codec_Pause);
 
-	Sidetone_Key_Down();
 
 }
 void Disconnect_Sidetone_Input(void)
@@ -246,14 +245,13 @@ void Disconnect_Sidetone_Input(void)
 	Delay(Codec_Pause);
 
 	Disconnect_PGA();
-	Delay(800000);
 
 }
 
 void Sidetone_Key_Down(void)
 {
-
 	Set_HP_Gain(Options_GetValue(OPTION_ST_LEVEL));
+	Connect_Sidetone_Input();
 
 }
 
@@ -261,6 +259,6 @@ void Sidetone_Key_Up(void)
 {
 
 	Mute_HP();
-
+	Disconnect_Sidetone_Input();  //  Disconnect the CW Sidetone to Headphones
 }
 

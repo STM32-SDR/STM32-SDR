@@ -139,7 +139,6 @@ void RxTx_CheckAndHandlePTT(void)
 			xprintf("To CW Tx\n");
 		}
 		if (!CW_DesiresTransmitMode() && RxTx_InTxMode()) {
-			Disconnect_Sidetone_Input();  //  Disconnect the CW Sidetone to Headphones
 			RxTx_SetReceive();
 			xprintf("To CW Rx\n");
 		}
