@@ -2,8 +2,8 @@
   ******************************************************************************
   * @file    usb_hcd_int.h
   * @author  MCD Application Team
-  * @version V2.1.0
-  * @date    19-March-2012
+  * @version V1.0.0RC4
+  * @date    12-August-2013
   * @brief   Peripheral Device Interface Layer
   ******************************************************************************
   * @attention
@@ -59,7 +59,9 @@ typedef struct _USBH_HCD_INT
 {
   uint8_t (* SOF) (USB_OTG_CORE_HANDLE *pdev);
   uint8_t (* DevConnected) (USB_OTG_CORE_HANDLE *pdev);
-  uint8_t (* DevDisconnected) (USB_OTG_CORE_HANDLE *pdev);   
+  uint8_t (* DevDisconnected) (USB_OTG_CORE_HANDLE *pdev);
+  uint8_t (* DevPortEnabled) (USB_OTG_CORE_HANDLE *pdev);
+  uint8_t (* DevPortDisabled) (USB_OTG_CORE_HANDLE *pdev);
   
 }USBH_HCD_INT_cb_TypeDef;
 

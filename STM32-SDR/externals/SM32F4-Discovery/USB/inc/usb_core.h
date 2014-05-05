@@ -2,8 +2,8 @@
   ******************************************************************************
   * @file    usb_core.h
   * @author  MCD Application Team
-  * @version V2.1.0
-  * @date    19-March-2012
+  * @version V1.0.0RC4
+  * @date    12-August-2013
   * @brief   Header of the Core Layer
   ******************************************************************************
   * @attention
@@ -274,6 +274,7 @@ typedef struct _HCD
 {
   uint8_t                  Rx_Buffer [MAX_DATA_LENGTH];  
   __IO uint32_t            ConnSts;
+  __IO uint32_t            PortEnabled;
   __IO uint32_t            ErrCnt[USB_OTG_MAX_TX_FIFOS];
   __IO uint32_t            XferCnt[USB_OTG_MAX_TX_FIFOS];
   __IO HC_STATUS           HC_Status[USB_OTG_MAX_TX_FIFOS];  

@@ -2,8 +2,8 @@
   ******************************************************************************
   * @file    usbh_stdreq.c 
   * @author  MCD Application Team
-  * @version V2.1.0
-  * @date    19-March-2012
+  * @version V1.0.0RC4
+  * @date    12-August-2013
   * @brief   This file implements the standard requests for device enumeration
   ******************************************************************************
   * @attention
@@ -79,7 +79,7 @@
     #pragma data_alignment=4   
   #endif
 #endif /* USB_OTG_HS_INTERNAL_DMA_ENABLED */
-__ALIGN_BEGIN uint8_t          USBH_CfgDesc[512] __ALIGN_END ;
+__ALIGN_BEGIN uint8_t          USBH_CfgDesc[CFG_DESC_MAX_SIZE] __ALIGN_END ;
 
 
 /** @defgroup USBH_STDREQ_Private_FunctionPrototypes
@@ -87,7 +87,7 @@ __ALIGN_BEGIN uint8_t          USBH_CfgDesc[512] __ALIGN_END ;
 */
 static void USBH_ParseDevDesc (USBH_DevDesc_TypeDef* , uint8_t *buf, uint16_t length);
 
-static void USBH_ParseCfgDesc (USBH_CfgDesc_TypeDef* cfg_desc,
+USBH_Status USBH_ParseCfgDesc (USBH_CfgDesc_TypeDef* cfg_desc,
                                USBH_InterfaceDesc_TypeDef* itf_desc,
                                USBH_EpDesc_TypeDef  ep_desc[][USBH_MAX_NUM_ENDPOINTS],                                                           
                                uint8_t *buf, 
@@ -124,7 +124,7 @@ USBH_Status USBH_Get_DevDesc(USB_OTG_CORE_HANDLE *pdev,
 {
   
   USBH_Status status;
-  
+
   if((status = USBH_GetDescriptor(pdev, 
                                   phost,
                                   USB_REQ_RECIPIENT_DEVICE | USB_REQ_TYPE_STANDARD,                          
@@ -155,7 +155,7 @@ USBH_Status USBH_Get_CfgDesc(USB_OTG_CORE_HANDLE *pdev,
                              uint16_t length)
 
 {
-  USBH_Status status;
+  USBH_Status status, result;
   uint16_t index = 0;
   
   if((status = USBH_GetDescriptor(pdev,
@@ -172,11 +172,13 @@ USBH_Status USBH_Get_CfgDesc(USB_OTG_CORE_HANDLE *pdev,
     }
     
     /* Commands successfully sent and Response Received  */       
-    USBH_ParseCfgDesc (&phost->device_prop.Cfg_Desc,
+    result = USBH_ParseCfgDesc (&phost->device_prop.Cfg_Desc,
                        phost->device_prop.Itf_Desc,
                        phost->device_prop.Ep_Desc, 
                        pdev->host.Rx_Buffer,
-                       length); 
+                       length);
+    if (result != USBH_OK)  status= result;
+
     
   }
   return status;
@@ -395,7 +397,7 @@ static void  USBH_ParseDevDesc (USBH_DevDesc_TypeDef* dev_desc,
 * @param  length: Length of the descriptor
 * @retval None
 */
-static void  USBH_ParseCfgDesc (USBH_CfgDesc_TypeDef* cfg_desc,
+USBH_Status USBH_ParseCfgDesc (USBH_CfgDesc_TypeDef* cfg_desc,
                                 USBH_InterfaceDesc_TypeDef* itf_desc,
                                 USBH_EpDesc_TypeDef   ep_desc[][USBH_MAX_NUM_ENDPOINTS], 
                                 uint8_t *buf, 
@@ -410,6 +412,7 @@ static void  USBH_ParseCfgDesc (USBH_CfgDesc_TypeDef* cfg_desc,
   int8_t                        ep_ix = 0;  
   static uint16_t               prev_ep_size = 0;
   static uint8_t                prev_itf = 0;  
+  USBH_Status status;
   
   
   pdesc   = (USBH_DescHeader_t *)buf;
@@ -432,7 +435,6 @@ static void  USBH_ParseCfgDesc (USBH_CfgDesc_TypeDef* cfg_desc,
     if ( cfg_desc->bNumInterfaces <= USBH_MAX_NUM_INTERFACES) 
     {
       pif = (USBH_InterfaceDesc_TypeDef *)0;
-      
       while (ptr < cfg_desc->wTotalLength ) 
       {
         pdesc = USBH_GetNextDesc((uint8_t *)pdesc, &ptr);
@@ -440,51 +442,60 @@ static void  USBH_ParseCfgDesc (USBH_CfgDesc_TypeDef* cfg_desc,
         {
           if_ix             = *(((uint8_t *)pdesc ) + 2);
           pif               = &itf_desc[if_ix];
-          
           if((*((uint8_t *)pdesc + 3)) < 3)
           {
-          USBH_ParseInterfaceDesc (&temp_pif, (uint8_t *)pdesc);            
-          ep_ix = 0;
-          
-          /* Parse Ep descriptors relative to the current interface */
-          if(temp_pif.bNumEndpoints <= USBH_MAX_NUM_ENDPOINTS)
-          {          
-            while (ep_ix < temp_pif.bNumEndpoints) 
+            USBH_ParseInterfaceDesc (&temp_pif, (uint8_t *)pdesc);
+            ep_ix = 0;
+
+            /* Parse Ep descriptors relative to the current interface */
+            if(temp_pif.bNumEndpoints <= USBH_MAX_NUM_ENDPOINTS)
             {
-              pdesc = USBH_GetNextDesc((void* )pdesc, &ptr);
-              if (pdesc->bDescriptorType   == USB_DESC_TYPE_ENDPOINT) 
-              {  
-                pep               = &ep_desc[if_ix][ep_ix];
-                
-                if(prev_itf != if_ix)
+              while (ep_ix < temp_pif.bNumEndpoints)
+              {
+                pdesc = USBH_GetNextDesc((void* )pdesc, &ptr);
+                if (pdesc->bDescriptorType   == USB_DESC_TYPE_ENDPOINT)
                 {
-                  prev_itf = if_ix;
-                  USBH_ParseInterfaceDesc (pif, (uint8_t *)&temp_pif); 
-                }
-                else
-                {
-                  if(prev_ep_size > LE16((uint8_t *)pdesc + 4))
+                  pep               = &ep_desc[if_ix][ep_ix];
+                  if(prev_itf != if_ix)
                   {
-                    break;
+                    prev_itf = if_ix;
+                    USBH_ParseInterfaceDesc (pif, (uint8_t *)&temp_pif);
                   }
                   else
                   {
-                    USBH_ParseInterfaceDesc (pif, (uint8_t *)&temp_pif);    
+                    if(prev_ep_size > LE16((uint8_t *)pdesc + 4))
+                    {
+                      break;
+                    }
+                    else
+                    {
+                      USBH_ParseInterfaceDesc (pif, (uint8_t *)&temp_pif);
+                    }
                   }
+                  USBH_ParseEPDesc (pep, (uint8_t *)pdesc);
+                  prev_ep_size = LE16((uint8_t *)pdesc + 4);
+                  ep_ix++;
                 }
-                USBH_ParseEPDesc (pep, (uint8_t *)pdesc);
-                prev_ep_size = LE16((uint8_t *)pdesc + 4);
-                ep_ix++;
               }
             }
+            else /*num endpoints exceeded */
+            {
+              status = USBH_NOT_SUPPORTED;
+              return status;
+            }
           }
-         }
         }
       }
     }
+    else /*num interfaces exceeded */
+    {
+      status = USBH_NOT_SUPPORTED;
+      return status;
+    }
     prev_ep_size = 0;
     prev_itf = 0; 
-  }  
+  }
+  return USBH_OK ;
 }
 
 

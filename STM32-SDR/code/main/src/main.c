@@ -53,7 +53,9 @@
 #include	"STM32-SDR-Subroutines.h"
 #include	"Oscillator.h"
 
-#define VERSION_STRING "1.051_STalp"
+
+#define VERSION_STRING "1.052_STalp"
+
 
 extern int NCO_Point;
 extern int NCOTuneCount;

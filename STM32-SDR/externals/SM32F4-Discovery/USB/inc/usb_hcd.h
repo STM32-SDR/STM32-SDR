@@ -2,8 +2,8 @@
   ******************************************************************************
   * @file    usb_hcd.h
   * @author  MCD Application Team
-  * @version V2.1.0
-  * @date    19-March-2012
+  * @version V1.0.0RC4
+  * @date    12-August-2013
   * @brief   Host layer Header file
   ******************************************************************************
   * @attention
@@ -86,6 +86,8 @@ uint32_t  HCD_SubmitRequest        (USB_OTG_CORE_HANDLE *pdev ,
 uint32_t  HCD_GetCurrentSpeed      (USB_OTG_CORE_HANDLE *pdev);
 uint32_t  HCD_ResetPort            (USB_OTG_CORE_HANDLE *pdev);
 uint32_t  HCD_IsDeviceConnected    (USB_OTG_CORE_HANDLE *pdev);
+uint32_t  HCD_IsPortEnabled         (USB_OTG_CORE_HANDLE *pdev);
+
 uint32_t  HCD_GetCurrentFrame      (USB_OTG_CORE_HANDLE *pdev) ;
 URB_STATE HCD_GetURB_State         (USB_OTG_CORE_HANDLE *pdev,  uint8_t ch_num); 
 uint32_t  HCD_GetXferCnt           (USB_OTG_CORE_HANDLE *pdev,  uint8_t ch_num); 
@@ -105,4 +107,6 @@ HC_STATUS HCD_GetHCState           (USB_OTG_CORE_HANDLE *pdev,  uint8_t ch_num) 
   * @}
   */ 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
+
+
 
