@@ -52,6 +52,7 @@
 #include	"widgets.h"
 #include	"STM32-SDR-Subroutines.h"
 #include	"Oscillator.h"
+#include  	"main.h"
 
 
 #define VERSION_STRING "1.052_STalp"
@@ -216,11 +217,13 @@ static void initializeHardware(void)
 	Init_Waterfall();
 	main_delay(SETUP_DELAY);
 
-	INTTIM_Config();			//Setup interrupt 4 for 1 mS
-	main_delay(SETUP_DELAY);
+	 /* Sampling rate interrupt timer */
+	 INTTIM_Config();
 
-	SideTone_Config();			 //SideTone Configuration
-	main_delay(SETUP_DELAY);
+	 /* PWM Configuration */
+	 PWM_Config(256);
+	 PWM_SetDC(128);
+
 
 	// Init USB Host Library
 	USBH_Init(

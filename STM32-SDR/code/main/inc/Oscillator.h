@@ -22,7 +22,12 @@
 //#ifndef __OSCILLATOR__H__
 //#define __OSCILLATOR__H__
 
-void INTTIM_Config(void);
-void SideTone_Config(void);
+TIM_OCInitTypeDef  TIM_OCInitStructure;
+TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
+GPIO_InitTypeDef  GPIO_InitStructure;
 
+
+void PWM_Config(int period);
+void PWM_SetDC(uint16_t dutycycle);
+void INTTIM_Config(void);
 //#endif
