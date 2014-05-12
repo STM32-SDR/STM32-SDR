@@ -220,13 +220,13 @@ void Connect_Sidetone_Input(void)  // Power Up MAR and HP
 	I2C_WriteRegister(CODEC_ADDRESS, 0x00, 0x01);	//Page Select
 	Delay(Codec_Pause);
 
-	I2C_WriteRegister(CODEC_ADDRESS, 0x0c, 0x01);  //MAR to HPL and LDAC AFIR not routed to HPL
+	I2C_WriteRegister(CODEC_ADDRESS, 0x08, 0x01);  //MAR to HPL and LDAC AFIR not routed to HPL
 	Delay(Codec_Pause);
 
 	I2C_WriteRegister(CODEC_ADDRESS, 0x0d, 0x02);  //MAR to HPR and RDAC AFIR not routed to HPR
 	Delay(Codec_Pause);
 
-	I2C_WriteRegister(CODEC_ADDRESS, 0x37, 0x0c);  //IN3R routed to Right MICPGA
+	I2C_WriteRegister(CODEC_ADDRESS, 0x37, 0x08);  //IN3R routed to Right MICPGA
 	Delay(Codec_Pause);
 
 
