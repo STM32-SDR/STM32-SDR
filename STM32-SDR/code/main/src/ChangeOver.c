@@ -157,10 +157,9 @@ _Bool RxTx_IsPttPressed(void)
 void Receive_Sequence(void)
 {
 	//Codec_Init();
-	Disconnect_Sidetone_Input();
+
 	Mute_HP();
 	Mute_LO();
-	Disconnect_Sidetone_Input();
 	s_inTxMode = 0;
 	if (AGC_Mode != 3)
 	{AGC_On =1;
@@ -172,7 +171,8 @@ void Receive_Sequence(void)
 	}
 	GPIO_WriteBit(GPIOD, GPIO_Pin_3, Bit_SET);	//Make PTT_Out High, Remember FET Inversion
 	Delay(1000);
-	Disconnect_PGA();
+	Disconnect_Sidetone_Input();
+	//Disconnect_PGA();
 	Delay(800000);
 	Connect_IQ_Inputs();
 
