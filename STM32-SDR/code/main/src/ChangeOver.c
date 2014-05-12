@@ -157,9 +157,10 @@ _Bool RxTx_IsPttPressed(void)
 void Receive_Sequence(void)
 {
 	//Codec_Init();
-
+	Disconnect_Sidetone_Input();
 	Mute_HP();
 	Mute_LO();
+	Disconnect_Sidetone_Input();
 	s_inTxMode = 0;
 	if (AGC_Mode != 3)
 	{AGC_On =1;
@@ -172,7 +173,7 @@ void Receive_Sequence(void)
 	GPIO_WriteBit(GPIOD, GPIO_Pin_3, Bit_SET);	//Make PTT_Out High, Remember FET Inversion
 	Delay(1000);
 	Disconnect_PGA();
-
+	Delay(800000);
 	Connect_IQ_Inputs();
 
 	Set_DAC_DVC(Options_GetValue(OPTION_RX_AUDIO));
@@ -205,7 +206,7 @@ void Xmit_CW_Sequence(void)
 	s_inTxMode = 1;
 	AGC_On = 0;
 	Disconnect_PGA();
-	//Connect_Sidetone_Input();  //  Route the CW Sidetone to Headphones
+	Connect_Sidetone_Input();  //  Route the CW Sidetone to Headphones
 	Sidetone_Key_Down();
 	Set_DAC_DVC(-33); //CW Xmit DAC Gain
 	GPIO_WriteBit(GPIOD, GPIO_Pin_3, Bit_RESET);  //Make PTT_Out Low,Remember FET Inversion

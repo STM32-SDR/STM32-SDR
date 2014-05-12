@@ -251,7 +251,7 @@ void Disconnect_Sidetone_Input(void)
 void Sidetone_Key_Down(void)
 {
 	Set_HP_Gain(Options_GetValue(OPTION_ST_LEVEL));
-	Connect_Sidetone_Input();
+	//Connect_Sidetone_Input();
 
 }
 
@@ -259,6 +259,6 @@ void Sidetone_Key_Up(void)
 {
 
 	Mute_HP();
-	Disconnect_Sidetone_Input();  //  Disconnect the CW Sidetone to Headphones
+	//Disconnect_Sidetone_Input();  //  Disconnect the CW Sidetone to Headphones
 }
 
