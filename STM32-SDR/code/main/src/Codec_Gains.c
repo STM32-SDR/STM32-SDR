@@ -226,8 +226,8 @@ void Connect_Sidetone_Input(void)  // Power Up MAR and HP
 	I2C_WriteRegister(CODEC_ADDRESS, 0x0d, 0x02);  //MAR to HPR and RDAC AFIR not routed to HPR
 	Delay(Codec_Pause);
 
-	I2C_WriteRegister(CODEC_ADDRESS, 0x14, 0x40);  //Soft Routing
-		Delay(Codec_Pause);
+	//I2C_WriteRegister(CODEC_ADDRESS, 0x14, 0x40);  //Soft Routing
+	//	Delay(Codec_Pause);
 
 
 	I2C_WriteRegister(CODEC_ADDRESS, 0x37, 0x08);  //IN3R routed to Right MICPGA
