@@ -78,7 +78,9 @@ typedef struct
   */
 
 #define NVIC_VectTab_RAM             ((uint32_t)0x20000000)
-#define NVIC_VectTab_FLASH           ((uint32_t)0x08000000)
+// BASE_ADDRESS defined in makefile
+//#define NVIC_VectTab_FLASH           ((uint32_t)0x08008000)
+#define NVIC_VectTab_FLASH           ((uint32_t)BASE_ADDRESS)
 #define IS_NVIC_VECTTAB(VECTTAB) (((VECTTAB) == NVIC_VectTab_RAM) || \
                                   ((VECTTAB) == NVIC_VectTab_FLASH))
 /**
