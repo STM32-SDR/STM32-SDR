@@ -165,8 +165,6 @@ void CW_KeyPollTimerIRQ(void)
 		}
 
 		// Process current state
-		//if(debouncedIsKeyPressed) Sidetone_Key_Down();
-			//		else Sidetone_Key_Up();
 
 		writeKeySampleToKeyBuffer(debouncedIsKeyPressed);
 

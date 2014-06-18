@@ -135,6 +135,7 @@ void RxTx_CheckAndHandlePTT(void)
 	// Special case to handle CW:
 	if (Mode_GetCurrentMode() == MODE_CW) {
 		if (CW_DesiresTransmitMode() && !RxTx_InTxMode()) {
+			Connect_Sidetone_Input();  //  Route the CW Sidetone to Headphones
 			RxTx_SetTransmit();
 			xprintf("To CW Tx\n");
 		}
@@ -201,13 +202,13 @@ void Xmit_SSB_Sequence(void)
 
 void Xmit_CW_Sequence(void)
 {
-	Mute_HP();
+	//Mute_HP();
 	Mute_LO();
 	s_inTxMode = 1;
 	AGC_On = 0;
-	Disconnect_PGA();
-	Connect_Sidetone_Input();  //  Route the CW Sidetone to Headphones
-	Sidetone_Key_Down();
+	//Disconnect_PGA();
+	//Connect_Sidetone_Input();  //  Route the CW Sidetone to Headphones
+	//Sidetone_Key_Down();
 	Set_DAC_DVC(-33); //CW Xmit DAC Gain
 	GPIO_WriteBit(GPIOD, GPIO_Pin_3, Bit_RESET);  //Make PTT_Out Low,Remember FET Inversion
 	Delay(1000);
