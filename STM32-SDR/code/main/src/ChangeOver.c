@@ -43,6 +43,7 @@ const int DEBOUNCE_COUNT_REQUIRED = 30;	// Called from main()
 // Private state variables:
 static _Bool s_isPttPressed = 0;
 static _Bool s_inTxMode = 0;
+static _Bool s_inTransition = 0;
 
 // Private functions:
 static void Receive_Sequence(void);
@@ -140,6 +141,9 @@ void RxTx_CheckAndHandlePTT(void)
 			xprintf("To CW Tx\n");
 		}
 		if (!CW_DesiresTransmitMode() && RxTx_InTxMode()) {
+			s_inTransition = 1;
+			Disconnect_Sidetone_Input();
+			Delay(900000);
 			RxTx_SetReceive();
 			xprintf("To CW Rx\n");
 		}
@@ -150,7 +154,10 @@ _Bool RxTx_IsPttPressed(void)
 {
 	return s_isPttPressed;
 }
-
+_Bool RxTx_InTransion(void)
+{
+	return s_inTransition;
+}
 
 /****************************************
  * Private Functions
@@ -172,14 +179,16 @@ void Receive_Sequence(void)
 	}
 	GPIO_WriteBit(GPIOD, GPIO_Pin_3, Bit_SET);	//Make PTT_Out High, Remember FET Inversion
 	Delay(1000);
-	Disconnect_Sidetone_Input();
-	//Disconnect_PGA();
-	Delay(800000);
+	//Disconnect_Sidetone_Input();
+	//Delay(900000);
+	Disconnect_PGA();
+
 	Connect_IQ_Inputs();
 
 	Set_DAC_DVC(Options_GetValue(OPTION_RX_AUDIO));
 	Set_ADC_DVC(-10);  //was -20 using Milt's AGC scheme
 	Set_HP_Gain(6);
+	s_inTransition = 0;
 	//Init_Waterfall();
 }
 
@@ -206,9 +215,6 @@ void Xmit_CW_Sequence(void)
 	Mute_LO();
 	s_inTxMode = 1;
 	AGC_On = 0;
-	//Disconnect_PGA();
-	//Connect_Sidetone_Input();  //  Route the CW Sidetone to Headphones
-	//Sidetone_Key_Down();
 	Set_DAC_DVC(-33); //CW Xmit DAC Gain
 	GPIO_WriteBit(GPIOD, GPIO_Pin_3, Bit_RESET);  //Make PTT_Out Low,Remember FET Inversion
 	Delay(1000);

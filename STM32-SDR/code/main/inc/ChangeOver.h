@@ -37,6 +37,8 @@ _Bool RxTx_InTxMode(void);
 // Handle Push To Talk
 void RxTx_CheckAndHandlePTT(void);
 _Bool RxTx_IsPttPressed(void);
+//Handle transition TX to RX status
+_Bool RxTx_InTransion(void);
 
 
 #endif /* CHANGEOVER_H_ */

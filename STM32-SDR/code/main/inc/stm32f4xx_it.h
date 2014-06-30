@@ -32,9 +32,9 @@ extern "C" {
 
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
-//Magic Number = 2^36 * f0/fs  where f0 = 500Hz and fs = 100KHz
-#define R 21474836
-//#define R 107374182
+//Magic Number = 2^32 * f0/fs  where f0 = 500Hz and fs = 100KHz
+//#define R 21474836 // 500 Hz
+#define R 23622320
 
 /* Exported macro ------------------------------------------------------------*/
 /* Exported variables ------------------------------------------------------------*/

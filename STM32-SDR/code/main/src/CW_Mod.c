@@ -25,7 +25,7 @@
 #include <assert.h>
 #include "stm32f4xx_tim.h"
 #include "Codec_Gains.h"
-
+#include "ChangeOver.h"
 
 // Create a circular buffer used for reading/writing key samples.
 // Need not match our sampling rate or the DMA rate. Just our data-storage area
@@ -134,6 +134,8 @@ void CW_KeyPollTimerIRQ(void)
 	if (TIM_GetITStatus(TIM3, TIM_IT_Update ) != RESET) {
 		TIM_ClearITPendingBit(TIM3, TIM_IT_Update );
 
+		//if not in transition from xmit to receive
+		if(!RxTx_InTransion()){
 		// Read pin state
 		_Bool isKeyPressed = GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_9) == 0;
 
@@ -164,13 +166,13 @@ void CW_KeyPollTimerIRQ(void)
 			}
 		}
 
-		// Process current state
-
+		// Process current state if not in transition from xmit to receive
 		writeKeySampleToKeyBuffer(debouncedIsKeyPressed);
 
 		// DEBUG: Count interrupts
 		//extern volatile int g_numTimer3Interrupts;
 		//g_numTimer3Interrupts++;
+		}
 	}
 }
 
