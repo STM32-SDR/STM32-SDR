@@ -55,7 +55,7 @@
 #include  	"main.h"
 
 
-#define VERSION_STRING "1.052_STalp"
+#define VERSION_STRING "1.053_ST"
 
 
 extern int NCO_Point;

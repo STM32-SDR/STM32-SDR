@@ -1,13 +1,15 @@
 /*
 
 	STM32F4 Discovery Board linker script
+	
+	Used for setting up the image for bootloader support.
 
 */
 
 MEMORY
 {
-  /* This one for "normal" flash programming*/
-  FLASH		(rx)	: ORIGIN = 0x08000000, LENGTH = 1024K
+  /* This one for "bootloader" programming*/
+  FLASH		(rx)	: ORIGIN = 0x08008000, LENGTH = 992K
   RAMCCM	(xrw)	: ORIGIN = 0x10000000, LENGTH = 64K
   RAM 		(xrw)	: ORIGIN = 0x20000000, LENGTH = 128K
 }

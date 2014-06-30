@@ -9,10 +9,11 @@
 #
 # make clean = Clean project files.
 #
-# To rebuild project do "make clean" and "make all".
+# To rebuild project for "normal" flash programming do "make clean" and "make all".
+# To rebuild project for bootloading do "make clean" and "make bootloadable" 
 #
 # Included originally in the yagarto projects. Original Author : Michael Fischer
-# Modified to suit our purposes by Hussam Al-Hertani
+# Modified to suit our purposes by Hussam Al-Hertani, and then by Brian Fraser
 # Use at your own risk!!!!!
 #
 #	Modified by KB4FXC, 2012/08/23, to use static libraries rather
@@ -56,10 +57,18 @@ DLIBS =
 #
 # Define project name and Ram/Flash mode here
 PROJECT        = STM32-SDR
+PROJECT_BL     = STM-SDR-BootloadImage
+bootloadable: PROJECT = $(PROJECT_BL)
+
 RUN_FROM_FLASH = 1
+
+# Define the base address for the software; 0x80080000 for bootloader.
+BASE_ADDRESS = 0x08000000
+bootloadable: BASE_ADDRESS = 0x08008000	
+
  
 # List all user C define here, like -D_DEBUG=1
-UDEFS = 
+UDEFS = -DBASE_ADDRESS=$(BASE_ADDRESS)
  
 # Define ASM defines here
 UADEFS =
@@ -133,11 +142,13 @@ DIRS := $(subst \.\,\,$(DIRS_TMP))
 #
 # Define linker script file here
 #
-ifeq ($(RUN_FROM_FLASH), 0)
+# Choose the script based on if we need normal flash programming, or bootloader support.
 LDSCRIPT = $(LINKER)/stm32f407vg.ld
+bootloadable: LDSCRIPT = $(LINKER)/stm32f407vg-bootloadable.ld
+
+ifeq ($(RUN_FROM_FLASH), 0)
 FULL_PRJ = $(PROJECT)_ram
 else
-LDSCRIPT = ./linker/stm32f407vg.ld
 FULL_PRJ = $(PROJECT)_rom
 endif
  
@@ -166,8 +177,32 @@ CPFLAGS += -MD -MP -MF .dep/$(@F).d
 #
 # makefile rules
 #
+bootloadable: normal_build
+	@echo *********************************************************************************
+	@echo *                                 WARNING!
+	@echo *********************************************************************************
+	@echo *
+	@echo * If you switched from building for flash programming to building for bootloader 
+	@echo * programming without doing a 'clean', then the built image will not run.
+	@echo * 
+	@echo * Start with a 'make clean', then do a 'make bootloadable'
+	@echo *
+	@echo *********************************************************************************
+	
+all: normal_build
+	@echo *********************************************************************************
+	@echo *                                 WARNING!
+	@echo *********************************************************************************
+	@echo *
+	@echo * If you switched from building for bootloader programming to building for flash 
+	@echo * programming without doing a 'clean', then the built image will not run.
+	@echo * 
+	@echo * Start with a 'make clean', then do a 'make all'
+	@echo *
+	@echo *********************************************************************************
 
-all: dirs $(OBJS) $(FULL_PRJ).elf  $(FULL_PRJ).hex $(FULL_PRJ).bin
+
+normal_build: dirs $(OBJS) elfhexbin
 ifeq ($(RUN_FROM_FLASH), 0)
 	$(TRGT)size $(PROJECT)_ram.elf
 else
@@ -184,15 +219,11 @@ $(OBJDIR)\\%.o: %.c
 $(OBJDIR)\\%.o: %.s
 	$(AS) -c $(ASFLAGS) $< -o $@
 
-%elf: $(OBJS)
-	$(CC) $(OBJS) $(LDFLAGS) $(LIBS) -o $@
+elfhexbin: $(OBJS)
+	$(CC) $(OBJS) $(LDFLAGS) $(LIBS) -o $(FULL_PRJ).elf
+	$(HEX) $(FULL_PRJ).elf $(FULL_PRJ).hex
+	$(BIN) $(FULL_PRJ).elf $(FULL_PRJ).bin
 
-%hex: %elf
-	$(HEX) $< $@
-	
-%bin: %elf
-	$(BIN)  $< $@
-	
 unixclean:
 	# CAUTION: NOT UPDATED!
 	# If building on a Linux box, or using different version of make, you may need
@@ -214,6 +245,10 @@ clean:
 	-del $(FULL_PRJ).map
 	-del $(FULL_PRJ).hex
 	-del $(FULL_PRJ).bin
+	-del $(PROJECT_BL)_rom.elf
+	-del $(PROJECT_BL)_rom.map
+	-del $(PROJECT_BL)_rom.hex
+	-del $(PROJECT_BL)_rom.bin
 	-del $(SRC:.c=.c.bak)
 	-del $(ASRC:.s=.s.bak)
 	-rmdir .dep /S /Q
@@ -236,7 +271,5 @@ dump:
 	$(CC) --version
 	@echo Your make version:
 	make --version
- 
-
 
 # *** EOF ***
