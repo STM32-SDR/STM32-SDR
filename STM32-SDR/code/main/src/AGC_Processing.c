@@ -52,6 +52,7 @@ float	PGA_Coeff;
 float   FPGA_Coeff;
 int		AGC_Signal;
 int		Old_AGC_Signal;
+int 	shape = 3; 		// Mode 0 (CW)  time constant shaping:  decay * shape and attack / shape
 
 // Original SDR2GO Various Time Constants
 //const float PGA_TC_Slow = .5; 	//Time constant for slow PGA decay
@@ -153,11 +154,19 @@ void Calc_AGC_Setpoints(void) {
 
 void Init_AGC (void)			{
 
-		PGA_Coeff = dt*(BUFFERSIZE/2)/PGA_TC_Slow;
+		PGA_Coeff =dt*(BUFFERSIZE/2)/PGA_TC_Slow;
 		FPGA_Coeff = dt*(BUFFERSIZE/2)/PGA_TC_Fast;
 
 		AGC_Coeff = dt*(BUFFERSIZE/2)/AGC_TC_Slow;
 		AGCF_Coeff = dt*(BUFFERSIZE/2)/AGC_TC_Fast;
+
+		// Mode 0 CW shaping  JDG
+		if (AGC_Mode == 0)
+			{PGA_Coeff *= shape;
+			FPGA_Coeff /= (shape/2);
+			AGC_Coeff *= shape;
+			AGCF_Coeff /= (shape/2);
+			}
 
 		R_AGC_Coeff = 1 - AGC_Coeff;
 		R_AGCF_Coeff = 1 - AGCF_Coeff;
