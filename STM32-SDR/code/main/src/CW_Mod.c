@@ -67,6 +67,7 @@ void CW_Init(void)
 
 void initCwGPIO(void)
 {
+	debug(INIT, "initCwGPIO:\n");
 	GPIO_InitTypeDef GPIO_InitStructure;
 
 	/* Enable GPIOC clock */
@@ -84,6 +85,7 @@ void initCwGPIO(void)
 // Setup the timer interrupt
 static void initCwTimerInterrupt(void)
 {
+	debug(INIT, "initCwGPIO:NVIC\n");
 	NVIC_InitTypeDef NVIC_InitStructure;
 
 	/* Enable the TIM3 global Interrupt */
@@ -96,6 +98,7 @@ static void initCwTimerInterrupt(void)
 	/* TIM3 clock enable */
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
 
+	debug(INIT, "initCwGPIO:TIM_TimeBase\n");
 	/* Time base configuration */
 	TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
 	TIM_TimeBaseStructure.TIM_Period = 1000 - 1; // 1 MHz down to 1 KHz (1 ms)
@@ -104,9 +107,10 @@ static void initCwTimerInterrupt(void)
 	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
 	TIM_TimeBaseInit(TIM3, &TIM_TimeBaseStructure);
 
+	debug(INIT, "initCwGPIO:TIM_ITConfig\n");
 	/* TIM IT enable */
 	TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE);
-
+	debug(INIT, "initCwGPIO:Enable\n");
 	/* TIM3 enable counter */
 	TIM_Cmd(TIM3, ENABLE);
 }
@@ -163,7 +167,6 @@ void CW_KeyPollTimerIRQ(void)
 		//g_numTimer3Interrupts++;
 	}
 }
-
 
 _Bool CW_DesiresTransmitMode(void)
 {

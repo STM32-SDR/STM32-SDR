@@ -63,7 +63,7 @@ void ScreenAdvanced_Create(void)
 	/*
 	 * Create the UI widgets
 	 */
-	GL_PageControls_TypeDef* lblTitle = Widget_NewLabel("Advanced", LCD_COLOR_WHITE, LCD_COLOR_BLACK, 0, GL_FONTOPTION_12x12, 0);
+	GL_PageControls_TypeDef* lblTitle = Widget_NewLabel("Advanced", LCD_COLOR_WHITE, LCD_COLOR_BLACK, 0, GL_FONTOPTION_16x24, 0);
 	GL_PageControls_TypeDef* lblDirections1 = Widget_NewLabel("Tap to select", LCD_COLOR_WHITE, LCD_COLOR_BLACK, 0, GL_FONTOPTION_8x12Bold, 0);
 	GL_PageControls_TypeDef* lblDirections2 = Widget_NewLabel("setting changes value", LCD_COLOR_WHITE, LCD_COLOR_BLACK, 0, GL_FONTOPTION_8x12Bold, 0);
 	s_lblStatus = Widget_NewLabel("Tap setting to exit", LCD_COLOR_WHITE, LCD_COLOR_BLACK, 0, GL_FONTOPTION_8x12Bold, 0);
@@ -129,4 +129,3 @@ static void defaults_Click(GL_PageControls_TypeDef* pThis)
 static void calibrate_Click(GL_PageControls_TypeDef* pThis) {
 	Screen_ShowScreen(&g_screenCalibrate);
 }
-

@@ -23,9 +23,13 @@
 #include <assert.h>
 #include "DMA_IRQ_Handler.h"
 #include "ChangeOver.h"
+#include "widgets.h"
 
 extern double NCO_Frequency;
 extern int NCOTUNE;
+extern int WF_Flag;
+extern void Screen_PSK_SetTune(void);
+extern int NCO_Point;
 
 typedef struct
 {
@@ -86,6 +90,14 @@ static ModeStruct s_modeData[] = {
 		/*Side*/ SIDEBAND_LSB,
 		/*NCO*/  1500.
 	},
+	{
+		/*Name*/ "Tune ",
+		/*Desc*/ "Carrier of 1kHz USB tone",
+		/*Usr */ USERMODE_TUNE,
+		/*Mode*/ MODE_PSK,
+		/*Side*/ SIDEBAND_USB,
+		/*NCO*/  1000.
+	},
 };
 
 static ModeStruct* s_pCurrentMode = &s_modeData[USERMODE_USB];
@@ -123,6 +135,32 @@ void Mode_SetCurrentMode(UserModeType newMode)
 
 	NCO_Frequency = s_pCurrentMode->DefaultNCO;
 
+	switch (newMode) {
+		case USERMODE_LSB:
+		case USERMODE_USB:
+		case USERMODE_CW:
+		case USERMODE_CWR:
+			RxTx_SetReceive();
+			WF_Flag = 0;
+			break;
+		case USERMODE_DIGU:
+		case USERMODE_DIGL:
+			RxTx_SetReceive();
+			WF_Flag = 1;
+			NCOTUNE = 1;
+			Screen_PSK_SetTune(); //move to up arrow on tune button
+			break;
+		case USERMODE_TUNE:
+			WF_Flag = 0;
+			NCOTUNE = 1;
+			Screen_PSK_SetTune(); //move to up arrow on tune button
+			NCO_Point = 55; //Position for 1kHz
+			RxTx_SetTransmit();
+			break;
+		default:
+			break;
+	}
+	Init_Waterfall();
 }
 
 // Query current state:

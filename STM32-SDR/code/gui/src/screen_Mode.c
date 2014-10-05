@@ -30,7 +30,7 @@
 static GL_Page_TypeDef *s_pThisScreen = &g_screenMode;
 
 #define ID_MODEBTN_START    100
-#define FIRST_BUTTON_Y       60
+#define FIRST_BUTTON_Y       30
 #define SPACE_PER_BUTTON_Y   30
 #define BUTTON_LEFT           0
 #define LABEL_LEFT           60
@@ -53,9 +53,9 @@ void ScreenMode_Create(void)
 	 * Create the title and directions texts
 	 */
 	GL_PageControls_TypeDef* lblTitle = Widget_NewLabel("Mode Selection", LCD_COLOR_WHITE, LCD_COLOR_BLACK, 0, GL_FONTOPTION_16x24, 0);
-	GL_PageControls_TypeDef* lblDirections = Widget_NewLabel("Tap button for desired mode.", LCD_COLOR_BLUE, LCD_COLOR_BLACK, 0, GL_FONTOPTION_8x12Bold, 0);
-	AddPageControlObj(0,     10, lblTitle,     s_pThisScreen);
-	AddPageControlObj(0,     35, lblDirections,     s_pThisScreen);
+//	GL_PageControls_TypeDef* lblDirections = Widget_NewLabel("Tap button for desired mode.", LCD_COLOR_BLUE, LCD_COLOR_BLACK, 0, GL_FONTOPTION_8x12Bold, 0);
+	AddPageControlObj(0, 0, lblTitle,     s_pThisScreen);
+//	AddPageControlObj(0,     35, lblDirections,     s_pThisScreen);
 
 	// Populate the Mode buttons and descriptions:
 	for (int i = 0; i < USERMODE_NUM_MODES; i++) {

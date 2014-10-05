@@ -27,8 +27,11 @@
 #include "AGC_Processing.h"
 #include "xprintf.h"
 #include "ScrollingTextBox.h"
+#include "Text_Enter.h"
+#include "xprintf.h"
 
-extern 	int WF_Flag;
+
+//extern 	int WF_Flag;
 extern 	int FilterNumber;
 volatile int g_numDMAInterrupts = 0;
 volatile int g_numTimer3Interrupts = 0;
@@ -45,11 +48,13 @@ static GL_PageControls_TypeDef* pFiltLabel;
 /**
  * Call-back prototypes
  */
-static void WS_Click(GL_PageControls_TypeDef* pThis);
+//static void WS_Click(GL_PageControls_TypeDef* pThis);
 //static void TR_Click(GL_PageControls_TypeDef* pThis);
 //static void testButton_Click(GL_PageControls_TypeDef* pThis);
 
 //extern void ClearTextDisplay(void);
+
+static void Screen_TextButtonClick(GL_PageControls_TypeDef* pThis);
 
 // following 4 functions added by MEC
 static _Bool AGCStatusUpdateHandler(GL_PageControls_TypeDef* pThis, _Bool forceRedisplay)
@@ -114,7 +119,6 @@ static _Bool DACUpdateHandler(GL_PageControls_TypeDef* pThis, _Bool forceRedispl
 	 return 0;
 }
 
-
 static _Bool RSLUpdateHandler(GL_PageControls_TypeDef* pThis, _Bool forceRedisplay){
 	return 0;
 }
@@ -142,19 +146,19 @@ void ScreenMainCW_Create(void)
 	AddPageControlObj(0, 0, btnMode, s_pThisScreen);
 	// .. Options
 	GL_PageControls_TypeDef* btnOptions = Widget_NewBigButtonOptions();
-	AddPageControlObj(0, LCD_HEIGHT - 42, btnOptions, s_pThisScreen);
+	AddPageControlObj(0, LCD_HEIGHT - 54, btnOptions, s_pThisScreen);
 	// .. Frequency
 	GL_PageControls_TypeDef* btnFreq = Widget_NewBigButtonFrequency();
 	AddPageControlObj(
 			LCD_WIDTH - ((GL_Custom_TypeDef*)(btnFreq->objPTR))->GetWidth(btnFreq),
-			LCD_HEIGHT - ((GL_Custom_TypeDef*)(btnFreq->objPTR))->GetHeight(btnFreq),
+			LCD_HEIGHT - 12 - ((GL_Custom_TypeDef*)(btnFreq->objPTR))->GetHeight(btnFreq),
 			btnFreq, s_pThisScreen);
 
 	// .. Rx & Tx buttons (Remove when code can automatically switch)
-//	GL_PageControls_TypeDef* btnTR  = NewButton(10, "Tx/Rx", TR_Click);
-	GL_PageControls_TypeDef* btnWS  = NewButton(9,  "Wf/Sp", WS_Click);
-//	AddPageControlObj(100, LCD_HEIGHT - 42, btnTR, s_pThisScreen);
-	AddPageControlObj(170, LCD_HEIGHT - 42, btnWS, s_pThisScreen);
+	//GL_PageControls_TypeDef* btnTR  = NewButton(10, "Tx/Rx", TR_Click);
+	//GL_PageControls_TypeDef* btnWS  = NewButton(9,  "Wf/Sp", WS_Click);
+	//AddPageControlObj(100, LCD_HEIGHT - 42, btnTR, s_pThisScreen);
+	//AddPageControlObj(170, LCD_HEIGHT - 42, btnWS, s_pThisScreen);
 
 	// following 4 sections added by MEC
 	//AGC Mode Label
@@ -178,23 +182,40 @@ void ScreenMainCW_Create(void)
 		pFiltLabel = Widget_NewLabel("F0", LCD_COLOR_YELLOW, LCD_COLOR_BLACK, 0, GL_FONTOPTION_8x16,FilterStatusUpdateHandler);
 		AddPageControlObj(52, 12, pFiltLabel, s_pThisScreen);
 
+	// Programmable buttons
+		for (int i = 0; i < Prog_PSK1 - Prog_CW1; i++) {
+			static GL_PageControls_TypeDef* btnText;
+			btnText = NewButton(250 + Prog_CW1 + i, Text_GetName(i + Prog_CW1), Screen_TextButtonClick);
+			int x = (i / 2) * 70 + 95;
+			int y = (i % 2) * 25 + LCD_HEIGHT - 55 ;
+			AddPageControlObj(x, y, btnText, s_pThisScreen);
+		}
 
 	// Just for testing
 //	GL_PageControls_TypeDef* btnTest  = NewButton(11,  " Test ", testButton_Click);
 //	AddPageControlObj(0, 150, btnTest, s_pThisScreen);
+
 }
 
 
 /**
  * Button callbacks
  */
+
+static void Screen_TextButtonClick(GL_PageControls_TypeDef* pThis)
+{
+	debug(GUI, "Screen_TextButtonClick:\n");
+	uint16_t id = pThis->ID - 250;
+	compose_Text (id);
+}
+
+/*
 #include "ChangeOver.h"
 static void WS_Click(GL_PageControls_TypeDef* pThis)
 {
 	WF_Flag = !WF_Flag;
 	if (WF_Flag) Init_Waterfall();
 }
-/*
 static void TR_Click(GL_PageControls_TypeDef* pThis)
 {
 	if (RxTx_InTxMode()){
@@ -205,7 +226,6 @@ static void TR_Click(GL_PageControls_TypeDef* pThis)
 		RxTx_SetTransmit();
 	}
 }
-
 static void testButton_Click(GL_PageControls_TypeDef* pThis)
 {
 	// Grab the values to prevent UART timing from affecting the count.

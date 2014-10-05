@@ -23,6 +23,9 @@
 #include "screen_All.h"
 #include <assert.h>
 #include "FrequencyManager.h"
+#include "xprintf.h"
+
+extern void Screen_FreqDone(void);
 
 #define TEXT_HEIGHT_PER_CHAR 12
 #define TEXT_WIDTH_PER_CHAR  8
@@ -62,19 +65,28 @@ GL_PageControls_TypeDef* Widget_NewBigButtonFrequency(void)
  */
 static void insideEventHandler(GL_PageControls_TypeDef* pThis, int relX, int relY)
 {
-	if (Screen_GetScreenMode() == FILTER)
-	{
-
+	debug(GUI, "Widget_NewBigButtonFrequency:insideEventHandler:\n");
 	_Bool touchLeftHalf = relX < INSIDE_WIDTH / 2;
-	if (touchLeftHalf) {
-		FrequencyManager_IncreaseFreqStepSize();
+	switch (Screen_GetScreenMode()){
+		case FILTER:
+			if (touchLeftHalf) {
+				FrequencyManager_IncreaseFreqStepSize();
+			}
+			else {
+				FrequencyManager_DecreaseFreqStepSize();
+			}
+			break;
+
+		case FREQUENCY:
+		case FREQEDIT:
+			Screen_FreqDone();
+			break;
+
+		default:
+			Screen_SetScreenMode(FREQUENCY);
+			Screen_ShowScreen(&g_screenFrequencies);
+			break;
 	}
-	else {
-		FrequencyManager_DecreaseFreqStepSize();
-	}
-	}
-	else
-		Screen_ShowScreen(&g_screenFrequencies);
 }
 
 static void insideDrawHandler(GL_PageControls_TypeDef* pThis, _Bool force, int relX, int relY)
@@ -101,7 +113,7 @@ static void insideDrawHandler(GL_PageControls_TypeDef* pThis, _Bool force, int r
 		int writeX = relX + OFFSETX_TEXT;
 		int writeY = relY + OFFSETY_BAND;
 
-		GL_PrintString(writeX, writeY, FrequencyManager_GetBandName(FrequencyManager_GetSelectedBand()), 0);
+		GL_PrintString(writeX, writeY, FrequencyManager_DisplayBandName(FrequencyManager_GetSelectedBand()), 0);
 		previousBand = curBand;
 	}
 

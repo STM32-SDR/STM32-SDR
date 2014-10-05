@@ -27,6 +27,9 @@
 #include 	"PSKDet.h"
 #include 	"PSKMod.h"
 #include 	"PSK_TX_ShapeTable.h"
+#include	"STM32-SDR-Subroutines.h"
+#include	"xprintf.h"
+#include	"ModeSelect.h"
 
 #define TXTOG_CODE 1
 
@@ -56,6 +59,8 @@ void Update_PSK(void)
 	static int Itbl_num, Qtbl_num;  //chhstatic
 	static int m_PresentPhase; //chhstatic
 
+	int tempdata;
+
 	S1 = PSKShapeTbl[Itbl_num * 256 + m_Ramp + 1];
 	S2 = PSKShapeTbl[Qtbl_num * 256 + m_Ramp + 1];
 
@@ -64,7 +69,12 @@ void Update_PSK(void)
 	if (m_Ramp == 256) {
 		m_Ramp = 0;
 		uint8_t symbol = GetNextBPSKSymbol();
-		int tempdata = PSKPhaseLookupTable[symbol][m_PresentPhase];
+//		xprintf("mode = %d, %c", Mode_GetCurrentUserMode(), Mode_GetCurrentUserModeName());
+		if (Mode_GetCurrentUserMode() == USERMODE_TUNE)
+			tempdata = 0x110;
+		else
+			tempdata = PSKPhaseLookupTable[symbol][m_PresentPhase];
+
 		Itbl_num = (tempdata & 0x700) >> 8;
 		Qtbl_num = (tempdata & 0x070) >> 4;
 		m_PresentPhase = (tempdata & 0x7);
@@ -153,6 +163,7 @@ char GetTxChar(void)
 	char ch;
 
 	if(!PSK_isQueueEmpty())	{
+		if (XmitBuffer[0] != 0x1B) { // check for macro escape sequence
 		ch = XmitBuffer[0] & 0x00FF;
 		// Shift contents left one character
 		for (int i = 0; i < m_pTail; i++)
@@ -162,6 +173,25 @@ char GetTxChar(void)
 		for(int i = m_pTail; i < PSK_TX_BUFFER_SIZE - 2; i++)
 			XmitBuffer[i] = ' ';
 		m_pTail--;
+
+		} else {
+
+			if (XmitBuffer[1] == 0x08){ // Receive mode macro
+				debug(KEYBOARD, "Rx macro detected during PSK transmission\n");
+				// Shift contents left two characters
+				for (int i = 0; i < m_pTail; i++)
+					XmitBuffer[i] = XmitBuffer[i+2];
+				// Put spaces in remaining empty spaces
+				for(int i = m_pTail-1; i < PSK_TX_BUFFER_SIZE - 2; i++)
+					XmitBuffer[i] = ' ';
+				m_pTail-=2;
+
+				PlayMacro (0x08);
+				ch = TXTOG_CODE;
+			} else {
+				ch = ' ';
+			}
+		}
 	}
 	else
 		ch = TXTOG_CODE;		/* if que is empty return TXTOG_CODE */

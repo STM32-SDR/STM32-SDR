@@ -97,8 +97,6 @@ GL_PageControls_TypeDef* NewButton (uint16_t ID, const char* label,
                                     
 GL_PageControls_TypeDef* NewCheckbox (uint16_t ID, const char* label,
                                        void (*pEventHandler)(void));
-
-void ChangeButtonText(GL_Page_TypeDef* pPage, uint16_t ID, const char* label);
                                        
 GL_PageControls_TypeDef* NewSwitch (uint16_t ID, const char* label_1, const char* label_2,
                                     void (*pEventHandler)(void));

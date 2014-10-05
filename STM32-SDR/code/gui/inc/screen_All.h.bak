@@ -63,14 +63,12 @@
 #include "graphicObject.h"
 #include "LcdHal.h"
 
-// screen modes
+// Option screen modes
 #define MAIN 0
 #define OPTIONS 1
 #define ADVANCED 2
 #define FILTER 3
 #define FUNCTION 4
-#define FREQUENCY 5
-#define FREQEDIT 6
 
 // Screen global variables (defined in screen_all.c) for switching screens
 // ## Add new screens here:
@@ -85,8 +83,6 @@ extern GL_Page_TypeDef g_screenAdvanced;
 extern GL_Page_TypeDef g_screenFilter;
 extern GL_Page_TypeDef g_screenFrequencies;
 extern GL_Page_TypeDef g_screenEditText;
-extern GL_Page_TypeDef g_screenEditProgText;
-extern GL_Page_TypeDef g_screenEditTagText;
 
 // Screen creation routines (in screen_XYZ.c)
 // ## Add creation routines for all screens here
@@ -102,15 +98,6 @@ void ScreenFilter_Create(void);
 void ScreenRefreshFilter(int);
 void ScreenFrequencies_Create(void);
 void ScreenEditText_Create(void);
-void ScreenEditTagText_Create(void);
-void ScreenEditProgText_Create(void);
-void Screen_TextDone(void);
-void Screen_TagDone(void);
-void Screen_ChangeButtonTextLabel(int i);
-void Screen_ChangeButtonTagLabel(int i);
-void Screen_ChangeButtonProgLabel(int i);
-void Screen_ChangeButtonFreqLabel(int i);
-//static void Screen_TextButtonClick(GL_PageControls_TypeDef* pThis);
 
 // Screen access functions:
 void Screen_CreateAllScreens(void);
@@ -119,7 +106,6 @@ void Screen_ShowMainScreen(void);
 
 // void Screen_done(GL_PageControls_TypeDef* pThis);
 void Screen_Done(void);
-void Screen_FreqDone(void);
 
 int Screen_GetFilterCodeID(void);
 int Screen_GetFilterFreqID(void);

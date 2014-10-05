@@ -92,7 +92,6 @@ _Bool RxTx_InTxMode(void)
 	return s_inTxMode;
 }
 
-
 // Handle Push To Talk
 void RxTx_CheckAndHandlePTT(void)
 {

@@ -2,7 +2,6 @@
 
 void ToggleRxTx( void);
 void ToggleWaterfall( void);
-void ChangeMode(int userMode);
 void PlayMacro( int n);
 void RecordMacro( int n);
 void ClearMacro( int n);
@@ -24,4 +23,3 @@ void Sel_Filt4 ( void );
 void Sel_Filt5 ( void );
 void No_Filt ( void );
 extern void SetRXFrequency(double freq);
-void SetFrequency(char *string);

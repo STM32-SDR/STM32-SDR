@@ -24,6 +24,7 @@
 #include	"stm32f4xx_rcc.h"
 #include 	"stm32f4xx_i2c.h"
 #include 	"Init_I2C.h"
+#include	"xprintf.h"
 
 void I2C_GPIO_Init(void)
 {
@@ -307,6 +308,13 @@ uint32_t I2C_WriteEEProm(uint16_t RegisterAddr, uint8_t RegisterValue)
 {
 	uint32_t result = 0;
 
+	// check to see if writing is necessary
+	uint8_t temp = (uint8_t) I2C_ReadEEProm(RegisterAddr);
+	if (temp != RegisterValue){
+
+		debug(GUI, "I2C_WriteEEProm\n");
+
+
 	/*!< While the bus is busy */
 	__IO uint32_t Timeout = I2C_SHORT_TIMEOUT;
 	while (I2C_GetFlagStatus(I2C1, I2C_FLAG_BUSY )) {
@@ -368,7 +376,7 @@ uint32_t I2C_WriteEEProm(uint16_t RegisterAddr, uint8_t RegisterValue)
 	I2C_GenerateSTOP(I2C1, ENABLE);
 
 	Delay(100000); //hopefully around 5 msec???
-
+	}
 	/* Return the verifying value: 0 (Passed) or 1-5 (Failed) */
 	return result;
 }

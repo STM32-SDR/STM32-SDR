@@ -30,9 +30,10 @@
 #include "ScrollingTextBox.h"
 #include "KeyboardStatus.h"
 #include "AGC_Processing.h"
+#include "xprintf.h"
 
 extern 	int	NCOTUNE;
-extern 	int WF_Flag;
+//extern 	int WF_Flag;
 extern 	int FilterNumber;
 
 // Used in this file to refer to the correct screen (helps to keep code copy-paste friendly.
@@ -43,16 +44,17 @@ static GL_PageControls_TypeDef* pPGALabel;
 static GL_PageControls_TypeDef* pDACLabel;
 static GL_PageControls_TypeDef* pRSLLabel;
 static GL_PageControls_TypeDef* pFiltLabel;
-static GL_PageControls_TypeDef* pNCOLabel;
+//static GL_PageControls_TypeDef* pNCOLabel;
 
 /**
  * Call-back prototypes
  */
-static void WS_Click(GL_PageControls_TypeDef* pThis);
+static void Screen_TextButtonClick(GL_PageControls_TypeDef* pThis);
+//static void WS_Click(GL_PageControls_TypeDef* pThis);
 static void TR_Click(GL_PageControls_TypeDef* pThis);
 static void N_Click(GL_PageControls_TypeDef* pThis);
 static void C_Click(GL_PageControls_TypeDef* pThis);
-static void Clear_Click(GL_PageControls_TypeDef* pThis);
+//static void Clear_Click(GL_PageControls_TypeDef* pThis);
 
 static _Bool KeyboardStatusUpdateHandler(GL_PageControls_TypeDef* pThis, _Bool forceRedisplay)
 {
@@ -139,18 +141,18 @@ static _Bool RSLUpdateHandler(GL_PageControls_TypeDef* pThis, _Bool forceRedispl
 	return 0;
 }
 
-
+/*
 static _Bool NCOUpdateHandler(GL_PageControls_TypeDef* pThis, _Bool forceRedisplay){
 
 	if (NCOTUNE) {
-		Widget_ChangeLabelText(pNCOLabel, "N");
+		Widget_ChangeLabelText(pNCOLabel, "^");
 	}
 	else {
 		Widget_ChangeLabelText(pNCOLabel, "V");
 	}
 	return 0;
 }
-
+*/
 
 /**
  * Create the screen
@@ -183,7 +185,7 @@ void ScreenMainPSK_Create(void)
 
 	// Keyboard status
 	pKeyboardLabel = Widget_NewLabel("Your keyboard...", LCD_COLOR_YELLOW, LCD_COLOR_BLACK, 0, GL_FONTOPTION_8x8,KeyboardStatusUpdateHandler);
-	AddPageControlObj(115,  228, pKeyboardLabel, s_pThisScreen);
+	AddPageControlObj(110, LCD_HEIGHT - 40, pKeyboardLabel, s_pThisScreen);
 
 	//AGC Mode Label
 	pAGCLabel = Widget_NewLabel("AGC_Mode ", LCD_COLOR_YELLOW, LCD_COLOR_BLACK, 0, GL_FONTOPTION_8x16,AGCStatusUpdateHandler);
@@ -207,36 +209,51 @@ void ScreenMainPSK_Create(void)
 	AddPageControlObj(52, 12, pFiltLabel, s_pThisScreen);
 
 	//NCO label
-	pNCOLabel = Widget_NewLabel("V", LCD_COLOR_YELLOW, LCD_COLOR_BLACK, 0, GL_FONTOPTION_8x16,NCOUpdateHandler);
-	AddPageControlObj(155, 204, pNCOLabel, s_pThisScreen);
-
-
+//	pNCOLabel = Widget_NewLabel("V", LCD_COLOR_YELLOW, LCD_COLOR_BLACK, 0, GL_FONTOPTION_8x16,NCOUpdateHandler);
+//	AddPageControlObj(LCD_WIDTH - 12, 177, pNCOLabel, s_pThisScreen);
 
 	// .. Rx & Tx buttons (Remove when code can automatically switch)
-	GL_PageControls_TypeDef* btnFT  = NewButton(10, "Tune ", TR_Click);
-	GL_PageControls_TypeDef* btnWS  = NewButton(9,  "Wf/Sp", WS_Click);
+	GL_PageControls_TypeDef* btnFT  = NewButton(10, "Tune ^ ", TR_Click);
+//	GL_PageControls_TypeDef* btnWS  = NewButton(9,  "Wf/Sp", WS_Click);
 	GL_PageControls_TypeDef* btnN  = NewButton(13,  "NM ", N_Click);
 	GL_PageControls_TypeDef* btnC  = NewButton(14,  "CS ", C_Click);
-	GL_PageControls_TypeDef* btnClear  = NewButton(16,  " Clear ", Clear_Click);
+//	GL_PageControls_TypeDef* btnClear  = NewButton(16,  " Clear ", Clear_Click);
 
 
-	AddPageControlObj(100, LCD_HEIGHT - 42, btnFT, s_pThisScreen);
-	AddPageControlObj(170, LCD_HEIGHT - 42, btnWS, s_pThisScreen);
+	AddPageControlObj(255, 170, btnFT, s_pThisScreen);
+//	AddPageControlObj(170, LCD_HEIGHT - 42, btnWS, s_pThisScreen);
 	AddPageControlObj(126,   170, btnN, s_pThisScreen);
 	AddPageControlObj(0, 170, btnC, s_pThisScreen);
-	AddPageControlObj(255, 170, btnClear, s_pThisScreen);
+//	AddPageControlObj(255, 170, btnClear, s_pThisScreen);
+
+	// Programmable buttons
+		for (int i = 0; i < Text_Items - Prog_PSK1; i++) {
+			static GL_PageControls_TypeDef* btnText;
+			btnText = NewButton(250 + Prog_PSK1 + i, Text_GetName(i + Prog_PSK1), Screen_TextButtonClick);
+			int x = i * 70 + 95;
+//			int y = (i % 2) * 25 + LCD_HEIGHT - 55 ;
+			int y = LCD_HEIGHT - 30 ;
+			AddPageControlObj(x, y, btnText, s_pThisScreen);
+		}
+
 }
 
+void Screen_PSK_SetTune (void){
+	if (Screen_GetScreenMode() == MAIN)
+		ChangeButtonText(s_pThisScreen, 10, "Tune ^ ");
+}
 
 /**
  * Button callbacks
  */
 #include "ChangeOver.h"
+/*
 static void WS_Click(GL_PageControls_TypeDef* pThis)
 {
 	WF_Flag = !WF_Flag;
 	if (WF_Flag) Init_Waterfall();
 }
+*/
 static void TR_Click(GL_PageControls_TypeDef* pThis)
 {
 	/*if (RxTx_InTxMode()){
@@ -247,6 +264,10 @@ static void TR_Click(GL_PageControls_TypeDef* pThis)
 		RxTx_SetTransmit();
 	} */
 	NCOTUNE = !NCOTUNE;
+	if (NCOTUNE)
+		ChangeButtonText(s_pThisScreen, 10, "Tune ^ ");
+	else
+		ChangeButtonText(s_pThisScreen, 10, "Tune v ");
 }
 
 
@@ -263,11 +284,16 @@ static void C_Click(GL_PageControls_TypeDef* pThis)
 	Contact_Clear(0);
 	text_cnt = 0;
 }
-
+/*
 static void Clear_Click(GL_PageControls_TypeDef* pThis)
 {
 	ClearXmitBuffer();
 
 }
-
-
+*/
+static void Screen_TextButtonClick(GL_PageControls_TypeDef* pThis)
+{
+	debug(GUI, "Screen_TextButtonClick:\n");
+	uint16_t id = pThis->ID - 250;
+	compose_Text (id);
+}

@@ -28,10 +28,11 @@
 //#include <assert.h>
 
 // Used in this file to refer to the correct screen (helps to keep code copy-paste friendly.
-static GL_Page_TypeDef *s_pThisScreen = &g_screenEditText;
+static GL_Page_TypeDef *s_pThisScreen = &g_screenEditProgText;
 
 static GL_PageControls_TypeDef* s_lblStatus1;
 static GL_PageControls_TypeDef* s_lblStatus2;
+static GL_PageControls_TypeDef* s_lblStatus3;
 
 #define TRUE 1
 #define FALSE 0
@@ -47,12 +48,13 @@ static void tagEditButton_Click(GL_PageControls_TypeDef* pThis);
 //static void store_Click(GL_PageControls_TypeDef* pThis);
 static void done_Click(GL_PageControls_TypeDef* pThis);
 //static void edit_Click(GL_PageControls_TypeDef* pThis);
+void Screen_ProgDone(void);
 static void clearLabel(void);
 static void resetLabel(void);
 
-#define ID_TEXT_START      200
-#define FIRST_BUTTON_Y       0
-#define SPACE_PER_BUTTON_Y   35
+#define ID_TEXT_START      300
+#define FIRST_BUTTON_Y       16
+#define SPACE_PER_BUTTON_Y   32
 #define LEFT_COL_X           0
 #define COLUMN_WIDTH         60
 #define BUTTONS_PER_COLUMN   4
@@ -60,7 +62,7 @@ static void resetLabel(void);
 /**
  * Create the screen
  */
-void ScreenEditText_Create(void)
+void ScreenEditProgText_Create(void)
 {
 	debug(GUI, "ScreenEditText_Create:\n");
 	Create_PageObj(s_pThisScreen);
@@ -70,18 +72,18 @@ void ScreenEditText_Create(void)
 	 */
 
 	s_lblStatus1 = Widget_NewLabel("Press to Edit.", LCD_COLOR_WHITE, LCD_COLOR_BLACK, 0, GL_FONTOPTION_8x12Bold, 0);
-	s_lblStatus2 = Widget_NewLabel("Keyboard Functions", LCD_COLOR_WHITE, LCD_COLOR_BLACK, 0, GL_FONTOPTION_8x12Bold, 0);
+	s_lblStatus2 = Widget_NewLabel("Screen Functions", LCD_COLOR_WHITE, LCD_COLOR_BLACK, 0, GL_FONTOPTION_8x12Bold, 0);
+	s_lblStatus3 = Widget_NewLabel("  SSB     CW     PSK", LCD_COLOR_WHITE, LCD_COLOR_BLACK, 0, GL_FONTOPTION_8x8, 0);
 //	GL_PageControls_TypeDef* btnStore = NewButton(0, " Store  ", store_Click);
 //	GL_PageControls_TypeDef* btnEdit = NewButton(0, "  Edit  ", edit_Click);
 	GL_PageControls_TypeDef* btnDone = NewButton(0, "  Done  ", done_Click);
 	GL_PageControls_TypeDef* btnTagEdit = NewButton(0, "  Tags  ", tagEditButton_Click);
 
-
 	// Populate the options buttons:
 
-	for (int i = 0; i <= Text_F12; i++) {
+	for (int i = 0; i < Text_Items - Prog_SSB1; i++) {
 		static GL_PageControls_TypeDef* btnText;
-		btnText = NewButton(ID_TEXT_START + i, Text_GetName(i), textButton_Click);
+		btnText = NewButton(ID_TEXT_START + i, Text_GetName(Prog_SSB1 + i), textButton_Click);
 
 		int x = (i / BUTTONS_PER_COLUMN) * COLUMN_WIDTH;
 		int y = (i % BUTTONS_PER_COLUMN) * SPACE_PER_BUTTON_Y + FIRST_BUTTON_Y;
@@ -92,15 +94,16 @@ void ScreenEditText_Create(void)
 
 	AddPageControlObj(200, 85, s_lblStatus1,  s_pThisScreen);
 	AddPageControlObj(180, 0, s_lblStatus2,  s_pThisScreen);
+	AddPageControlObj(0, 0, s_lblStatus3,  s_pThisScreen);
 //	AddPageControlObj(80 , LCD_HEIGHT - 30, btnStore, s_pThisScreen);
 //	AddPageControlObj(160, LCD_HEIGHT - 30, btnEdit, s_pThisScreen);
 	AddPageControlObj(0, LCD_HEIGHT - 30, btnDone, s_pThisScreen);
 	AddPageControlObj(240, LCD_HEIGHT - 30, btnTagEdit, s_pThisScreen);
 }
 
-void Screen_ChangeButtonTextLabel(int i){
-	debug(GUI, "screen_ChangeButtonText: i = \n", i);
-	ChangeButtonText(s_pThisScreen, ID_TEXT_START + i, Text_GetName(i));
+void Screen_ChangeButtonProgLabel(int i){
+	debug(GUI, "Screen_ChangeButtonProgLabel: i= \n", i);
+	ChangeButtonText(s_pThisScreen, ID_TEXT_START + i - Prog_SSB1, Text_GetName(i));
 }
 
 static void resetLabel(void)
@@ -137,7 +140,7 @@ static void displayStoreFeedback(void)
 static void textButton_Click(GL_PageControls_TypeDef* pThis)
 {
 	debug(GUI, "textButton_Click:\n");
-	uint16_t id = pThis->ID - ID_TEXT_START;
+	uint16_t id = pThis->ID - ID_TEXT_START + Prog_SSB1;
 	editMode=TRUE;
 	if (editMode){
 		//assert(id >= 0 && id <= Text_Items);
@@ -178,12 +181,12 @@ static void edit_Click(GL_PageControls_TypeDef* pThis)
 static void done_Click(GL_PageControls_TypeDef* pThis) {
 	// Change text back to normal for next time.
 	debug (GUI, "done_Click\n");
-	Screen_TextDone();
+	Screen_ProgDone();
 }
 
-void Screen_TextDone(){
+void Screen_ProgDone(void){
 	debug (GUI, "Screen_TextDone\n");
-	Screen_ChangeButtonTextLabel(s_currentTextNumber);
+	Screen_ChangeButtonProgLabel(s_currentTextNumber);
 	displayStoreFeedback();
 	Count_WriteToEEPROM();
 	Text_WriteToEEPROM();
@@ -192,7 +195,6 @@ void Screen_TextDone(){
 	set_kybd_mode(0);
 	Screen_SetScreenMode(OPTIONS);
 	Screen_ShowScreen(&g_screenOptions);
-
 }
 
 static void tagEditButton_Click(GL_PageControls_TypeDef* pThis) {
@@ -204,5 +206,7 @@ static void tagEditButton_Click(GL_PageControls_TypeDef* pThis) {
 	Screen_SetScreenMode(FUNCTION);
 	Screen_ShowScreen(&g_screenEditTagText);
 }
+
+
 
 

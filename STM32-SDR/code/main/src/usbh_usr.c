@@ -338,14 +338,16 @@ void USR_KEYBRD_ProcessData(uint8_t data1,uint8_t data2 )
 {
 	//USB_DEBUG_MARKER();
 
+	debug(KEYBOARD, "USR_KEYBRD_ProcessData: data1 = %x, data2 = %x\n", data1, data2);
+
 	// Skip control characters like enter, bell, escape..
 	//if ((data1 >= ' ' && data2 < 112)||(data1 == 10)||(data1==8)) {
 	//if (data1 >= ' ' && data2 < 112) {
 	// Could eliminate data2 and use only data1--data1 can be used to identify Function keys.
 
 	// Check the Function Keys F1 thru F10
-	if (data1 >=0x80 && data1<=0x89) {
-		//check for modified ASCII codes for F1-F10
+	if (data1 >=0x80 && data1<=0x8B) {
+		//check for modified ASCII codes for F1-F12
 		data1 = data1 - 0x80;
 		kybd_dispFunctionKey(data1);
 		//Note: 0x90 to 0x99 denote shifted Function keys 1 to 10.

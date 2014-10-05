@@ -17,7 +17,9 @@
 #include <stdarg.h>
 void (*xfunc_out)(unsigned char); /* Pointer to the output stream */
 static char *outptr;
-static void xvprintf(const char* fmt, va_list arp);
+static void xvprintf(const char* fmt, /* Pointer to the format string */
+		va_list arp /* Pointer to arguments */
+);
 
 /*----------------------------------------------*/
 /* Debug message printing                       */
@@ -33,9 +35,11 @@ static void xvprintf(const char* fmt, va_list arp);
 // e.g. DEBUG_SELECTED GUI + GUI_DETAIL + USB etc.
 // uncomment one of the following lines or create your own custom set
 
-//#define DEBUG_SELECTED	(GUI + TOUCH)
+//#define DEBUG_SELECTED	(GUI + KEYBOARD + TOUCH)
+//#define DEBUG_SELECTED	(GUI)
+//#define DEBUG_SELECTED	(KEYBOARD)
 //#define DEBUG_SELECTED	(LCD + ENCODER)
-//#define DEBUG_SELECTED	(GUI + CAL + TOUCH + LCD + ENCODER)
+//#define DEBUG_SELECTED	(GUI + CAL + TOUCH + LCD + ENCODER + KEYBOARD + INIT)
 #define DEBUG_SELECTED NONE
 
 void debug (int debug_code,
@@ -51,8 +55,8 @@ void debug (int debug_code,
 	if ((debug_code & DEBUG_SELECTED) != NONE) {
 		if (debug_code & GUI)
 			xprintf ("Debug GUI: ");
-		if (debug_code & GUI_DETAIL)
-			xprintf ("Debug GUI detail: ");
+		if (debug_code & SCREEN)
+			xprintf ("Debug Screen: ");
 		if (debug_code & USB)
 			xprintf ("Debug USB: ");
 		if (debug_code & CAL)

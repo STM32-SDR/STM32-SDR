@@ -224,6 +224,13 @@ void TIM3_IRQHandler(void)
 }
 
 /**
+  * @brief  TIM4_IRQHandler
+  *         This function handles Timer4 Handler.
+  * @param  None
+  * @retval None
+  */
+
+/**
  * @}
  */
 

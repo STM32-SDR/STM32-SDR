@@ -21,44 +21,52 @@
 
 #include "FrequencyManager.h"
 #include <assert.h>
+#include <stdlib.h>
 #include "eeprom.h"
 #include "Si570.h"
 #include "xprintf.h"
 #include "screen_All.h"
 #include "stm32f4xx_gpio.h"
 #include "Band_Filter.h"
+#include "ModeSelect.h"
+#include "Init_I2C.h"
+//#include "number_images.h"
+
 int NCOTUNE;
 int NCO_Point;
 int NCOTuneCount;
 int NCO_Flag;
 
 // Band Values:
+
 typedef struct
 {
-	const char* Name;
-	const uint32_t Setpoint;
+	char  Name[freqLabel_length+1];
+	uint32_t Setpoint;
 	uint32_t CurrentFrequency;
+	UserModeType Mode;
 } BandsStruct;
 
-static BandsStruct s_bandsData[] = {
+BandsStruct s_bandsData[] = {
 		// Note: Does not initialize the CurrentFrequency; done in initialize function.
-		{ " 20 M PSK ",  14070000},
-		{ " 40 M PSKu",   7070000},
-		{ "10 MHz WWV",  10000000},
-		{ "15 MHz WWV",  15000000},
-		{ " 40 M QRP ",   7285000},
-		{ " 20 M QRP ",  14285000},
-		{ " 10 M     ",  28885000},
-		{ " 15 M     ",  21385000},
-		{ "  4 M     ",  70200000},
-		{ " M1       ",   3729000},
-		{ " M2       ",   7268500},
-		{ " M3       ",   7090000},
-	    { " M4       ",  50885000},
-	    { " M5       ", 144285000},
-	    { " SI570 F0 ",  56320000},
-	    { "          ",         0},
+		{ " 20m PSK",  14070000, 0, USERMODE_DIGU},
+		{ " 40m PSK",    7070000, 0, USERMODE_DIGL},
+		{ "10 MHz WWV",  10000000, 0, USERMODE_USB},
+		{ "15 MHz WWV",  15000000, 0, USERMODE_USB},
+		{ " 40m QRP",   7285000, 0, USERMODE_LSB},
+		{ " 20m QRP",  14285000, 0, USERMODE_USB},
+		{ " 10m SSB",  28885000, 0, USERMODE_USB},
+		{ " 15m SSB",  21385000, 0, USERMODE_USB},
+		{ " 40m",  70200000, 0, USERMODE_USB},
+		{ " 80m SSB",   3729000, 0, USERMODE_LSB},
+		{ " 40m SSB",   7268500, 0, USERMODE_LSB},
+		{ " 40m",   7090000, 0, USERMODE_LSB},
+	    { " 6m SSB",  50885000, 0, USERMODE_USB},
+	    { " 2m SSB", 144285000, 0, USERMODE_USB},
+	    { "SI570 F0 ",  56320000, 0, USERMODE_USB},
+	    { "",         0, 0, USERMODE_USB},
 };
+
 static BandPreset s_selectedBand = FREQBAND_20M_PSK;
 
 // Stepping
@@ -69,10 +77,10 @@ static uint32_t s_stepSize = 100;
 #define FREQUENCY_MIN   1800000 //   1.8 MHz
 #define FREQUENCY_MAX 500000000 // 500 MHz
 
-#define EEPROM_FREQBAND_OFFSET 100
+#define EEPROM_FREQBAND_OFFSET 400
 #define EEPROM_SENTINEL_LOC 0
 //#define EEPROM_SENTINEL_VAL 1235
-#define EEPROM_SENTINEL_VAL 1237
+#define EEPROM_SENTINEL_VAL 1247
 
 // Filter bands, See also options.h and options.c Options_GetValue
 #define EEPROM_FILTERBAND_OFFSET 300
@@ -127,6 +135,7 @@ void FrequencyManager_Initialize(void)
 
 void FrequencyManager_ResetBandsToDefault(void)
 {
+	debug(GUI, "FrequencyManager_ResetBandsToDefault:\n");
 	for (int i = 0; i < FREQBAND_NUMBER_OF_BANDS; i++) {
 		s_bandsData[i].CurrentFrequency = s_bandsData[i].Setpoint;
 	}
@@ -137,10 +146,13 @@ void FrequencyManager_ResetBandsToDefault(void)
  */
 void FrequencyManager_SetSelectedBand(BandPreset newBand)
 {
-	assert(newBand >= 0 && newBand < FREQBAND_NUMBER_OF_BANDS);
+	debug(GUI, "FrequencyManager_SetSelectedBand:\n");
+	assert(newBand >= 0 && newBand <= FREQBAND_NUMBER_OF_BANDS); //Includes blank band
 	s_selectedBand = newBand;
-	uint32_t newFreq = s_bandsData[newBand].CurrentFrequency;
+	uint32_t newFreq = s_bandsData[newBand].Setpoint;
+	UserModeType newMode = s_bandsData[newBand].Mode;
 	FrequencyManager_SetCurrentFrequency(newFreq);
+	Mode_SetCurrentMode(newMode);
 	FrequencyManager_Check_FilterBand(newFreq);
 }
 BandPreset FrequencyManager_GetSelectedBand(void)
@@ -151,12 +163,12 @@ BandPreset FrequencyManager_GetSelectedBand(void)
 		return NULL_BAND;
 }
 
-
-const char* FrequencyManager_GetBandName(BandPreset band)
+char* FrequencyManager_GetBandName(BandPreset band)
 {
 	assert(band >= 0 && band <= FREQBAND_NUMBER_OF_BANDS);
 	return s_bandsData[band].Name;
 }
+
 uint32_t FrequencyManager_GetBandValue(BandPreset band)
 {
 	assert(band >= 0 && band < FREQBAND_NUMBER_OF_BANDS);
@@ -191,7 +203,16 @@ void FrequencyManager_SetCurrentFrequency(uint32_t newFrequency)
 	// If we made it through the above, record the value.
 	s_bandsData[s_selectedBand].CurrentFrequency = newFrequency;
 }
-uint32_t FrequencyManager_GetCurrentFrequency(void)
+
+void FrequencyManager_SaveCurrentFrequency(void){
+	debug(GUI, "FrequencyManager_SaveCurrentFrequency:\n");
+	s_bandsData[s_selectedBand].Setpoint =FrequencyManager_GetCurrentFrequency();
+	UserModeType newMode = Mode_GetCurrentUserMode();
+	s_bandsData[s_selectedBand].Mode = newMode;
+	FrequencyManager_WriteBandsToEeprom();
+}
+
+uint32_t FrequencyManager_GetCurrentFrequency (void)
 {
 	return s_bandsData[s_selectedBand].CurrentFrequency;
 }
@@ -200,6 +221,60 @@ void FrequencyManager_SetFreqMultiplier(int16_t newFreqMult)
 {
 	s_frequencyMultiplier = newFreqMult;
 }
+/*
+void display_digit (int x, int y, int number){
+	switch (number){
+		case 0: {
+			LCD_DrawBMP16Bit(x,y, gimp_image0.height, gimp_image0.width, (uint16_t*) gimp_image0.pixel_data, 0);
+			break;
+		}
+		case 1: {
+			LCD_DrawBMP16Bit(x,y, gimp_image1.height, gimp_image1.width, (uint16_t*) gimp_image1.pixel_data, 0);
+			break;
+		}
+		case 2: {
+			LCD_DrawBMP16Bit(x,y, gimp_image2.height, gimp_image2.width, (uint16_t*) gimp_image2.pixel_data, 0);
+			break;
+		}
+		case 3: {
+			LCD_DrawBMP16Bit(x,y, gimp_image3.height, gimp_image3.width, (uint16_t*) gimp_image3.pixel_data, 0);
+			break;
+		}
+		case 4: {
+			LCD_DrawBMP16Bit(x,y, gimp_image4.height, gimp_image4.width, (uint16_t*) gimp_image4.pixel_data, 0);
+			break;
+		}
+		case 5: {
+			LCD_DrawBMP16Bit(x,y, gimp_image5.height, gimp_image5.width, (uint16_t*) gimp_image5.pixel_data, 0);
+			break;
+		}
+		case 6: {
+			LCD_DrawBMP16Bit(x,y, gimp_image6.height, gimp_image6.width, (uint16_t*) gimp_image6.pixel_data, 0);
+			break;
+		}
+		case 7: {
+			LCD_DrawBMP16Bit(x,y, gimp_image7.height, gimp_image7.width, (uint16_t*) gimp_image7.pixel_data, 0);
+			break;
+		}
+		case 8: {
+			LCD_DrawBMP16Bit(x,y, gimp_image8.height, gimp_image8.width, (uint16_t*) gimp_image8.pixel_data, 0);
+			break;
+		}
+		case 9: {
+			LCD_DrawBMP16Bit(x,y, gimp_image9.height, gimp_image9.width, (uint16_t*) gimp_image9.pixel_data, 0);
+			break;
+		}
+}
+
+void FrequencyManager_DisplayFrequency(void){
+	uint32_t val = FrequencyManager_GetCurrentFrequency()/1000;
+		int i = 6;
+		for(; i && val ; --i, val /= 10)
+			display_digit(100, 140 + 25*i, val % 10);
+		}
+//		return &buf[i+1];
+}
+*/
 
 /*
  * Manage stepping the frequency (for example, using the adjustment knob)
@@ -209,12 +284,14 @@ void FrequencyManager_StepFrequencyUp(void)
 	uint32_t newFreq = FrequencyManager_GetCurrentFrequency() + s_stepSize;
 	FrequencyManager_SetCurrentFrequency(newFreq);
 	FrequencyManager_Check_FilterBand(newFreq);
+//	FrequencyManager_DisplayFrequency();
 }
 void FrequencyManager_StepFrequencyDown(void)
 {
 	uint32_t newFreq = FrequencyManager_GetCurrentFrequency() - s_stepSize;
 	FrequencyManager_SetCurrentFrequency(newFreq);
 	FrequencyManager_Check_FilterBand(newFreq);
+//	FrequencyManager_DisplayFrequency();
 }
 void FrequencyManager_IncreaseFreqStepSize(void)
 {
@@ -274,23 +351,61 @@ void FrequencyManager_Output_FilterCode(int newCode){
 	}
 }
 
+char* FrequencyManager_DisplayBandName (BandPreset id){
+
+	static char buf1[freqLabel_length+1] = {0}; // +1 to allow space for for null
+	int length = strlen(s_bandsData[id].Name);
+	for (int c=0; c<freqLabel_length; c++){
+		if (c< length)
+			buf1[c] = s_bandsData[id].Name[c];
+		else
+			buf1[c] = ' '; //pad remainder of line with spaces
+	}
+	debug(KEYBOARD, "FrequencyManager_DisplayBandName: buf1 = %s\n", buf1);
+	return &buf1[0];
+}
+
 /*
  * EEPROM Routines
  */
 void FrequencyManager_WriteBandsToEeprom(void)
 {
-	uint32_t eepromValue;
+	debug (GUI, "FrequencyManager_WriteBandsToEeprom:");
+	uint32_t eepromFreq;
+	uint16_t eepromMode;
+	char text;
+
 	for (int i = 0; i < FREQBAND_NUMBER_OF_BANDS; i++) {
-		eepromValue = Read_Long_EEProm(EEPROM_FREQBAND_OFFSET+ i * 4);
-		if (s_bandsData[i].CurrentFrequency != eepromValue)
-			Write_Long_EEProm(EEPROM_FREQBAND_OFFSET + i * 4, s_bandsData[i].CurrentFrequency);
+		eepromFreq = Read_Long_EEProm(EEPROM_FREQBAND_OFFSET + i * 6);
+		if (s_bandsData[i].Setpoint != eepromFreq)
+			Write_Long_EEProm(EEPROM_FREQBAND_OFFSET + i *+6, s_bandsData[i].Setpoint);
+		eepromMode = Read_Int_EEProm(EEPROM_FREQBAND_OFFSET + i * 6 + 4);
+		if (s_bandsData[i].Mode != eepromMode)
+			Write_Int_EEProm(EEPROM_FREQBAND_OFFSET + i * 6 + 4, s_bandsData[i].Mode);
+	}
+
+	for (int i = 0; i < FREQBAND_NUMBER_OF_BANDS; i++) {
+//		buf1 = FrequencyManager_DisplayBandName (i);
+		for (int c=0; c<freqLabel_length; c++){
+			text = (char)I2C_ReadEEProm(EEPROM_FREQBAND_OFFSET + (FREQBAND_NUMBER_OF_BANDS*6) + i*(freqLabel_length+1) + c);
+					if (s_bandsData[i].Name[c] != text)
+						I2C_WriteEEProm(EEPROM_FREQBAND_OFFSET + (FREQBAND_NUMBER_OF_BANDS*6)+ i*(freqLabel_length+1) + c, s_bandsData[i].Name[c]);
+		}
 	}
 }
 
 void FrequencyManager_ReadBandsFromEeprom(void)
 {
+	debug (GUI, "FrequencyManager_ReadBandsFromEeprom:");
 	for (int i = 0; i < FREQBAND_NUMBER_OF_BANDS; i++) {
-		s_bandsData[i].CurrentFrequency = Read_Long_EEProm(EEPROM_FREQBAND_OFFSET+ i * 4);
+		s_bandsData[i].CurrentFrequency = Read_Long_EEProm(EEPROM_FREQBAND_OFFSET+ i * 6);
+		s_bandsData[i].Setpoint = Read_Long_EEProm(EEPROM_FREQBAND_OFFSET+ i * 6);
+		s_bandsData[i].Mode = Read_Int_EEProm(EEPROM_FREQBAND_OFFSET+ i * 6 + 4);
+	}
+	for (int i = 0; i < FREQBAND_NUMBER_OF_BANDS; i++) {
+		for (int c=0; c<freqLabel_length; c++){
+			s_bandsData[i].Name[c] = (char)I2C_ReadEEProm(EEPROM_FREQBAND_OFFSET + (FREQBAND_NUMBER_OF_BANDS*6) + i*(freqLabel_length+1) + c);
+		}
 	}
 }
 
@@ -298,7 +413,7 @@ void FrequencyManager_WriteFiltersToEeprom(void)
 {
 	uint16_t eepromCode;
 	uint32_t eepromFreq;
-	debug(GUI, "WriteFiltersToEeprom\n");
+	debug(GUI, "FrequencyManager_WriteFiltersToEeprom:\n");
 	for (int i = 0; i < FREQ_NUMBER_OF_FILTER_BANDS; i++) {
 		eepromCode = Read_Int_EEProm(EEPROM_FILTERBAND_OFFSET + i*6);
 		if (s_bandTable[i].Code != eepromCode)
@@ -311,7 +426,7 @@ void FrequencyManager_WriteFiltersToEeprom(void)
 }
 void FrequencyManager_ReadFiltersFromEeprom(void)
 {
-	debug(GUI, "ReadFiltersFromEeprom\n");
+	debug(GUI, "FrequencyManager_ReadFiltersFromEeprom:\n");
 	for (int i = 0; i < FREQ_NUMBER_OF_FILTER_BANDS; i++) {
 		s_bandTable[i].Code = Read_Int_EEProm(EEPROM_FILTERBAND_OFFSET + i*6);
 		s_bandTable[i].Frequency = Read_Long_EEProm(EEPROM_FILTERBAND_OFFSET+ i*6 + 2);
@@ -323,7 +438,7 @@ void FrequencyManager_ReadFiltersFromEeprom(void)
 
 void FrequencyManager_ResetFiltersToDefault(void)
 {
-	debug(GUI, "ResetFiltersToDefault\n");
+	debug(GUI, "FrequencyManager_ResetFiltersToDefault:\n");
 	for (int i = 0; i < FREQ_NUMBER_OF_FILTER_BANDS; i++){
 	s_bandTable[i].Code = s_defaultBandsData[i].Code;
 	s_bandTable[i].Frequency = s_defaultBandsData[i].Frequency;
@@ -334,7 +449,7 @@ void FrequencyManager_ResetFiltersToDefault(void)
 
 void FrequencyManager_SetBandCodeFilter (uint8_t band, uint8_t value)
 {
-	debug(GUI, "FrequencyManager_SetBandCodeFilter\n");
+	debug(GUI, "FrequencyManager_SetBandCodeFilter:\n");
 	s_bandTable[band].Code = value;
 	debug(GUI, "band = %d, code = %d\n", band, value);
 	FrequencyManager_Output_FilterCode(value);
@@ -342,7 +457,7 @@ void FrequencyManager_SetBandCodeFilter (uint8_t band, uint8_t value)
 
 void FrequencyManager_SetBandFreqFilter (uint8_t band, uint32_t frequency)
 {
-	debug(GUI, "FrequencyManager_SetBandFreqFilter\n");
+	debug(GUI, "FrequencyManager_SetBandFreqFilter:\n");
 	s_bandTable[band].Frequency = frequency;
 	debug(GUI, "band = %d, frequency = %d\n", band, frequency);
 }

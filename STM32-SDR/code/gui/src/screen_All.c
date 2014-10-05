@@ -23,6 +23,7 @@
 #include "ModeSelect.h"
 #include "LcdHal.h"
 #include <assert.h>
+#include "xprintf.h"
 
 static GL_Page_TypeDef *s_pCurrentScreen = 0;
 
@@ -44,10 +45,13 @@ GL_Page_TypeDef g_screenAdvanced;
 GL_Page_TypeDef g_screenFilter;
 GL_Page_TypeDef g_screenFrequencies;
 GL_Page_TypeDef g_screenEditText;
+GL_Page_TypeDef g_screenEditTagText;
+GL_Page_TypeDef g_screenEditProgText;
 
 // Create all screens
 void Screen_CreateAllScreens(void)
 {
+	debug(GUI, "Screen_CreateAllScreens:\n");
 	// Create (populate/allocate/...) each screen.
 	// ## Add new screens to this list.
 	ScreenMainPSK_Create();
@@ -61,11 +65,15 @@ void Screen_CreateAllScreens(void)
 	ScreenFilter_Create();
 	ScreenFrequencies_Create();
 	ScreenEditText_Create();
+	ScreenEditTagText_Create();
+	ScreenEditProgText_Create();
+	debug(GUI, "Screen_CreateAllScreens: Done\n");
 }
 
 // Change to a new screen.
 void Screen_ShowScreen(GL_Page_TypeDef *pNewScreen)
 {
+	debug(GUI, "Screen_ShowScreen:\n");
 	assert(pNewScreen != 0);
 
 	// Break out if already on this screen.
@@ -86,11 +94,14 @@ void Screen_ShowScreen(GL_Page_TypeDef *pNewScreen)
 
 	s_pCurrentScreen = pNewScreen;
 
+	// set default waterfall/spectrum display
+
 }
 
 // Transition to the correct main screen, based on the mode.
 void Screen_ShowMainScreen(void)
 {
+	debug(GUI, "Screen_ShowMainScreen:\n");
 	switch(Mode_GetCurrentMode()) {
 	case MODE_PSK:
 		Screen_ShowScreen(&g_screenMainPSK);

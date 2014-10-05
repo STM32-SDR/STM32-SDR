@@ -246,7 +246,8 @@ static void displayFFT(int x, int y)
 
 					// Draw red line for selected frequency
 					//if ((x == (int) (selectedFreqX + 0.5)) && isShowingAFOffset){
-					if (x == NCO_Point){
+					if ((x == NCO_Point && Mode_GetCurrentMode() == MODE_PSK)
+						|| (x == 27 && Mode_GetCurrentMode() == MODE_CW)){
 						// Leave some white at the top
 						if (y <= SELFREQ_ADJ) {
 							LCD_WriteRAM(LCD_COLOR_WHITE);
@@ -286,7 +287,8 @@ static void displayFFT(int x, int y)
 			for (int y = WF_Line0; y < FFT_HEIGHT; y++){
 				for (int x = 0; x <FFT_WIDTH; x++) {
 					//if (x == (int)(selectedFreqX +0.5) && isShowingAFOffset) {
-					if (x == NCO_Point){
+					if ((x == NCO_Point && Mode_GetCurrentMode() == MODE_PSK)
+						|| (x == 27 && Mode_GetCurrentMode() == MODE_CW)){
 						//LCD_WriteRAM(LCD_COLOR_RED);
 						LCD_WriteRAM(LCD_COLOR_WHITE);
 					}
@@ -298,7 +300,8 @@ static void displayFFT(int x, int y)
 			for ( int y = 0; y < WF_Line0; y++){
 				for (int x = 0; x < FFT_WIDTH; x++){
 					//if (x == (int)(selectedFreqX +0.5) && isShowingAFOffset){
-					if (x == NCO_Point){
+					if ((x == NCO_Point && Mode_GetCurrentMode() == MODE_PSK)
+						|| (x == 27 && Mode_GetCurrentMode() == MODE_CW)){
 						//LCD_WriteRAM(LCD_COLOR_RED);
 						LCD_WriteRAM(LCD_COLOR_WHITE);
 					}
@@ -320,7 +323,7 @@ static void displayFFT(int x, int y)
 static _Bool showAFOffsetOnScreen(void)
 {
 	ModeType currentMode = Mode_GetCurrentMode();
-	return (currentMode != MODE_SSB);
+	return (currentMode == MODE_PSK);
 }
 
 static void displayFrequencyOffsetText(_Bool force)

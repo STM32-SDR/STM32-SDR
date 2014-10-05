@@ -321,6 +321,27 @@ GL_PageControls_TypeDef* NewButton(uint16_t ID, const char* label, void (*pEvent
 }
 
 /**
+ */
+void ChangeButtonText(GL_Page_TypeDef* pPage, uint16_t ID, const char* label)
+{
+	debug (GUI, "ChangeButtonText: \n");
+
+	for (uint32_t index = 0; index < pPage->ControlCount; index++) {
+		GL_PageControls_TypeDef* pPageCtrl = pPage->PageControls[index];
+		GL_Button_TypeDef* pLabel = (GL_Button_TypeDef*) (pPageCtrl->objPTR);
+
+		if (pLabel->ID == ID) {
+			GL_SetStringFieldValue(pLabel->label, label, MAX_LABEL_LENGTH);
+
+		// Redraw:
+			if (pLabel->Control_Visible) {
+				pPageCtrl->SetObjVisible(pPageCtrl, pPageCtrl->objCoordinates);
+			}
+		}
+	}
+}
+
+/**
  * @brief  Create and initialize a Checkbox object
  * @param  oName: Object Name
  * @param  label: Label for the Checkbox

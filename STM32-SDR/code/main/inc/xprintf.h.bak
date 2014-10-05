@@ -46,9 +46,5 @@ int xatoi (char** str, long* res);
 #define TOUCH 8 // touch screen
 #define LCD 16 // LCD obviously!
 #define ENCODER 32 // Encoders
-#define KEYBOARD 64 // Keyboard entry
-#define SCREEN 128 // Screen operations
-#define INIT 256 // Startuop initialization sequence
+#define GUI_DETAIL 64 // Encoders
 	// etc.
-
-

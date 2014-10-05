@@ -76,8 +76,8 @@ void ScreenFilter_Create(void)
 	/*
 	 * Create the UI widgets
 	 */
-	GL_PageControls_TypeDef* lblTitle = Widget_NewLabel("Filters", LCD_COLOR_WHITE, LCD_COLOR_BLACK, 0, GL_FONTOPTION_12x12, 0);
-	GL_PageControls_TypeDef* lblDirections2 = Widget_NewLabel("Set code & freqency", LCD_COLOR_YELLOW, LCD_COLOR_BLACK, 0, GL_FONTOPTION_8x12Bold, 0);
+	GL_PageControls_TypeDef* lblTitle = Widget_NewLabel("Filter", LCD_COLOR_WHITE, LCD_COLOR_BLACK, 0, GL_FONTOPTION_16x24, 0);
+	GL_PageControls_TypeDef* lblDirections2 = Widget_NewLabel("Set code & freqency", LCD_COLOR_WHITE, LCD_COLOR_BLACK, 0, GL_FONTOPTION_8x12Bold, 0);
 	GL_PageControls_TypeDef* lblBandHeading1 = Widget_NewLabel("bits", LCD_COLOR_WHITE, LCD_COLOR_BLACK, 0, GL_FONTOPTION_8x16, 0);
 	GL_PageControls_TypeDef* lblBandHeading2 = Widget_NewLabel("      kHz", LCD_COLOR_WHITE, LCD_COLOR_BLACK, 0, GL_FONTOPTION_8x16, 0);
 	GL_PageControls_TypeDef* btnFreq = Widget_NewBigButtonFrequency();
@@ -89,7 +89,7 @@ void ScreenFilter_Create(void)
 	 */
 	// Title
 	AddPageControlObj(  0,   0, lblTitle,        s_pThisScreen);
-	AddPageControlObj(115,  0, lblDirections2,  s_pThisScreen);
+	AddPageControlObj(130,  0, lblDirections2,  s_pThisScreen);
 	AddPageControlObj(96, 16, lblBandHeading1,  s_pThisScreen);
 	AddPageControlObj(136, 16, lblBandHeading2,  s_pThisScreen);
 

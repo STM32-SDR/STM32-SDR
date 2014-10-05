@@ -36,7 +36,6 @@
 #include	"xprintf.h"
 #include	"screen_All.h"
 
-
 extern int 	NCOTUNE;
 
 // Data for the encoder state.
@@ -175,7 +174,6 @@ _Bool Encoders_AreBothEncodersPressed(void)
 void Encoders_CalculateAndProcessChanges(void)
 {
 	// TODO:- Is delay needed for encoder? Should it be doubled (as would have been before encoder refactor)?
-	Delay(100);
 
 	int change = 0;
 	change = calculateEncoderChange(&s_encoderStruct1);
@@ -188,11 +186,45 @@ void Encoders_CalculateAndProcessChanges(void)
 static int8_t calculateEncoderChange(EncoderStruct_t *pEncoder)
 {
 	// Encoder motion has been detected--determine direction
-	Delay(100);
+	int8_t direction;
+
+	uint8_t code = (GPIO_ReadInputData(pEncoder->pPort) >> pEncoder->lowPinNumber & 0x03);
+	code = 4 * code + pEncoder->old;
+	// bits 0/1 are old values and bits 2/3 are now values
+	//encoder sequence is 0, 1, 3, 2
+	pEncoder->old = code / 4; //save the new encoder bits
+
+	switch (code){
+	case 0x01:
+	case 0x07:
+	case 0x08:
+	case 0x0E:
+		direction = -1;
+		break;
+	case 0x02:
+	case 0x04:
+	case 0x0B:
+	case 0x0d:
+		direction = 1;
+		break;
+	default:
+		direction = 0;
+	break;
+	}
+
+	return direction;
+
+	/*
 
 	// Remember previous encoder state and add current state (2 bits)
 	pEncoder->old <<= 2;
+	if (print==1)
+			xprintf("calculateEncoderChange: old=%x\n", pEncoder->old);
+
 	pEncoder->old |= (GPIO_ReadInputData(pEncoder->pPort) >> pEncoder->lowPinNumber & 0x03);
+
+	if (print==1)
+			xprintf("calculateEncoderChange: old=%x\n", pEncoder->old);
 
 	int8_t tempDir = ENCODER_STATES[(pEncoder->old & 0x0F)];
 	pEncoder->dir0 += tempDir;
@@ -208,10 +240,14 @@ static int8_t calculateEncoderChange(EncoderStruct_t *pEncoder)
 	}
 
 	return pEncoder->dir1;
+
+	*/
+
 }
 
 static void applyEncoderChange1(int8_t changeDirection)
 {
+//	xprintf("applyEncoderChange1: changeDirection = %d\n", changeDirection);
 	// Check for no change
 	if (changeDirection == 0) {
 		return;

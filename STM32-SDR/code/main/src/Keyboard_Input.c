@@ -23,11 +23,13 @@
 #include "widgets.h"
 #include "Text_Enter.h"
 #include "STM32-SDR-Subroutines.h"
+#include "xprintf.h"
+#include <string.h>
 
 #define KBD_BUFF_LEN 41 // 40 characters on the screen, +1 for null.
 
 int kybd_mode = 0;
-char Call[]    = " Call     ";
+char Call[]    = "   Call   " ;
 char Name[]    = " Name     ";
 
 int i;
@@ -43,12 +45,14 @@ volatile char macro_string[KBD_BUFF_LEN];
 void kybd_addCharacter(char Char);
 void kybd_dispFunctionKey(uint8_t data);
 void kybd_char_switch (char data);
-void compose_F6(void);
-void Text2Buffer(char *str, uint8_t count);
+//void compose_F6(void);
+void Text2Buffer(char *str);
 void String2Buffer(char *str);
 
 void kybd_char_switch(char data)
 {
+
+	debug(KEYBOARD, "kybd_char_switch: kybd_mode = %x, data = %x\n", kybd_mode, data);
 	switch(kybd_mode) {
 	case 0: kybd_addCharacter(data); break;
 	case 1: kybd_edit_contact(data,0); break;
@@ -59,6 +63,7 @@ void kybd_char_switch(char data)
 
 void kybd_addCharacter(char Char)
 {
+	debug(KEYBOARD, "kybd_addCharacter: Char = %c\n", Char);
 	// Count characters already inserted
 	static uint8_t cnt = 0;
 
@@ -84,22 +89,9 @@ void kybd_addCharacter(char Char)
 
 void kybd_dispFunctionKey(uint8_t data)
 {
-
-	switch(data) {
-	case 0: compose_F1(); break;
-	case 1: compose_F2(); break;
-	case 2: compose_F3(); break;
-	case 3: compose_F4(); break;
-	case 4: compose_F5(); break;
-	case 5: compose_F6(); break;
-	case 6: compose_F7(); break;
-	case 7: compose_F8(); break;
-	case 8: compose_F9(); break;
-	case 9: ToggleRxTx(); break;
-	}
+	debug(KEYBOARD, "kybd_dispFunctionKey: data = %d\n", data);
+	compose_Text (data);
 }
-
-
 
 void String2Buffer(char *str) {
 	char TempChar;
@@ -110,8 +102,10 @@ void String2Buffer(char *str) {
  }
 
 
-void Text2Buffer(char *str, uint8_t count) {
+void Text2Buffer(char *str) {
 	char TempChar;
+	int count = strlen(str);
+	debug(KEYBOARD, "Text2Buffer: string = '%s', count = %d\n", str, count);
 	do {
 		TempChar = *str++;
 		kybd_addCharacter(TempChar);

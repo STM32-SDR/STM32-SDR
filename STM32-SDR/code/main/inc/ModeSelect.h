@@ -35,7 +35,7 @@ typedef enum {
 	USERMODE_CWR,
 	USERMODE_DIGU,
 	USERMODE_DIGL,
-
+	USERMODE_TUNE,
 	USERMODE_NUM_MODES	// Automatically set to the count.
 } UserModeType;
 

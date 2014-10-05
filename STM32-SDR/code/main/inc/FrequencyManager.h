@@ -49,6 +49,8 @@ typedef enum {
 
 #define NULL_BAND FREQBAND_NUMBER_OF_BANDS
 
+#define freqLabel_length 10
+
 void FrequencyManager_Initialize(void);
 void FrequencyManager_ResetBandsToDefault(void);
 
@@ -57,11 +59,12 @@ void FrequencyManager_SetSelectedBand(BandPreset newBand);
 BandPreset FrequencyManager_GetSelectedBand(void);
 
 // Work with preset bands:
-const char* FrequencyManager_GetBandName(BandPreset band);
+char* FrequencyManager_GetBandName(BandPreset band);
 uint32_t FrequencyManager_GetBandValue(BandPreset band);
 
 // Get/Set current frequency to radio (in Hz)
 void FrequencyManager_SetCurrentFrequency(uint32_t newFrequency);
+void FrequencyManager_SaveCurrentFrequency(void);
 uint32_t FrequencyManager_GetCurrentFrequency(void);
 void FrequencyManager_SetFreqMultiplier(int16_t newFreqMult);
 
@@ -72,6 +75,8 @@ void FrequencyManager_IncreaseFreqStepSize(void);
 void FrequencyManager_DecreaseFreqStepSize(void);
 uint32_t FrequencyManager_GetFrequencyStepSize(void);
 void FrequencyManager_SetFrequencyStepSize(uint32_t step);
+
+char* FrequencyManager_DisplayBandName (BandPreset id); //pointer to band name
 
 // EEPROM Routines:
 void FrequencyManager_WriteBandsToEeprom(void);

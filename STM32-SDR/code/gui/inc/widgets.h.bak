@@ -65,8 +65,6 @@ GL_PageControls_TypeDef* Widget_NewBigButton(
 GL_PageControls_TypeDef* Widget_NewBigButtonMode(void);
 GL_PageControls_TypeDef* Widget_NewBigButtonFrequency(void);
 GL_PageControls_TypeDef* Widget_NewBigButtonOptions(void);
-void Widget_ChangeButtonText(GL_PageControls_TypeDef *pThis, const char* strText);
-
 
 
 /**
