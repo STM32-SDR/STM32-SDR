@@ -38,7 +38,6 @@ _Bool RxTx_InTxMode(void);
 void RxTx_CheckAndHandlePTT(void);
 void RxTx_SetTuneMode(_Bool mod);
 
-
 #endif /* CHANGEOVER_H_ */
 
 

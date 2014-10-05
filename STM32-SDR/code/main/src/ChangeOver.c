@@ -31,6 +31,7 @@
 #include "ScrollingTextBox.h"
 #include "AGC_Processing.h"
 #include "ModeSelect.h"
+#include "Init_Codec.h"
 #include <assert.h>
 #include <xprintf.h>
 
@@ -42,6 +43,7 @@ const int DEBOUNCE_COUNT_REQUIRED = 30;	// Called from main()
 // Private state variables:
 static _Bool s_isPttPressed = 0;
 static _Bool s_inTxMode = 0;
+static _Bool s_inTransition = 0;
 
 // Private functions:
 static void Receive_Sequence(void);
@@ -120,7 +122,7 @@ void RxTx_CheckAndHandlePTT(void)
 			if (debounceCount == DEBOUNCE_COUNT_REQUIRED) {
 				s_isPttPressed = isKeyDown;
 				debounceCount = 0;
-				xprintf("PTT Changed to %d\n", s_isPttPressed);
+				//xprintf("PTT Changed to %d\n", s_isPttPressed);
 				handlePttStateChange();
 			}
 		}
@@ -133,10 +135,14 @@ void RxTx_CheckAndHandlePTT(void)
 	// Special case to handle CW:
 	if (Mode_GetCurrentMode() == MODE_CW) {
 		if (CW_DesiresTransmitMode() && !RxTx_InTxMode()) {
+			Connect_Sidetone_Input();  //  Route the CW Sidetone to Headphones
 			RxTx_SetTransmit();
 			xprintf("To CW Tx\n");
 		}
 		if (!CW_DesiresTransmitMode() && RxTx_InTxMode()) {
+			s_inTransition = 1;
+			Disconnect_Sidetone_Input();
+			Delay(900000);
 			RxTx_SetReceive();
 			xprintf("To CW Rx\n");
 		}
@@ -147,13 +153,18 @@ _Bool RxTx_IsPttPressed(void)
 {
 	return s_isPttPressed;
 }
-
+_Bool RxTx_InTransion(void)
+{
+	return s_inTransition;
+}
 
 /****************************************
  * Private Functions
  ****************************************/
 void Receive_Sequence(void)
 {
+	//Codec_Init();
+
 	Mute_HP();
 	Mute_LO();
 	s_inTxMode = 0;
@@ -164,14 +175,19 @@ void Receive_Sequence(void)
 	else
 	{
 	AGC_On =0;  //This forces the manual AGC mode
+	Init_AGC();  //added JDG
 	}
-
 	GPIO_WriteBit(GPIOD, GPIO_Pin_3, Bit_SET);	//Make PTT_Out High, Remember FET Inversion
+	Delay(1000);
+	//Disconnect_Sidetone_Input();
+	//Delay(900000);
 	Disconnect_PGA();
+
 	Connect_IQ_Inputs();
 	Set_DAC_DVC(Options_GetValue(OPTION_RX_AUDIO));
 	Set_ADC_DVC(-10);  //was -20 using Milt's AGC scheme
 	Set_HP_Gain(6);
+	s_inTransition = 0;
 	//Init_Waterfall();
 }
 
@@ -181,6 +197,7 @@ void Xmit_SSB_Sequence(void)
 	Mute_LO();
 	s_inTxMode = 1;
 	AGC_On = 0;  //Turn off AGC so that DAC is held constant during transmit
+	Init_AGC();  //added JDG
 	Disconnect_PGA();
 	Set_DAC_DVC(15); //SSB Xmit DAC Gain
 	Set_ADC_DVC(0);
@@ -194,17 +211,17 @@ void Xmit_SSB_Sequence(void)
 
 void Xmit_CW_Sequence(void)
 {
-	Mute_HP();
+	//Mute_HP();
 	Mute_LO();
 	s_inTxMode = 1;
 	AGC_On = 0;
-	Disconnect_PGA();
+	Init_AGC();  //added JDG
 	Set_DAC_DVC(-33); //CW Xmit DAC Gain
 	GPIO_WriteBit(GPIOD, GPIO_Pin_3, Bit_RESET);  //Make PTT_Out Low,Remember FET Inversion
 	Delay(1000);
 	//Set_LO_Gain(20);
 	Set_LO_Gain(Options_GetValue(OPTION_Tx_LEVEL));
-	Set_HP_Gain(Options_GetValue(OPTION_ST_LEVEL));
+
 }
 
 void Xmit_PSK_Sequence(void)
@@ -213,6 +230,7 @@ void Xmit_PSK_Sequence(void)
 	Mute_LO();
 	s_inTxMode = 1;
 	AGC_On = 0;  //Turn off AGC so that DAC is held constant during transmit
+	Init_AGC();  //added JDG
 	Disconnect_PGA();
 	Set_DAC_DVC(12); //PSK Xmit DAC Gain
 	GPIO_WriteBit(GPIOD, GPIO_Pin_3, Bit_RESET);  //Make PTT_Out Low,Remember FET Inversion

@@ -210,8 +210,14 @@ void Codec_Init(void)
 	I2C_WriteRegister(CODEC_ADDRESS, 0x13, 0x00);
 	Delay(Codec_Pause);
 
+	I2C_WriteRegister(CODEC_ADDRESS, 0x3c, 0x80);  //PGAr 0 db Gain
+	Delay(Codec_Pause);
+
+	I2C_WriteRegister(CODEC_ADDRESS, 0x19, 0x27);  //MAR -30 db Gain
+	Delay(Codec_Pause);
+
 	//Power up HPL,HPR,LOL,LOR
-	I2C_WriteRegister(CODEC_ADDRESS, 0x09, 0x3c);
+	I2C_WriteRegister(CODEC_ADDRESS, 0x09, 0x3d); // added MAR
 	Delay(Codec_Pause);
 
 	//***********************************************************************

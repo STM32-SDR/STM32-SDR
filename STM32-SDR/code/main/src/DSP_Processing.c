@@ -201,7 +201,7 @@ void Process_FFT(void)
 
 	switch (AGC_Mode){   // AGC Mode Switch
 		case 0:
-			Sig_Total = Sig_Sum0;
+			Sig_Total = Sig_Sum0;	// Maximum signal in filter passband
 			break;
 		case 1:
 			Sig_Total = Sig_Sum1;

@@ -24,7 +24,8 @@
 #include "xprintf.h"
 #include <assert.h>
 #include "stm32f4xx_tim.h"
-
+#include "Codec_Gains.h"
+#include "ChangeOver.h"
 
 // Create a circular buffer used for reading/writing key samples.
 // Need not match our sampling rate or the DMA rate. Just our data-storage area
@@ -33,6 +34,7 @@ static _Bool s_keySamples[KEY_SAMPLE_ARRAY_SIZE];
 static int s_keySampleWriteIdx = 0;
 static int s_keySampleReadIdx = 0;
 static _Bool s_wantToTransmit = 0;
+static char lastsample = 0;
 
 // Number samples required on key to accept a change in state.
 #define DEBOUNCE_THRESHOLD 2
@@ -119,16 +121,25 @@ static void initCwTimerInterrupt(void)
 // Sampling
 void writeKeySampleToKeyBuffer(char key)
 {
+	if(key != lastsample)  // only change sidetone if state changed.
+		{
+		if(key) Sidetone_Key_Down();
+			else Sidetone_Key_Up();
+		lastsample = key;
+		}
+
 	s_keySamples[s_keySampleWriteIdx] = key;
 	s_keySampleWriteIdx = (s_keySampleWriteIdx + 1) % KEY_SAMPLE_ARRAY_SIZE;
-}
 
+}
 // ISR which samples the key pin.
 void CW_KeyPollTimerIRQ(void)
 {
 	if (TIM_GetITStatus(TIM3, TIM_IT_Update ) != RESET) {
 		TIM_ClearITPendingBit(TIM3, TIM_IT_Update );
 
+		//if not in transition from xmit to receive
+		if(!RxTx_InTransion()){
 		// Read pin state
 		_Bool isKeyPressed = GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_9) == 0;
 
@@ -159,12 +170,13 @@ void CW_KeyPollTimerIRQ(void)
 			}
 		}
 
-		// Process current state
+		// Process current state if not in transition from xmit to receive
 		writeKeySampleToKeyBuffer(debouncedIsKeyPressed);
 
 		// DEBUG: Count interrupts
 		//extern volatile int g_numTimer3Interrupts;
 		//g_numTimer3Interrupts++;
+		}
 	}
 }
 
@@ -206,12 +218,14 @@ void CW_FillTxAmplitudeBuffer(float amplitudeBuffer[], int bufferSize)
 		curAmplitude += amplitudeChange;
 		if (curAmplitude > 1.0) {
 			curAmplitude = 1.0;
+
 		}
 		if (curAmplitude < 0) {
 			curAmplitude = 0;
 		}
 
 		// Store the value:
+
 		amplitudeBuffer[ampBuffIdx] = curAmplitude;
 
 		// Move to next key sample (if required)

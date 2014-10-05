@@ -51,12 +51,15 @@
 #include    "DMA_IRQ_Handler.h"
 #include	"widgets.h"
 #include	"STM32-SDR-Subroutines.h"
+#include	"Oscillator.h"
+#include  	"main.h"
 
-#define VERSION_STRING "1.053+A1.11 "
+#define VERSION_STRING "1.054"
 
 extern int NCO_Point;
 extern int NCOTuneCount;
 extern int NCO_Flag;
+
 
 const uint32_t CODEC_FREQUENCY = 8000;
 
@@ -212,7 +215,18 @@ static void initializeHardware(void)
 	debug(INIT, "initializeHardware:Init_Waterfall\n");
 	Init_Waterfall();
 	main_delay(SETUP_DELAY);
+
 	debug(INIT, "initializeHardware:USBH_Init\n");
+
+
+	 /* Sampling rate interrupt timer */
+	 INTTIM_Config();
+
+	 /* PWM Configuration */
+	 PWM_Config(256);
+	 PWM_SetDC(128);
+
+
 	// Init USB Host Library
 	USBH_Init(
 			&USB_OTG_Core_dev, // Core handle

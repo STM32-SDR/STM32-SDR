@@ -31,6 +31,7 @@
 #include "stm32fxxx_it.h"
 #include <assert.h>
 
+
 /** @addtogroup STM32F4_Discovery_Peripheral_Examples
  * @{
  */
@@ -223,6 +224,21 @@ void TIM3_IRQHandler(void)
 	CW_KeyPollTimerIRQ();
 }
 
+#include "Oscillator.h"
+void TIM5_IRQHandler(void)
+{
+  if (TIM_GetITStatus(TIM5, TIM_IT_Update) != RESET)
+  {
+
+    PWM_SetDC(pulse_width);
+    // Calculate a new pulse width
+    phase_accumulator+=R;
+    angle=(uint8_t)(phase_accumulator>>24);
+    pulse_width = sinetable[angle];
+    TIM_ClearITPendingBit(TIM5, TIM_IT_Update);
+
+  }
+}
 /**
   * @brief  TIM4_IRQHandler
   *         This function handles Timer4 Handler.
