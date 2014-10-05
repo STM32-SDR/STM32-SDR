@@ -38,10 +38,12 @@ float 	DAC_RMS_Sig;
 
 int		Sig;
 int		Sig_Max;
+int 	Sig_Max1;
 long	Sig_Total;
 long	Sig_Sum0;
 long	Sig_Sum1;
 long	Sig_Sum2;
+
 
 float 	FFT_Coeff = 0.2;
 extern  int NCO_Bin;
@@ -155,12 +157,16 @@ void Process_FFT(void)
 	//********************************************************
 
 	Sig_Max = 0;
+	Sig_Max1 = 0;
 	Sig_Sum0 = 0;
 	Sig_Sum1 = 0;
 	Sig_Sum2 = 0;
 
+
 	int jl = (int)(Flow/df);
 	int jh = (int)(Fhigh/df);
+	int jcwl = (int)(400/df);
+	int jcwh = (int)(800/df);
 
 	for (int j = 0; j < 256; j++) 
 		FFT_Mag_10[j] = (int) FFT_Magnitude[j] * 10; //add in 10 db gain
@@ -175,6 +181,14 @@ void Process_FFT(void)
 		//First Order Filter for FFT
 		FFT_Filter[j] =  FFT_Coeff * FFT_Output[j] + (1.0-FFT_Coeff) * FFT_Filter[j];
 
+		//CW Peak in range from 400-700
+		if (j >= jcwl && j <= jcwh){
+			Sig = (int)FFT_Magnitude[j];
+		    if ( Sig > Sig_Max) {
+			Sig_Max1 = Sig;
+		    }
+
+		}
 		//Digi AGC
 		if (j == NCO_Bin) {
 			for (int k = NCO_Bin-2; k < NCO_Bin+3; k++)	{
@@ -196,12 +210,13 @@ void Process_FFT(void)
 
 	  }  // End of Search
 
-	Sig_Sum0 = Sig_Max;
+	Sig_Sum0 = Sig_Max1;
 
 
 	switch (AGC_Mode){   // AGC Mode Switch
 		case 0:
-			Sig_Total = Sig_Sum0;	// Maximum signal in filter passband
+			//Sig_Total = Sig_Sum0;	// Maximum signal in filter passband
+			Sig_Total = Sig_Sum0;
 			break;
 		case 1:
 			Sig_Total = Sig_Sum1;
