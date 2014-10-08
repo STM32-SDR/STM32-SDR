@@ -188,6 +188,7 @@ int Screen_GetFilterFreqID (){
  */
 static void optionsCodeUp_Click(GL_PageControls_TypeDef* pThis)
 {
+	Screen_ButtonAnimate(pThis);
 	filterCodeSelected--;
 	if (filterCodeSelected < MIN_BAND)
 		filterCodeSelected = MAX_BAND;
@@ -198,6 +199,7 @@ static void optionsCodeUp_Click(GL_PageControls_TypeDef* pThis)
 
 static void optionsCodeDown_Click(GL_PageControls_TypeDef* pThis)
 {
+	Screen_ButtonAnimate(pThis);
 	filterCodeSelected++;
 	if (filterCodeSelected > MAX_BAND)
 		filterCodeSelected = MIN_BAND;
@@ -208,6 +210,7 @@ static void optionsCodeDown_Click(GL_PageControls_TypeDef* pThis)
 
 static void optionsFreqUp_Click(GL_PageControls_TypeDef* pThis)
 {
+	Screen_ButtonAnimate(pThis);
 	filterFreqSelected--;
 	if (filterFreqSelected < MIN_BAND)
 		filterFreqSelected = MAX_BAND-1;
@@ -218,6 +221,7 @@ static void optionsFreqUp_Click(GL_PageControls_TypeDef* pThis)
 
 static void optionsFreqDown_Click(GL_PageControls_TypeDef* pThis)
 {
+	Screen_ButtonAnimate(pThis);
 	filterFreqSelected++;
 	if (filterFreqSelected > MAX_BAND-1)
 		filterFreqSelected = MIN_BAND;
@@ -228,6 +232,7 @@ static void optionsFreqDown_Click(GL_PageControls_TypeDef* pThis)
 
 static void defaultsFilter_Click(GL_PageControls_TypeDef* pThis)
 {
+	Screen_ButtonAnimate(pThis);
 	debug (GUI, "defaultsFilter_Click\n");
 	FrequencyManager_ResetFiltersToDefault();
 }
@@ -235,6 +240,7 @@ static void defaultsFilter_Click(GL_PageControls_TypeDef* pThis)
 static void doneFilter_Click(GL_PageControls_TypeDef* pThis) {
 
 	debug (GUI, "doneFilter_Click\n");
+	Screen_ButtonAnimate(pThis);
 	FrequencyManager_WriteFiltersToEeprom();
 	FrequencyManager_SetCurrentFrequency(saveFrequency);
 
@@ -249,6 +255,7 @@ static void doneFilter_Click(GL_PageControls_TypeDef* pThis) {
 
 void Screen_filter_Click(GL_PageControls_TypeDef* pThis) {
 	debug (GUI, "Screen_filter_Click:\n");
+	Screen_ButtonAnimate(pThis);
 
 	// save the current synthesizer frequency to put back later and set new value
 	saveFrequency = FrequencyManager_GetCurrentFrequency();

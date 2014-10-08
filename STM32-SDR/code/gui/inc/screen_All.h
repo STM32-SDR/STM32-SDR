@@ -62,6 +62,7 @@
 #include "graphicObjectTypes.h"
 #include "graphicObject.h"
 #include "LcdHal.h"
+#include "Init_I2C.h"
 
 // screen modes
 #define MAIN 0
@@ -116,6 +117,7 @@ void Screen_ChangeButtonFreqLabel(int i);
 void Screen_CreateAllScreens(void);
 void Screen_ShowScreen(GL_Page_TypeDef *pNewScreen);
 void Screen_ShowMainScreen(void);
+void Screen_ButtonAnimate(GL_PageControls_TypeDef* pThis);
 
 // void Screen_done(GL_PageControls_TypeDef* pThis);
 void Screen_Done(void);

@@ -115,15 +115,10 @@ int Screen_GetScreenMode() {
  */
 static void optionButton_Click(GL_PageControls_TypeDef* pThis)
 {
+	Screen_ButtonAnimate(pThis);
 	uint16_t id = pThis->ID - ID_OPTION_START;
 	assert(id >= 0 && id <= NUM_OPTIONS);
 	Options_SetSelectedOption(id);
-	GL_Button_TypeDef* pThat = (GL_Button_TypeDef*) (pThis->objPTR);
-	pThat->isObjectTouched = GL_TRUE;
-	pThis->SetObjVisible(pThis, pThis->objCoordinates);
-	Delay(2500000); //250ms
-	pThat->isObjectTouched = GL_FALSE;
-	pThis->SetObjVisible(pThis, pThis->objCoordinates);
 	if (id <= END_BASIC_OPTIONS)
 		Screen_Done();
 }
@@ -136,22 +131,28 @@ void Screen_Done() {
 }
 
 void advanced_Click(GL_PageControls_TypeDef* pThis) {
+	Screen_ButtonAnimate(pThis);
 	Screen_SetScreenMode(ADVANCED);
 //	Options_SetSelectedOption(START_ADVANCED_OPTIONS);
 	Screen_ShowScreen(&g_screenAdvanced);
 }
 
 static void functionEditButton_Click(GL_PageControls_TypeDef* pThis) {
+	Screen_ButtonAnimate(pThis);
 	Screen_SetScreenMode(FUNCTION);
 	Screen_ShowScreen(&g_screenEditText);
 }
 
 static void programEditButton_Click(GL_PageControls_TypeDef* pThis) {
+	debug (GUI, "programEditButton_Click:");
+	Screen_ButtonAnimate(pThis);
 	Screen_SetScreenMode(FUNCTION);
 	Screen_ShowScreen(&g_screenEditProgText);
+	debug (GUI, "programEditButton_Click: end");
 }
 
 static void tagEditButton_Click(GL_PageControls_TypeDef* pThis) {
+	Screen_ButtonAnimate(pThis);
 	Screen_SetScreenMode(FUNCTION);
 	Screen_ShowScreen(&g_screenEditTagText);
 

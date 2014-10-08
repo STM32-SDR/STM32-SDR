@@ -27,7 +27,7 @@
 #include "xprintf.h"
 #include "Encoders.h"
 #include <string.h>
-#include "Init_I2C.h"
+
 
 // Used in this file to refer to the correct screen (helps to keep code copy-paste friendly.
 static GL_Page_TypeDef *s_pThisScreen = &g_screenAdvanced;
@@ -109,23 +109,20 @@ static void displayDefaultsFeedback(void)
  */
 static void optionButton_Click(GL_PageControls_TypeDef* pThis)
 {
+	Screen_ButtonAnimate(pThis);
 	uint16_t id = pThis->ID - ID_OPTION_START;
 	assert(id >= 0 && id <= NUM_OPTIONS);
 	Options_SetSelectedOption(id);
-	GL_Button_TypeDef* pThat = (GL_Button_TypeDef*) (pThis->objPTR);
-	pThat->isObjectTouched = GL_TRUE;
-	pThis->SetObjVisible(pThis, pThis->objCoordinates);
-	Delay(2500000); //250ms
-	pThat->isObjectTouched = GL_FALSE;
-	pThis->SetObjVisible(pThis, pThis->objCoordinates);
 }
 
 static void defaults_Click(GL_PageControls_TypeDef* pThis)
 {
+	Screen_ButtonAnimate(pThis);
 	displayDefaultsFeedback();
 	Options_ResetToDefaults();
 }
 
 static void calibrate_Click(GL_PageControls_TypeDef* pThis) {
+	Screen_ButtonAnimate(pThis);
 	Screen_ShowScreen(&g_screenCalibrate);
 }

@@ -130,6 +130,7 @@ static void displayStoreFeedback(void)
 static void tagButton_Click(GL_PageControls_TypeDef* pThis)
 {
 	debug(GUI, "tagButton_Click:\n");
+	Screen_ButtonAnimate(pThis);
 	uint16_t id = pThis->ID - ID_TEXT_START;
 	editMode=TRUE;
 	if (editMode){
@@ -174,6 +175,7 @@ static void edit_Click(GL_PageControls_TypeDef* pThis)
 static void done_Click(GL_PageControls_TypeDef* pThis) {
 	// Change text back to normal for next time.
 	debug (GUI, "done_Click\n");
+	Screen_ButtonAnimate(pThis);
 	Screen_ChangeButtonTagLabel(s_currentTagNumber);
 	Screen_TagDone();
 }

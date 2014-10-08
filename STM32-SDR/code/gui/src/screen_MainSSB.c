@@ -208,6 +208,7 @@ void ScreenMainSSB_Create(void)
 
 static void Screen_TextButtonClick(GL_PageControls_TypeDef* pThis)
 {
+	Screen_ButtonAnimate(pThis);
 	debug(GUI, "Screen_TextButtonClick:\n");
 	uint16_t id = pThis->ID - 250;
 	compose_Text (id);

@@ -48,6 +48,7 @@ GL_Page_TypeDef g_screenEditText;
 GL_Page_TypeDef g_screenEditTagText;
 GL_Page_TypeDef g_screenEditProgText;
 
+
 // Create all screens
 void Screen_CreateAllScreens(void)
 {
@@ -64,9 +65,9 @@ void Screen_CreateAllScreens(void)
 	ScreenAdvanced_Create();
 	ScreenFilter_Create();
 	ScreenFrequencies_Create();
-	ScreenEditText_Create();
-	ScreenEditTagText_Create();
-	ScreenEditProgText_Create();
+//	ScreenEditText_Create();
+//	ScreenEditTagText_Create();
+//	ScreenEditProgText_Create();
 	debug(GUI, "Screen_CreateAllScreens: Done\n");
 }
 
@@ -75,24 +76,30 @@ void Screen_ShowScreen(GL_Page_TypeDef *pNewScreen)
 {
 	debug(GUI, "Screen_ShowScreen:\n");
 	assert(pNewScreen != 0);
-
+	xprintf("1");
 	// Break out if already on this screen.
 	if (pNewScreen == s_pCurrentScreen) {
 		return;
 	}
-
+	xprintf("2");
 	if (s_pCurrentScreen != 0) {
 		s_pCurrentScreen->ShowPage(s_pCurrentScreen, GL_FALSE);
 	}
+	xprintf("3");
 	GL_Clear(LCD_COLOR_BLACK);
+	xprintf("4");
 	GL_SetBackColor(LCD_COLOR_BLACK);
+	xprintf("5");
 	GL_SetTextColor(LCD_COLOR_WHITE);
+	xprintf("6");
 
 	// Second parameter as true forces the screen to redraw itself
 	// as opposed to allowing it choose what to redraw based on need.
 	pNewScreen->ShowPage(pNewScreen, GL_TRUE);
+	xprintf("7");
 
 	s_pCurrentScreen = pNewScreen;
+	xprintf("8");
 
 	// set default waterfall/spectrum display
 
@@ -115,4 +122,14 @@ void Screen_ShowMainScreen(void)
 	default:
 		assert(0);
 	}
+}
+
+void Screen_ButtonAnimate(GL_PageControls_TypeDef* pThis)
+{
+	GL_Button_TypeDef* pThat = (GL_Button_TypeDef*) (pThis->objPTR);
+	pThat->isObjectTouched = GL_TRUE;
+	pThis->SetObjVisible(pThis, pThis->objCoordinates);
+	Delay(2500000); //250ms for button animation
+	pThat->isObjectTouched = GL_FALSE;
+	pThis->SetObjVisible(pThis, pThis->objCoordinates);
 }

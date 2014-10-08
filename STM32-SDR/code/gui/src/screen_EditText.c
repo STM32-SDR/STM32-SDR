@@ -137,6 +137,7 @@ static void displayStoreFeedback(void)
 static void textButton_Click(GL_PageControls_TypeDef* pThis)
 {
 	debug(GUI, "textButton_Click:\n");
+	Screen_ButtonAnimate(pThis);
 	uint16_t id = pThis->ID - ID_TEXT_START;
 	editMode=TRUE;
 	if (editMode){
@@ -178,6 +179,7 @@ static void edit_Click(GL_PageControls_TypeDef* pThis)
 static void done_Click(GL_PageControls_TypeDef* pThis) {
 	// Change text back to normal for next time.
 	debug (GUI, "done_Click\n");
+	Screen_ButtonAnimate(pThis);
 	Screen_TextDone();
 }
 
@@ -196,6 +198,7 @@ void Screen_TextDone(){
 }
 
 static void tagEditButton_Click(GL_PageControls_TypeDef* pThis) {
+	Screen_ButtonAnimate(pThis);
 	// Change text back to normal for next time.
 	debug (GUI, "tagEditButton_Click\n");
 	clearLabel();

@@ -263,6 +263,7 @@ static void TR_Click(GL_PageControls_TypeDef* pThis)
 	else {
 		RxTx_SetTransmit();
 	} */
+	Screen_ButtonAnimate(pThis);
 	NCOTUNE = !NCOTUNE;
 	if (NCOTUNE)
 		ChangeButtonText(s_pThisScreen, 10, "Tune ^ ");
@@ -273,6 +274,7 @@ static void TR_Click(GL_PageControls_TypeDef* pThis)
 
 static void N_Click(GL_PageControls_TypeDef* pThis)
 {
+	Screen_ButtonAnimate(pThis);
 	set_kybd_mode(2);
 	Contact_Clear(1);
 	text_cnt = 0;
@@ -280,6 +282,7 @@ static void N_Click(GL_PageControls_TypeDef* pThis)
 
 static void C_Click(GL_PageControls_TypeDef* pThis)
 {
+	Screen_ButtonAnimate(pThis);
 	set_kybd_mode(1);
 	Contact_Clear(0);
 	text_cnt = 0;
@@ -293,6 +296,7 @@ static void Clear_Click(GL_PageControls_TypeDef* pThis)
 */
 static void Screen_TextButtonClick(GL_PageControls_TypeDef* pThis)
 {
+	Screen_ButtonAnimate(pThis);
 	debug(GUI, "Screen_TextButtonClick:\n");
 	uint16_t id = pThis->ID - 250;
 	compose_Text (id);

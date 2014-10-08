@@ -1409,7 +1409,7 @@ static GL_ErrStatus SetButtonVisible(GL_PageControls_TypeDef* pTmp, GL_Coordinat
 	if (!pThis) {
 		return GL_ERROR;
 	}
-	pThis->Control_Visible = GL_TRUE;
+//	pThis->Control_Visible = GL_TRUE;
 
 	// Select images for button up.
 	_Bool isTouched = pThis->isObjectTouched;
@@ -1426,10 +1426,24 @@ static GL_ErrStatus SetButtonVisible(GL_PageControls_TypeDef* pTmp, GL_Coordinat
 		ptrBitmapRight = (uint8_t*) BtnNormalRight;
 	}
 
-	GL_DrawButton(objCoordinates, ptrBitmapLeft, ptrBitmapCenter, ptrBitmapRight, pThis->label);
+	if (pThis->Control_Visible == GL_TRUE)
+		GL_DrawButton(objCoordinates, ptrBitmapLeft, ptrBitmapCenter, ptrBitmapRight, pThis->label);
+	else {
+		GL_SetTextColor(GL_Black);
+		GL_DrawFilledRectangle( (uint16_t)(objCoordinates.MaxX+1),
+				(uint16_t)(objCoordinates.MinX),
+				(uint8_t)(objCoordinates.MaxY+1),
+				(uint8_t)(objCoordinates.MinY), GL_Black);
+	}
 	return GL_OK;
 }
 
+/**
+ * @brief  Show the Control Object at the specified coordinates.
+ * @param  *pThis: Pointer to Object Structure
+ * @param  *objCoordinates: Pointer to objCoordinates Structure
+ * @retval GL_ErrStatus - GL_OK if successful, GL_ERROR otherwise
+ */
 
 /**
  * @brief  Show the Control Object at the specified coordinates.

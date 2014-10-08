@@ -64,7 +64,7 @@ static void resetLabel(void);
  */
 void ScreenEditProgText_Create(void)
 {
-	debug(GUI, "ScreenEditText_Create:\n");
+	debug(GUI, "ScreenEditProgText_Create:\n");
 	Create_PageObj(s_pThisScreen);
 
 	/*
@@ -140,6 +140,7 @@ static void displayStoreFeedback(void)
 static void textButton_Click(GL_PageControls_TypeDef* pThis)
 {
 	debug(GUI, "textButton_Click:\n");
+	Screen_ButtonAnimate(pThis);
 	uint16_t id = pThis->ID - ID_TEXT_START + Prog_SSB1;
 	editMode=TRUE;
 	if (editMode){
@@ -181,6 +182,7 @@ static void edit_Click(GL_PageControls_TypeDef* pThis)
 static void done_Click(GL_PageControls_TypeDef* pThis) {
 	// Change text back to normal for next time.
 	debug (GUI, "done_Click\n");
+	Screen_ButtonAnimate(pThis);
 	Screen_ProgDone();
 }
 
@@ -200,6 +202,7 @@ void Screen_ProgDone(void){
 static void tagEditButton_Click(GL_PageControls_TypeDef* pThis) {
 	// Change text back to normal for next time.
 	debug (GUI, "tagEditButton_Click\n");
+	Screen_ButtonAnimate(pThis);
 	clearLabel();
 	resetLabel();
 	set_kybd_mode(0);
