@@ -28,6 +28,7 @@ void RxTx_Init(void);
 // Control switching between receive and transmit mode.
 void RxTx_SetReceive(void);
 void RxTx_SetTransmit(void);
+_Bool RxTx_InTransion(void);
 
 
 // Query current mode (transmit or receive).

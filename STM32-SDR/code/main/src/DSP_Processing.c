@@ -181,13 +181,13 @@ void Process_FFT(void)
 		//First Order Filter for FFT
 		FFT_Filter[j] =  FFT_Coeff * FFT_Output[j] + (1.0-FFT_Coeff) * FFT_Filter[j];
 
-		//CW Peak in range from 400-700
+		//CW Peak in range from 400-800
 		if (j >= jcwl && j <= jcwh){
 			Sig = (int)FFT_Magnitude[j];
 		    if ( Sig > Sig_Max) {
 			Sig_Max1 = Sig;
 		    }
-
+		    Sig_Sum0 += (int)FFT_Magnitude[j];
 		}
 		//Digi AGC
 		if (j == NCO_Bin) {
@@ -210,13 +210,12 @@ void Process_FFT(void)
 
 	  }  // End of Search
 
-	Sig_Sum0 = Sig_Max1;
 
 
 	switch (AGC_Mode){   // AGC Mode Switch
 		case 0:
-			//Sig_Total = Sig_Sum0;	// Maximum signal in filter passband
-			Sig_Total = Sig_Sum0;
+			//Sig_Total = Sig_Max1;	// Maximum signal in CW range
+			Sig_Total = Sig_Sum0;	//Sum signal in CW range
 			break;
 		case 1:
 			Sig_Total = Sig_Sum1;
@@ -225,7 +224,7 @@ void Process_FFT(void)
 			Sig_Total = Sig_Sum2;
 			break;
 		case 3:
-			Sig_Total = Sig_Sum1;  //This forces RSL to be derived from Peak magnitude
+			Sig_Total =Sig_Max;  //This forces RSL to be derived from Peak magnitude --was  Sig_Sum1 JDG
 			break;
 		} // End of AGC Mode Switch
 

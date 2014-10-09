@@ -197,7 +197,7 @@ void Xmit_SSB_Sequence(void)
 	Mute_LO();
 	s_inTxMode = 1;
 	AGC_On = 0;  //Turn off AGC so that DAC is held constant during transmit
-	Init_AGC();  //added JDG
+	//Init_AGC();  //added JDG
 	Disconnect_PGA();
 	Set_DAC_DVC(15); //SSB Xmit DAC Gain
 	Set_ADC_DVC(0);
@@ -215,7 +215,7 @@ void Xmit_CW_Sequence(void)
 	Mute_LO();
 	s_inTxMode = 1;
 	AGC_On = 0;
-	Init_AGC();  //added JDG
+	//Init_AGC();  //added JDG
 	Set_DAC_DVC(-33); //CW Xmit DAC Gain
 	GPIO_WriteBit(GPIOD, GPIO_Pin_3, Bit_RESET);  //Make PTT_Out Low,Remember FET Inversion
 	Delay(1000);
@@ -230,7 +230,7 @@ void Xmit_PSK_Sequence(void)
 	Mute_LO();
 	s_inTxMode = 1;
 	AGC_On = 0;  //Turn off AGC so that DAC is held constant during transmit
-	Init_AGC();  //added JDG
+	//Init_AGC();  //added JDG
 	Disconnect_PGA();
 	Set_DAC_DVC(12); //PSK Xmit DAC Gain
 	GPIO_WriteBit(GPIOD, GPIO_Pin_3, Bit_RESET);  //Make PTT_Out Low,Remember FET Inversion
