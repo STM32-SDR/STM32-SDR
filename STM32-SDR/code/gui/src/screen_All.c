@@ -120,7 +120,6 @@ void Screen_ButtonAnimate(GL_PageControls_TypeDef* pThis)
 	GL_Button_TypeDef* pThat = (GL_Button_TypeDef*) (pThis->objPTR);
 	pThat->isObjectTouched = GL_TRUE;
 	pThis->SetObjVisible(pThis, pThis->objCoordinates);
-	Delay(2500000); //250ms for button animation
 	pThat->isObjectTouched = GL_FALSE;
 	pThis->SetObjVisible(pThis, pThis->objCoordinates);
 }

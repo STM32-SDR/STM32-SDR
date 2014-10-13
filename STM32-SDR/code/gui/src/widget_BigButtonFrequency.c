@@ -67,6 +67,8 @@ static void insideEventHandler(GL_PageControls_TypeDef* pThis, int relX, int rel
 {
 	debug(GUI, "Widget_NewBigButtonFrequency:insideEventHandler:\n");
 	_Bool touchLeftHalf = relX < INSIDE_WIDTH / 2;
+	_Bool touchLeftQuarter = relX < INSIDE_WIDTH / 4;
+	_Bool touchRightQuarter = relX > INSIDE_WIDTH * 3 / 4;
 	switch (Screen_GetScreenMode()){
 		case FILTER:
 			if (touchLeftHalf) {
@@ -79,12 +81,24 @@ static void insideEventHandler(GL_PageControls_TypeDef* pThis, int relX, int rel
 
 		case FREQUENCY:
 		case FREQEDIT:
-			Screen_FreqDone();
+			if (touchLeftQuarter) {
+				FrequencyManager_IncreaseFreqStepSize();
+			} else if (touchRightQuarter){
+				FrequencyManager_DecreaseFreqStepSize();
+			} else {
+				Screen_FreqDone();
+			}
 			break;
 
 		default:
-			Screen_SetScreenMode(FREQUENCY);
-			Screen_ShowScreen(&g_screenFrequencies);
+			if (touchLeftQuarter) {
+				FrequencyManager_IncreaseFreqStepSize();
+			} else if (touchRightQuarter){
+				FrequencyManager_DecreaseFreqStepSize();
+			} else {
+				Screen_SetScreenMode(FREQUENCY);
+				Screen_ShowScreen(&g_screenFrequencies);
+			}
 			break;
 	}
 }

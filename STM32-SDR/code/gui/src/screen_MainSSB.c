@@ -41,7 +41,9 @@ static GL_PageControls_TypeDef* pPGALabel;
 static GL_PageControls_TypeDef* pDACLabel;
 static GL_PageControls_TypeDef* pRSLLabel;
 static GL_PageControls_TypeDef* pFiltLabel;
+static GL_PageControls_TypeDef* pFreqLabel;
 
+extern 	int FrequencyManager_GetCurrentFrequency(void);
 
 /**
  * Call-back prototypes
@@ -108,6 +110,41 @@ static _Bool FilterStatusUpdateHandler(GL_PageControls_TypeDef* pThis, _Bool for
       return 0;
 }
 
+static _Bool FreqStatusUpdateHandler(GL_PageControls_TypeDef* pThis, _Bool forceRedisplay)
+{
+      // For CW, put this in code\gui\src\screen_MainCW.c
+	//and display the result
+	static char buf[15] = {0};
+	int val = FrequencyManager_GetCurrentFrequency();
+	int i = 12, j=12;
+	for(; i>=0 && j>=0 && val ; --i){
+		if (i%3==0){
+			buf[j] = ","[0];
+//			xprintf("i = %d, j = %d, val = %d, buf[j] = %c\n", i, j, val, buf[j]);
+			j--;
+		}
+		buf[j] = "0123456789"[val % 10];
+//		xprintf("i = %d, j = %d, val = %d, buf[j] = %c\n", i, j, val, buf[j]);
+		val /= 10;
+		j--;
+	}
+		//replace leading 0 with space
+	for(; i>=0 && j>=0; --i, val /= 10){
+		buf[j] = " "[0];
+		j--;
+//		xprintf("i = %d, j = %d, val = %d, buf[j] = %c\n", i, j, val, buf[j]);
+	}
+	buf[12] = "H"[0]; //replace last comma with Hz + null
+	buf[13] = "z"[0];
+	buf[14] = 0;
+//		xprintf("Frequency = %s\n", buf);
+
+	Widget_ChangeLabelText(pFreqLabel, buf);
+
+      // No need to indicate update required because changing the
+      // label text forces an update (redraw).
+	return 0;
+}
 
 static _Bool PGAUpdateHandler(GL_PageControls_TypeDef* pThis, _Bool forceRedisplay){
 	 return 0;
@@ -189,6 +226,10 @@ void ScreenMainSSB_Create(void)
 	//Filt Label
 		pFiltLabel = Widget_NewLabel("F0", LCD_COLOR_YELLOW, LCD_COLOR_BLACK, 0, GL_FONTOPTION_8x16,FilterStatusUpdateHandler);
 		AddPageControlObj(52, 12, pFiltLabel, s_pThisScreen);
+
+	//Frequency Label
+		pFreqLabel = Widget_NewLabel("", LCD_COLOR_GREEN, LCD_COLOR_BLACK, 0, GL_FONTOPTION_16x24,FreqStatusUpdateHandler);
+		AddPageControlObj(98, 130, pFreqLabel, s_pThisScreen);
 
 	// Programmable buttons
 		for (int i = 0; i < Prog_CW1 - Prog_SSB1; i++) {
