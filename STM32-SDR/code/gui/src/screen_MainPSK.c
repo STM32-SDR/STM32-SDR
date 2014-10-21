@@ -239,8 +239,11 @@ void ScreenMainPSK_Create(void)
 }
 
 void Screen_PSK_SetTune (void){
-	if (Screen_GetScreenMode() == MAIN)
+	if ((Screen_GetScreenMode() == MAIN) & (Mode_GetCurrentMode() == MODE_PSK)){
+		NCOTUNE=1;
 		ChangeButtonText(s_pThisScreen, 10, "Tune ^ ");
+	} else
+		NCOTUNE=0;
 }
 
 /**

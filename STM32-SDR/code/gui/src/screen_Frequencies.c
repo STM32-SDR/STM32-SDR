@@ -222,6 +222,7 @@ void Screen_FreqDone(void) {
 	pThat->Control_Visible = GL_FALSE; // make the mode button invisible
 	RefreshPageControl (s_pThisScreen, 1);
 	Screen_SetScreenMode(MAIN);
+	Screen_PSK_SetTune();
 	displayPresetInstructions ();
 	Screen_ShowMainScreen();
 }

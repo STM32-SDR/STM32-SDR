@@ -129,4 +129,6 @@ int Screen_GetScreenMode(void);
 void Screen_SetScreenMode(int value);
 void Screen_filter_Click(GL_PageControls_TypeDef* pThis);
 
+void Screen_PSK_SetTune(void);
+
 #endif

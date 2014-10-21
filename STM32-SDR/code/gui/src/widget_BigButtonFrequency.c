@@ -87,6 +87,7 @@ static void insideEventHandler(GL_PageControls_TypeDef* pThis, int relX, int rel
 				FrequencyManager_DecreaseFreqStepSize();
 			} else {
 				Screen_FreqDone();
+				Screen_PSK_SetTune();
 			}
 			break;
 
@@ -98,6 +99,7 @@ static void insideEventHandler(GL_PageControls_TypeDef* pThis, int relX, int rel
 			} else {
 				Screen_SetScreenMode(FREQUENCY);
 				Screen_ShowScreen(&g_screenFrequencies);
+				Screen_PSK_SetTune(); // ensure we are in the correct tune mode
 			}
 			break;
 	}

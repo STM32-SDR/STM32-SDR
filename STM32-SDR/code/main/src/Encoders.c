@@ -48,9 +48,11 @@ const int8_t ENCODER_STATES[] = {
 
 typedef struct
 {
-	uint8_t old;
-	int8_t dir0;
-	int8_t dir1;
+	uint16_t old;
+	uint8_t history_a;
+	uint8_t history_b;
+//	int8_t dir0;
+//	int8_t dir1;
 
 	GPIO_TypeDef *pPort;
 	uint8_t lowPinNumber;
@@ -59,6 +61,8 @@ static EncoderStruct_t s_encoderStruct1 = {0, 0, 0, GPIOC, 5};
 static EncoderStruct_t s_encoderStruct2 = {0, 0, 0, GPIOB, 4};
 
 // Encoder used for options =0 or filter code selection = 1
+
+int encoder = 0;
 
 // Prototypes
 static void configureGPIOEncoder1(void);
@@ -176,45 +180,132 @@ void Encoders_CalculateAndProcessChanges(void)
 	// TODO:- Is delay needed for encoder? Should it be doubled (as would have been before encoder refactor)?
 
 	int change = 0;
+	encoder = 1;
 	change = calculateEncoderChange(&s_encoderStruct1);
 	applyEncoderChange1(change);
 
+	encoder = 2;
 	change = calculateEncoderChange(&s_encoderStruct2);
 	applyEncoderChange2(change);
+}
+
+_Bool testBit (uint8_t byte, uint8_t bit){
+	if (((byte >> bit) & 0x01) == 1)
+		return 1;
+	else
+		return 0;
 }
 
 static int8_t calculateEncoderChange(EncoderStruct_t *pEncoder)
 {
 	// Encoder motion has been detected--determine direction
-	int8_t direction;
+	int8_t direction=0;
 
-	uint8_t code = (GPIO_ReadInputData(pEncoder->pPort) >> pEncoder->lowPinNumber & 0x03);
-	code = 4 * code + pEncoder->old;
-	// bits 0/1 are old values and bits 2/3 are now values
-	//encoder sequence is 0, 1, 3, 2
-	pEncoder->old = code / 4; //save the new encoder bits
+	uint16_t code = (GPIO_ReadInputData(pEncoder->pPort) >> pEncoder->lowPinNumber & 0x03);
 
-	switch (code){
-	case 0x01:
-	case 0x07:
-	case 0x08:
-	case 0x0E:
-		direction = -1;
-		break;
-	case 0x02:
-	case 0x04:
-	case 0x0B:
-	case 0x0d:
-		direction = 1;
-		break;
-	default:
-		direction = 0;
-	break;
+	//de-bounce filter
+	//collect a history of bits
+	pEncoder->history_a = (pEncoder->history_a << 1) + (code & 0x01);
+	pEncoder->history_b= (pEncoder->history_b << 1) + ((code & 0x02) >> 1);
+
+	//count how many bits have been set
+
+	int8_t filter_length = 4; //also this is the max value of sum_a and sum_b
+	int8_t hysteresis = 3;
+	int8_t sum_a=0;
+	int8_t sum_b=0;
+
+	for (int i=0; i<filter_length; i++){
+		if (testBit(pEncoder->history_a, i)) sum_a++;
+		else sum_a--;
+		if (testBit(pEncoder->history_b, i)) sum_b++;
+		else sum_b--;
+//		if (encoder == 1) xprintf("i=%d, testBitA=%d, testBitB=%d, sum_a=%d, sum_b=%d\n", i,testBit(pEncoder->history_a, i),testBit(pEncoder->history_b, i),sum_a,sum_b);
 	}
 
-	return direction;
+	// start with previous code value and apply hysteresis to changes
+	code = (pEncoder->old >> 4) & 0x03;
 
+	if (!testBit(code, 0) & (sum_a >= hysteresis))
+		code++;
+	if (testBit(code, 0) & (sum_a <= -hysteresis))
+		code--;
+
+	if (!testBit(code, 1) & (sum_b > hysteresis))
+		code+=2;
+	if (testBit(code, 1) & (sum_b < -hysteresis))
+		code-=2;
+
+	// encoder sequence is 0, 1, 3, 2 clockwise
+	// or 2, 3, 1, 0 anti-clockwise
+	// uses a 8 state machine to detect rotation to eliminate noise
+	// requires 3 sequences before determining direction
+
+	//new encoder bits are prepended to the MSB's
+	// pEncoder->old bits 0/1 and 2/3 are old values and bits 4/5 are new values
+	code = 0x100 * code + pEncoder->old;
+
+	// when a change is detected shift right 4 bits and store the sequence
+	// for use next cycle
+	if (((code & 0xF00 )>> 8) != ((code & 0x0F0 )>>4))
+		pEncoder->old = code / 0x10; //save the new encoder bits
+
+	switch (code){
+	case 0x310:
+	case 0x231:
+	case 0x023:
+	case 0x102:
+		// clockwise
+		direction = +1;
+		break;
+	case 0x132:
+	case 0x013:
+	case 0x201:
+	case 0x320:
+		// anti-clockwise
+		direction = -1;
+		break;
+
+		//may be changing direction from clockwise to anti-clockwise
+	case 0x202:
+		pEncoder->old = 0x20;
+		break;
+	case 0x010:
+		pEncoder->old = 0x01;
+		break;
+	case 0x131:
+		pEncoder->old = 0x13;
+		break;
+	case 0x323:
+		pEncoder->old = 0x32;
+		break;
+
+		//may be changing direction from anti-clockwise to clockwise
+	case 0x020:
+		pEncoder->old = 0x02;
+		break;
+	case 0x232:
+		pEncoder->old = 0x23;
+		break;
+	case 0x313:
+		pEncoder->old = 0x31;
+		break;
+	case 0x101:
+		pEncoder->old = 0x10;
+		break;
+
+		// ignore any other sequences
+	default:
+		break;
+	}
+
+//	if ((encoder == 1) & (direction != 0)) xprintf ("history_a=%x, history_b=%x, sum_a = %d, sum_b=%d", pEncoder->history_a, pEncoder->history_b, sum_a, sum_b);
+//	if ((encoder == 1) & (direction != 0)) xprintf(", code=%x, direction=%d\n", code, direction);
+
+	return direction;
 	/*
+
+Old encoder algorithm does not work well!!
 
 	// Remember previous encoder state and add current state (2 bits)
 	pEncoder->old <<= 2;
@@ -240,8 +331,7 @@ static int8_t calculateEncoderChange(EncoderStruct_t *pEncoder)
 	}
 
 	return pEncoder->dir1;
-
-	*/
+*/
 
 }
 

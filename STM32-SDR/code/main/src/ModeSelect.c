@@ -24,6 +24,7 @@
 #include "DMA_IRQ_Handler.h"
 #include "ChangeOver.h"
 #include "widgets.h"
+#include "STM32-SDR-Subroutines.h"
 
 extern double NCO_Frequency;
 extern int NCOTUNE;
@@ -142,17 +143,16 @@ void Mode_SetCurrentMode(UserModeType newMode)
 		case USERMODE_CWR:
 			RxTx_SetReceive();
 			WF_Flag = 0;
+			No_Filt (); //default to AF filter off
 			break;
 		case USERMODE_DIGU:
 		case USERMODE_DIGL:
 			RxTx_SetReceive();
 			WF_Flag = 1;
-			NCOTUNE = 1;
 			Screen_PSK_SetTune(); //move to up arrow on tune button
 			break;
 		case USERMODE_TUNE:
 			WF_Flag = 0;
-			NCOTUNE = 1;
 			Screen_PSK_SetTune(); //move to up arrow on tune button
 			NCO_Point = 55; //Position for 1kHz
 			RxTx_SetTransmit();
