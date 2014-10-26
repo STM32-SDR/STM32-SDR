@@ -98,64 +98,8 @@ void CalcQuality(double angle);
 int SymbSync(struct Complex sample);
 void CalcFreqError(struct Complex IQ);
 void CalcFFreqError(struct Complex IQ);
-/* variables */
-int m_FastAFCMode;
-int m_AFCCaptureOn;
-int m_IMDValid;
-int m_SQOpen;
-int m_LastBitZero;
 
-unsigned char m_VaricodeDecTbl[2048];
-int m_BitAcc;
-long m_IQPhaseArray[20];
-long m_SyncArray[20];
-int m_AFCTimer;
-int m_AFCmode;
-int m_PSKmode;
-int m_SampleClkAdj;
-int m_IQPhzIndex;
-int m_SquelchSpeed;
-int m_SQLevel;
-int m_SQThresh;
-int m_ClkErrTimer;
-int m_ClkErrCounter;
-int m_ClkError;
-int m_LastPkPos;
-int m_OnCount;
-int m_OffCount;
-int m_SampCnt;
-double m_FreqError;
-double m_DevAve;
-double m_I0; /* 4 stage I/Q delay line variables */
-double m_I1;
-double m_Q0;
-double m_Q1;
-double m_BitPhaseInc;
-double m_BitPhasePos;
-double m_SyncAve[21];
-double m_NCOphzinc;
-double m_SampleFreq;
-double m_AFClimit;
-double m_AFCmax;
-double m_AFCmin;
-double m_NLPk;
-
-struct Complex m_FreqSignal;
-struct Complex m_BitSignal;
-
-/* Local variables for various functions that need to be saved between calls */
-int m_PkPos;
-int m_NewPkPos;
-int m_BitPos;
-int m_Pcnt;
-int m_Ncnt;
-double m_AGCave;
-double m_FperrAve;
-double m_FferrAve;
-double m_QFreqError;
-double m_VcoPhz;
-struct Complex m_z1;
-struct Complex m_z2;
+extern int m_SQOpen;
 
 void InitPSK(int Fs);
 void ProcPSKDet(void);

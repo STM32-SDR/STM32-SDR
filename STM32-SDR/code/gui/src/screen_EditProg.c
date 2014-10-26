@@ -52,7 +52,7 @@ void Screen_ProgDone(void);
 static void clearLabel(void);
 static void resetLabel(void);
 
-#define ID_TEXT_START      300
+#define ID_TEXT_START      150
 #define FIRST_BUTTON_Y       16
 #define SPACE_PER_BUTTON_Y   32
 #define LEFT_COL_X           0
@@ -73,7 +73,7 @@ void ScreenEditProgText_Create(void)
 
 	s_lblStatus1 = Widget_NewLabel("Press to Edit.", LCD_COLOR_WHITE, LCD_COLOR_BLACK, 0, GL_FONTOPTION_8x12Bold, 0);
 	s_lblStatus2 = Widget_NewLabel("Screen Functions", LCD_COLOR_WHITE, LCD_COLOR_BLACK, 0, GL_FONTOPTION_8x12Bold, 0);
-	s_lblStatus3 = Widget_NewLabel("  SSB     CW     PSK", LCD_COLOR_WHITE, LCD_COLOR_BLACK, 0, GL_FONTOPTION_8x8, 0);
+	s_lblStatus3 = Widget_NewLabel("  SSB     CW     ", LCD_COLOR_WHITE, LCD_COLOR_BLACK, 0, GL_FONTOPTION_8x8, 0);
 //	GL_PageControls_TypeDef* btnStore = NewButton(0, " Store  ", store_Click);
 //	GL_PageControls_TypeDef* btnEdit = NewButton(0, "  Edit  ", edit_Click);
 	GL_PageControls_TypeDef* btnDone = NewButton(0, "  Done  ", done_Click);
@@ -81,7 +81,8 @@ void ScreenEditProgText_Create(void)
 
 	// Populate the options buttons:
 
-	for (int i = 0; i < Text_Items - Prog_SSB1; i++) {
+//	for (int i = 0; i < Text_Items - Prog_SSB1; i++) {
+	for (int i = 0; i < 8; i++) {
 		static GL_PageControls_TypeDef* btnText;
 		btnText = NewButton(ID_TEXT_START + i, Text_GetName(Prog_SSB1 + i), textButton_Click);
 
@@ -182,7 +183,6 @@ static void edit_Click(GL_PageControls_TypeDef* pThis)
 static void done_Click(GL_PageControls_TypeDef* pThis) {
 	// Change text back to normal for next time.
 	debug (GUI, "done_Click\n");
-	Screen_ButtonAnimate(pThis);
 	Screen_ProgDone();
 }
 
@@ -202,7 +202,6 @@ void Screen_ProgDone(void){
 static void tagEditButton_Click(GL_PageControls_TypeDef* pThis) {
 	// Change text back to normal for next time.
 	debug (GUI, "tagEditButton_Click\n");
-	Screen_ButtonAnimate(pThis);
 	clearLabel();
 	resetLabel();
 	set_kybd_mode(0);

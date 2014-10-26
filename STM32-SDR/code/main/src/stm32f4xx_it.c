@@ -250,19 +250,5 @@ void TIM5_IRQHandler(void)
 
   }
 }
-/**
-  * @brief  TIM4_IRQHandler
-  *         This function handles Timer4 Handler.
-  * @param  None
-  * @retval None
-  */
-
-/**
- * @}
- */
-
-/**
- * @}
- */
 
 /******************* (C) COPYRIGHT 2011 STMicroelectronics *****END OF FILE****/

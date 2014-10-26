@@ -24,6 +24,7 @@
 
 void Encoders_Init(void);
 void Encoders_CalculateAndProcessChanges(void);
+void Encoder_TimerIRQ(void);
 
 // Return if one (or both) encoders pressed.
 _Bool Encoders_IsOptionsEncoderPressed(void);

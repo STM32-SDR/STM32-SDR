@@ -16,15 +16,15 @@ extern int   AGC_Mode;
 extern float DDeltaPGA;
 
 
-float   AGC_Mag;
-int		RSL_Mag;
+extern float   AGC_Mag;
+extern int		RSL_Mag;
 
-int PGAGAIN0;
-int dac_gain;
-int	AGC_Signal;
+extern int PGAGAIN0;
+extern int dac_gain;
+extern int	AGC_Signal;
 
-int AGC_On;
-int Old_PGAGAIN0;
-int Old_dac_gain;
+extern int AGC_On;
+extern int Old_PGAGAIN0;
+extern int Old_dac_gain;
 
-int RSL_Cal;
+extern int RSL_Cal;

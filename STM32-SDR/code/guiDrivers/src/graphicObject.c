@@ -2153,23 +2153,30 @@ static GL_ErrStatus SetPage(GL_Page_TypeDef* pPage, GL_bool bVal)
  */
 GL_ErrStatus ShowPage(GL_Page_TypeDef* pPage, GL_bool bVal)
 {
+	debug(GUI, "ShowPage:1\n");
 	uint32_t i = 0;
 	if (!pPage) {
 		return GL_ERROR;
+		debug(GUI, "ShowPage:2\n");
 	}
 	pPage->Page_Visible = bVal;
 	pPage->SetPage(pPage, bVal);
+	debug(GUI, "ShowPage:3\n");
 	if (bVal == GL_TRUE) {
+		debug(GUI, "ShowPage:4\n");
 		while (i < pPage->ControlCount) /* search for the required button */
 		{
+			debug(GUI, "ShowPage:5 i=%d\n", i);
 			pPage->PageControls[i]->SetObjVisible(pPage->PageControls[i], pPage->PageControls[i]->objCoordinates);
 			i++;
 		}
 	}
 	else {
+		debug(GUI, "ShowPage:6\n");
 //		GL_Clear(GL_White);
 	}
 	pPage->SetPage(pPage, bVal);
+	debug(GUI, "ShowPage:7\n");
 
 	return GL_OK;
 }

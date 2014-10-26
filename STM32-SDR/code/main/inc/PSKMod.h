@@ -35,14 +35,7 @@ extern char XmitBuffer[];
 void ClearXmitBuffer(void);
 char GetTxChar(void);
 
-/* PSK31  generator variables */
-int m_AddEndingZero;
-uint16_t m_TxShiftReg;
-double m_SymbolRate;
-
-float m_RMSConstant;
-double m_2PI;
-float S1, S2;
+extern float S1, S2;
 
 /* PSK31 modulator private functions */
 char GetChar(void);

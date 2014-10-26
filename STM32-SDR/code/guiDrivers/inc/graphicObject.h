@@ -170,9 +170,9 @@ GL_ErrStatus AddPageControlObj (uint16_t PosX, uint16_t PosY,
                                 GL_PageControls_TypeDef* objPTR,
                                 GL_Page_TypeDef* pagePTR);
                                 
-GL_ErrStatus DestroyPageControl ( GL_Page_TypeDef* pPage, uint16_t ID );
+//GL_ErrStatus DestroyPageControl ( GL_Page_TypeDef* pPage, uint16_t ID );
 
-GL_ErrStatus DestroyPage (GL_Page_TypeDef *pThis);
+//GL_ErrStatus DestroyPage (GL_Page_TypeDef *pThis);
 
 GL_ErrStatus ShowPage(GL_Page_TypeDef* pThis, GL_bool bVal);
 

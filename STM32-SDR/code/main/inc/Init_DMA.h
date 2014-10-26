@@ -24,10 +24,10 @@
 #define BUFFERSIZE		1024  // change for 512 sampling
 #include	"arm_math.h"
 
-int16_t Rx0BufferDMA[BUFFERSIZE];
-int16_t Tx0BufferDMA[BUFFERSIZE];
-int16_t Rx1BufferDMA[BUFFERSIZE];
-int16_t Tx1BufferDMA[BUFFERSIZE];
+extern int16_t Rx0BufferDMA[BUFFERSIZE];
+extern int16_t Tx0BufferDMA[BUFFERSIZE];
+extern int16_t Rx1BufferDMA[BUFFERSIZE];
+extern int16_t Tx1BufferDMA[BUFFERSIZE];
 
 void Audio_DMA_Init(void);
 

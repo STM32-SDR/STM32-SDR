@@ -117,7 +117,6 @@ static void optionButton_Click(GL_PageControls_TypeDef* pThis)
 
 static void defaults_Click(GL_PageControls_TypeDef* pThis)
 {
-	Screen_ButtonAnimate(pThis);
 	displayDefaultsFeedback();
 	Options_ResetToDefaults();
 }

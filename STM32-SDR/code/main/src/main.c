@@ -54,7 +54,7 @@
 #include	"Oscillator.h"
 #include  	"main.h"
 
-#define VERSION_STRING "1.054+C0.06"
+#define VERSION_STRING "1.055 Beta"
 
 extern int NCO_Point;
 extern int NCOTuneCount;
@@ -134,7 +134,7 @@ int main(void)
 		if (AGC_Flag == 1) {
 			Proc_AGC();
 		}
-
+		Screen_Update(); //see if button is pressed
 	}
 }
 

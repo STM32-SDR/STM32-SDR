@@ -240,7 +240,6 @@ static void defaultsFilter_Click(GL_PageControls_TypeDef* pThis)
 static void doneFilter_Click(GL_PageControls_TypeDef* pThis) {
 
 	debug (GUI, "doneFilter_Click\n");
-	Screen_ButtonAnimate(pThis);
 	FrequencyManager_WriteFiltersToEeprom();
 	FrequencyManager_SetCurrentFrequency(saveFrequency);
 
@@ -255,7 +254,6 @@ static void doneFilter_Click(GL_PageControls_TypeDef* pThis) {
 
 void Screen_filter_Click(GL_PageControls_TypeDef* pThis) {
 	debug (GUI, "Screen_filter_Click:\n");
-	Screen_ButtonAnimate(pThis);
 
 	// save the current synthesizer frequency to put back later and set new value
 	saveFrequency = FrequencyManager_GetCurrentFrequency();
@@ -270,6 +268,7 @@ void Screen_filter_Click(GL_PageControls_TypeDef* pThis) {
 	FrequencyManager_Output_FilterCode(newCode);
 
 	Screen_SetScreenMode(FILTER);
+	Screen_PSK_SetTune(); //make sure we are in frequency tune mode
 	Screen_ShowScreen(&g_screenFilter);
 }
 

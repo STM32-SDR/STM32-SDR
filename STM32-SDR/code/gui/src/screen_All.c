@@ -43,11 +43,18 @@ GL_Page_TypeDef g_screenMode;
 GL_Page_TypeDef g_screenOptions;
 GL_Page_TypeDef g_screenAdvanced;
 GL_Page_TypeDef g_screenFilter;
+GL_Page_TypeDef g_screenEditProgText;
 GL_Page_TypeDef g_screenFrequencies;
 GL_Page_TypeDef g_screenEditText;
 GL_Page_TypeDef g_screenEditTagText;
-GL_Page_TypeDef g_screenEditProgText;
 
+typedef struct{
+_Bool isPressed;
+int counter;
+GL_PageControls_TypeDef* pointer;
+} buttonMemory;
+
+static buttonMemory button = {0, 0, 0};
 
 // Create all screens
 void Screen_CreateAllScreens(void)
@@ -74,14 +81,19 @@ void Screen_CreateAllScreens(void)
 // Change to a new screen.
 void Screen_ShowScreen(GL_Page_TypeDef *pNewScreen)
 {
-	debug(GUI, "Screen_ShowScreen:\n");
+	debug(GUI, "Screen_ShowScreen:1\n");
 	assert(pNewScreen != 0);
 	// Break out if already on this screen.
+	debug(GUI, "Screen_ShowScreen:2\n");
 	if (pNewScreen == s_pCurrentScreen) {
+		debug(GUI, "Screen_ShowScreen:3\n");
 		return;
 	}
+	debug(GUI, "Screen_ShowScreen:4\n");
 	if (s_pCurrentScreen != 0) {
+		debug(GUI, "Screen_ShowScreen:5\n");
 		s_pCurrentScreen->ShowPage(s_pCurrentScreen, GL_FALSE);
+		debug(GUI, "Screen_ShowScreen:6\n");
 	}
 	GL_Clear(LCD_COLOR_BLACK);
 	GL_SetBackColor(LCD_COLOR_BLACK);
@@ -90,7 +102,9 @@ void Screen_ShowScreen(GL_Page_TypeDef *pNewScreen)
 	// Second parameter as true forces the screen to redraw itself
 	// as opposed to allowing it choose what to redraw based on need.
 	pNewScreen->ShowPage(pNewScreen, GL_TRUE);
+	debug(GUI, "Screen_ShowScreen:7\n");
 	s_pCurrentScreen = pNewScreen;
+	debug(GUI, "Screen_ShowScreen:8\n");
 
 	// set default waterfall/spectrum display
 
@@ -120,6 +134,22 @@ void Screen_ButtonAnimate(GL_PageControls_TypeDef* pThis)
 	GL_Button_TypeDef* pThat = (GL_Button_TypeDef*) (pThis->objPTR);
 	pThat->isObjectTouched = GL_TRUE;
 	pThis->SetObjVisible(pThis, pThis->objCoordinates);
-	pThat->isObjectTouched = GL_FALSE;
-	pThis->SetObjVisible(pThis, pThis->objCoordinates);
+	button.pointer = pThis;
+	button.counter=0;
+	button.isPressed = 1;
+}
+
+void Screen_Update (void){
+	if (button.isPressed) {
+		button.counter++;
+		if (button.counter>20000){
+			GL_Button_TypeDef* pThat = (GL_Button_TypeDef*) (button.pointer->objPTR);
+			if (pThat->isObjectTouched == GL_TRUE){
+				pThat->isObjectTouched = GL_FALSE;
+				button.pointer->SetObjVisible(button.pointer, button.pointer->objCoordinates);
+			}
+			button.isPressed = 0;
+			button.counter = 0;
+		}
+	}
 }

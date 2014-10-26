@@ -59,6 +59,12 @@ extern char* Mode_GetCurrentUserModeName (void);
 #define tagLabel_length 6
 #define contact_length 10
 
+uint8_t text_cnt;
+int textPointer; //points to the cursor position when editing text
+int labelPointer;
+int tagTextPointer;
+int tagLabelPointer;
+int freqLabelPointer;
 int i;
 
 #define TRUE 1

@@ -22,12 +22,12 @@
 #define _TEXT_ENTER_H_
 #include <stdint.h>
 
-uint8_t text_cnt;
-int textPointer; //points to the cursor position when editing text
-int labelPointer;
-int tagTextPointer;
-int tagLabelPointer;
-int freqLabelPointer;
+extern uint8_t text_cnt;
+extern int textPointer;
+extern int labelPointer;
+extern int tagTextPointer;
+extern int tagLabelPointer;
+extern int freqLabelPointer;
 
 typedef enum {
 	Text_F1 = 0, // keyboard function keys

@@ -38,7 +38,7 @@ q15_t PFC[125];
 
 extern 	int WF_Flag;
 
-extern void ClearTextDisplay(void);
+//extern void ClearTextDisplay(void);
 
 extern _Bool Encoders_IsOptionsEncoderPressed(void);
 
@@ -53,7 +53,8 @@ void ChangeNextAGC (void);
 void ToggleRxTx (void) {
 	if (RxTx_InTxMode()){
 		RxTx_SetReceive();
-		ClearTextDisplay();
+//		if (Mode_GetCurrentMode() == MODE_PSK)
+//				ClearTextDisplay();
 	}
 	else {
 		RxTx_SetTransmit();

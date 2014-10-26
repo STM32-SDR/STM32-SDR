@@ -31,8 +31,8 @@ void kybd_edit_my_call(void);
 void kybd_clear_my_call(void);
 void kybd_clear_my_name(void);
 
-uint8_t call_cnt;
-uint8_t my_call_cnt;
+//extern uint8_t call_cnt;
+//extern uint8_t my_call_cnt;
 
 #define KBD_BUFF_LEN 40
 extern volatile char kybd_string[KBD_BUFF_LEN];

@@ -166,6 +166,7 @@ static void freqButton_Click(GL_PageControls_TypeDef* pThis)
 		FrequencyManager_SetSelectedBand(userBand);
 		Screen_SetScreenMode(MAIN);
 		displayPresetInstructions ();
+		Screen_PSK_SetTune();
 		Screen_ShowMainScreen();
 
 	}

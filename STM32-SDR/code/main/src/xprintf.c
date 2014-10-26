@@ -48,8 +48,6 @@ void debug (int debug_code,
 		const char* fmt, /* Pointer to the format string */
 		... /* Optional arguments */
 
-
-
 )
 {
 	if ((debug_code & DEBUG_SELECTED) != NONE) {

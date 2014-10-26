@@ -24,6 +24,7 @@
 #include	"stm32f4xx_exti.h"
 #include	"stm32f4xx_syscfg.h"
 #include 	"stm32f4xx_gpio.h"
+#include	"stm32f4xx_tim.h"
 #include	"arm_math.h"
 #include	"SI570.h"
 #include	"Init_I2C.h"
@@ -38,33 +39,20 @@
 
 extern int 	NCOTUNE;
 
-// Data for the encoder state.
-const int16_t ENC_SENS = 2;
-const int8_t ENCODER_STATES[] = {
-		0, 1, -1, 0,
-		-1, 0, 0, 1,
-		1, 0, 0, -1,
-		0, -1, 1, 0 };
-
 typedef struct
 {
 	uint16_t old;
-	uint8_t history_a;
-	uint8_t history_b;
-//	int8_t dir0;
-//	int8_t dir1;
-
+	int8_t direction;
 	GPIO_TypeDef *pPort;
 	uint8_t lowPinNumber;
 } EncoderStruct_t;
-static EncoderStruct_t s_encoderStruct1 = {0, 0, 0, GPIOC, 5};
-static EncoderStruct_t s_encoderStruct2 = {0, 0, 0, GPIOB, 4};
+static EncoderStruct_t s_encoderStruct1 = {0, 0, GPIOC, 5};
+static EncoderStruct_t s_encoderStruct2 = {0, 0, GPIOB, 4};
 
 // Encoder used for options =0 or filter code selection = 1
 
-int encoder = 0;
-
 // Prototypes
+static void initEncoderTimer(void);
 static void configureGPIOEncoder1(void);
 static void configureGPIOEncoder2(void);
 //static void configureEncoderInterrupt(void);
@@ -85,6 +73,68 @@ void Encoders_Init(void)
 	init_encoder2();  //this may be required to introduce a delay for start up
 	FrequencyManager_StepFrequencyDown();
 	FrequencyManager_StepFrequencyUp();
+	initEncoderTimer();
+}
+
+static void initEncoderTimer(void)
+{
+	debug(GUI, "initEncoderTimer:\n");
+
+	NVIC_InitTypeDef NVIC_InitStructure;
+
+	/* Enable the TIM8 global Interrupt */
+	NVIC_InitStructure.NVIC_IRQChannel = TIM7_IRQn;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+	NVIC_Init(&NVIC_InitStructure);
+
+	/* TIM7 clock enable */
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM7, ENABLE);
+
+	/* Time base configuration */
+	TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
+	TIM_TimeBaseStructure.TIM_Period = 256;
+	TIM_TimeBaseStructure.TIM_Prescaler = 256;
+	TIM_TimeBaseStructure.TIM_ClockDivision = 0;
+	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
+	TIM_TimeBaseInit(TIM7, &TIM_TimeBaseStructure);
+
+	/* TIM IT enable */
+	TIM_ITConfig(TIM7, TIM_IT_Update, ENABLE);
+
+	/* TIM4 enable counter */
+	TIM_Cmd(TIM7, ENABLE);
+}
+
+
+void TIM7_IRQHandler(void)
+{
+	static int8_t change;
+	static int count;
+	static int old_count;
+	static int loop;
+
+	if (TIM_GetITStatus(TIM7, TIM_IT_Update ) != RESET){
+		count++;
+		change=calculateEncoderChange(&s_encoderStruct1);
+		if (change != 0){
+			loop++;
+//			xprintf ("%d, %d\n", loop, (count - old_count));
+			if ((count - old_count) < 20){
+				s_encoderStruct1.direction += change;
+				loop=0;
+			} else if (loop >= 4){
+				s_encoderStruct1.direction += change;
+				loop=0;
+			}
+			old_count=count;
+		}
+
+		change=calculateEncoderChange(&s_encoderStruct2);
+		applyEncoderChange2(change);
+		TIM_ClearITPendingBit(TIM7, TIM_IT_Update );
+	}
 }
 
 static void configureGPIOEncoder1(void)
@@ -169,31 +219,26 @@ _Bool Encoders_AreBothEncodersPressed(void)
 			&& Encoders_IsFrequencyEncoderPressed();
 }
 
-
-
 /*
  * Process Encoder Changes
  */
-
-void Encoders_CalculateAndProcessChanges(void)
-{
-	// TODO:- Is delay needed for encoder? Should it be doubled (as would have been before encoder refactor)?
-
-	int change = 0;
-	encoder = 1;
-	change = calculateEncoderChange(&s_encoderStruct1);
-	applyEncoderChange1(change);
-
-	encoder = 2;
-	change = calculateEncoderChange(&s_encoderStruct2);
-	applyEncoderChange2(change);
-}
-
-_Bool testBit (uint8_t byte, uint8_t bit){
-	if (((byte >> bit) & 0x01) == 1)
-		return 1;
-	else
-		return 0;
+void Encoders_CalculateAndProcessChanges(void){
+	if (s_encoderStruct1.direction > 0){
+		applyEncoderChange1(1);
+		s_encoderStruct1.direction--;
+	}
+	if (s_encoderStruct1.direction < 0){
+		applyEncoderChange1(-1);
+		s_encoderStruct1.direction++;
+	}
+	if (s_encoderStruct2.direction > 0){
+		applyEncoderChange2(1);
+		s_encoderStruct2.direction--;
+	}
+	if (s_encoderStruct2.direction < 0){
+		applyEncoderChange2(-1);
+		s_encoderStruct2.direction++;
+	}
 }
 
 static int8_t calculateEncoderChange(EncoderStruct_t *pEncoder)
@@ -202,39 +247,6 @@ static int8_t calculateEncoderChange(EncoderStruct_t *pEncoder)
 	int8_t direction=0;
 
 	uint16_t code = (GPIO_ReadInputData(pEncoder->pPort) >> pEncoder->lowPinNumber & 0x03);
-
-	//de-bounce filter
-	//collect a history of bits
-	pEncoder->history_a = (pEncoder->history_a << 1) + (code & 0x01);
-	pEncoder->history_b= (pEncoder->history_b << 1) + ((code & 0x02) >> 1);
-
-	//count how many bits have been set
-
-	int8_t filter_length = 4; //also this is the max value of sum_a and sum_b
-	int8_t hysteresis = 3;
-	int8_t sum_a=0;
-	int8_t sum_b=0;
-
-	for (int i=0; i<filter_length; i++){
-		if (testBit(pEncoder->history_a, i)) sum_a++;
-		else sum_a--;
-		if (testBit(pEncoder->history_b, i)) sum_b++;
-		else sum_b--;
-//		if (encoder == 1) xprintf("i=%d, testBitA=%d, testBitB=%d, sum_a=%d, sum_b=%d\n", i,testBit(pEncoder->history_a, i),testBit(pEncoder->history_b, i),sum_a,sum_b);
-	}
-
-	// start with previous code value and apply hysteresis to changes
-	code = (pEncoder->old >> 4) & 0x03;
-
-	if (!testBit(code, 0) & (sum_a >= hysteresis))
-		code++;
-	if (testBit(code, 0) & (sum_a <= -hysteresis))
-		code--;
-
-	if (!testBit(code, 1) & (sum_b > hysteresis))
-		code+=2;
-	if (testBit(code, 1) & (sum_b < -hysteresis))
-		code-=2;
 
 	// encoder sequence is 0, 1, 3, 2 clockwise
 	// or 2, 3, 1, 0 anti-clockwise
@@ -299,45 +311,11 @@ static int8_t calculateEncoderChange(EncoderStruct_t *pEncoder)
 		break;
 	}
 
-//	if ((encoder == 1) & (direction != 0)) xprintf ("history_a=%x, history_b=%x, sum_a = %d, sum_b=%d", pEncoder->history_a, pEncoder->history_b, sum_a, sum_b);
-//	if ((encoder == 1) & (direction != 0)) xprintf(", code=%x, direction=%d\n", code, direction);
-
 	return direction;
-	/*
-
-Old encoder algorithm does not work well!!
-
-	// Remember previous encoder state and add current state (2 bits)
-	pEncoder->old <<= 2;
-	if (print==1)
-			xprintf("calculateEncoderChange: old=%x\n", pEncoder->old);
-
-	pEncoder->old |= (GPIO_ReadInputData(pEncoder->pPort) >> pEncoder->lowPinNumber & 0x03);
-
-	if (print==1)
-			xprintf("calculateEncoderChange: old=%x\n", pEncoder->old);
-
-	int8_t tempDir = ENCODER_STATES[(pEncoder->old & 0x0F)];
-	pEncoder->dir0 += tempDir;
-	if ((pEncoder->dir0 < ENC_SENS) && (pEncoder->dir0 > -ENC_SENS))
-		pEncoder->dir1 = 0;
-	if (pEncoder->dir0 >= ENC_SENS) {
-		pEncoder->dir1 = 1;
-		pEncoder->dir0 = 0;
-	}
-	if (pEncoder->dir0 <= -ENC_SENS) {
-		pEncoder->dir1 = -1;
-		pEncoder->dir0 = 0;
-	}
-
-	return pEncoder->dir1;
-*/
-
 }
 
 static void applyEncoderChange1(int8_t changeDirection)
 {
-//	xprintf("applyEncoderChange1: changeDirection = %d\n", changeDirection);
 	// Check for no change
 	if (changeDirection == 0) {
 		return;

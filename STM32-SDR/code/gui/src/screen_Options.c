@@ -71,7 +71,7 @@ void ScreenOptions_Create(void)
 	GL_PageControls_TypeDef* btnOptionsBigButton = Widget_NewBigButtonOptions();
 	GL_PageControls_TypeDef* btnAdvanced = NewButton(15, " Advanced  ", advanced_Click);
 	GL_PageControls_TypeDef* btnFunctions  = NewButton(17,  "Keyboard Fn", functionEditButton_Click);
-	GL_PageControls_TypeDef* btnPrograms  = NewButton(18,  " Screen Fn ", programEditButton_Click);
+//	GL_PageControls_TypeDef* btnPrograms  = NewButton(18,  " Screen Fn ", programEditButton_Click);
 	GL_PageControls_TypeDef* btnTags  = NewButton(19,  "  <Tags>   ", tagEditButton_Click);
 	GL_PageControls_TypeDef* btnFilter = NewButton(20, "  Filter   ", Screen_filter_Click);
 	/*
@@ -96,9 +96,9 @@ void ScreenOptions_Create(void)
 	AddPageControlObj(0, LCD_HEIGHT - 60, s_lblStatus,  s_pThisScreen);
 	AddPageControlObj(220, FIRST_BUTTON_Y, btnAdvanced, s_pThisScreen);
 	AddPageControlObj(220, FIRST_BUTTON_Y + SPACE_PER_BUTTON_Y, btnFunctions, s_pThisScreen);
-	AddPageControlObj(220, FIRST_BUTTON_Y + 2 * SPACE_PER_BUTTON_Y, btnPrograms, s_pThisScreen);
-	AddPageControlObj(220, FIRST_BUTTON_Y + 3 * SPACE_PER_BUTTON_Y, btnTags, s_pThisScreen);
-	AddPageControlObj(220, FIRST_BUTTON_Y + 4 * SPACE_PER_BUTTON_Y, btnFilter, s_pThisScreen);
+//	AddPageControlObj(220, FIRST_BUTTON_Y + 2 * SPACE_PER_BUTTON_Y, btnPrograms, s_pThisScreen);
+	AddPageControlObj(220, FIRST_BUTTON_Y + 2 * SPACE_PER_BUTTON_Y, btnTags, s_pThisScreen);
+	AddPageControlObj(220, FIRST_BUTTON_Y + 3 * SPACE_PER_BUTTON_Y, btnFilter, s_pThisScreen);
 }
 
 void Screen_SetScreenMode(int value) {
@@ -115,7 +115,6 @@ int Screen_GetScreenMode() {
  */
 static void optionButton_Click(GL_PageControls_TypeDef* pThis)
 {
-	Screen_ButtonAnimate(pThis);
 	uint16_t id = pThis->ID - ID_OPTION_START;
 	assert(id >= 0 && id <= NUM_OPTIONS);
 	Options_SetSelectedOption(id);
@@ -131,28 +130,25 @@ void Screen_Done() {
 }
 
 void advanced_Click(GL_PageControls_TypeDef* pThis) {
-	Screen_ButtonAnimate(pThis);
 	Screen_SetScreenMode(ADVANCED);
 //	Options_SetSelectedOption(START_ADVANCED_OPTIONS);
 	Screen_ShowScreen(&g_screenAdvanced);
 }
 
 static void functionEditButton_Click(GL_PageControls_TypeDef* pThis) {
-	Screen_ButtonAnimate(pThis);
 	Screen_SetScreenMode(FUNCTION);
 	Screen_ShowScreen(&g_screenEditText);
 }
 
 static void programEditButton_Click(GL_PageControls_TypeDef* pThis) {
-	debug (GUI, "programEditButton_Click:");
-	Screen_ButtonAnimate(pThis);
+	debug (GUI, "programEditButton_Click:1");
 	Screen_SetScreenMode(FUNCTION);
+	debug (GUI, "programEditButton_Click:2");
 	Screen_ShowScreen(&g_screenEditProgText);
 	debug (GUI, "programEditButton_Click: end");
 }
 
 static void tagEditButton_Click(GL_PageControls_TypeDef* pThis) {
-	Screen_ButtonAnimate(pThis);
 	Screen_SetScreenMode(FUNCTION);
 	Screen_ShowScreen(&g_screenEditTagText);
 

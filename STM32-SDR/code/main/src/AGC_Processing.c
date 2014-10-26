@@ -15,7 +15,6 @@
 #include	"DMA_IRQ_Handler.h"
 #include    "ChangeOver.h"
 
-
 float   AGC_Mag;
 float   DAC_AGC_Mag;
 int		RSL_Mag;

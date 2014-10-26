@@ -40,6 +40,15 @@
 //#define PSK_TX_BUFFER_SIZE 41	// 40 characters on screen + space for null
 #define PSK_TX_BUFFER_SIZE 161
 
+/* PSK31  generator variables */
+int m_AddEndingZero;
+uint16_t m_TxShiftReg;
+double m_SymbolRate;
+
+float m_RMSConstant;
+double m_2PI;
+float S1, S2;
+
 float S1, S2;
 extern const unsigned int VARICODE_TABLE[256];
 

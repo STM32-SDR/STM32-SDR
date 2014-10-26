@@ -118,6 +118,7 @@ void Screen_CreateAllScreens(void);
 void Screen_ShowScreen(GL_Page_TypeDef *pNewScreen);
 void Screen_ShowMainScreen(void);
 void Screen_ButtonAnimate(GL_PageControls_TypeDef* pThis);
+void Screen_Update (void);
 
 // void Screen_done(GL_PageControls_TypeDef* pThis);
 void Screen_Done(void);

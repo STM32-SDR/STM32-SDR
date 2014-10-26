@@ -342,8 +342,8 @@ static uint32_t USB_OTG_USBH_handle_port_ISR(USB_OTG_CORE_HANDLE *pdev)
 	uint32_t retval = 0;
 	USB_OTG_GINTMSK_TypeDef intmsk;
 
-	__IO
-	USB_OTG_GRSTCTL_TypeDef greset;
+//	__IO
+//	USB_OTG_GRSTCTL_TypeDef greset;
 
 	intmsk.d32 = 0;
 

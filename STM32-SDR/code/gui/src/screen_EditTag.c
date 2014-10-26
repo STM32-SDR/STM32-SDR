@@ -175,7 +175,6 @@ static void edit_Click(GL_PageControls_TypeDef* pThis)
 static void done_Click(GL_PageControls_TypeDef* pThis) {
 	// Change text back to normal for next time.
 	debug (GUI, "done_Click\n");
-	Screen_ButtonAnimate(pThis);
 	Screen_ChangeButtonTagLabel(s_currentTagNumber);
 	Screen_TagDone();
 }

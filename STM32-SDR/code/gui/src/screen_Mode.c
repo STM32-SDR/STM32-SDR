@@ -76,7 +76,6 @@ void ScreenMode_Create(void)
  */
 static void modeButton_Click(GL_PageControls_TypeDef* pThis)
 {
-	Screen_ButtonAnimate(pThis);
 	uint16_t userMode = pThis->ID - ID_MODEBTN_START;
 	assert(userMode >= 0 && userMode <= USERMODE_NUM_MODES);
 

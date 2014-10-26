@@ -43,13 +43,13 @@ void Check_SI570(void);
 
 //===================================================================
 //long		FOUT_multiplier, FOUT_divisor, Display_multiplier, Display_divisor;
-unsigned char si570_read[6];
-unsigned const char HS_DIV_VALUE_char[6];
-unsigned long RFREQ_INT, RFREQ_FRAC;
-float HS_DIV, N1;
-double RFREQ, Old_RFREQ, FXTAL;
+extern unsigned char si570_read[6];
+extern unsigned const char HS_DIV_VALUE_char[6];
+extern unsigned long RFREQ_INT, RFREQ_FRAC;
+extern float HS_DIV, N1;
+extern double RFREQ, Old_RFREQ, FXTAL;
 extern long FOUT;  //, delta_freq;
 extern double F0;
-unsigned char SI570_Chk;
+extern unsigned char SI570_Chk;
 //===================================================================
 
