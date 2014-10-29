@@ -190,7 +190,7 @@ void Init_AGC (void)			{
 		Sig_Thr = (float)Options_GetValue(OPTION_AGC_THRSH);
 		RSL_Cal = Options_GetValue(OPTION__RSL_CAL);
 
-		if (AGC_Mode != 3 ||  !RxTx_InTransion())
+		if (AGC_Mode != 3)
 		AGC_On =1;
 		else
 		AGC_On =0;
