@@ -197,7 +197,7 @@ void Xmit_SSB_Sequence(void)
 	Mute_LO();
 	s_inTxMode = 1;
 	AGC_On = 0;  //Turn off AGC so that DAC is held constant during transmit
-	Init_AGC();  //added JDG
+	//Init_AGC();  //added JDG
 	Disconnect_Sidetone_Input();  //added JDG
 	//Disconnect_PGA();
 	Set_DAC_DVC(15); //SSB Xmit DAC Gain

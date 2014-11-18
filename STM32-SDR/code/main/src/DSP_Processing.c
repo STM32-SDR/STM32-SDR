@@ -184,7 +184,7 @@ void Process_FFT(void)
 		//CW Peak in range from 400-800
 		if (j >= jcwl && j <= jcwh){
 			Sig = (int)FFT_Magnitude[j];
-		    if ( Sig > Sig_Max) {
+		    if ( Sig > Sig_Max1) {
 			Sig_Max1 = Sig;
 		    }
 		    Sig_Sum0 += (int)FFT_Magnitude[j];
@@ -210,7 +210,7 @@ void Process_FFT(void)
 
 	  }  // End of Search
 
-
+	//Sig_Sum0 = Sig_Max;
 
 	switch (AGC_Mode){   // AGC Mode Switch
 		case 0:
@@ -229,7 +229,8 @@ void Process_FFT(void)
 		} // End of AGC Mode Switch
 
 	RMS_Sig = 10*sqrt((float32_t)Sig_Total);
-	DAC_RMS_Sig = 10*sqrt((float32_t)Sig_Sum0); //Always use Peak value for DAC AGC
+	//DAC_RMS_Sig = 10*sqrt((float32_t)Sig_Max); //Always use Peak value for DAC AGC
+	DAC_RMS_Sig = 10*sqrt((float32_t)Sig_Max); //Always use Peak value for DAC AGC
 	dB_Sig = 23. + 10*log((float32_t)Sig_Total + .001);
 
 	if (RMS_Sig <4000.0)	AGC_Mag = FFT_Coeff*RMS_Sig + (1.-FFT_Coeff)*AGC_Mag; //Limits upper value
