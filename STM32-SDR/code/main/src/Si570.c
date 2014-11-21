@@ -198,18 +198,29 @@ void Read_Si570_registers(unsigned char read[])
 void Write_Si570_registers(unsigned char write[])
 	{
 	char i;
-	i = I2C_ReadSlave( SI570_Addr, 137);
-	I2C_WriteRegister( SI570_Addr, 137, i | 0x10);	//	Freeze DCO
-	I2C_WriteRegister_N( SI570_Addr, 7, write, 6);
-	i = I2C_ReadSlave( SI570_Addr, 137);
-	I2C_WriteRegister( SI570_Addr, 137, i & ~0x10);	//	Unfreeze DCO
-
-	if (Large_RFREQ_Change()) {
+	if (Large_RFREQ_Change())
+	{
+		i = I2C_ReadSlave( SI570_Addr, 137);
+		I2C_WriteRegister( SI570_Addr, 137, i | 0x10);	//	Freeze DCO
+		I2C_WriteRegister_N( SI570_Addr, 7, write, 6);
+		//i = I2C_ReadSlave( SI570_Addr, 137);
+		I2C_WriteRegister( SI570_Addr, 137, i & ~0x10);	//	Unfreeze DCO
 		i = I2C_ReadSlave( SI570_Addr, 135);
 		I2C_WriteRegister( SI570_Addr, 135, i | 0x40);	//	New Freq Applied
 		while (I2C_ReadSlave( SI570_Addr, 135) & 0x40)
-			;
-		}
+		Old_RFREQ = RFREQ;
+	}
+	else
+	{
+		i = I2C_ReadSlave( SI570_Addr, 135);
+		I2C_WriteRegister( SI570_Addr, 135, i | 0x20);	//	Freeze M Control Word
+		i = I2C_ReadSlave( SI570_Addr, 137);
+		I2C_WriteRegister_N( SI570_Addr, 7, write, 6);
+		i = I2C_ReadSlave( SI570_Addr, 135);
+		I2C_WriteRegister( SI570_Addr, 135, i & 0xdf);	//	Unfreeze M Control Word
+	}
+
+
 	}
 
 //===================================================================
