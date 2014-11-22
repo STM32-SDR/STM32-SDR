@@ -210,7 +210,6 @@ void Process_FFT(void)
 
 	  }  // End of Search
 
-	//Sig_Sum0 = Sig_Max;
 
 	switch (AGC_Mode){   // AGC Mode Switch
 		case 0:
@@ -229,7 +228,6 @@ void Process_FFT(void)
 		} // End of AGC Mode Switch
 
 	RMS_Sig = 10*sqrt((float32_t)Sig_Total);
-	//DAC_RMS_Sig = 10*sqrt((float32_t)Sig_Max); //Always use Peak value for DAC AGC
 	DAC_RMS_Sig = 10*sqrt((float32_t)Sig_Max); //Always use Peak value for DAC AGC
 	dB_Sig = 23. + 10*log((float32_t)Sig_Total + .001);
 
