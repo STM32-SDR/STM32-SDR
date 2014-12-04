@@ -71,7 +71,7 @@ void ScreenOptions_Create(void)
 	GL_PageControls_TypeDef* btnOptionsBigButton = Widget_NewBigButtonOptions();
 	GL_PageControls_TypeDef* btnAdvanced = NewButton(15, " Advanced  ", advanced_Click);
 	GL_PageControls_TypeDef* btnFunctions  = NewButton(17,  "Keyboard Fn", functionEditButton_Click);
-//	GL_PageControls_TypeDef* btnPrograms  = NewButton(18,  " Screen Fn ", programEditButton_Click);
+	GL_PageControls_TypeDef* btnPrograms  = NewButton(18,  " Screen Fn ", programEditButton_Click);
 	GL_PageControls_TypeDef* btnTags  = NewButton(19,  "  <Tags>   ", tagEditButton_Click);
 	GL_PageControls_TypeDef* btnFilter = NewButton(20, "  Filter   ", Screen_filter_Click);
 	/*
@@ -96,9 +96,9 @@ void ScreenOptions_Create(void)
 	AddPageControlObj(0, LCD_HEIGHT - 60, s_lblStatus,  s_pThisScreen);
 	AddPageControlObj(220, FIRST_BUTTON_Y, btnAdvanced, s_pThisScreen);
 	AddPageControlObj(220, FIRST_BUTTON_Y + SPACE_PER_BUTTON_Y, btnFunctions, s_pThisScreen);
-//	AddPageControlObj(220, FIRST_BUTTON_Y + 2 * SPACE_PER_BUTTON_Y, btnPrograms, s_pThisScreen);
-	AddPageControlObj(220, FIRST_BUTTON_Y + 2 * SPACE_PER_BUTTON_Y, btnTags, s_pThisScreen);
-	AddPageControlObj(220, FIRST_BUTTON_Y + 3 * SPACE_PER_BUTTON_Y, btnFilter, s_pThisScreen);
+	AddPageControlObj(220, FIRST_BUTTON_Y + 2 * SPACE_PER_BUTTON_Y, btnPrograms, s_pThisScreen);
+	AddPageControlObj(220, FIRST_BUTTON_Y + 3 * SPACE_PER_BUTTON_Y, btnTags, s_pThisScreen);
+	AddPageControlObj(220, FIRST_BUTTON_Y + 4 * SPACE_PER_BUTTON_Y, btnFilter, s_pThisScreen);
 }
 
 void Screen_SetScreenMode(int value) {
