@@ -196,11 +196,12 @@ void Xmit_CW(void)
 	static q15_t NCO_I;
 	static long NCO_phz;
 	static float cwAmplitudes[BUFFERSIZE / 2];
-
+	double NCO_Freq = 550;  //jdg added & changed name
+	float Sample_Freq = 8000.0; //jdg added
 	// REVISIT:- remove test-bit change-code.
 //	GPIO_WriteBit(Test_GPIO, Test_0, Bit_SET);
 
-	x_NCOphzinc = (PI2 * (double) NCO_Frequency / (double) Sample_Frequency);
+	x_NCOphzinc = (PI2 * (double) NCO_Freq / (double) Sample_Freq);
 
 	//Transfer I/Q data and fill FFT buffer on inactive buffer
 	if (DMA_RX_Memory == 0) {

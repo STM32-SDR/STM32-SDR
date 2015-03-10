@@ -41,6 +41,7 @@ static void xvprintf(const char* fmt, /* Pointer to the format string */
 //#define DEBUG_SELECTED	(LCD + ENCODER)
 //#define DEBUG_SELECTED	(GUI + CAL + TOUCH + LCD + ENCODER + KEYBOARD + INIT)
 #define DEBUG_SELECTED NONE
+//#define DEBUG_SELECTED (CAL + INIT)
 
 void debug (int debug_code,
 

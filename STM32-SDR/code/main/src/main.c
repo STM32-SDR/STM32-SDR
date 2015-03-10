@@ -54,7 +54,7 @@
 #include	"Oscillator.h"
 #include  	"main.h"
 
-#define VERSION_STRING "1.059"
+#define VERSION_STRING "1.059j"
 
 extern int NCO_Point;
 extern int NCOTuneCount;

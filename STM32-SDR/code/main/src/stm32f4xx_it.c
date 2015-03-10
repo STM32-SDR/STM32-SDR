@@ -50,6 +50,9 @@ const uint16_t sinetable[]  = {
 uint16_t pulse_width = 128;
 uint32_t phase_accumulator = 0;
 uint8_t angle = 0;
+//Magic Number = 2^32 * f0/fs  where f0 = 500Hz and fs = 100KHz
+//const uint32_t R 21474836; // 500 Hz
+const uint32_t magicR = 23622320; // 550
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
@@ -243,7 +246,7 @@ void TIM5_IRQHandler(void)
 
     PWM_SetDC(pulse_width);
     // Calculate a new pulse width
-    phase_accumulator+=R;
+    phase_accumulator+=magicR;
     angle=(uint8_t)(phase_accumulator>>24);
     pulse_width = sinetable[angle];
     TIM_ClearITPendingBit(TIM5, TIM_IT_Update);
