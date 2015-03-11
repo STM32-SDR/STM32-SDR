@@ -196,12 +196,13 @@ void Xmit_CW(void)
 	static q15_t NCO_I;
 	static long NCO_phz;
 	static float cwAmplitudes[BUFFERSIZE / 2];
-	double NCO_Freq = 550;  //jdg added & changed name
-	float Sample_Freq = 8000.0; //jdg added
+	double NCO_Frequency_cw = 550;  //jdg added & changed name
+	float Sample_Frequency_cw = 8000.0; //jdg added
+	double x_NCOphzinc_cw; //jdg added
 	// REVISIT:- remove test-bit change-code.
 //	GPIO_WriteBit(Test_GPIO, Test_0, Bit_SET);
 
-	x_NCOphzinc = (PI2 * (double) NCO_Freq / (double) Sample_Freq);
+	x_NCOphzinc_cw = (PI2 * (double) NCO_Frequency_cw / (double) Sample_Frequency_cw);
 
 	//Transfer I/Q data and fill FFT buffer on inactive buffer
 	if (DMA_RX_Memory == 0) {
@@ -217,7 +218,7 @@ void Xmit_CW(void)
 
 	//Transfer I/Q data and fill FFT buffer on inactive buffer
 	for (i = 0; i < BUFFERSIZE / 2; i++) {
-		NCO_phz += (long) (KCONV * (x_NCOphzinc));
+		NCO_phz += (long) (KCONV * (x_NCOphzinc_cw));
 		NCO_I = (Sine_table[((NCO_phz >> 4) + 0x400) & 0xFFF]);
 
 		float CW_Gain = cwAmplitudes[i];
