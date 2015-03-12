@@ -1023,7 +1023,7 @@ void kybd_edit_text(char data){
 				case (TAG_EDIT):
 				case (TAG_LABEL_EDIT):{
 					Screen_ChangeButtonTagLabel(tagID);
-					if (tagID < Tag_12)
+					if (tagID < Tag_10)
 						tagID++;
 					else
 						tagID = 0;
@@ -1081,7 +1081,7 @@ void kybd_edit_text(char data){
 					if (tagID > 0)
 						tagID--;
 					else
-						tagID = Tag_12;
+						tagID = Tag_10;
 					debug(KEYBOARD, "kybd_edit_text: move up tag, tagID = %d\n", tagID);
 					tagTextPointer = strlen(s_TagData[tagID].Text);
 					tagLabelPointer = strlen(s_TagData[tagID].Item);

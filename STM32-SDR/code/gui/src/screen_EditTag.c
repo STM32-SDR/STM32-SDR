@@ -75,8 +75,9 @@ void ScreenEditTagText_Create(void)
 
 	debug(GUI, "ScreenEditTagText_Create: setup tag buttons\n");
 	// Populate the options buttons:
-	for (int i = 0; i <= Tag_12; i++) {
-		GL_PageControls_TypeDef* btnText = NewButton(ID_TEXT_START + i, Tag_GetName(i), tagButton_Click);
+	GL_PageControls_TypeDef* btnText;
+	for (int i = 0; i <= Tag_10; i++) {
+		btnText = NewButton(ID_TEXT_START + i, Tag_GetName(i), tagButton_Click);
 
 		int x = (i / BUTTONS_PER_COLUMN) * COLUMN_WIDTH;
 		int y = (i % BUTTONS_PER_COLUMN) * SPACE_PER_BUTTON_Y + FIRST_BUTTON_Y;

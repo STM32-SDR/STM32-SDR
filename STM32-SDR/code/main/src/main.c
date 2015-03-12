@@ -53,8 +53,9 @@
 #include	"STM32-SDR-Subroutines.h"
 #include	"Oscillator.h"
 #include  	"main.h"
+#include	"ps2Keyboard_Input.h"
 
-#define VERSION_STRING "1.059j"
+#define VERSION_STRING "1.059j +PS2 A0.4 +CW"
 
 extern int NCO_Point;
 extern int NCOTuneCount;
@@ -110,6 +111,9 @@ int main(void)
 
 		// Check encoder 2 push button
 		process_button();
+
+		// Process any pending PS2 events
+		ps2Read();
 
 		// Process any pending USB events
 		USBH_Process(&USB_OTG_Core_dev, &USB_Host);
@@ -216,8 +220,14 @@ static void initializeHardware(void)
 	debug(INIT, "initializeHardware:Init_Waterfall\n");
 	Init_Waterfall();
 	main_delay(SETUP_DELAY);
+	debug(INIT, "initializeHardware:configureGPIOps2\n");
+	configureGPIOps2();
+	main_delay(SETUP_DELAY);
 
 	debug(INIT, "initializeHardware:USBH_Init\n");
+
+
+
 
 
 	 /* Sampling rate interrupt timer */

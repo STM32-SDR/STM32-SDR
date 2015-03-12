@@ -28,7 +28,7 @@
 #include "xprintf.h"
 #include "ScrollingTextBox.h"
 #include "Text_Enter.h"
-#include "xprintf.h"
+#include "FrequencyManager.h"
 
 
 //extern 	int WF_Flag;
@@ -46,9 +46,9 @@ static GL_PageControls_TypeDef* pDACLabel;
 static GL_PageControls_TypeDef* pRSLLabel;
 static GL_PageControls_TypeDef* pFiltLabel;
 static GL_PageControls_TypeDef* pFreqLabel;
+static GL_PageControls_TypeDef* pTxFreqLabel;
 
 extern 	int FilterNumber;
-extern 	int FrequencyManager_GetCurrentFrequency(void);
 
 /**
  * Call-back prototypes
@@ -58,6 +58,8 @@ extern 	int FrequencyManager_GetCurrentFrequency(void);
 //static void testButton_Click(GL_PageControls_TypeDef* pThis);
 
 //extern void ClearTextDisplay(void);
+
+static void Screen_SplitButtonClick(GL_PageControls_TypeDef* pThis);
 
 static void Screen_TextButtonClick(GL_PageControls_TypeDef* pThis);
 
@@ -119,7 +121,7 @@ static _Bool FreqStatusUpdateHandler(GL_PageControls_TypeDef* pThis, _Bool force
 {
       // For CW, put this in code\gui\src\screen_MainCW.c
 	//and display the result
-	static char buf[15] = {0};
+	static char buf[16] = {0};
 	int val = FrequencyManager_GetCurrentFrequency();
 	int i = 12, j=12;
 	for(; i>=0 && j>=0 && val ; --i){
@@ -139,9 +141,10 @@ static _Bool FreqStatusUpdateHandler(GL_PageControls_TypeDef* pThis, _Bool force
 		j--;
 //		xprintf("i = %d, j = %d, val = %d, buf[j] = %c\n", i, j, val, buf[j]);
 	}
-	buf[12] = "H"[0]; //replace last comma with Hz + null
-	buf[13] = "z"[0];
-	buf[14] = 0;
+	buf[12] = " "[0];
+	buf[13] = "H"[0]; //replace last comma with Hz + null
+	buf[14] = "z"[0];
+	buf[15] = 0;
 //		xprintf("Frequency = %s\n", buf);
 
 	Widget_ChangeLabelText(pFreqLabel, buf);
@@ -224,7 +227,13 @@ void ScreenMainCW_Create(void)
 
 	//Frequency Label
 		pFreqLabel = Widget_NewLabel("", LCD_COLOR_GREEN, LCD_COLOR_BLACK, 0, GL_FONTOPTION_16x24,FreqStatusUpdateHandler);
-		AddPageControlObj(98, 130, pFreqLabel, s_pThisScreen);
+		AddPageControlObj(82, 145, pFreqLabel, s_pThisScreen);
+
+		pTxFreqLabel = Widget_NewLabel("", LCD_COLOR_GREEN, LCD_COLOR_BLACK, 0, GL_FONTOPTION_16x24,FreqStatusUpdateHandler);
+		AddPageControlObj(34, 115, pTxFreqLabel, s_pThisScreen); // IsTransparent
+
+		GL_PageControls_TypeDef* btnSplit = NewButton(123, " Split ", Screen_SplitButtonClick);
+		AddPageControlObj(0, 145, btnSplit, s_pThisScreen);
 
 	// Programmable buttons
 		for (int i = 0; i < Prog_PSK1 - Prog_CW1; i++) {
@@ -245,6 +254,56 @@ void ScreenMainCW_Create(void)
 /**
  * Button callbacks
  */
+
+static void Screen_SplitButtonClick(GL_PageControls_TypeDef* pThis)
+{
+	static char buf[19] = {0};
+	buf[0]="T"[0];
+	buf[1]="x"[0];
+	buf[2]=" "[0];
+	debug(GUI, "Screen_SplitButtonClick:\n");
+	Screen_ButtonAnimate(pThis);
+	debug(GUI, "Screen_SplitButtonClick: split = %d\n", FrequencyManager_isSplit());
+	if (!FrequencyManager_isSplit()) {
+		FrequencyManager_setSplit(1);
+		ChangeButtonText(s_pThisScreen, 123, " Join  ");
+
+		uint32_t val = FrequencyManager_GetCurrentFrequency();
+		debug(GUI, "Screen_SplitButtonClick: currentFreq = %d\n", val);
+		debug(GUI, "Screen_SplitButtonClick: savedFreq = %d\n", FrequencyManager_GetCurrentFrequency());
+		FrequencyManager_SaveTxFrequency(val);
+		int i = 15, j=15;
+		for(; i>=0 && j>=0 && val ; --i){
+			if (i%3==0){
+				buf[j] = ","[0]; //put in commas
+	//			xprintf("i = %d, j = %d, val = %d, buf[j] = %c\n", i, j, val, buf[j]);
+				j--;
+			}
+			buf[j] = "0123456789"[val % 10];
+	//		xprintf("i = %d, j = %d, val = %d, buf[j] = %c\n", i, j, val, buf[j]);
+			val /= 10;
+			j--;
+		}
+			//replace leading 0 with space, first 3 chars are "Tx "
+		for(; i>=3 && j>=3; --i, val /= 10){
+			buf[j] = " "[0];
+			j--;
+	//		xprintf("i = %d, j = %d, val = %d, buf[j] = %c\n", i, j, val, buf[j]);
+		}
+		buf[15] = " "[0];
+		buf[16] = "H"[0]; //replace last comma with Hz + null
+		buf[17] = "z"[0];
+		buf[18] = 0;
+	} else {
+		FrequencyManager_setSplit(0);
+		strcpy(buf, "                  ");
+		ChangeButtonText(s_pThisScreen, 123, " Split ");
+	}
+	Widget_ChangeLabelText(pTxFreqLabel, buf);
+
+	RefreshPageControl (s_pThisScreen, 1);
+
+}
 
 static void Screen_TextButtonClick(GL_PageControls_TypeDef* pThis)
 {

@@ -51,7 +51,7 @@ void String2Buffer(char *str);
 
 void kybd_char_switch(char data)
 {
-
+	xprintf ("%x",data);
 	debug(KEYBOARD, "kybd_char_switch: kybd_mode = %x, data = %x\n", kybd_mode, data);
 	switch(kybd_mode) {
 	case 0: kybd_addCharacter(data); break;

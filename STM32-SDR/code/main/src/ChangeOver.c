@@ -32,6 +32,7 @@
 #include "AGC_Processing.h"
 #include "ModeSelect.h"
 #include "Init_Codec.h"
+#include "FrequencyManager.h"
 #include <assert.h>
 #include <xprintf.h>
 
@@ -65,6 +66,8 @@ void RxTx_Init(void)
 // Control switching between receive and transmit mode.
 void RxTx_SetReceive(void)
 {
+	if (FrequencyManager_isSplit())
+		FrequencyManager_SetRxFrequency();
 	Receive_Sequence();
 }
 void RxTx_SetTransmit(void)
@@ -74,6 +77,8 @@ void RxTx_SetTransmit(void)
 		Xmit_SSB_Sequence();
 		break;
 	case MODE_CW:
+		if (FrequencyManager_isSplit())
+			FrequencyManager_SetTxFrequency();
 		Xmit_CW_Sequence();
 		break;
 	case MODE_PSK:

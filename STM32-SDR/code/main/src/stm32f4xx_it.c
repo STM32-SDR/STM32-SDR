@@ -29,6 +29,7 @@
 #include "usbh_core.h"
 #include "stm32f4xx_conf.h"
 #include "stm32fxxx_it.h"
+#include "ps2Keyboard_Input.h"
 #include <assert.h>
 
 
@@ -50,9 +51,11 @@ const uint16_t sinetable[]  = {
 uint16_t pulse_width = 128;
 uint32_t phase_accumulator = 0;
 uint8_t angle = 0;
+
 //Magic Number = 2^32 * f0/fs  where f0 = 500Hz and fs = 100KHz
-//const uint32_t R 21474836; // 500 Hz
-const uint32_t magicR = 23622320; // 550
+//#define R 21474836 // 500 Hz
+const uint32_t magicR = 23622320; // 550 Hz
+
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
@@ -60,6 +63,121 @@ const uint32_t magicR = 23622320; // 550
 /* Private variables ---------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
+
+
+uint32_t pinsused = 0;
+
+TM_EXTI_Result_t TM_EXTI_Attach(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin, TM_EXTI_Trigger_t trigger) {
+	GPIO_InitTypeDef GPIO_InitStruct;
+	EXTI_InitTypeDef EXTI_InitStruct;
+	NVIC_InitTypeDef NVIC_InitStruct;
+	uint32_t gpio_clock;
+	uint8_t pinsource, portsource, irqchannel;
+
+	/* Check if line is already in use */
+	if (pinsused & GPIO_Pin) {
+		/* Return error */
+		return TM_EXTI_Result_Error;
+	}
+
+	/* Enable SYSCFG clock */
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
+
+	/* Get proper settings */
+	if (GPIOx == GPIOE) {
+		gpio_clock = RCC_AHB1Periph_GPIOE;
+		portsource = EXTI_PortSourceGPIOE;
+	} else {
+		/* Return error */
+		return TM_EXTI_Result_Error;
+	}
+
+	switch (GPIO_Pin) {
+		case GPIO_Pin_0:
+			pinsource = EXTI_PinSource0;
+			irqchannel = EXTI0_IRQn;
+			break;
+		default:
+			return TM_EXTI_Result_Error;
+	}
+
+	/* Enable clock for GPIO */
+	RCC_AHB1PeriphClockCmd(gpio_clock, ENABLE);
+
+	/* Set pin as input */
+	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN;
+	GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
+	GPIO_InitStruct.GPIO_Pin = GPIO_Pin;
+	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
+
+	if (trigger == TM_EXTI_Trigger_Falling) {
+		GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;
+	} else if (trigger == TM_EXTI_Trigger_Rising) {
+		GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_DOWN;
+	} else {
+		GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
+	}
+
+	/* Initialize pin */
+	GPIO_Init(GPIOx, &GPIO_InitStruct);
+
+	/* Connect proper GPIO */
+	SYSCFG_EXTILineConfig(portsource, pinsource);
+
+	/* Enable EXTI */
+	EXTI_InitStruct.EXTI_Line = GPIO_Pin;
+	EXTI_InitStruct.EXTI_LineCmd = ENABLE;
+	EXTI_InitStruct.EXTI_Mode = EXTI_Mode_Interrupt;
+	EXTI_InitStruct.EXTI_Trigger = (EXTITrigger_TypeDef)trigger;
+	EXTI_Init(&EXTI_InitStruct);
+
+	/* Add to NVIC */
+	NVIC_InitStruct.NVIC_IRQChannel = irqchannel;
+	NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = TM_EXTI_PRIORITY;
+	NVIC_InitStruct.NVIC_IRQChannelSubPriority = pinsource;
+	NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
+	NVIC_Init(&NVIC_InitStruct);
+
+	/* Add to used pins */
+	pinsused |= GPIO_Pin;
+
+	/* Return OK */
+	return TM_EXTI_Result_Ok;
+}
+
+TM_EXTI_Result_t TM_EXTI_Detach(uint16_t GPIO_Pin) {
+	EXTI_InitTypeDef EXTI_InitStruct;
+
+	/* Check if pin is used */
+	if (!(pinsused & GPIO_Pin)) {
+		/* Return Error */
+	}
+
+	/* Disable EXTI */
+	EXTI_InitStruct.EXTI_Line = GPIO_Pin;
+	EXTI_InitStruct.EXTI_LineCmd = DISABLE;
+	EXTI_InitStruct.EXTI_Mode = EXTI_Mode_Interrupt;
+	EXTI_InitStruct.EXTI_Trigger = EXTI_Trigger_Falling;
+	EXTI_Init(&EXTI_InitStruct);
+
+	/* Clear from used pins */
+	pinsused &= ~GPIO_Pin;
+
+	/* Return OK */
+	return TM_EXTI_Result_Ok;
+}
+
+#ifndef TM_EXTI_DISABLE_DEFAULT_HANDLER_0
+void EXTI0_IRQHandler(void) {
+	/* Check status */
+	if (EXTI_GetITStatus(EXTI_Line0) != RESET) {
+		/* Clear bit */
+		EXTI_ClearITPendingBit(EXTI_Line0);
+		/* Call user function */
+		kbInterrupt();
+	}
+}
+#endif
 
 /******************************************************************************/
 /*            Cortex-M4 Processor Exceptions Handlers                         */
@@ -189,6 +307,7 @@ extern void USB_OTG_BSP_TimerIRQ (void);
   * @param  None
   * @retval None
   */
+
 void EXTI1_IRQHandler(void)
 {
   if(EXTI_GetITStatus(EXTI_Line1) != RESET)

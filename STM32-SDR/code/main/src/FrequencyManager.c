@@ -109,6 +109,36 @@ static bandFilter s_bandTable[8];
 
 static int oldCode = 8; //Detect band code changes, Initialized to invalid value
 
+static uint32_t splitTxFrequency; // Used during split Tx/Rx
+static uint32_t splitRxFrequency; // Used during split Tx/Rx
+_Bool split=0;
+
+void FrequencyManager_setSplit(_Bool setting){
+	debug(GUI, "FrequencyManager_setSplit:\n");
+	split = setting;
+}
+
+_Bool FrequencyManager_isSplit(void){
+	debug(GUI, "FrequencyManager_isSplit:\n");
+	return split;
+}
+
+void FrequencyManager_SaveTxFrequency(uint32_t savedFrequency){
+	debug(GUI, "FrequencyManager_SaveTxFrequency:\n");
+	splitTxFrequency = savedFrequency;
+}
+
+void FrequencyManager_SetTxFrequency(){
+	debug(GUI, "FrequencyManager_SetTxFrequency:\n");
+	splitRxFrequency = FrequencyManager_GetCurrentFrequency();
+	FrequencyManager_SetCurrentFrequency(splitTxFrequency);
+}
+
+void FrequencyManager_SetRxFrequency(){
+	debug(GUI, "FrequencyManager_SetRxFrequency:\n");
+	FrequencyManager_SetCurrentFrequency(splitRxFrequency);
+}
+
 void FrequencyManager_Initialize(void)
 {
 
@@ -221,60 +251,6 @@ void FrequencyManager_SetFreqMultiplier(int16_t newFreqMult)
 {
 	s_frequencyMultiplier = newFreqMult;
 }
-/*
-void display_digit (int x, int y, int number){
-	switch (number){
-		case 0: {
-			LCD_DrawBMP16Bit(x,y, gimp_image0.height, gimp_image0.width, (uint16_t*) gimp_image0.pixel_data, 0);
-			break;
-		}
-		case 1: {
-			LCD_DrawBMP16Bit(x,y, gimp_image1.height, gimp_image1.width, (uint16_t*) gimp_image1.pixel_data, 0);
-			break;
-		}
-		case 2: {
-			LCD_DrawBMP16Bit(x,y, gimp_image2.height, gimp_image2.width, (uint16_t*) gimp_image2.pixel_data, 0);
-			break;
-		}
-		case 3: {
-			LCD_DrawBMP16Bit(x,y, gimp_image3.height, gimp_image3.width, (uint16_t*) gimp_image3.pixel_data, 0);
-			break;
-		}
-		case 4: {
-			LCD_DrawBMP16Bit(x,y, gimp_image4.height, gimp_image4.width, (uint16_t*) gimp_image4.pixel_data, 0);
-			break;
-		}
-		case 5: {
-			LCD_DrawBMP16Bit(x,y, gimp_image5.height, gimp_image5.width, (uint16_t*) gimp_image5.pixel_data, 0);
-			break;
-		}
-		case 6: {
-			LCD_DrawBMP16Bit(x,y, gimp_image6.height, gimp_image6.width, (uint16_t*) gimp_image6.pixel_data, 0);
-			break;
-		}
-		case 7: {
-			LCD_DrawBMP16Bit(x,y, gimp_image7.height, gimp_image7.width, (uint16_t*) gimp_image7.pixel_data, 0);
-			break;
-		}
-		case 8: {
-			LCD_DrawBMP16Bit(x,y, gimp_image8.height, gimp_image8.width, (uint16_t*) gimp_image8.pixel_data, 0);
-			break;
-		}
-		case 9: {
-			LCD_DrawBMP16Bit(x,y, gimp_image9.height, gimp_image9.width, (uint16_t*) gimp_image9.pixel_data, 0);
-			break;
-		}
-}
-
-void FrequencyManager_DisplayFrequency(void){
-	uint32_t val = FrequencyManager_GetCurrentFrequency()/1000;
-		int i = 6;
-		for(; i && val ; --i, val /= 10)
-			display_digit(100, 140 + 25*i, val % 10);
-		}
-//		return &buf[i+1];
-}
-*/
 
 /*
  * Manage stepping the frequency (for example, using the adjustment knob)

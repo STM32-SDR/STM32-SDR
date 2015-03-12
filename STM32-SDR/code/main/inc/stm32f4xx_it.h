@@ -33,7 +33,6 @@ extern "C" {
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
 
-
 /* Exported macro ------------------------------------------------------------*/
 /* Exported variables ------------------------------------------------------------*/
 const extern uint16_t sinetable[];
@@ -61,3 +60,39 @@ void SysTick_Handler(void);
 #endif /* __STM32F4xx_IT_H */
 
 /******************* (C) COPYRIGHT 2011 STMicroelectronics *****END OF FILE****/
+
+/* Default priority for NVIC */
+#define TM_EXTI_PRIORITY	0x0A
+
+/**
+ * Interrupt trigger enumeration
+ *
+ * Parameters:
+ * 	- TM_EXTI_Trigger_Rising:
+ * 		Trigger interrupt on rising edge on line
+ * 	- TM_EXTI_Trigger_Falling:
+ * 		Trigger interrupt on falling edge on line
+ * 	- TM_EXTI_Trigger_Rising_Falling:
+ * 		Trigger interrupt on any edge on line
+ */
+typedef enum {
+	TM_EXTI_Trigger_Rising = 0x08,
+	TM_EXTI_Trigger_Falling = 0x0C,
+	TM_EXTI_Trigger_Rising_Falling = 0x10
+} TM_EXTI_Trigger_t;
+
+/**
+ * Result enumeration
+ *
+ * Parameters:
+ * 	- TM_EXTI_Result_Ok:
+ * 		Everything ok
+ * 	- TM_EXTI_Result_Error:
+ * 		An error has occured
+ */
+typedef enum {
+	TM_EXTI_Result_Ok = 0,
+	TM_EXTI_Result_Error
+} TM_EXTI_Result_t;
+
+TM_EXTI_Result_t TM_EXTI_Attach(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin, TM_EXTI_Trigger_t trigger);

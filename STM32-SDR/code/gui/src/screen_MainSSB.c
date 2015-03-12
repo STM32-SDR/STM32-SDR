@@ -114,7 +114,7 @@ static _Bool FreqStatusUpdateHandler(GL_PageControls_TypeDef* pThis, _Bool force
 {
       // For CW, put this in code\gui\src\screen_MainCW.c
 	//and display the result
-	static char buf[15] = {0};
+	static char buf[16] = {0};
 	int val = FrequencyManager_GetCurrentFrequency();
 	int i = 12, j=12;
 	for(; i>=0 && j>=0 && val ; --i){
@@ -134,9 +134,10 @@ static _Bool FreqStatusUpdateHandler(GL_PageControls_TypeDef* pThis, _Bool force
 		j--;
 //		xprintf("i = %d, j = %d, val = %d, buf[j] = %c\n", i, j, val, buf[j]);
 	}
-	buf[12] = "H"[0]; //replace last comma with Hz + null
-	buf[13] = "z"[0];
-	buf[14] = 0;
+	buf[12] = " "[0];
+	buf[13] = "H"[0]; //replace last comma with Hz + null
+	buf[14] = "z"[0];
+	buf[15] = 0;
 //		xprintf("Frequency = %s\n", buf);
 
 	Widget_ChangeLabelText(pFreqLabel, buf);
@@ -229,7 +230,7 @@ void ScreenMainSSB_Create(void)
 
 	//Frequency Label
 		pFreqLabel = Widget_NewLabel("", LCD_COLOR_GREEN, LCD_COLOR_BLACK, 0, GL_FONTOPTION_16x24,FreqStatusUpdateHandler);
-		AddPageControlObj(98, 130, pFreqLabel, s_pThisScreen);
+		AddPageControlObj(82, 130, pFreqLabel, s_pThisScreen);
 
 	// Programmable buttons
 		for (int i = 0; i < Prog_CW1 - Prog_SSB1; i++) {
