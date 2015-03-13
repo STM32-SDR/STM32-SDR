@@ -301,6 +301,7 @@ static void Screen_SplitButtonClick(GL_PageControls_TypeDef* pThis)
 			buf[17] = "z"[0];
 			buf[18] = 0;
 			TxSplit_set(1);
+			FrequencyManager_SetRxFrequency();
 			}
 		else {							// State when Split is engaged and TX freq has been set  .. JDG
 				FrequencyManager_setSplit(0);

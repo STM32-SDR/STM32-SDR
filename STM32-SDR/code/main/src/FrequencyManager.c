@@ -145,7 +145,7 @@ void FrequencyManager_SaveTxFrequency(uint32_t savedFrequency){
 
 void FrequencyManager_SetTxFrequency(){
 	debug(GUI, "FrequencyManager_SetTxFrequency:\n");
-	splitTxFrequency = FrequencyManager_GetCurrentFrequency();
+	FrequencyManager_SetCurrentFrequency(splitTxFrequency);
 }
 
 void FrequencyManager_SetRxFrequency(){
