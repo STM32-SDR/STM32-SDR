@@ -55,7 +55,7 @@
 #include  	"main.h"
 #include	"ps2Keyboard_Input.h"
 
-#define VERSION_STRING "1.059j +PS2 A0.4 +CW"
+#define VERSION_STRING "1.060j"
 
 extern int NCO_Point;
 extern int NCOTuneCount;

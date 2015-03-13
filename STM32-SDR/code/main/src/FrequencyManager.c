@@ -112,6 +112,16 @@ static int oldCode = 8; //Detect band code changes, Initialized to invalid value
 static uint32_t splitTxFrequency; // Used during split Tx/Rx
 static uint32_t splitRxFrequency; // Used during split Tx/Rx
 _Bool split=0;
+_Bool txsplit=0;
+
+void TxSplit_set(_Bool setting){
+	debug(GUI, "Tx_setSplit_Set:\n");
+	txsplit = setting;
+}
+_Bool TxSplit_isEntered(void){
+	debug(GUI, "TxSplit_isEntered:\n");
+	return txsplit;
+}
 
 void FrequencyManager_setSplit(_Bool setting){
 	debug(GUI, "FrequencyManager_setSplit:\n");
@@ -123,6 +133,11 @@ _Bool FrequencyManager_isSplit(void){
 	return split;
 }
 
+void FrequencyManager_SaveRxFrequency(uint32_t savedFrequency){
+	debug(GUI, "FrequencyManager_SaveRxFrequency:\n");
+	splitRxFrequency = savedFrequency;
+}
+
 void FrequencyManager_SaveTxFrequency(uint32_t savedFrequency){
 	debug(GUI, "FrequencyManager_SaveTxFrequency:\n");
 	splitTxFrequency = savedFrequency;
@@ -130,8 +145,7 @@ void FrequencyManager_SaveTxFrequency(uint32_t savedFrequency){
 
 void FrequencyManager_SetTxFrequency(){
 	debug(GUI, "FrequencyManager_SetTxFrequency:\n");
-	splitRxFrequency = FrequencyManager_GetCurrentFrequency();
-	FrequencyManager_SetCurrentFrequency(splitTxFrequency);
+	splitTxFrequency = FrequencyManager_GetCurrentFrequency();
 }
 
 void FrequencyManager_SetRxFrequency(){

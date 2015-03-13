@@ -51,8 +51,12 @@ typedef enum {
 
 #define freqLabel_length 10
 
+void TxSplit_set(_Bool setting);
+_Bool TxSplit_isEntered(void);
+
 void FrequencyManager_setSplit(_Bool setting);
 _Bool FrequencyManager_isSplit(void);
+void FrequencyManager_SaveRxFrequency(uint32_t savedFrequency);
 void FrequencyManager_SaveTxFrequency(uint32_t savedFrequency);
 void FrequencyManager_SetTxFrequency(void);
 void FrequencyManager_SetRxFrequency(void);

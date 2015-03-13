@@ -264,41 +264,50 @@ static void Screen_SplitButtonClick(GL_PageControls_TypeDef* pThis)
 	debug(GUI, "Screen_SplitButtonClick:\n");
 	Screen_ButtonAnimate(pThis);
 	debug(GUI, "Screen_SplitButtonClick: split = %d\n", FrequencyManager_isSplit());
-	if (!FrequencyManager_isSplit()) {
+	if (!FrequencyManager_isSplit()&&!TxSplit_isEntered()) {		// State when Split is not engaged and TX freq has not been set  .. JDG
 		FrequencyManager_setSplit(1);
-		ChangeButtonText(s_pThisScreen, 123, " Join  ");
-
 		uint32_t val = FrequencyManager_GetCurrentFrequency();
 		debug(GUI, "Screen_SplitButtonClick: currentFreq = %d\n", val);
 		debug(GUI, "Screen_SplitButtonClick: savedFreq = %d\n", FrequencyManager_GetCurrentFrequency());
-		FrequencyManager_SaveTxFrequency(val);
-		int i = 15, j=15;
-		for(; i>=0 && j>=0 && val ; --i){
-			if (i%3==0){
-				buf[j] = ","[0]; //put in commas
-	//			xprintf("i = %d, j = %d, val = %d, buf[j] = %c\n", i, j, val, buf[j]);
+		FrequencyManager_SaveRxFrequency(val);
+		ChangeButtonText(s_pThisScreen, 123, " SetTx  ");
+		}
+		else if (FrequencyManager_isSplit()&&!TxSplit_isEntered()) {	// State when Split is engaged and TX freq has not been set  .. JDG
+			ChangeButtonText(s_pThisScreen, 123, " Join  ");
+			uint32_t val = FrequencyManager_GetCurrentFrequency();
+			debug(GUI, "Screen_SplitButtonClick: currentFreq = %d\n", val);
+			debug(GUI, "Screen_SplitButtonClick: savedFreq = %d\n", FrequencyManager_GetCurrentFrequency());
+			FrequencyManager_SaveTxFrequency(val);
+			int i = 15, j=15;
+			for(; i>=0 && j>=0 && val ; --i){
+				if (i%3==0){
+					buf[j] = ","[0]; //put in commas
+		//			xprintf("i = %d, j = %d, val = %d, buf[j] = %c\n", i, j, val, buf[j]);
+					j--;
+				}
+				buf[j] = "0123456789"[val % 10];
+		//		xprintf("i = %d, j = %d, val = %d, buf[j] = %c\n", i, j, val, buf[j]);
+				val /= 10;
 				j--;
 			}
-			buf[j] = "0123456789"[val % 10];
-	//		xprintf("i = %d, j = %d, val = %d, buf[j] = %c\n", i, j, val, buf[j]);
-			val /= 10;
-			j--;
-		}
-			//replace leading 0 with space, first 3 chars are "Tx "
-		for(; i>=3 && j>=3; --i, val /= 10){
-			buf[j] = " "[0];
-			j--;
-	//		xprintf("i = %d, j = %d, val = %d, buf[j] = %c\n", i, j, val, buf[j]);
-		}
-		buf[15] = " "[0];
-		buf[16] = "H"[0]; //replace last comma with Hz + null
-		buf[17] = "z"[0];
-		buf[18] = 0;
-	} else {
-		FrequencyManager_setSplit(0);
-		strcpy(buf, "                  ");
-		ChangeButtonText(s_pThisScreen, 123, " Split ");
-	}
+				//replace leading 0 with space, first 3 chars are "Tx "
+			for(; i>=3 && j>=3; --i, val /= 10){
+				buf[j] = " "[0];
+				j--;
+		//		xprintf("i = %d, j = %d, val = %d, buf[j] = %c\n", i, j, val, buf[j]);
+			}
+			buf[15] = " "[0];
+			buf[16] = "H"[0]; //replace last comma with Hz + null
+			buf[17] = "z"[0];
+			buf[18] = 0;
+			TxSplit_set(1);
+			}
+		else {							// State when Split is engaged and TX freq has been set  .. JDG
+				FrequencyManager_setSplit(0);
+				TxSplit_set(0);
+				strcpy(buf, "                  ");
+				ChangeButtonText(s_pThisScreen, 123, " Split ");
+			}
 	Widget_ChangeLabelText(pTxFreqLabel, buf);
 
 	RefreshPageControl (s_pThisScreen, 1);
