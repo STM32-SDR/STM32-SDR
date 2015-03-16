@@ -270,7 +270,7 @@ static void Screen_SplitButtonClick(GL_PageControls_TypeDef* pThis)
 		debug(GUI, "Screen_SplitButtonClick: currentFreq = %d\n", val);
 		debug(GUI, "Screen_SplitButtonClick: savedFreq = %d\n", FrequencyManager_GetCurrentFrequency());
 		FrequencyManager_SaveRxFrequency(val);
-		ChangeButtonText(s_pThisScreen, 123, " SetTx  ");
+		ChangeButtonText(s_pThisScreen, 123, " SetTx ");
 		}
 		else if (FrequencyManager_isSplit()&&!TxSplit_isEntered()) {	// State when Split is engaged and TX freq has not been set  .. JDG
 			ChangeButtonText(s_pThisScreen, 123, " Join  ");
