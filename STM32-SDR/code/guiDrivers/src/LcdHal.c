@@ -174,8 +174,8 @@ void GL_LCD_DrawFilledRect(uint8_t Xpos, uint16_t Ypos, uint8_t Height, uint16_t
 
 /**
  * @brief  Displays a circle.
- * @param  Xpos: specifies the X position.
- * @param  Ypos: specifies the Y position.
+ * @param  Xpos: specifies the center X position.
+ * @param  Ypos: specifies the center Y position.
  * @param  Radius: the radius size of the circle
  * @retval None
  */

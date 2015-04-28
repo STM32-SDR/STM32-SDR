@@ -168,7 +168,7 @@ LIBS    = $(DLIBS) $(ULIBS)
 MCFLAGS = -mcpu=$(MCU) -mfpu=fpv4-sp-d16 -mfloat-abi=hard
  
 ASFLAGS = $(MCFLAGS) -g -gdwarf-2 -mthumb  -Wa,-amhls=$(OBJDIR)/$(<:.s=.lst) $(ADEFS)
-CPFLAGS = $(MCFLAGS) $(OPT) -std=c99 -gdwarf-2 -mthumb   -fomit-frame-pointer -Wall -Wstrict-prototypes -fverbose-asm -Wa,-ahlms=$(OBJDIR)/$(<:.c=.lst) $(DEFS)
+CPFLAGS = $(MCFLAGS) $(OPT) -std=c99 -gdwarf-2 -mthumb -fno-strict-aliasing -fomit-frame-pointer -Wall -Wstrict-prototypes -fverbose-asm -Wa,-ahlms=$(OBJDIR)/$(<:.c=.lst) $(DEFS)
 LDFLAGS = $(MCFLAGS) -mthumb -nostartfiles -T$(LDSCRIPT) -Wl,-Map=$(FULL_PRJ).map,--cref,--no-warn-mismatch $(LIBDIR)
  
 # Generate dependency information

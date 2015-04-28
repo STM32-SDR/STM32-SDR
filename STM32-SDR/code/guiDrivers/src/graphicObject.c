@@ -150,8 +150,8 @@ void GL_DrawFilledRectangle(uint16_t maxX, uint16_t minX, uint8_t maxY, uint8_t 
 
 /**
  * @brief  Displays a circle.
- * @param  Xpos: specifies the X position.
- * @param  Ypos: specifies the Y position.
+ * @param  Xpos: specifies the center X position.
+ * @param  Ypos: specifies the center Y position.
  * @param  Radius: specifies the circle radius.
  * @param  Color: specifies the filling color.
  * @retval None
@@ -159,11 +159,11 @@ void GL_DrawFilledRectangle(uint16_t maxX, uint16_t minX, uint8_t maxY, uint8_t 
 void GL_DrawFilledCircle(uint16_t Xpos, uint8_t Ypos, uint16_t Radius, uint16_t Color)
 {
 	uint32_t n = 2;
-	GL_LCD_DrawCircle(Ypos - Radius, Xpos - Radius, Radius);
-	GL_LCD_DrawCircle(Ypos - Radius, Xpos - Radius, Radius - 1);
+	GL_LCD_DrawCircle(Xpos, Ypos, Radius);
+	GL_LCD_DrawCircle(Xpos, Ypos, Radius - 1);
 	GL_SetTextColor(Color);
 	for (; n < Radius; n++) {
-		GL_LCD_DrawCircle(Ypos - Radius, Xpos - Radius, Radius - n);
+		GL_LCD_DrawCircle(Xpos, Ypos, Radius - n);
 	}
 }
 
