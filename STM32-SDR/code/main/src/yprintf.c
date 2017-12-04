@@ -11,112 +11,58 @@
  /
  /-------------------------------------------------------------------------*/
 
-#include "xprintf.h"
+#include "yprintf.h"
 
-#if _USE_XFUNC_OUT
+#if _USE_YFUNC_OUT
 #include <stdarg.h>
-void (*xfunc_out)(unsigned char); /* Pointer to the output stream */
+void (*yfunc_out)(unsigned char); /* Pointer to the output stream */
 static char *outptr;
-static void xvprintf(const char* fmt, /* Pointer to the format string */
+static void yvprintf(const char* fmt, /* Pointer to the format string */
 		va_list arp /* Pointer to arguments */
 );
-
-/*----------------------------------------------*/
-/* Debug message printing                       */
-/*----------------------------------------------*/
-
-// A macro to allow tracing of all debug events.
-#define DEBUG_MARKER() do { \
-	debug ("%s()   at line %d.\n", __func__, __LINE__); \
-	} while (0)
-		//debugEvent(__LINE__);
-
-// DEBUG_SELECTED can be the sum of all the enabling codes
-// e.g. DEBUG_SELECTED GUI + GUI_DETAIL + USB etc.
-// uncomment one of the following lines or create your own custom set
-
-//#define DEBUG_SELECTED	(GUI + KEYBOARD + TOUCH)
-//#define DEBUG_SELECTED	(GUI)
-//#define DEBUG_SELECTED	(KEYBOARD)
-//#define DEBUG_SELECTED	(LCD + ENCODER)
-//#define DEBUG_SELECTED	(GUI + CAL + TOUCH + LCD + ENCODER + KEYBOARD + INIT)
-//#define DEBUG_SELECTED (GUI + TOUCH + LCD + KEYBOARD + ENCODER)
-//#define DEBUG_SELECTED (CONTROL + INIT)
-#define DEBUG_SELECTED (NONE)
-
-void debug (int debug_code,
-
-		/* Put a formatted string to the default device */
-		const char* fmt, /* Pointer to the format string */
-		... /* Optional arguments */
-
-)
-{
-	if ((debug_code & DEBUG_SELECTED) != NONE) {
-		if (debug_code & GUI)
-			xprintf ("Debug GUI: ");
-		if (debug_code & SCREEN)
-			xprintf ("Debug Screen: ");
-		if (debug_code & USB)
-			xprintf ("Debug USB: ");
-		if (debug_code & CAL)
-			xprintf ("Debug calibrate: ");
-		if (debug_code & TOUCH)
-			xprintf ("Debug touch display: ");
-		if (debug_code & LCD)
-			xprintf ("Debug LCD: ");
-		if (debug_code & ENCODER)
-			xprintf ("Debug Encoder: ");
-        // Call the xprintf using the var-args
-        va_list arp;
-        va_start(arp, fmt);
-        xvprintf(fmt, arp);
-        va_end(arp);
-	}
-}
 
 /*----------------------------------------------*/
 /* Put a character                              */
 /*----------------------------------------------*/
 
-void xputc(char c)
+void yputc(char c)
 {
 	if (_CR_CRLF && c == '\n')
-		xputc('\r'); /* CR -> CRLF */
+		yputc('\r'); /* CR -> CRLF */
 
 	if (outptr) {
 		*outptr++ = (unsigned char) c;
 		return;
 	}
 
-	if (xfunc_out)
-		xfunc_out((unsigned char) c);
+	if (yfunc_out)
+		yfunc_out((unsigned char) c);
 }
 
 /*----------------------------------------------*/
 /* Put a null-terminated string                 */
 /*----------------------------------------------*/
 
-void xputs( /* Put a string to the default device */
+void yputs( /* Put a string to the default device */
 		const char* str /* Pointer to the string */
 )
 {
 	while (*str)
-		xputc(*str++);
+		yputc(*str++);
 }
 
-void xfputs( /* Put a string to the specified device */
+void yfputs( /* Put a string to the specified device */
 		void (*func)(unsigned char), /* Pointer to the output function */
 		const char* str /* Pointer to the string */
 )
 {
 	void (*pf)(unsigned char);
 
-	pf = xfunc_out; /* Save current output device */
-	xfunc_out = func; /* Switch output to specified device */
+	pf = yfunc_out; /* Save current output device */
+	yfunc_out = func; /* Switch output to specified device */
 	while (*str) /* Put the string */
-		xputc(*str++);
-	xfunc_out = pf; /* Restore output device */
+		yputc(*str++);
+	yfunc_out = pf; /* Restore output device */
 }
 
 /*----------------------------------------------*/
@@ -137,7 +83,7 @@ void xfputs( /* Put a string to the specified device */
  */
 
 static
-void xvprintf(const char* fmt, /* Pointer to the format string */
+void yvprintf(const char* fmt, /* Pointer to the format string */
 		va_list arp /* Pointer to arguments */
 )
 {
@@ -150,7 +96,7 @@ void xvprintf(const char* fmt, /* Pointer to the format string */
 		if (!c)
 			break; /* End of format? */
 		if (c != '%') { /* Pass through it if not a % sequense */
-			xputc(c);
+			yputc(c);
 			continue;
 		}
 		f = 0;
@@ -182,13 +128,13 @@ void xvprintf(const char* fmt, /* Pointer to the format string */
 			for (j = 0; p[j]; j++)
 				;
 			while (!(f & 2) && j++ < w)
-				xputc(' ');
-			xputs(p);
+				yputc(' ');
+			yputs(p);
 			while (j++ < w)
-				xputc(' ');
+				yputc(' ');
 			continue;
 		case 'C': /* Character */
-			xputc((char) va_arg(arp, int));
+			yputc((char) va_arg(arp, int));
 			continue;
 		case 'B': /* Binary */
 			r = 2;
@@ -204,7 +150,7 @@ void xvprintf(const char* fmt, /* Pointer to the format string */
 			r = 16;
 			break;
 		default: /* Unknown type (passthrough) */
-			xputc(c);
+			yputc(c);
 			continue;
 		}
 
@@ -231,16 +177,16 @@ void xvprintf(const char* fmt, /* Pointer to the format string */
 		j = i;
 		d = (f & 1) ? '0' : ' ';
 		while (!(f & 2) && j++ < w)
-			xputc(d);
+			yputc(d);
 		do
-			xputc(s[--i]);
+			yputc(s[--i]);
 		while (i);
 		while (j++ < w)
-			xputc(' ');
+			yputc(' ');
 	}
 }
 
-void xprintf( /* Put a formatted string to the default device */
+void yprintf( /* Put a formatted string to the default device */
 		const char* fmt, /* Pointer to the format string */
 		... /* Optional arguments */
 )
@@ -248,11 +194,11 @@ void xprintf( /* Put a formatted string to the default device */
 	va_list arp;
 
 	va_start(arp, fmt);
-	xvprintf(fmt, arp);
+	yvprintf(fmt, arp);
 	va_end(arp);
 }
 
-void xsprintf( /* Put a formatted string to the memory */
+void ysprintf( /* Put a formatted string to the memory */
 		char* buff, /* Pointer to the output buffer */
 		const char* fmt, /* Pointer to the format string */
 		... /* Optional arguments */
@@ -263,14 +209,14 @@ void xsprintf( /* Put a formatted string to the memory */
 	outptr = buff; /* Switch destination for memory */
 
 	va_start(arp, fmt);
-	xvprintf(fmt, arp);
+	yvprintf(fmt, arp);
 	va_end(arp);
 
 	*outptr = 0; /* Terminate output string with a \0 */
 	outptr = 0; /* Switch destination for device */
 }
 
-void xfprintf( /* Put a formatted string to the specified device */
+void yfprintf( /* Put a formatted string to the specified device */
 		void (*func)(unsigned char), /* Pointer to the output function */
 		const char* fmt, /* Pointer to the format string */
 		... /* Optional arguments */
@@ -279,21 +225,21 @@ void xfprintf( /* Put a formatted string to the specified device */
 	va_list arp;
 	void (*pf)(unsigned char);
 
-	pf = xfunc_out; /* Save current output device */
-	xfunc_out = func; /* Switch output to specified device */
+	pf = yfunc_out; /* Save current output device */
+	yfunc_out = func; /* Switch output to specified device */
 
 	va_start(arp, fmt);
-	xvprintf(fmt, arp);
+	yvprintf(fmt, arp);
 	va_end(arp);
 
-	xfunc_out = pf; /* Restore output device */
+	yfunc_out = pf; /* Restore output device */
 }
 
 /*----------------------------------------------*/
 /* Dump a line of binary dump                   */
 /*----------------------------------------------*/
 
-void put_dump(const void* buff, /* Pointer to the array to be dumped */
+void yput_dump(const void* buff, /* Pointer to the array to be dumped */
 		unsigned long addr, /* Heading address value */
 		int len, /* Number of items to be dumped */
 		int width /* Size of the items (DF_CHAR, DF_SHORT, DF_LONG) */
@@ -304,73 +250,73 @@ void put_dump(const void* buff, /* Pointer to the array to be dumped */
 	const unsigned short *sp;
 	const unsigned long *lp;
 
-	xprintf("%08lX ", addr); /* address */
+	yprintf("%08lX ", addr); /* address */
 
 	switch (width) {
 	case DW_CHAR:
 		bp = buff;
 		for (i = 0; i < len; i++) /* Hexdecimal dump */
-			xprintf(" %02X", bp[i]);
-		xputc(' ');
+			yprintf(" %02X", bp[i]);
+		yputc(' ');
 		for (i = 0; i < len; i++) /* ASCII dump */
-			xputc((bp[i] >= ' ' && bp[i] <= '~') ? bp[i] : '.');
+			yputc((bp[i] >= ' ' && bp[i] <= '~') ? bp[i] : '.');
 		break;
 	case DW_SHORT:
 		sp = buff;
 		do /* Hexdecimal dump */
-			xprintf(" %04X", *sp++);
+			yprintf(" %04X", *sp++);
 		while (--len);
 		break;
 	case DW_LONG:
 		lp = buff;
 		do /* Hexdecimal dump */
-			xprintf(" %08LX", *lp++);
+			yprintf(" %08LX", *lp++);
 		while (--len);
 		break;
 	}
 
-	xputc('\n');
+	yputc('\n');
 }
 
-#endif /* _USE_XFUNC_OUT */
+#endif /* _USE_YFUNC_OUT */
 
-#if _USE_XFUNC_IN
-unsigned char (*xfunc_in)(void); /* Pointer to the input stream */
+#if _USE_YFUNC_IN
+unsigned char (*yfunc_in)(void); /* Pointer to the input stream */
 
 /*----------------------------------------------*/
 /* Get a line from the input                    */
 /*----------------------------------------------*/
 
-int xgets ( /* 0:End of stream, 1:A line arrived */
+int ygets ( /* 0:End of stream, 1:A line arrived */
 		char* buff, /* Pointer to the buffer */
 		int len /* Buffer length */
 )
 {
 	int c, i;
 
-	if (!xfunc_in) return 0; /* No input function specified */
+	if (!yfunc_in) return 0; /* No input function specified */
 
 	i = 0;
 	for (;;) {
-		c = xfunc_in(); /* Get a char from the incoming stream */
+		c = yfunc_in(); /* Get a char from the incoming stream */
 		if (!c) return 0; /* End of stream? */
 		if (c == '\r') break; /* End of line? */
 		if (c == '\b' && i) { /* Back space? */
 			i--;
-			if (_LINE_ECHO) xputc(c);
+			if (_LINE_ECHO) yputc(c);
 			continue;
 		}
 		if (c >= ' ' && i < len - 1) { /* Visible chars */
 			buff[i++] = c;
-			if (_LINE_ECHO) xputc(c);
+			if (_LINE_ECHO) yputc(c);
 		}
 	}
 	buff[i] = 0; /* Terminate with a \0 */
-	if (_LINE_ECHO) xputc('\n');
+	if (_LINE_ECHO) yputc('\n');
 	return 1;
 }
 
-int xfgets ( /* 0:End of stream, 1:A line arrived */
+int yfgets ( /* 0:End of stream, 1:A line arrived */
 		unsigned char (*func)(void), /* Pointer to the input stream function */
 		char* buff, /* Pointer to the buffer */
 		int len /* Buffer length */
@@ -379,10 +325,10 @@ int xfgets ( /* 0:End of stream, 1:A line arrived */
 	unsigned char (*pf)(void);
 	int n;
 
-	pf = xfunc_in; /* Save current input device */
-	xfunc_in = func; /* Switch input to specified device */
-	n = xgets(buff, len); /* Get a line */
-	xfunc_in = pf; /* Restore input device */
+	pf = yfunc_in; /* Save current input device */
+	yfunc_in = func; /* Switch input to specified device */
+	n = ygets(buff, len); /* Get a line */
+	yfunc_in = pf; /* Restore input device */
 
 	return n;
 }
@@ -399,7 +345,7 @@ int xfgets ( /* 0:End of stream, 1:A line arrived */
  ^ 6th call fails and returns 0
  */
 
-int xatoi ( /* 0:Failed, 1:Successful */
+int yatoi ( /* 0:Failed, 1:Successful */
 		char **str, /* Pointer to pointer to the string */
 		long *res /* Pointer to the valiable to store the value */
 )
@@ -454,4 +400,4 @@ int xatoi ( /* 0:Failed, 1:Successful */
 	return 1;
 }
 
-#endif /* _USE_XFUNC_IN */
+#endif /* _USE_YFUNC_IN */

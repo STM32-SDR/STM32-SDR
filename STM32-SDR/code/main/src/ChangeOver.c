@@ -34,7 +34,10 @@
 #include "Init_Codec.h"
 #include "FrequencyManager.h"
 #include <assert.h>
+#include "main.h"
 #include <xprintf.h>
+#include <yprintf.h>
+#include "Si570.h"
 
 
 // Constants
@@ -69,7 +72,14 @@ void RxTx_SetReceive(void)
 	if (FrequencyManager_isSplit())
 		FrequencyManager_SetRxFrequency();
 	Receive_Sequence();
+#ifdef ENABLECONTROL
+	if (!Si570_isEnabled()) {
+		debug (CONTROL, "Serial -> *X0\n");
+		yprintf ("*X0\n");
+	}
+#endif
 }
+
 void RxTx_SetTransmit(void)
 {
 	switch(Mode_GetCurrentMode()) {
@@ -87,6 +97,12 @@ void RxTx_SetTransmit(void)
 	default:
 		assert(0);
 	}
+#ifdef ENABLECONTROL
+	if (!Si570_isEnabled()) {
+		debug (CONTROL, "Serial -> *X1\n");
+		yprintf ("*X1\n");
+	}
+#endif
 }
 
 // Query current mode (transmit or receive).
@@ -142,14 +158,14 @@ void RxTx_CheckAndHandlePTT(void)
 		if (CW_DesiresTransmitMode() && !RxTx_InTxMode()) {
 			Connect_Sidetone_Input();  //  Route the CW Sidetone to Headphones
 			RxTx_SetTransmit();
-			xprintf("To CW Tx\n");
+//			xprintf("To CW Tx\n");
 		}
 		if (!CW_DesiresTransmitMode() && RxTx_InTxMode()) {
 			s_inTransition = 1;
 			Disconnect_Sidetone_Input();
 			Delay(900000);
 			RxTx_SetReceive();
-			xprintf("To CW Rx\n");
+//			xprintf("To CW Rx\n");
 		}
 	}
 }

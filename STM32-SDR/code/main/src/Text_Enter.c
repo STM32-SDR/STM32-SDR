@@ -51,7 +51,7 @@ extern char* Mode_GetCurrentUserModeName (void);
 #define EEPROM_OFFSET_text 4000
 #define EEPROM_OFFSET_count 3000
 #define EEPROM_SENTINEL_LOC 75
-#define EEPROM_SENTINEL_VAL 1077
+#define EEPROM_SENTINEL_VAL 1078
 
 #define text_length 78 // keep this an even number, screen width = 38 char
 #define label_length 6
@@ -647,7 +647,7 @@ void Text_Display(int TextIdx, int textPointer)
 		else
 			buf1[c] = ' '; //pad remainder of line with spaces
 		if (c == textPointer)
-			buf2[c] = "^"[0];
+			buf2[c] = '^';
 		else
 			buf2[c] = ' ';
 	}
@@ -658,7 +658,7 @@ void Text_Display(int TextIdx, int textPointer)
 		else
 			buf3[c] = ' '; //pad remainder of line with spaces
 		if (c + text_length/2 == textPointer)
-			buf4[c] = "^"[0];
+			buf4[c] = '^';
 		else
 			buf4[c] = ' ';
 	}
@@ -737,7 +737,7 @@ void Item_Edit_Display(int TextIdx, int textPointer)
 		else
 			buf1[c] = ' '; //pad remainder of line with spaces
 		if (c == textPointer)
-			buf2[c] = "^"[0];
+			buf2[c] = '^';
 		else
 			buf2[c] = ' ';
 	}
@@ -787,7 +787,7 @@ void TagText_Display(int TextIdx, int textPointer)
 		else
 			buf1[c] = ' '; //pad remainder of line with spaces
 		if (c == textPointer)
-			buf2[c] = "^"[0];
+			buf2[c] = '^';
 		else
 			buf2[c] = ' ';
 	}
@@ -859,7 +859,7 @@ void TagItem_Edit_Display(int TextIdx, int textPointer)
 		else
 			buf1[c] = ' '; //pad remainder of line with spaces
 		if (c == textPointer)
-			buf2[c] = "^"[0];
+			buf2[c] = '^';
 		else
 			buf2[c] = ' ';
 	}
@@ -944,7 +944,7 @@ void FreqName_Display(){
 		else
 			buf1[c] = ' '; //pad remainder of line with spaces
 		if (c == freqLabelPointer)
-			buf2[c] = "^"[0];
+			buf2[c] = '^';
 		else
 			buf2[c] = ' ';
 	}
@@ -1333,7 +1333,7 @@ void kybd_edit_text(char data){
 					break;
 				}
 			}
-			Text_Blank();
+//			Text_Blank();
 			break;
 		}
 
@@ -1543,7 +1543,7 @@ void compose_Text(int messageNumber){
 		// i = pointer in source, j = pointer in destination, k = pointer in tag
 		j=0;
 		for (i=0; i<lengthMessage; i++){
-			if (s_TextData[messageNumber].Text[i] != "<"[0]){
+			if (s_TextData[messageNumber].Text[i] != '<'){
 				//copy byte-for-byte
 				message[j] = s_TextData[messageNumber].Text[i];
 				debug(KEYBOARD, "j = %d, copied message[j] = %c\n", j, message[j]);
@@ -1554,7 +1554,7 @@ void compose_Text(int messageNumber){
 				debug(KEYBOARD, "start of tag\n");
 				for (k=0; k<10; k++)
 					tag[k] = 0x00;
-				for (k = 0; s_TextData[messageNumber].Text[i+k+1] != ">"[0]; k++) {
+				for (k = 0; s_TextData[messageNumber].Text[i+k+1] != '>'; k++) {
 					tag[k] = s_TextData[messageNumber].Text[i+k+1];
 					debug(KEYBOARD, "copied tag[k] = %c\n", tag[k]);
 				}
@@ -1577,7 +1577,7 @@ void compose_Text(int messageNumber){
 					debug(KEYBOARD, "Frequency tag detected\n");
 					for (k=0; k<10; k++)
 						tag[k] = 0x00;
-					for (k = 0; s_TextData[messageNumber].Text[i+k+1] != ";"[0]; k++) {
+					for (k = 0; s_TextData[messageNumber].Text[i+k+1] != ';'; k++) {
 						tag[k] = s_TextData[messageNumber].Text[i+k+1];
 						debug(KEYBOARD, "copied tag[k] = %c\n", tag[k]);
 					}

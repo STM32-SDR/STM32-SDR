@@ -42,6 +42,7 @@
 //#define EEPROM_SENTINEL_VAL 2222
 //#define EEPROM_SENTINEL_VAL 1037
 //#define EEPROM_SENTINEL_VAL 1005
+//#define EEPROM_SENTINEL_VAL 1509
 #define EEPROM_SENTINEL_VAL 1509
 
 static OptionNumber s_currentOptionNumber = OPTION_RX_AUDIO;
@@ -79,7 +80,7 @@ static OptionStruct s_optionsData[] = {
 		/*Init*/ 0,
 		/*Min */ 0,
 		/*Max */ 3,
-		/*Rate*/ 1,
+		/*Rate*/ 0,
 		/*Data*/ 0,
 	},
 	{

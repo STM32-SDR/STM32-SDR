@@ -40,6 +40,8 @@ void Compute_FXTAL(void);
 void Output_Frequency(long Freq_Out);
 char Large_RFREQ_Change(void);
 void Check_SI570(void);
+void Si570_Init(void);
+_Bool Si570_isEnabled(void);
 
 //===================================================================
 //long		FOUT_multiplier, FOUT_divisor, Display_multiplier, Display_divisor;

@@ -107,6 +107,8 @@ char* FrequencyManager_Freq_ascii(int band);
 void FrequencyManager_Check_FilterBand(uint32_t newFreq);
 void FrequencyManager_Output_FilterCode(int newCode);
 
+void FrequencyManager_ControlCurrentFrequency(void);
+
 #endif
 
 void Tune_NCO_Up (void);

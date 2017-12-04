@@ -25,6 +25,7 @@
 #include "ChangeOver.h"
 #include "widgets.h"
 #include "STM32-SDR-Subroutines.h"
+#include "options.h"
 
 extern double NCO_Frequency;
 extern int NCOTUNE;
@@ -139,14 +140,21 @@ void Mode_SetCurrentMode(UserModeType newMode)
 	switch (newMode) {
 		case USERMODE_LSB:
 		case USERMODE_USB:
+			Options_SetValue(OPTION_AGC_Mode, 2);
+			RxTx_SetReceive();
+			WF_Flag = 0;
+			No_Filt (); //default to AF filter off
+			break;
 		case USERMODE_CW:
 		case USERMODE_CWR:
+			Options_SetValue(OPTION_AGC_Mode, 0);
 			RxTx_SetReceive();
 			WF_Flag = 0;
 			No_Filt (); //default to AF filter off
 			break;
 		case USERMODE_DIGU:
 		case USERMODE_DIGL:
+			Options_SetValue(OPTION_AGC_Mode, 1);
 			RxTx_SetReceive();
 			WF_Flag = 1;
 			Screen_PSK_SetTune(); //move to up arrow on tune button

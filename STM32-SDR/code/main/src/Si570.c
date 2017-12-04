@@ -22,6 +22,8 @@
 
 #include "Si570.h"
 #include "Init_I2C.h"
+#include "xprintf.h"
+#include "widgets.h"
 
 //===================================================================
 unsigned char si570_read[6];
@@ -32,9 +34,37 @@ unsigned long RFREQ_INT, RFREQ_FRAC;
 float HS_DIV, N1;
 double RFREQ, Old_RFREQ, FXTAL;
 double F0;
+_Bool si570_isEnabled = 0;
 
 
 /*======================================================================*/
+
+void Si570_Init(void)
+{
+	if (si570_isEnabled)
+		Compute_FXTAL();
+}
+
+_Bool  Si570_isEnabled (void) {
+	static _Bool firstTime = 1;
+
+	if (firstTime) {
+		Check_SI570();
+		debug (CONTROL, "Si570_isEnabled: SI570_Chk = %d\n", SI570_Chk);
+
+		if (SI570_Chk == 3) {
+			GL_PrintString(0, 180, "Si570 missing ->  serial control", 0);
+			debug (CONTROL, "Si570_Init: Not Enabled\n");
+			si570_isEnabled = 0;
+		} else {
+			GL_PrintString(0, 180, "Si570 found", 0);
+			si570_isEnabled = 1;
+			debug (CONTROL, "i570_Init: Enabled\n");
+		}
+		firstTime = 0;
+	}
+	return si570_isEnabled;
+}
 
 void Output_Frequency(long Freq_Out)
 {
@@ -181,7 +211,9 @@ void Unpack_Si570_registers(unsigned char reg[])
 
 void Check_SI570(void)
 	{
+	debug (CONTROL, "Check_SI570:\n");
 	SI570_Chk = I2C_ReadSlave(SI570_Addr, 135);
+	debug (CONTROL, "SI570_Chk = %x\n", SI570_Chk);
 	}
 
 //===================================================================

@@ -48,7 +48,8 @@ int xatoi (char** str, long* res);
 #define ENCODER 32 // Encoders
 #define KEYBOARD 64 // Keyboard entry
 #define SCREEN 128 // Screen operations
-#define INIT 256 // Startuop initialization sequence
+#define INIT 256 // Startup initialization sequence
+#define CONTROL 512 // Serial port command sequences
 	// etc.
 
 

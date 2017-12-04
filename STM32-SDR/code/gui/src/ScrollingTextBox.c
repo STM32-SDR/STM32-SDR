@@ -25,6 +25,7 @@
 #include "DMA_IRQ_Handler.h"
 #include "LcdDriver_ILI9320.h"
 #include "ChangeOver.h"
+#include "xprintf.h"
 
 #define FIRSTROW		1
 #define LASTROW			4

@@ -117,7 +117,7 @@ void ScreenFrequencies_Create(void)
 }
 
 void displayPresetInstructions(void){
-	debug(GUI, "displayPresetInstructions:\n");
+	debug(GUI, "displayPresetInstructions: editMode = %x\n", editMode);
 	Widget_ChangeLabelText (lbl1, "Tap a band to select.");
 	Widget_ChangeLabelText (lbl2, "");
 	Widget_ChangeLabelText (lbl3, "Press & turn frequency knob to set");
@@ -125,7 +125,7 @@ void displayPresetInstructions(void){
 }
 
 void displayEditInstructions(void){
-	debug(GUI, "displayEditInstructions:\n");
+	debug(GUI, "displayEditInstructions: editMode = %x\n", editMode);
 	Widget_ChangeLabelText (lbl1, "Tap band to edit.    ");
 	Widget_ChangeLabelText (lbl2, "");
 	Widget_ChangeLabelText (lbl3, "                                  ");
@@ -134,7 +134,7 @@ void displayEditInstructions(void){
 
 static void freqEditButton_Click(GL_PageControls_TypeDef* pThis)
 {
-	debug(GUI, "freqEditButton_Click:\n");
+	debug(GUI, "freqEditButton_Click: editMode = %x\n", editMode);
 	uint16_t id = pThis->ID - ID_FREQBTN_START;
 	editMode=TRUE;
 	Freq_SetSelectedText(id);
@@ -144,9 +144,9 @@ static void freqEditButton_Click(GL_PageControls_TypeDef* pThis)
 }
 
 void Screen_ChangeButtonFreqLabel(int i){
-	debug(GUI, "Screen_ChangeButtonFreqLabel:\n");
+	debug(GUI, "Screen_ChangeButtonFreqLabel: editMode = %x\n", editMode);
 	ChangeButtonText(s_pThisScreen, ID_FREQBTN_START + i, FrequencyManager_DisplayBandName(i));
-	FrequencyManager_SaveCurrentFrequency();
+//	FrequencyManager_SaveCurrentFrequency();
 }
 
 /**
@@ -154,7 +154,7 @@ void Screen_ChangeButtonFreqLabel(int i){
  */
 static void freqButton_Click(GL_PageControls_TypeDef* pThis)
 {
-	debug(GUI, "freqButton_Click:\n");
+	debug(GUI, "freqButton_Click: editMode = %x\n", editMode);
 
 	uint16_t userBand = pThis->ID - ID_FREQBTN_START;
 	assert(userBand >= 0 && userBand <= FREQBAND_NUMBER_OF_BANDS);
@@ -163,6 +163,7 @@ static void freqButton_Click(GL_PageControls_TypeDef* pThis)
 		FrequencyManager_SetSelectedBand(userBand);
 		freqEditButton_Click(pThis);
 	} else {
+		FrequencyManager_ReadBandsFromEeprom();
 		FrequencyManager_SetSelectedBand(userBand);
 		Screen_SetScreenMode(MAIN);
 		displayPresetInstructions ();
@@ -174,8 +175,7 @@ static void freqButton_Click(GL_PageControls_TypeDef* pThis)
 
 static void edit_Click(GL_PageControls_TypeDef* pThis)
 {
-	debug(GUI, "edit_Click:\n");
-	xprintf("1\n");
+	debug(GUI, "edit_Click: editMode = %x\n", editMode);
 	if (Screen_GetScreenMode()==FREQUENCY){
 		GL_Button_TypeDef* pThat = (GL_Button_TypeDef*) (btnMode->objPTR);
 		pThat->Control_Visible = GL_TRUE; // make the mode button visible
@@ -197,7 +197,7 @@ static void edit_Click(GL_PageControls_TypeDef* pThis)
 static void mode_Click(GL_PageControls_TypeDef* pThis) {
 	// Reset to defaults in preparation for next display.
 //	displayNormalFeedback();
-	debug(GUI, "mode_Click:\n");
+	debug(GUI, "mode_Click: editMode = %x\n", editMode);
 	GL_Button_TypeDef* pThat = (GL_Button_TypeDef*) (btnMode->objPTR);
 	if (pThat->Control_Visible == GL_TRUE){
 
@@ -215,8 +215,9 @@ static void mode_Click(GL_PageControls_TypeDef* pThis) {
 
 void Screen_FreqDone(void) {
 	// Reset to defaults in preparation for next display.
-	debug(GUI, "screen_FreqDone:\n");
-	FrequencyManager_SaveCurrentFrequency();
+	debug(GUI, "screen_FreqDone: editMode = %x\n", editMode);
+	if (editMode==TRUE)
+		FrequencyManager_SaveCurrentFrequency();
 	Screen_ChangeButtonFreqLabel(FrequencyManager_GetSelectedBand());
 	editMode=FALSE;
 	GL_Button_TypeDef* pThat = (GL_Button_TypeDef*) (btnMode->objPTR);

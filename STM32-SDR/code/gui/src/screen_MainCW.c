@@ -69,16 +69,16 @@ static _Bool AGCStatusUpdateHandler(GL_PageControls_TypeDef* pThis, _Bool forceR
 
      switch(AGC_Mode){
 
-     case 0: Widget_ChangeLabelText(pAGCLabel, "CW AGC ");
+     case 0: Widget_ChangeLabelText(pAGCLabel, "CW AGC  ");
      break;
 
      case 1: Widget_ChangeLabelText(pAGCLabel, "Digi AGC ");
      break;
 
-     case 2: Widget_ChangeLabelText(pAGCLabel, "SSB AGC  ");
+     case 2: Widget_ChangeLabelText(pAGCLabel, "SSB AGC ");
      break;
 
-     case 3: Widget_ChangeLabelText(pAGCLabel, "AGC Off   ");
+     case 3: Widget_ChangeLabelText(pAGCLabel, "AGC Off ");
      break;
      return 0;
 
@@ -126,7 +126,7 @@ static _Bool FreqStatusUpdateHandler(GL_PageControls_TypeDef* pThis, _Bool force
 	int i = 12, j=12;
 	for(; i>=0 && j>=0 && val ; --i){
 		if (i%3==0){
-			buf[j] = ","[0];
+			buf[j] = ',';
 //			xprintf("i = %d, j = %d, val = %d, buf[j] = %c\n", i, j, val, buf[j]);
 			j--;
 		}
@@ -137,13 +137,13 @@ static _Bool FreqStatusUpdateHandler(GL_PageControls_TypeDef* pThis, _Bool force
 	}
 		//replace leading 0 with space
 	for(; i>=0 && j>=0; --i, val /= 10){
-		buf[j] = " "[0];
+		buf[j] = ' ';
 		j--;
 //		xprintf("i = %d, j = %d, val = %d, buf[j] = %c\n", i, j, val, buf[j]);
 	}
-	buf[12] = " "[0];
-	buf[13] = "H"[0]; //replace last comma with Hz + null
-	buf[14] = "z"[0];
+	buf[12] = ' ';
+	buf[13] = 'H'; //replace last comma with Hz + null
+	buf[14] = 'z';
 	buf[15] = 0;
 //		xprintf("Frequency = %s\n", buf);
 
@@ -258,9 +258,9 @@ void ScreenMainCW_Create(void)
 static void Screen_SplitButtonClick(GL_PageControls_TypeDef* pThis)
 {
 	static char buf[19] = {0};
-	buf[0]="T"[0];
-	buf[1]="x"[0];
-	buf[2]=" "[0];
+	buf[0]='T';
+	buf[1]='x';
+	buf[2]=' ';
 	debug(GUI, "Screen_SplitButtonClick:\n");
 	Screen_ButtonAnimate(pThis);
 	debug(GUI, "Screen_SplitButtonClick: split = %d\n", FrequencyManager_isSplit());
@@ -281,7 +281,7 @@ static void Screen_SplitButtonClick(GL_PageControls_TypeDef* pThis)
 			int i = 15, j=15;
 			for(; i>=0 && j>=0 && val ; --i){
 				if (i%3==0){
-					buf[j] = ","[0]; //put in commas
+					buf[j] = ','; //put in commas
 		//			xprintf("i = %d, j = %d, val = %d, buf[j] = %c\n", i, j, val, buf[j]);
 					j--;
 				}
@@ -292,13 +292,13 @@ static void Screen_SplitButtonClick(GL_PageControls_TypeDef* pThis)
 			}
 				//replace leading 0 with space, first 3 chars are "Tx "
 			for(; i>=3 && j>=3; --i, val /= 10){
-				buf[j] = " "[0];
+				buf[j] = ' ';
 				j--;
 		//		xprintf("i = %d, j = %d, val = %d, buf[j] = %c\n", i, j, val, buf[j]);
 			}
-			buf[15] = " "[0];
-			buf[16] = "H"[0]; //replace last comma with Hz + null
-			buf[17] = "z"[0];
+			buf[15] = ' ';
+			buf[16] = 'H'; //replace last comma with Hz + null
+			buf[17] = 'z';
 			buf[18] = 0;
 			TxSplit_set(1);
 			FrequencyManager_SetRxFrequency();

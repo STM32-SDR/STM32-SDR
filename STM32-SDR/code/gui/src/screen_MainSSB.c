@@ -62,16 +62,16 @@ static _Bool AGCStatusUpdateHandler(GL_PageControls_TypeDef* pThis, _Bool forceR
 
      switch(AGC_Mode){
 
-     case 0: Widget_ChangeLabelText(pAGCLabel, "Peak AGC ");
+     case 0: Widget_ChangeLabelText(pAGCLabel, "CW AGC  ");
      break;
 
-     case 1: Widget_ChangeLabelText(pAGCLabel, "Digi AGC ");
+     case 1: Widget_ChangeLabelText(pAGCLabel, "Digi AGC");
      break;
 
-     case 2: Widget_ChangeLabelText(pAGCLabel, "SSB AGC  ");
+     case 2: Widget_ChangeLabelText(pAGCLabel, "SSB AGC ");
      break;
 
-     case 3: Widget_ChangeLabelText(pAGCLabel, "AGC Off   ");
+     case 3: Widget_ChangeLabelText(pAGCLabel, "AGC Off ");
      break;
      return 0;
 
@@ -119,7 +119,7 @@ static _Bool FreqStatusUpdateHandler(GL_PageControls_TypeDef* pThis, _Bool force
 	int i = 12, j=12;
 	for(; i>=0 && j>=0 && val ; --i){
 		if (i%3==0){
-			buf[j] = ","[0];
+			buf[j] = ',';
 //			xprintf("i = %d, j = %d, val = %d, buf[j] = %c\n", i, j, val, buf[j]);
 			j--;
 		}
@@ -130,13 +130,13 @@ static _Bool FreqStatusUpdateHandler(GL_PageControls_TypeDef* pThis, _Bool force
 	}
 		//replace leading 0 with space
 	for(; i>=0 && j>=0; --i, val /= 10){
-		buf[j] = " "[0];
+		buf[j] = ' ';
 		j--;
 //		xprintf("i = %d, j = %d, val = %d, buf[j] = %c\n", i, j, val, buf[j]);
 	}
-	buf[12] = " "[0];
-	buf[13] = "H"[0]; //replace last comma with Hz + null
-	buf[14] = "z"[0];
+	buf[12] = ' ';
+	buf[13] = 'H'; //replace last comma with Hz + null
+	buf[14] = 'z';
 	buf[15] = 0;
 //		xprintf("Frequency = %s\n", buf);
 

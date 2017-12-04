@@ -76,7 +76,6 @@ GL_PageControls_TypeDef* Widget_NewPSKTextDisplay(void)
 	return newControl;
 }
 
-
 /*
  * Private interface
  */

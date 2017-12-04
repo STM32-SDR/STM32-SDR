@@ -90,6 +90,7 @@ void Widget_ChangeLabelColour(GL_PageControls_TypeDef *pThis, uint16_t newTextCo
 
 
 GL_PageControls_TypeDef* Widget_NewPSKTextDisplay(void);
+void Widget_ClearPSKTextDisplay(GL_PageControls_TypeDef *pThis);
 
 
 /*******************************************

@@ -30,8 +30,8 @@
 #include	"Init_I2S.h"
 #include	"PSKDet.h"
 #include	"ModeSelect.h"
-#include	"SI570.h"
 #include	"uart.h"
+#include	"uart2.h"
 #include 	"usb_conf.h"
 #include	"usbh_hid_core.h"
 #include	"usbh_usr.h"
@@ -44,6 +44,7 @@
 #include	"sdr_image.h"
 #include	"ScrollingTextBox.h"
 #include	"xprintf.h"
+#include	"yprintf.h"
 #include	"Text_Enter.h"
 #include	"AGC_Processing.h"
 #include	"Band_Filter.h"
@@ -54,8 +55,9 @@
 #include	"Oscillator.h"
 #include  	"main.h"
 #include	"ps2Keyboard_Input.h"
+#include 	"Si570.h"
 
-#define VERSION_STRING "1.060j"
+#define VERSION_STRING "1.062"
 
 extern int NCO_Point;
 extern int NCOTuneCount;
@@ -96,6 +98,9 @@ int main(void)
 		Screen_ShowMainScreen();
 	}
 	InitTextDisplay();
+
+	//send initialization to serial control port
+	uart2_initSerial();
 
 	while (1) {
 		// Check if encoder-knobs have changed:
@@ -152,6 +157,8 @@ static void initializeHardware(void)
 	const int SETUP_DELAY = 100;
 	debug(INIT, "initializeHardware:uart_init\n");
 	uart_init();
+	debug(INIT, "initializeHardware:uart2_init\n");
+	uart2_init();
 	main_delay(SETUP_DELAY);
 	debug(INIT, "initializeHardware:uart_init\n");
 	displaySerialPortWelcome();
@@ -179,6 +186,21 @@ static void initializeHardware(void)
 	debug(INIT, "initializeHardware:displaySplashScreen\n");
 	displaySplashScreen();
 	main_delay(SETUP_DELAY);
+
+	debug(INIT, "initializeHardware:Si570_isEnabled\n");
+	if (!Si570_isEnabled()) {
+		main_delay(SETUP_DELAY);
+		debug(INIT, "initializeHardware:Si570 Not found - Reinitializing\n");
+			uart2_init();
+			main_delay(SETUP_DELAY);
+			debug(INIT, "initializeHardware:I2C_GPIO_Init\n");
+			I2C_GPIO_Init();
+			main_delay(SETUP_DELAY);
+			debug(INIT, "initializeHardware:I2C_Cntrl_Init\n");
+			I2C_Cntrl_Init();
+			main_delay(SETUP_DELAY);
+	}
+
 	debug(INIT, "initializeHardware:SetRXFrequency\n");
 	SetRXFrequency(1000);
 	NCO_Point = (int)((1000./15.625)+.5);
@@ -189,12 +211,18 @@ static void initializeHardware(void)
 	debug(INIT, "initializeHardware:Options_Initialize\n");
 	Options_Initialize();
 	main_delay(SETUP_DELAY);
+
 	debug(INIT, "initializeHardware:FrequencyManager_Initialize\n");
 	FrequencyManager_Initialize();
 	main_delay(SETUP_DELAY);
+	debug(INIT, "initializeHardware:Si570_Init\n");
+	Si570_Init();
+	main_delay(SETUP_DELAY);
+
 	debug(INIT, "initializeHardware:Encoders_Init\n");
 	Encoders_Init();
 	main_delay(SETUP_DELAY);
+
 	debug(INIT, "initializeHardware:TS_Initialize\n");
 	TS_Initialize();
 	main_delay(SETUP_DELAY);
@@ -251,13 +279,13 @@ static void initializeHardware(void)
 			&USR_Callbacks     // In /usbh_usr.c (user callback)
 	);
 	main_delay(SETUP_DELAY);
-	debug(INIT, "initializeHardware:init_DSP");
+	debug(INIT, "initializeHardware:init_DSP\n");
 	init_DSP();
 	main_delay(SETUP_DELAY);
-	debug(INIT, "initializeHardware:Audio_DMA_Start");
+	debug(INIT, "initializeHardware:Audio_DMA_Start\n");
 	Audio_DMA_Start();			//Get everything up and running before starting DMA Interrupt
 	main_delay(SETUP_DELAY);
-	debug(INIT, "initializeHardware:GPIO_BandFilterInit");
+	debug(INIT, "initializeHardware:GPIO_BandFilterInit\n");
 	GPIO_BandFilterInit();
 
 	int newFreq = FrequencyManager_GetCurrentFrequency();

@@ -25,11 +25,13 @@
 #include "eeprom.h"
 #include "Si570.h"
 #include "xprintf.h"
+#include "yprintf.h"
 #include "screen_All.h"
 #include "stm32f4xx_gpio.h"
 #include "Band_Filter.h"
 #include "ModeSelect.h"
 #include "Init_I2C.h"
+#include "main.h"
 //#include "number_images.h"
 
 int NCOTUNE;
@@ -49,6 +51,7 @@ typedef struct
 
 BandsStruct s_bandsData[] = {
 		// Note: Does not initialize the CurrentFrequency; done in initialize function.
+		/*
 		{ " 20m PSK",  14070000, 0, USERMODE_DIGU},
 		{ " 40m PSK",    7070000, 0, USERMODE_DIGL},
 		{ "10 MHz WWV",  10000000, 0, USERMODE_USB},
@@ -57,7 +60,7 @@ BandsStruct s_bandsData[] = {
 		{ " 20m QRP",  14285000, 0, USERMODE_USB},
 		{ " 10m SSB",  28885000, 0, USERMODE_USB},
 		{ " 15m SSB",  21385000, 0, USERMODE_USB},
-		{ " 40m",  70200000, 0, USERMODE_USB},
+		{ " 40m",  7200000, 0, USERMODE_USB},
 		{ " 80m SSB",   3729000, 0, USERMODE_LSB},
 		{ " 40m SSB",   7268500, 0, USERMODE_LSB},
 		{ " 40m",   7090000, 0, USERMODE_LSB},
@@ -65,6 +68,24 @@ BandsStruct s_bandsData[] = {
 	    { " 2m SSB", 144285000, 0, USERMODE_USB},
 	    { "SI570 F0 ",  56320000, 0, USERMODE_USB},
 	    { "",         0, 0, USERMODE_USB},
+	    */
+		{ " 80m CW",     3560000, 0, USERMODE_CW},
+		{ " 40m CW",     7040000, 0, USERMODE_CW},
+		{ " 20m CW",    14060000, 0, USERMODE_CW},
+		{ " 15m CW",    21060000, 0, USERMODE_CW},
+		{ "10 MHz WWV", 10000000, 0, USERMODE_USB},
+		{ " 80m PSK",    3580000, 0, USERMODE_DIGU},
+		{ " 40m PSK",    7070000, 0, USERMODE_DIGU},
+		{ " 20m PSK",   14070000, 0, USERMODE_DIGU},
+		{ " 15m PSK",   21080000, 0, USERMODE_DIGU},
+		{ "15 MHz WWV", 15000000, 0, USERMODE_USB},
+		{ " 80m SSB",    3985000, 0, USERMODE_LSB},
+		{ " 40m SSB",    7285000, 0, USERMODE_LSB},
+		{ " 20m SSB",   14285000, 0, USERMODE_USB},
+		{ " 15m SSB",   21385000, 0, USERMODE_USB},
+	    { "SI570 F0 ",  56320000, 0, USERMODE_USB},
+	    { "",         0, 0, USERMODE_USB},
+
 };
 
 static BandPreset s_selectedBand = FREQBAND_20M_PSK;
@@ -80,7 +101,7 @@ static uint32_t s_stepSize = 100;
 #define EEPROM_FREQBAND_OFFSET 400
 #define EEPROM_SENTINEL_LOC 0
 //#define EEPROM_SENTINEL_VAL 1235
-#define EEPROM_SENTINEL_VAL 1247
+#define EEPROM_SENTINEL_VAL 1250
 
 // Filter bands, See also options.h and options.c Options_GetValue
 #define EEPROM_FILTERBAND_OFFSET 300
@@ -145,12 +166,15 @@ void FrequencyManager_SaveTxFrequency(uint32_t savedFrequency){
 
 void FrequencyManager_SetTxFrequency(){
 	debug(GUI, "FrequencyManager_SetTxFrequency:\n");
+	FrequencyManager_SaveRxFrequency(s_bandsData[s_selectedBand].CurrentFrequency);
 	FrequencyManager_SetCurrentFrequency(splitTxFrequency);
+	FrequencyManager_ControlCurrentFrequency ();
 }
 
 void FrequencyManager_SetRxFrequency(){
 	debug(GUI, "FrequencyManager_SetRxFrequency:\n");
 	FrequencyManager_SetCurrentFrequency(splitRxFrequency);
+	FrequencyManager_ControlCurrentFrequency ();
 }
 
 void FrequencyManager_Initialize(void)
@@ -169,9 +193,10 @@ void FrequencyManager_Initialize(void)
 		FrequencyManager_ReadBandsFromEeprom();
 		FrequencyManager_ReadFiltersFromEeprom();
 	}
+	debug (CONTROL, "Checking Si570, Si570_isEnabled = %x\n", Si570_isEnabled());
 
 	// Initialize the F0 for the radio:
-	F0 = (double) s_bandsData[FREQBAND_SI570_F0].CurrentFrequency;
+		F0 = (double) s_bandsData[FREQBAND_SI570_F0].CurrentFrequency;
 
 	FrequencyManager_SetSelectedBand(FREQBAND_20M_PSK);
 
@@ -222,6 +247,7 @@ uint32_t FrequencyManager_GetBandValue(BandPreset band)
 /*
  * Get/Set current frequency to radio (in Hz)
  */
+
 void FrequencyManager_SetCurrentFrequency(uint32_t newFrequency)
 {
 	// Change the radio frequency:
@@ -231,21 +257,37 @@ void FrequencyManager_SetCurrentFrequency(uint32_t newFrequency)
 
 	// Handle a normal frequency or an option:
 	// Set the startup frequency (F0)
-	if (s_selectedBand == FREQBAND_SI570_F0) {
-		F0 = (double) newFrequency;
-		if (SI570_Chk != 3) {
-			Compute_FXTAL();
+		if (s_selectedBand == FREQBAND_SI570_F0) {
+			F0 = (double) newFrequency;
+			if (SI570_Chk != 3) {
+				Compute_FXTAL();
+			}
 		}
-	}
-	// Normal frequency: Set it.
-	else {
-		if (SI570_Chk != 3) {
-			Output_Frequency(newFrequency * s_frequencyMultiplier);
+		// Normal frequency: Set it.
+		else {
+			if (SI570_Chk != 3) {
+				Output_Frequency(newFrequency * s_frequencyMultiplier);
+			}
 		}
-	}
 
 	// If we made it through the above, record the value.
 	s_bandsData[s_selectedBand].CurrentFrequency = newFrequency;
+
+}
+
+void FrequencyManager_ControlCurrentFrequency () {
+	static uint32_t lastFrequency = 0;
+	uint32_t frequency = s_bandsData[s_selectedBand].CurrentFrequency;
+// Output control
+	if(!Si570_isEnabled()) {
+	if (frequency != lastFrequency) {
+		debug (CONTROL, "Serial -> *F%d\n", frequency);
+		debug (CONTROL, "Serial -> *OF2\n");
+		yprintf ("*F%d\n", frequency);
+		yprintf ("*OF2\n"); // turn on output
+		lastFrequency = frequency;
+	}
+	}
 }
 
 void FrequencyManager_SaveCurrentFrequency(void){
@@ -360,7 +402,7 @@ char* FrequencyManager_DisplayBandName (BandPreset id){
  */
 void FrequencyManager_WriteBandsToEeprom(void)
 {
-	debug (GUI, "FrequencyManager_WriteBandsToEeprom:");
+	debug (GUI, "FrequencyManager_WriteBandsToEeprom:\n");
 	uint32_t eepromFreq;
 	uint16_t eepromMode;
 	char text;
@@ -386,7 +428,7 @@ void FrequencyManager_WriteBandsToEeprom(void)
 
 void FrequencyManager_ReadBandsFromEeprom(void)
 {
-	debug (GUI, "FrequencyManager_ReadBandsFromEeprom:");
+	debug (GUI, "FrequencyManager_ReadBandsFromEeprom:\n");
 	for (int i = 0; i < FREQBAND_NUMBER_OF_BANDS; i++) {
 		s_bandsData[i].CurrentFrequency = Read_Long_EEProm(EEPROM_FREQBAND_OFFSET+ i * 6);
 		s_bandsData[i].Setpoint = Read_Long_EEProm(EEPROM_FREQBAND_OFFSET+ i * 6);
@@ -487,7 +529,7 @@ char* FrequencyManager_Freq_ascii(int band){
 
 	//replace leading 0 with space
 	for(; i ; --i, val /= 10)
-			buf[i] = " "[0];
+			buf[i] = ' ';
 	return &buf[i+1];
 
 }

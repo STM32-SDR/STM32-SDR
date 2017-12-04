@@ -49,7 +49,7 @@ volatile uint8_t key=0;
 
 void configureGPIOps2(void)
 {
-	xprintf("Configure GPIO\n");
+//	xprintf("Configure GPIO\n");
 	GPIO_InitTypeDef GPIO_InitStructure;
 
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE, ENABLE);

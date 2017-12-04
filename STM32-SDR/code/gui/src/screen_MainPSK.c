@@ -108,16 +108,16 @@ static _Bool AGCStatusUpdateHandler(GL_PageControls_TypeDef* pThis, _Bool forceR
 
      switch(AGC_Mode){
 
-     case 0: Widget_ChangeLabelText(pAGCLabel, "Peak AGC ");
+     case 0: Widget_ChangeLabelText(pAGCLabel, "CW AGC  ");
      break;
 
      case 1: Widget_ChangeLabelText(pAGCLabel, "Digi AGC ");
      break;
 
-     case 2: Widget_ChangeLabelText(pAGCLabel, "SSB AGC  ");
+     case 2: Widget_ChangeLabelText(pAGCLabel, "SSB AGC ");
      break;
 
-     case 3: Widget_ChangeLabelText(pAGCLabel, "AGC Off   ");
+     case 3: Widget_ChangeLabelText(pAGCLabel, "AGC Off ");
      break;
      return 0;
 

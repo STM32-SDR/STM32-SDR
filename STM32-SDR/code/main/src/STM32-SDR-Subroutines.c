@@ -38,11 +38,10 @@ q15_t PFC[125];
 
 extern 	int WF_Flag;
 
-//extern void ClearTextDisplay(void);
-
 extern _Bool Encoders_IsOptionsEncoderPressed(void);
 
 extern void ClearXmitBuffer (void);
+extern void ClearTextDisplay(void);
 extern void FrequencyManager_SetCurrentFrequency(int value);
 extern void FrequencyManager_SetSelectedBand(int value);
 
@@ -159,6 +158,7 @@ void PlayMacro (int n) {
 			break;
 		case 20:
 			ClearXmitBuffer(); // Clear
+			ClearTextDisplay();
 			break;
 		case 22:
 			ChangeNextMode(); // Cycle through modes
